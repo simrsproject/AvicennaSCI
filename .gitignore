@@ -2,4 +2,12 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/Temiang.Avicenna/obj/Debug/Temiang.Avicenna.csproj.FileListAbsolute.txt
+/.vs
+/Temiang.Avicenna/obj
+/Temiang.Avicenna.Bridging.PCare/obj
+/Temiang.Avicenna.Bridging.SatuSehat/obj
+/Temiang.Avicenna.BusinessObject/obj
+/Temiang.Avicenna.Common/obj
+/Temiang.Avicenna.ReportDataSource/obj
+/Temiang.Avicenna.ReportLibrary/obj
+/Temiang.Avicenna.Tests/obj
