@@ -48,6 +48,38 @@ namespace Temiang.Avicenna.Module.Charges
             return "CloseAndApply();args.set_cancel(true);";
         }
 
+        private Registration _registration;
+        protected Registration RegistrationCurrent
+        {
+            get
+            {
+                if (_registration == null)
+                {
+                    _registration = new Registration();
+                    _registration.LoadByPrimaryKey(RegistrationNo);
+
+                }
+
+                return _registration;
+            }
+        }
+
+        protected bool IsVisibleTemporaryBill
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(hdnIsVisibleTemporaryBill.Value))
+                {
+                    var grr = new Guarantor();
+                    if (grr.LoadByPrimaryKey(RegistrationCurrent.GuarantorID))
+                        hdnIsVisibleTemporaryBill.Value = (RegistrationCurrent.SRRegistrationType == AppConstant.RegistrationType.OutPatient && grr.SRGuarantorType == AppSession.Parameter.GuarantorTypeBPJS).ToString();
+                    else
+                        hdnIsVisibleTemporaryBill.Value = "false";
+                }
+                return Convert.ToBoolean(hdnIsVisibleTemporaryBill.Value);
+            }
+        }
+
         #region Page Event & Initialize
 
         protected void Page_Init(object sender, EventArgs e)
@@ -111,6 +143,7 @@ namespace Temiang.Avicenna.Module.Charges
             if (!IsPostBack)
             {
                 hdnPageId.Value = PageID;
+                tblTemporaryBill.Visible = IsVisibleTemporaryBill;
 
                 TransChargesItems = null; // Reset record detail untuk menghindari akibat PageID masih sama dgn yg sebelumnya (Handono 231109)
 
@@ -458,7 +491,7 @@ namespace Temiang.Avicenna.Module.Charges
                 ajax.AddAjaxSetting(cboToServiceUnitID, cboAnalystID);
             }
 
-            if (tblTemporaryBill.Visible)
+            if (IsVisibleTemporaryBill)
             {
                 ajax.AddAjaxSetting(grdTransChargesItem, txtTemporaryBillTotal);
             }
@@ -597,8 +630,9 @@ namespace Temiang.Avicenna.Module.Charges
 
             txtRegistrationNo.Text = Request.QueryString["regno"];
 
-            var reg = new Registration();
-            reg.LoadByPrimaryKey(txtRegistrationNo.Text);
+            //var reg = new Registration();
+            //reg.LoadByPrimaryKey(txtRegistrationNo.Text);
+            var reg = RegistrationCurrent;
 
             txtRegistrationDate.SelectedDate = reg.RegistrationDate;
             txtRegistrationTime.Text = reg.RegistrationTime;
@@ -806,7 +840,6 @@ namespace Temiang.Avicenna.Module.Charges
 
             lblRegistrationInfo2.Text = RegistrationInfoSumary.GetDocumentCheckListCountRemains(txtRegistrationNo.Text);
 
-            tblTemporaryBill.Visible = reg.SRRegistrationType == AppConstant.RegistrationType.OutPatient && trBpjsSepNo.Visible;
             if (tblTemporaryBill.Visible)
             {
                 txtTemporaryBillPlafond.Value = Convert.ToDouble(reg.PlavonAmount);
@@ -6545,7 +6578,6 @@ namespace Temiang.Avicenna.Module.Charges
 
                 lblRegistrationInfo2.Text = RegistrationInfoSumary.GetDocumentCheckListCountRemains(txtRegistrationNo.Text);
 
-                tblTemporaryBill.Visible = reg.SRRegistrationType == AppConstant.RegistrationType.OutPatient && trBpjsSepNo.Visible;
                 if (tblTemporaryBill.Visible)
                 {
                     txtTemporaryBillPlafond.Value = Convert.ToDouble(reg.PlavonAmount);

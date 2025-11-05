@@ -370,6 +370,7 @@
     <asp:HiddenField runat="server" ID="hdnAbRestrictionID" />
     <asp:HiddenField runat="server" ID="hdnRasproIsNew" />
     <asp:HiddenField runat="server" ID="hdnIsRasproEnableApplied" />
+    <asp:HiddenField runat="server" ID="hdnIsVisibleTemporaryBill" />
 
     <cc:CollapsePanel ID="cpnAllergies" runat="server" Width="100%" Title="Allergies">
         <asp:Literal runat="server" ID="litPatientAllergy"></asp:Literal>

@@ -312,6 +312,7 @@
     </telerik:RadWindow>
     <asp:HiddenField runat="server" ID="hdnPageId" />
     <asp:HiddenField runat="server" ID="hdnIsMandatoryBookingNo" />
+    <asp:HiddenField runat="server" ID="hdnIsVisibleTemporaryBill" />
     <table cellpadding="0" cellspacing="0" width="100%">
         <tr>
             <td style="width: 50%; vertical-align: top;">

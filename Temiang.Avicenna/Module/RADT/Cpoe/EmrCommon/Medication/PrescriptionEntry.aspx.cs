@@ -136,20 +136,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             chkIsUnitDosePresc.Checked = header.IsUnitDosePrescription ?? false;
             ComboBox.SelectedValue(cboSRPrescriptionCategory, header.SRPrescriptionCategory);
 
-            tblTemporaryBill.Visible = false;
-            var reg = new Registration();
-            if (reg.LoadByPrimaryKey(RegistrationNo))
-            {
-                var grr = new Guarantor();
-                if (grr.LoadByPrimaryKey(reg.GuarantorID))
-                {
-                    tblTemporaryBill.Visible = reg.SRRegistrationType == AppConstant.RegistrationType.OutPatient && grr.SRGuarantorType == AppSession.Parameter.GuarantorTypeBPJS;
-                }
-            }
-
             if (tblTemporaryBill.Visible)
             {
-                txtTemporaryBillPlafond.Value = Convert.ToDouble(reg.PlavonAmount);
+                txtTemporaryBillPlafond.Value = Convert.ToDouble(RegistrationCurrent.PlavonAmount);
                 txtTemporaryBillTotal.Value = Convert.ToDouble(GetTotalTemporaryBill());
             }
         }
@@ -332,20 +321,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             // Override ServiceUnit
             SetPrescUnitAndLocationFromGuar();
 
-            tblTemporaryBill.Visible = false;
-            var reg = new Registration();
-            if (reg.LoadByPrimaryKey(RegistrationNo))
-            {
-                var grr = new Guarantor();
-                if (grr.LoadByPrimaryKey(reg.GuarantorID))
-                {
-                    tblTemporaryBill.Visible = reg.SRRegistrationType == AppConstant.RegistrationType.OutPatient && grr.SRGuarantorType == AppSession.Parameter.GuarantorTypeBPJS;
-                }
-            }
-
             if (tblTemporaryBill.Visible)
             {
-                txtTemporaryBillPlafond.Value = Convert.ToDouble(reg.PlavonAmount);
+                txtTemporaryBillPlafond.Value = Convert.ToDouble(RegistrationCurrent.PlavonAmount);
                 txtTemporaryBillTotal.Value = Convert.ToDouble(GetTotalTemporaryBill());
             }
 
@@ -688,12 +666,28 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 ajax.AddAjaxSetting(grdTransPrescriptionItem, litRasproInfo); // Refresh menu
             }
 
-            if (tblTemporaryBill.Visible)
+            if (IsVisibleTemporaryBill)
             {
                 ajax.AddAjaxSetting(grdTransPrescriptionItem, txtTemporaryBillTotal);
             }
         }
         #endregion
+
+        protected bool IsVisibleTemporaryBill
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(hdnIsVisibleTemporaryBill.Value))
+                {
+                    var grr = new Guarantor();
+                    if (grr.LoadByPrimaryKey(RegistrationCurrent.GuarantorID))
+                        hdnIsVisibleTemporaryBill.Value = (RegistrationCurrent.SRRegistrationType == AppConstant.RegistrationType.OutPatient && grr.SRGuarantorType == AppSession.Parameter.GuarantorTypeBPJS).ToString();
+                    else
+                        hdnIsVisibleTemporaryBill.Value = "false";
+                }
+                return Convert.ToBoolean(hdnIsVisibleTemporaryBill.Value);
+            }
+        }
 
         protected bool IsRasproEnableApplied
         {
@@ -736,6 +730,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
             if (!IsPostBack)
             {
+                tblTemporaryBill.Visible = IsVisibleTemporaryBill;
+                
                 // Hanya In Patient dan jika AntibioticRestriction diterapkan
                 pnlRaspro.Visible = IsRasproEnableApplied;
                 clpAntibioticSuggest.Visible = IsRasproEnableApplied;

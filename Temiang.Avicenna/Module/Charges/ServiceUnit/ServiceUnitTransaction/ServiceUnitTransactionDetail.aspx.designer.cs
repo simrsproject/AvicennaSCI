@@ -87,6 +87,15 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::System.Web.UI.WebControls.HiddenField hdnIsMandatoryBookingNo;
 
         /// <summary>
+        /// hdnIsVisibleTemporaryBill control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnIsVisibleTemporaryBill;
+
+        /// <summary>
         /// lblTransactionNo control.
         /// </summary>
         /// <remarks>
