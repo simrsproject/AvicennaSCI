@@ -1,0 +1,2 @@
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Bridging.SatuSehat\obj\Debug\Temiang.Avicenna.Bridging.SatuSehat.csproj.AssemblyReference.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Bridging.SatuSehat\obj\Debug\Temiang.Avicenna.Bridging.SatuSehat.csproj.CoreCompileInputs.cache

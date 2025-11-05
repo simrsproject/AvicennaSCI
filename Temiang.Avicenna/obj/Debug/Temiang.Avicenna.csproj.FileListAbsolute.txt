@@ -1,0 +1,5 @@
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.csproj.AssemblyReference.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.Module.Charges.BillingAdjustSettingDetail.resources
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.Module.ControlPanel.Setting.StandardReference.StandardReferenceItemDetail.ascx.resources
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.csproj.GenerateResource.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.dll.licenses

@@ -1,0 +1,4 @@
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Common\obj\Debug\Temiang.Avicenna.Common.csproj.AssemblyReference.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Common\obj\Debug\Temiang.Avicenna.Common.Properties.Resources.resources
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Common\obj\Debug\Temiang.Avicenna.Common.csproj.GenerateResource.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Common\obj\Debug\Temiang.Avicenna.Common.csproj.CoreCompileInputs.cache

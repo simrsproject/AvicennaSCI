@@ -1,0 +1,2 @@
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Bridging.PCare\obj\Debug\Temiang.Avicenna.Bridging.PCare.csproj.AssemblyReference.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Bridging.PCare\obj\Debug\Temiang.Avicenna.Bridging.PCare.csproj.CoreCompileInputs.cache

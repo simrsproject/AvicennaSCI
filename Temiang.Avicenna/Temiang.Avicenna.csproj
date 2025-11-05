@@ -5725,6 +5725,7 @@
     </Compile>
     <Compile Include="Module\AssetManagement\Management\PreventiveMaintenanceManualSchedule\PreventiveMaintenanceManualScheduleList.aspx.cs">
       <DependentUpon>PreventiveMaintenanceManualScheduleList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\AssetManagement\Management\PreventiveMaintenanceManualSchedule\PreventiveMaintenanceManualScheduleList.aspx.designer.cs">
       <DependentUpon>PreventiveMaintenanceManualScheduleList.aspx</DependentUpon>
@@ -5738,6 +5739,7 @@
     </Compile>
     <Compile Include="Module\AssetManagement\Management\PreventiveMaintenanceManualSchedule\ScheduleDateSelect.aspx.cs">
       <DependentUpon>ScheduleDateSelect.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\AssetManagement\Management\PreventiveMaintenanceManualSchedule\ScheduleDateSelect.aspx.designer.cs">
       <DependentUpon>ScheduleDateSelect.aspx</DependentUpon>
@@ -5814,6 +5816,7 @@
     </Compile>
     <Compile Include="Module\AssetManagement\Management\SanitationMaintenanceActivitySchedule\SanitationMaintenanceActivityScheduleSearch.aspx.cs">
       <DependentUpon>SanitationMaintenanceActivityScheduleSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\AssetManagement\Management\SanitationMaintenanceActivitySchedule\SanitationMaintenanceActivityScheduleSearch.aspx.designer.cs">
       <DependentUpon>SanitationMaintenanceActivityScheduleSearch.aspx</DependentUpon>
@@ -5911,6 +5914,7 @@
     </Compile>
     <Compile Include="Module\AssetManagement\Management\WorkOrderRealization\WorkOrderRealizationImplementerDetail.ascx.cs">
       <DependentUpon>WorkOrderRealizationImplementerDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\AssetManagement\Management\WorkOrderRealization\WorkOrderRealizationImplementerDetail.ascx.designer.cs">
       <DependentUpon>WorkOrderRealizationImplementerDetail.ascx</DependentUpon>
@@ -6247,6 +6251,7 @@
     </Compile>
     <Compile Include="Module\BloodBank\Stock\StockInformation\StockInformationList.aspx.cs">
       <DependentUpon>StockInformationList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\BloodBank\Stock\StockInformation\StockInformationList.aspx.designer.cs">
       <DependentUpon>StockInformationList.aspx</DependentUpon>
@@ -6505,6 +6510,7 @@
     </Compile>
     <Compile Include="Module\Charges\Billing\UnLockFinalizeBilling\UnLockFinalizeBillingList.aspx.cs">
       <DependentUpon>UnLockFinalizeBillingList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Charges\Billing\UnLockFinalizeBilling\UnLockFinalizeBillingList.aspx.designer.cs">
       <DependentUpon>UnLockFinalizeBillingList.aspx</DependentUpon>
@@ -6847,6 +6853,7 @@
     </Compile>
     <Compile Include="Module\Charges\Cashier\PaymentReceive\PaymentReceiveRegistrationList.aspx.cs">
       <DependentUpon>PaymentReceiveRegistrationList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Charges\Cashier\PaymentReceive\PaymentReceiveRegistrationList.aspx.designer.cs">
       <DependentUpon>PaymentReceiveRegistrationList.aspx</DependentUpon>
@@ -6986,6 +6993,7 @@
     </Compile>
     <Compile Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionHistoryDialog.aspx.cs">
       <DependentUpon>PrescriptionHistoryDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionHistoryDialog.aspx.designer.cs">
       <DependentUpon>PrescriptionHistoryDialog.aspx</DependentUpon>
@@ -7192,6 +7200,7 @@
     </Compile>
     <Compile Include="Module\Charges\ServiceUnit\BloodSamples\BloodSamplesReceptionProcessList.aspx.cs">
       <DependentUpon>BloodSamplesReceptionProcessList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Charges\ServiceUnit\BloodSamples\BloodSamplesReceptionProcessList.aspx.designer.cs">
       <DependentUpon>BloodSamplesReceptionProcessList.aspx</DependentUpon>
@@ -7562,6 +7571,7 @@
     </Compile>
     <Compile Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\SubForm\VisiteEntry.aspx.cs">
       <DependentUpon>VisiteEntry.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\SubForm\VisiteEntry.aspx.designer.cs">
       <DependentUpon>VisiteEntry.aspx</DependentUpon>
@@ -7624,6 +7634,7 @@
     </Compile>
     <Compile Include="Module\ControlPanel\AuditLog\AuditLogSetting\AuditLogSettingList.aspx.cs">
       <DependentUpon>AuditLogSettingList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\ControlPanel\AuditLog\AuditLogSetting\AuditLogSettingList.aspx.designer.cs">
       <DependentUpon>AuditLogSettingList.aspx</DependentUpon>
@@ -8124,6 +8135,7 @@
     </Compile>
     <Compile Include="Module\Cssd\Transaction\PackagingItem\PackagingItemDetail.aspx.cs">
       <DependentUpon>PackagingItemDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Cssd\Transaction\PackagingItem\PackagingItemDetail.aspx.designer.cs">
       <DependentUpon>PackagingItemDetail.aspx</DependentUpon>
@@ -8228,6 +8240,7 @@
     </Compile>
     <Compile Include="Module\Cssd\Transaction\SterileItemsReturnedClose\SterileItemsReturnedCloseList.aspx.cs">
       <DependentUpon>SterileItemsReturnedCloseList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Cssd\Transaction\SterileItemsReturnedClose\SterileItemsReturnedCloseList.aspx.designer.cs">
       <DependentUpon>SterileItemsReturnedCloseList.aspx</DependentUpon>
@@ -8297,6 +8310,7 @@
     </Compile>
     <Compile Include="Module\Cssd\Transaction\SterilizationProcess\SterilizationProcessSearch.aspx.cs">
       <DependentUpon>SterilizationProcessSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Cssd\Transaction\SterilizationProcess\SterilizationProcessSearch.aspx.designer.cs">
       <DependentUpon>SterilizationProcessSearch.aspx</DependentUpon>
@@ -8345,6 +8359,7 @@
     </Compile>
     <Compile Include="Module\Cssd\Transaction\UltrasoundProcess\UltrasoundProcessDetail.aspx.cs">
       <DependentUpon>UltrasoundProcessDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Cssd\Transaction\UltrasoundProcess\UltrasoundProcessDetail.aspx.designer.cs">
       <DependentUpon>UltrasoundProcessDetail.aspx</DependentUpon>
@@ -8526,6 +8541,7 @@
     </Compile>
     <Compile Include="Module\Finance\CashManagement\CashEntryV2\CashEntryRefferenceToARPayment.aspx.cs">
       <DependentUpon>CashEntryRefferenceToARPayment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\CashManagement\CashEntryV2\CashEntryRefferenceToARPayment.aspx.designer.cs">
       <DependentUpon>CashEntryRefferenceToARPayment.aspx</DependentUpon>
@@ -9004,6 +9020,7 @@
     </Compile>
     <Compile Include="Module\Finance\Master\DocumentChecklistDefinition\DocumentChecklistDefinitionSearch.aspx.cs">
       <DependentUpon>DocumentChecklistDefinitionSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Master\DocumentChecklistDefinition\DocumentChecklistDefinitionSearch.aspx.designer.cs">
       <DependentUpon>DocumentChecklistDefinitionSearch.aspx</DependentUpon>
@@ -9031,6 +9048,7 @@
     </Compile>
     <Compile Include="Module\Finance\Master\Guarantor\GuarantorAliasDetail.ascx.cs">
       <DependentUpon>GuarantorAliasDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Master\Guarantor\GuarantorAliasDetail.ascx.designer.cs">
       <DependentUpon>GuarantorAliasDetail.ascx</DependentUpon>
@@ -9149,6 +9167,7 @@
     </Compile>
     <Compile Include="Module\Finance\Master\Guarantor\ItemPickerList.aspx.cs">
       <DependentUpon>ItemPickerList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Master\Guarantor\ItemPickerList.aspx.designer.cs">
       <DependentUpon>ItemPickerList.aspx</DependentUpon>
@@ -9231,6 +9250,7 @@
     </Compile>
     <Compile Include="Module\Finance\Master\ItemServiceProcedure\ItemServiceProcedureList.aspx.cs">
       <DependentUpon>ItemServiceProcedureList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Master\ItemServiceProcedure\ItemServiceProcedureList.aspx.designer.cs">
       <DependentUpon>ItemServiceProcedureList.aspx</DependentUpon>
@@ -9412,6 +9432,7 @@
     </Compile>
     <Compile Include="Module\Finance\Master\ParamedicFeeDeductionSetting\ParamedicFeeDeductionSettingDetail.aspx.cs">
       <DependentUpon>ParamedicFeeDeductionSettingDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Master\ParamedicFeeDeductionSetting\ParamedicFeeDeductionSettingDetail.aspx.designer.cs">
       <DependentUpon>ParamedicFeeDeductionSettingDetail.aspx</DependentUpon>
@@ -9642,6 +9663,7 @@
     </Compile>
     <Compile Include="Module\Finance\Master\Supplier\SupplierList.aspx.cs">
       <DependentUpon>SupplierList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Master\Supplier\SupplierList.aspx.designer.cs">
       <DependentUpon>SupplierList.aspx</DependentUpon>
@@ -9864,6 +9886,7 @@
     </Compile>
     <Compile Include="Module\Finance\ParamedicFee\ParamedicFeeVerificationByDischargeDateV2\FeeInfoDialog.aspx.cs">
       <DependentUpon>FeeInfoDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\ParamedicFee\ParamedicFeeVerificationByDischargeDateV2\FeeInfoDialog.aspx.designer.cs">
       <DependentUpon>FeeInfoDialog.aspx</DependentUpon>
@@ -10234,6 +10257,7 @@
     </Compile>
     <Compile Include="Module\Finance\Receivable\MergeDocument\MergeDocumentList.aspx.cs">
       <DependentUpon>MergeDocumentList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Receivable\MergeDocument\MergeDocumentList.aspx.designer.cs">
       <DependentUpon>MergeDocumentList.aspx</DependentUpon>
@@ -10436,6 +10460,7 @@
     </Compile>
     <Compile Include="Module\Finance\Voucher\VoucherEntry\CheckCoaSetting\PaymentTypeCoaSetting.aspx.cs">
       <DependentUpon>PaymentTypeCoaSetting.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Voucher\VoucherEntry\CheckCoaSetting\PaymentTypeCoaSetting.aspx.designer.cs">
       <DependentUpon>PaymentTypeCoaSetting.aspx</DependentUpon>
@@ -10491,6 +10516,7 @@
     </Compile>
     <Compile Include="Module\Finance\Voucher\VoucherEntry\CheckDetailTransaction\DistributionTypeDetail.aspx.cs">
       <DependentUpon>DistributionTypeDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Finance\Voucher\VoucherEntry\CheckDetailTransaction\DistributionTypeDetail.aspx.designer.cs">
       <DependentUpon>DistributionTypeDetail.aspx</DependentUpon>
@@ -10910,6 +10936,7 @@
     </Compile>
     <Compile Include="Module\HR\Credential\Document\DocumentImageZoomView2.aspx.cs">
       <DependentUpon>DocumentImageZoomView2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\Credential\Document\DocumentImageZoomView2.aspx.designer.cs">
       <DependentUpon>DocumentImageZoomView2.aspx</DependentUpon>
@@ -11621,6 +11648,7 @@
     </Compile>
     <Compile Include="Module\HR\K3RS\Template\TemplateList.aspx.cs">
       <DependentUpon>TemplateList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\K3RS\Template\TemplateList.aspx.designer.cs">
       <DependentUpon>TemplateList.aspx</DependentUpon>
@@ -11648,6 +11676,7 @@
     </Compile>
     <Compile Include="Module\HR\KEHRS\Document\DocumentImageZoomView.aspx.cs">
       <DependentUpon>DocumentImageZoomView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\KEHRS\Document\DocumentImageZoomView.aspx.designer.cs">
       <DependentUpon>DocumentImageZoomView.aspx</DependentUpon>
@@ -11850,6 +11879,7 @@
     </Compile>
     <Compile Include="Module\HR\Leave\EmployeeLeave\EmployeeLeaveList.aspx.cs">
       <DependentUpon>EmployeeLeaveList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\Leave\EmployeeLeave\EmployeeLeaveList.aspx.designer.cs">
       <DependentUpon>EmployeeLeaveList.aspx</DependentUpon>
@@ -12010,6 +12040,7 @@
     </Compile>
     <Compile Include="Module\HR\Master\HRBase\Profile\CompanyLaborProfileList.aspx.cs">
       <DependentUpon>CompanyLaborProfileList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\Master\HRBase\Profile\CompanyLaborProfileList.aspx.designer.cs">
       <DependentUpon>CompanyLaborProfileList.aspx</DependentUpon>
@@ -12107,6 +12138,7 @@
     </Compile>
     <Compile Include="Module\HR\PositionHR\Position\PositionWorkResultDetail.ascx.cs">
       <DependentUpon>PositionWorkResultDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\PositionHR\Position\PositionWorkResultDetail.ascx.designer.cs">
       <DependentUpon>PositionWorkResultDetail.ascx</DependentUpon>
@@ -12385,6 +12417,7 @@
     </Compile>
     <Compile Include="Module\HR\Query\Education\PersonalEducationHistorySearch.aspx.cs">
       <DependentUpon>PersonalEducationHistorySearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\Query\Education\PersonalEducationHistorySearch.aspx.designer.cs">
       <DependentUpon>PersonalEducationHistorySearch.aspx</DependentUpon>
@@ -12426,6 +12459,7 @@
     </Compile>
     <Compile Include="Module\HR\Query\Family\PersonalFamilySearch.aspx.cs">
       <DependentUpon>PersonalFamilySearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\Query\Family\PersonalFamilySearch.aspx.designer.cs">
       <DependentUpon>PersonalFamilySearch.aspx</DependentUpon>
@@ -12564,6 +12598,7 @@
     </Compile>
     <Compile Include="Module\HR\TrainingHR\EmployeeTraining\EmployeeTrainingHistoryList.aspx.cs">
       <DependentUpon>EmployeeTrainingHistoryList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\HR\TrainingHR\EmployeeTraining\EmployeeTrainingHistoryList.aspx.designer.cs">
       <DependentUpon>EmployeeTrainingHistoryList.aspx</DependentUpon>
@@ -12864,6 +12899,7 @@
     </Compile>
     <Compile Include="Module\Inventory\Master\ItemProductMedical\ItemProductMedicalList.aspx.cs">
       <DependentUpon>ItemProductMedicalList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Inventory\Master\ItemProductMedical\ItemProductMedicalList.aspx.designer.cs">
       <DependentUpon>ItemProductMedicalList.aspx</DependentUpon>
@@ -13494,6 +13530,7 @@
     </Compile>
     <Compile Include="Module\Laundry\Master\WashingMachine\WashingMachineDetail.aspx.cs">
       <DependentUpon>WashingMachineDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Laundry\Master\WashingMachine\WashingMachineDetail.aspx.designer.cs">
       <DependentUpon>WashingMachineDetail.aspx</DependentUpon>
@@ -13822,6 +13859,7 @@
     </Compile>
     <Compile Include="Module\Laundry\Transaction\Returned\LaundryReturnedItemPickList.aspx.cs">
       <DependentUpon>LaundryReturnedItemPickList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Laundry\Transaction\Returned\LaundryReturnedItemPickList.aspx.designer.cs">
       <DependentUpon>LaundryReturnedItemPickList.aspx</DependentUpon>
@@ -13961,6 +13999,7 @@
     </Compile>
     <Compile Include="Module\Nutrient\Initialization\LiquidFoodSetting\LiquidFoodSettingList.aspx.cs">
       <DependentUpon>LiquidFoodSettingList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Nutrient\Initialization\LiquidFoodSetting\LiquidFoodSettingList.aspx.designer.cs">
       <DependentUpon>LiquidFoodSettingList.aspx</DependentUpon>
@@ -14394,6 +14433,7 @@
     </Compile>
     <Compile Include="Module\Nutrient\Transaction\DistributionPortionChecked\DistributionPortionCheckedList.aspx.cs">
       <DependentUpon>DistributionPortionCheckedList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Nutrient\Transaction\DistributionPortionChecked\DistributionPortionCheckedList.aspx.designer.cs">
       <DependentUpon>DistributionPortionCheckedList.aspx</DependentUpon>
@@ -14637,12 +14677,14 @@
     </Compile>
     <Compile Include="Module\Payroll\Master\IncentivePosition\IncentivePositionDetail.aspx.cs">
       <DependentUpon>IncentivePositionDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Payroll\Master\IncentivePosition\IncentivePositionDetail.aspx.designer.cs">
       <DependentUpon>IncentivePositionDetail.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\Payroll\Master\IncentivePosition\IncentivePositionList.aspx.cs">
       <DependentUpon>IncentivePositionList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Payroll\Master\IncentivePosition\IncentivePositionList.aspx.designer.cs">
       <DependentUpon>IncentivePositionList.aspx</DependentUpon>
@@ -15111,6 +15153,7 @@
     </Compile>
     <Compile Include="Module\Payroll\Process\UpdateBasicSalaryByPositionGrade\UpdateBasicSalaryByPositionGradeList.aspx.cs">
       <DependentUpon>UpdateBasicSalaryByPositionGradeList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Payroll\Process\UpdateBasicSalaryByPositionGrade\UpdateBasicSalaryByPositionGradeList.aspx.designer.cs">
       <DependentUpon>UpdateBasicSalaryByPositionGradeList.aspx</DependentUpon>
@@ -15355,6 +15398,7 @@
     </Compile>
     <Compile Include="Module\Payroll\Transaction\Attendance\ScheduleDetailDialog.aspx.cs">
       <DependentUpon>ScheduleDetailDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Payroll\Transaction\Attendance\ScheduleDetailDialog.aspx.designer.cs">
       <DependentUpon>ScheduleDetailDialog.aspx</DependentUpon>
@@ -15508,6 +15552,7 @@
     </Compile>
     <Compile Include="Module\Payroll\WorkingSchedule\WorkingScheduleList.aspx.cs">
       <DependentUpon>WorkingScheduleList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Payroll\WorkingSchedule\WorkingScheduleList.aspx.designer.cs">
       <DependentUpon>WorkingScheduleList.aspx</DependentUpon>
@@ -15891,6 +15936,7 @@
     </Compile>
     <Compile Include="Module\Inventory\Procurement\RequestOrderOutstanding\RequestOrderOutstandingList.aspx.cs">
       <DependentUpon>RequestOrderOutstandingList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Inventory\Procurement\RequestOrderOutstanding\RequestOrderOutstandingList.aspx.designer.cs">
       <DependentUpon>RequestOrderOutstandingList.aspx</DependentUpon>
@@ -16016,6 +16062,7 @@
     </Compile>
     <Compile Include="Module\Inventory\Warehouse\ConsignmentTransfer\ConsignmentTransferItemDetail.ascx.cs">
       <DependentUpon>ConsignmentTransferItemDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Inventory\Warehouse\ConsignmentTransfer\ConsignmentTransferItemDetail.ascx.designer.cs">
       <DependentUpon>ConsignmentTransferItemDetail.ascx</DependentUpon>
@@ -16414,6 +16461,7 @@
     </Compile>
     <Compile Include="Module\Inventory\Warehouse\ReceiptOfSubstituteItem\ReceiptOfSubstituteItemList.aspx.cs">
       <DependentUpon>ReceiptOfSubstituteItemList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Inventory\Warehouse\ReceiptOfSubstituteItem\ReceiptOfSubstituteItemList.aspx.designer.cs">
       <DependentUpon>ReceiptOfSubstituteItemList.aspx</DependentUpon>
@@ -16511,6 +16559,7 @@
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Sisrute\SisruteDetail.aspx.cs">
       <DependentUpon>SisruteDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Sisrute\SisruteDetail.aspx.designer.cs">
       <DependentUpon>SisruteDetail.aspx</DependentUpon>
@@ -16545,6 +16594,7 @@
     </Compile>
     <Compile Include="Module\RADT\CardexMonitoring\LoginPopup.aspx.cs">
       <DependentUpon>LoginPopup.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\CardexMonitoring\LoginPopup.aspx.designer.cs">
       <DependentUpon>LoginPopup.aspx</DependentUpon>
@@ -16719,6 +16769,7 @@
     </Compile>
     <Compile Include="Module\RADT\Cpoe\Common\ServiceUnitTrans\TariffComponentPackage.aspx.cs">
       <DependentUpon>TariffComponentPackage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Cpoe\Common\ServiceUnitTrans\TariffComponentPackage.aspx.designer.cs">
       <DependentUpon>TariffComponentPackage.aspx</DependentUpon>
@@ -17435,6 +17486,7 @@
     </Compile>
     <Compile Include="Module\RADT\EmrIp\EmrIpCommon\EditFromRegistrationNo.aspx.cs">
       <DependentUpon>EditFromRegistrationNo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\EmrIp\EmrIpCommon\EditFromRegistrationNo.aspx.designer.cs">
       <DependentUpon>EditFromRegistrationNo.aspx</DependentUpon>
@@ -17686,12 +17738,14 @@
     </Compile>
     <Compile Include="Module\RADT\InPatient\PhysicianTeam\PhysicianTeamDetail.aspx.cs">
       <DependentUpon>PhysicianTeamDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\InPatient\PhysicianTeam\PhysicianTeamDetail.aspx.designer.cs">
       <DependentUpon>PhysicianTeamDetail.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\InPatient\PhysicianTeam\PhysicianTeamDetailItem.ascx.cs">
       <DependentUpon>PhysicianTeamDetailItem.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\InPatient\PhysicianTeam\PhysicianTeamDetailItem.ascx.designer.cs">
       <DependentUpon>PhysicianTeamDetailItem.ascx</DependentUpon>
@@ -18041,6 +18095,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\Embalace\EmbalaceSearch.aspx.cs">
       <DependentUpon>EmbalaceSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\Embalace\EmbalaceSearch.aspx.designer.cs">
       <DependentUpon>EmbalaceSearch.aspx</DependentUpon>
@@ -18082,6 +18137,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\IncidentType\IncidentTypeSubComponentList.aspx.cs">
       <DependentUpon>IncidentTypeSubComponentList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\IncidentType\IncidentTypeSubComponentList.aspx.designer.cs">
       <DependentUpon>IncidentTypeSubComponentList.aspx</DependentUpon>
@@ -18787,6 +18843,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\TestResultTemplate\TestResultTemplateList.aspx.cs">
       <DependentUpon>TestResultTemplateList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\TestResultTemplate\TestResultTemplateList.aspx.designer.cs">
       <DependentUpon>TestResultTemplateList.aspx</DependentUpon>
@@ -18974,6 +19031,7 @@
     </Compile>
     <Compile Include="Module\RADT\MedicalRecord\DiagnosisAndProcedure\EpisodeProcDetail.ascx.cs">
       <DependentUpon>EpisodeProcDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\MedicalRecord\DiagnosisAndProcedure\EpisodeProcDetail.ascx.designer.cs">
       <DependentUpon>EpisodeProcDetail.ascx</DependentUpon>
@@ -20073,6 +20131,7 @@
     </Compile>
     <Compile Include="Module\RADT\Ppra\Gyssens\GyssensEntry.aspx.cs">
       <DependentUpon>GyssensEntry.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Ppra\Gyssens\GyssensEntry.aspx.designer.cs">
       <DependentUpon>GyssensEntry.aspx</DependentUpon>
@@ -20086,6 +20145,7 @@
     </Compile>
     <Compile Include="Module\RADT\QualityIndicator\Apd\ApdDetail.aspx.cs">
       <DependentUpon>ApdDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\QualityIndicator\Apd\ApdDetail.aspx.designer.cs">
       <DependentUpon>ApdDetail.aspx</DependentUpon>
@@ -20148,6 +20208,7 @@
     </Compile>
     <Compile Include="Module\RADT\QualityIndicator\ComplianceWasteDisposal\ComplianceWasteDisposalList.aspx.cs">
       <DependentUpon>ComplianceWasteDisposalList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\QualityIndicator\ComplianceWasteDisposal\ComplianceWasteDisposalList.aspx.designer.cs">
       <DependentUpon>ComplianceWasteDisposalList.aspx</DependentUpon>
@@ -20329,6 +20390,7 @@
     </Compile>
     <Compile Include="Module\RADT\QualityIndicator\CompliancePatientFallRiskPrevention\PatientFallRiskPreventionSearch.aspx.cs">
       <DependentUpon>PatientFallRiskPreventionSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\QualityIndicator\CompliancePatientFallRiskPrevention\PatientFallRiskPreventionSearch.aspx.designer.cs">
       <DependentUpon>PatientFallRiskPreventionSearch.aspx</DependentUpon>
@@ -21017,6 +21079,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\Class\ClassDetail.aspx.cs">
       <DependentUpon>ClassDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\Class\ClassDetail.aspx.designer.cs">
       <DependentUpon>ClassDetail.aspx</DependentUpon>
@@ -21401,6 +21464,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\VisitType\VisitTypeSearch.aspx.cs">
       <DependentUpon>VisitTypeSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\VisitType\VisitTypeSearch.aspx.designer.cs">
       <DependentUpon>VisitTypeSearch.aspx</DependentUpon>
@@ -22162,6 +22226,7 @@
     </Compile>
     <Compile Include="Module\Reports\SsRsViewer.aspx.cs">
       <DependentUpon>SsRsViewer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Reports\SsRsViewer.aspx.designer.cs">
       <DependentUpon>SsRsViewer.aspx</DependentUpon>
@@ -22196,6 +22261,7 @@
     </Compile>
     <Compile Include="PCareCommon\PCareMemberInfo.aspx.cs">
       <DependentUpon>PCareMemberInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="PCareCommon\PCareMemberInfo.aspx.designer.cs">
       <DependentUpon>PCareMemberInfo.aspx</DependentUpon>
@@ -23729,6 +23795,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\BodyDiagram\BodyDiagramList.aspx.cs">
       <DependentUpon>BodyDiagramList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\BodyDiagram\BodyDiagramList.aspx.designer.cs">
       <DependentUpon>BodyDiagramList.aspx</DependentUpon>
@@ -23756,6 +23823,7 @@
     </Compile>
     <Compile Include="Module\RADT\Master\ImageTemplate\ImageTemplateSearch.aspx.cs">
       <DependentUpon>ImageTemplateSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\Master\ImageTemplate\ImageTemplateSearch.aspx.designer.cs">
       <DependentUpon>ImageTemplateSearch.aspx</DependentUpon>

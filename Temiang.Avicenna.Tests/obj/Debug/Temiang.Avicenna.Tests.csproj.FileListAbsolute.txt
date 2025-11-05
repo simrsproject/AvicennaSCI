@@ -1,0 +1,2 @@
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.csproj.AssemblyReference.cache
+D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.csproj.CoreCompileInputs.cache
