@@ -1691,6 +1691,7 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
             foreach (var item in TransPaymentItemOrders)
             {
                 item.IsPaymentProceed = false;
+                item.IsPaymentReturned = true;
                 item.LastUpdateByUserID = AppSession.UserLogin.UserID;
                 item.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
             }
