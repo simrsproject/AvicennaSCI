@@ -367,3 +367,6 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 
 ---[31-10-2025 - Danang]---
 1. Apotek Online Bridging
+
+---[12-11-2025 - Apip]---
+1.	Modif ketika unapproval update juga IsPaymentReturned = 1 di table TransPaymentItemOrders, karena datanya tidak muncul ketika diklik transaction list nya lagi
