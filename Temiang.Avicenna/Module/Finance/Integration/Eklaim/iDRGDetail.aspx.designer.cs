@@ -2040,6 +2040,15 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
         protected global::Telerik.Web.UI.RadComboBox cboDializer;
 
         /// <summary>
+        /// txtDializerPercentage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtDializerPercentage;
+
+        /// <summary>
         /// txtDializer control.
         /// </summary>
         /// <remarks>

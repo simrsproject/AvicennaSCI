@@ -2668,7 +2668,7 @@
                         <tr>
                             <td class="label">Penggunaan Dializer
                             </td>
-                            <td colspan="2">
+                            <td>
                                 <telerik:RadComboBox ID="cboDializer" runat="server" Width="504px" AutoPostBack="true" OnSelectedIndexChanged="cboDializer_SelectedIndexChanged">
                                     <Items>
                                         <telerik:RadComboBoxItem Text="" Value="" />
@@ -2676,6 +2676,10 @@
                                         <telerik:RadComboBoxItem Text="Multiple Use (reuse)" Value="0" />
                                     </Items>
                                 </telerik:RadComboBox>
+                            </td>
+                            <td>
+                                <telerik:RadTextBox ID="txtDializerPercentage" runat="server" Width="100px"
+                                    ReadOnly="true" />
                             </td>
                             <td>
                                 <telerik:RadNumericTextBox ID="txtDializer" runat="server" Width="100px"
