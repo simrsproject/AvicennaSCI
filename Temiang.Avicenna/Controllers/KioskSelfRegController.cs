@@ -316,6 +316,13 @@ namespace Temiang.Avicenna.Controllers
                         }
                         else
                         {
+                            // CEK BLACKLIST
+                            if (Convert.ToBoolean(dtbPatient.Rows[0]["IsBlacklist"]))
+                            {
+                                ViewData["ErrMsg"] = lang == "en" ? "Patient is blacklisted and cannot be processed" : "Pasien ini terdaftar dalam daftar hitam dan tidak dapat diproses";
+                                return View();
+                            }
+
                             // POPULATE POLI
                             var orderedSu = GetPoliWeeklyScheduled(lang);
                             ViewData["suColl"] = orderedSu;
