@@ -211,6 +211,14 @@
                         </asp:LinkButton>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
+                <telerik:GridTemplateColumn UniqueName="PrintWithPrice" HeaderStyle-Width="35px" ItemStyle-HorizontalAlign="center">
+                    <ItemTemplate>
+                        <asp:LinkButton ID="lbtnPrintWithPrice" runat="server" CommandName="PrintWithPrice" ToolTip='Print With Price'
+                            CommandArgument='<%# DataBinder.Eval(Container.DataItem, "RegistrationNo") %>'>
+                            <img src="../../../../Images/Toolbar/print16.png" border="0" />
+                        </asp:LinkButton>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridDateTimeColumn HeaderStyle-Width="80px" DataField="RegistrationDate"
                     HeaderText="Reg. Date" UniqueName="RegistrationDate" SortExpression="RegistrationDate"
                     HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />
