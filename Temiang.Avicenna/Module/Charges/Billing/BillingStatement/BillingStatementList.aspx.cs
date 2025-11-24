@@ -155,6 +155,9 @@ namespace Temiang.Avicenna.Module.Charges.Billing
                 if (cboServiceUnitID.SelectedValue != string.Empty)
                     qr.Where(qr.ServiceUnitID == cboServiceUnitID.SelectedValue);
 
+                if (!string.IsNullOrEmpty(cboGuarantorID.SelectedValue))
+                    qr.Where(qr.GuarantorID == cboGuarantorID.SelectedValue);
+
                 var isFilter = false;
                 if (txtRegistrationNo.Text != string.Empty)
                 {
@@ -984,5 +987,27 @@ namespace Temiang.Avicenna.Module.Charges.Billing
             if (isPrint && AppSession.Parameter.IsUsedPrintSlipLogForBillingStatement)
                 PrintSlipLog.InsertUpdate(AppSession.PrintJobReportID, parameterName, parameterValue, AppSession.UserLogin.UserID);
         }
+        protected void cboGuarantorID_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        {
+            e.Item.Text = ((DataRowView)e.Item.DataItem)["GuarantorName"].ToString();
+            e.Item.Value = ((DataRowView)e.Item.DataItem)["GuarantorID"].ToString();
+        }
+        protected void cboGuarantorID_ItemsRequested(object o, RadComboBoxItemsRequestedEventArgs e)
+        {
+            string searchTextContain = string.Format("%{0}%", e.Text);
+            var query = new GuarantorQuery();
+            query.es.Top = 30;
+            query.Where
+                (
+                    query.GuarantorName.Like(searchTextContain),
+                    query.SRGuarantorType != AppSession.Parameter.GuarantorTypeMemberID,
+                    query.IsActive == true
+                );
+            query.OrderBy(query.GuarantorName.Ascending);
+
+            cboGuarantorID.DataSource = query.LoadDataTable();
+            cboGuarantorID.DataBind();
+        }
+
     }
 }
