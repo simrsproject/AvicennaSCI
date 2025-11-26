@@ -376,3 +376,6 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 
 ---[21-11-2025 - APip]---
 1.	Add nontifikasi jika pasien sudah di blacklist
+
+---[26-11-2025 - Apip]---
+1.	Clear cboSREklaimGroup saat new

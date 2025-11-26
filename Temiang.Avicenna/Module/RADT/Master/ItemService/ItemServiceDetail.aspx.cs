@@ -308,6 +308,10 @@ namespace Temiang.Avicenna.Module.RADT.Master
             cboSRBpjsItemGroup.Text = string.Empty;
             chkIsActive.Checked = true;
             chkIsHasTestResults.Checked = false;
+            cboSREklaimGroup.SelectedValue = string.Empty;
+            cboSREklaimGroup.Text = string.Empty;
+
+
         }
 
         protected override void OnMenuMoveNextClick(ValidateArgs args)
