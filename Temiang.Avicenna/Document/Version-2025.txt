@@ -374,8 +374,12 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 ---[13-11-2025 - Danang]---
 1. Fix Dializer iDRG
 
----[21-11-2025 - APip]---
+---[21-11-2025 - Apip]---
 1.	Add nontifikasi jika pasien sudah di blacklist
 
 ---[26-11-2025 - Apip]---
 1.	Clear cboSREklaimGroup saat new
+
+---[04-12-2025 - Luthfi]---
+1. Add assessment RCONT untuk Rehab RSI
+2. Modif akses user type Physiotherapy bisa isi assessment dokter
