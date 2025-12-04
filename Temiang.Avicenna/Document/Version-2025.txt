@@ -383,3 +383,9 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 ---[04-12-2025 - Luthfi]---
 1. Add assessment RCONT untuk Rehab RSI
 2. Modif akses user type Physiotherapy bisa isi assessment dokter
+
+---[04-12-2025 - Naufal]---
+1.	CR Antrian V1 & V2 RSI https://www.sciptaintegrasi.com/mantis/view.php?id=3326
+	- Add Caller V2 List EMR => param: IsCallQueueingListEmrV2
+	- Tutup slot dokter (close clinic EMR) tidak bisa ambil antrian atas nama dokter tsb
+	- Pop up untuk konfirmasi sudah apt apa belum di QueueEntry(V1) dan GetQueue(V2) dan tombol untuk perpindahan versi pengambilan antrian => param: IsDirectButtonBetweenKioskVersion

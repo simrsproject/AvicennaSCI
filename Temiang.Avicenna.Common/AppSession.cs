@@ -5735,6 +5735,11 @@ namespace Temiang.Avicenna.Common
             {
                 get { return IsYes(AppParameter.ParameterItem.IsUsingMultipleScoringSupervisor); }
             }
+
+            public static bool IsDirectButtonBetweenKioskVersion
+            {
+                get { return IsYes(AppParameter.ParameterItem.IsDirectButtonBetweenKioskVersion); }
+            }
         }
 
         public class Application

@@ -9,6 +9,8 @@ namespace Temiang.Avicenna.Module.Kiosk
 {
     public partial class QueueEntry : Page //BasePageBootstrap
     {
+        protected bool IsDirectButtonBetweenKioskVersion { get; set; }
+
         protected void Page_PreInit(object sender, EventArgs e)
         {
             Page.Theme = "";
@@ -16,7 +18,7 @@ namespace Temiang.Avicenna.Module.Kiosk
 
         protected void Page_Init(object sender, EventArgs e)
         {
-
+            IsDirectButtonBetweenKioskVersion = AppSession.Parameter.IsDirectButtonBetweenKioskVersion;
         }
 
         protected void Page_Load(object sender, EventArgs e)
