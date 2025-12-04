@@ -380,6 +380,16 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 ---[26-11-2025 - Apip]---
 1.	Clear cboSREklaimGroup saat new
 
+---[02-12-2025 - dk]---
+1. modif WorkingHour tambah 
+	- IsOvertimeAfterShift,
+	- IsOvertimeBeforeShift,
+	- IsTunjShift,
+	- IsOvertimeAfterShift2,
+	- IsOvertimeBeforeShift2,
+	- IsTunjShift2
+
 ---[04-12-2025 - Luthfi]---
 1. Add assessment RCONT untuk Rehab RSI
 2. Modif akses user type Physiotherapy bisa isi assessment dokter
+
