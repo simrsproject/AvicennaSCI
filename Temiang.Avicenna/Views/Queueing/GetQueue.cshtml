@@ -245,10 +245,13 @@
     <script type="text/javascript">
         var _location = '@(ViewBag.qLocation)';
         var _addjustStartTime = '@(ViewBag.addjustStartTime)' != '' ? '@(ViewBag.addjustStartTime)' : '120';
-        var _IsDirectButtonBetweenKioskVersion = '@(ViewBag.IsDirectButtonBetweenKioskVersion)';
+        var _IsDirectButtonBetweenKioskVersion = @(((bool)ViewBag.IsDirectButtonBetweenKioskVersion).ToString().ToLower());
         var _poliID = "";
         var _physicianID = "";
         var _guarantorID = "";
+        var qLocationFromUrl = '@(Request.QueryString["qLocation"] ?? "")';
+        var qLocStored = localStorage.getItem("qLocation");
+        var qLocation = qLocationFromUrl || qLocStored || "";
 
         const idleLimit = 6;
         let idleTime = 0;
@@ -286,6 +289,13 @@
             });
         }
         if (_IsDirectButtonBetweenKioskVersion) {
+            if (!qLocationFromUrl && qLocStored) {
+                //console.log("Auto-redirect karena URL tidak punya qLocation");
+                window.location.href = "@(ViewBag.UrlRoot)/Queueing/GetQueue?qLocation=" + qLocStored;
+            } else if (qLocationFromUrl) {
+                //console.log("Disimpan ke localStorage: " + qLocationFromUrl);
+                localStorage.setItem("qLocation", qLocationFromUrl);
+            }
             document.addEventListener("mousemove", resetIdle);
             document.addEventListener("keydown", resetIdle);
             document.addEventListener("touchstart", resetIdle);
