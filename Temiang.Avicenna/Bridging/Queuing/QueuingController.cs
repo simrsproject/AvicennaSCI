@@ -56,12 +56,55 @@ namespace Temiang.Avicenna.Bridging.Queuing
                 foreach (var sup in supColl) {
                     var dtbSlotTime = AppointmentNRegistrationDataService
                         .AppointmentSlotTime("", sup.ServiceUnitID, sup.ParamedicID, dDate.Date, dDate.Date);
+                    var schQuery = new ParamedicScheduleDateQuery("a");
+                    var ot = new OperationalTimeQuery("b");
+
+                    schQuery.InnerJoin(ot).On(schQuery.OperationalTimeID == ot.OperationalTimeID);
+                    schQuery.Where(
+                        schQuery.ScheduleDate == dDate,
+                        schQuery.ServiceUnitID == sup.ServiceUnitID,
+                        schQuery.ParamedicID == sup.ParamedicID
+                    );
+                    var schData = schQuery.LoadDataTable().AsEnumerable().FirstOrDefault();
+                    bool isAvailable = false;
+
+                    if (schData != null)
+                    {
+                        var now = DateTime.Now.TimeOfDay;
+
+                        var ranges = new[]
+                        {
+                            new { Start="StartTime1", End="EndTime1", Closed="IsClosedTime1"},
+                            new { Start="StartTime2", End="EndTime2", Closed="IsClosedTime2"},
+                            new { Start="StartTime3", End="EndTime3", Closed="IsClosedTime3"},
+                            new { Start="StartTime4", End="EndTime4", Closed="IsClosedTime4"},
+                            new { Start="StartTime5", End="EndTime5", Closed="IsClosedTime5"},
+                        };
+
+                        foreach (var r in ranges)
+                        {
+                            var st = schData[r.Start]?.ToString()?.Trim();
+                            var et = schData[r.End]?.ToString()?.Trim();
+
+                            if (TimeSpan.TryParse(st, out var start) && TimeSpan.TryParse(et, out var end))
+                            {
+                                if (now >= start && now < end)
+                                {
+                                    var c = schData[r.Closed]?.ToString()?.Trim().ToLower();
+                                    var closed = c == "true" || c == "1";
+                                    isAvailable = !closed;
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
                     var aQuota = new {
                         Paramedic = parColl.Where(p => p.ParamedicID == sup.ParamedicID).Select(p => new { p.ParamedicID, p.ParamedicName}).First(),
                         ServiceUnit = suColl.Where(s => s.ServiceUnitID == sup.ServiceUnitID).Select(s => new { s.ServiceUnitID, s.ServiceUnitName }).First(),
                         QuotaTotal = dtbSlotTime.Rows.Count,
-                        QuotaAvailable = dtbSlotTime.AsEnumerable().Where(r => string.IsNullOrEmpty(r["AppointmentStatus"].ToString())).Count()
+                        QuotaAvailable = dtbSlotTime.AsEnumerable().Where(r => string.IsNullOrEmpty(r["AppointmentStatus"].ToString())).Count(),
+                        IsAvailable = isAvailable
                     };
                     lQuota.Add(aQuota);
                 }

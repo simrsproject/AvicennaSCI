@@ -8,12 +8,15 @@
     <!-- Fonts -->
     <!--<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">-->
     <link href="@(ViewBag.UrlRoot)/Bootstrap/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="@(ViewBag.UrlRoot)/Bootstrap/plugins/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
     @*<link href="@(ViewBag.UrlRoot)/Bootstrap/Queue/GetQueue/assets/css/app.css" rel="stylesheet">*@
 
     <script src="@(ViewBag.UrlRoot)/Bootstrap/plugins/jquery/jquery.min.js"></script>
     @*<script src="@(ViewBag.UrlRoot)/Bootstrap/Queue/GetQueue/assets/js/popper.min.js"></script>*@
     <script src="@(ViewBag.UrlRoot)/Bootstrap/plugins/bootstrap/js/bootstrap.min.js"></script>
     <script src="@(ViewBag.UrlRoot)/Bootstrap/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="@(ViewBag.UrlRoot)/Bootstrap/plugins/sweetalert2/sweetalert2.min.js"></script>
+
     <!-- Styles -->
     <style>
         .header-section p {
@@ -104,9 +107,9 @@
             margin-bottom: 15px;
         }
 
-        .button-click-physician-section:nth-last-child(1), .button-click-physician-section p {
-            margin-bottom: 0px;
-        }
+            .button-click-physician-section:nth-last-child(1), .button-click-physician-section p {
+                margin-bottom: 0px;
+            }
 
         .button-click-physician-section-quota {
             border-right: 2px solid #000;
@@ -115,9 +118,9 @@
             text-shadow: 1px 1px #fff;
         }
 
-        .button-click-physician-section-quota p span {
-            font-size: 13px;
-        }
+            .button-click-physician-section-quota p span {
+                font-size: 13px;
+            }
 
         .button-click-physician-section-name {
             padding-left: 10px;
@@ -169,6 +172,9 @@
         </div>
     </div>
 
+    <div id="divButtonDirect">
+    </div>
+
     <!-- Modal dokter & penjamin -->
     <div class="modal fade" id="PopupPhysician" tabindex="-1" role="dialog" aria-labelledby="PopupPhysicianTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -213,7 +219,6 @@
         </div>
     </div>
     <!-- End Modal dokter & penjamin -->
-
     <!-- Modal rincian -->
     <div class="modal fade" id="PopupDetails" tabindex="-1" role="dialog" aria-labelledby="PopupDetailsTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -238,19 +243,79 @@
     <!-- End Modal rincian -->
 
     <script type="text/javascript">
-        var _location = '@(ViewBag.qLocation)' != '' ? '@(ViewBag.qLocation)' : '01';
+        var _location = '@(ViewBag.qLocation)';
         var _addjustStartTime = '@(ViewBag.addjustStartTime)' != '' ? '@(ViewBag.addjustStartTime)' : '120';
+        var _IsDirectButtonBetweenKioskVersion = '@(ViewBag.IsDirectButtonBetweenKioskVersion)';
         var _poliID = "";
         var _physicianID = "";
         var _guarantorID = "";
 
+        const idleLimit = 6;
+        let idleTime = 0;
+        let stopIdle = false;
+        let isPopupShown = false;
+
+        function resetIdle() {
+            idleTime = 0;
+        }
+
+        function ShowIdlePopup() {
+            if (isPopupShown) return;
+
+            isPopupShown = true;
+
+            Swal.fire({
+                title: 'Sudah punya kode booking?',
+                text: '',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sudah',
+                cancelButtonText: 'Belum',
+                reverseButtons: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false
+            }).then((result) => {
+                idleTime = 0;
+                isPopupShown = false;
+
+                if (result.value) {
+                    stopIdle = true;
+                    window.location.href = '@(ViewBag.UrlRoot)/module/kiosk/QueueEntry.aspx';
+                }
+            });
+        }
+        if (_IsDirectButtonBetweenKioskVersion) {
+            document.addEventListener("mousemove", resetIdle);
+            document.addEventListener("keydown", resetIdle);
+            document.addEventListener("touchstart", resetIdle);
+            setInterval(function () {
+                if (stopIdle) return;
+                if (!isPopupShown) {
+                    idleTime++;
+                }
+
+                if (idleTime >= idleLimit) {
+                    ShowIdlePopup();
+                }
+            }, 1000);
+        }
         $(document).ready(function () {
             GetListPoli();
+            //if (_IsDirectButtonBetweenKioskVersion) {
+            //    ShowIdlePopup();
+            //}
         });
 
         setTimeout(function () {
             window.location.reload(true);
         }, 600000);
+        if (_IsDirectButtonBetweenKioskVersion) {
+            $("#divButtonDirect").append(
+                `<div class="button-direct">
+                    <a class="btn btn-light btn-sm" href="@(ViewBag.UrlRoot)/Module/Kiosk/QueueEntry.aspx" role="button"><strong>Kiosk V1<br />(Sudah Punya Kode Booking)</strong></a>
+                </div>`);
+        }
 
         $('.button-close').click(function () {
             window.location.reload(true);
@@ -305,20 +370,26 @@
                 success: function (ret) {
                     if (ret.status === 'OK') {
                         if (ret.data != null) {
+
                             for (let i = 0; i < ret.data.length; i++) {
-                                if (ret.data[i].SRQueueingLocation_Reg == _location) {
+
+                                if (_location.trim() === "") {
+                                    AddNewPoli(ret.data[i].ServiceUnitName, ret.data[i].ServiceUnitID);
+                                    continue;
+                                }
+
+                                if (ret.data[i].SRQueueingLocation_Reg === _location) {
                                     AddNewPoli(ret.data[i].ServiceUnitName, ret.data[i].ServiceUnitID);
                                 }
                             }
+
                             GetPoliID();
                         }
                     } else {
-                    // DisplayToast(ret.data, "error");
                         alert(ret.data);
                     }
                 },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    //DisplayToast(xhr.responseText, "error");
+                error: function (xhr) {
                     alert(xhr.responseText);
                 },
                 dataType: 'json'
@@ -390,73 +461,85 @@
             });
         }
 
-        function GetQuotaPhysician(serviceUnitId, parSchedules) {
+        function GetQuotaPhysician(serviceUnitId) {
             $.ajax({
                 type: 'GET',
                 url:`@(ViewBag.UrlRoot)/api/sciadmin88/Queuing/GetQuota/${GetFormattedDate()}`,
+                dataType: 'json',
                 success: function (ret) {
-                    if (ret.status === 'OK') {
-                        for (let i = 0; i < ret.data.length; i++) {
-                            if (ret.data[i].ServiceUnit.ServiceUnitID == serviceUnitId) {
-                                if (ret.data[i].QuotaTotal > 0) {
-                                    const d = new Date();
-                                    const timeNow = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-
-                                    let schedule = parSchedules.find(s => s.ParamedicID === ret.data[i].Paramedic.ParamedicID);
-                                    const timeRanges = [
-                                        { startTime: schedule.StartTime1, endTime: schedule.EndTime1 },
-                                        { startTime: schedule.StartTime2, endTime: schedule.EndTime2 },
-                                        { startTime: schedule.StartTime3, endTime: schedule.EndTime3 },
-                                        { startTime: schedule.StartTime4, endTime: schedule.EndTime4 },
-                                        { startTime: schedule.StartTime5, endTime: schedule.EndTime5 }
-                                    ];
-
-                                    const isInAllowedTime = timeRanges.some(range => IsWithinRange(range, timeNow));
-
-                                    if (isInAllowedTime) {
-                                        AddNewPhysician(ret.data[i].Paramedic.ParamedicID, ret.data[i].Paramedic.ParamedicName, ret.data[i].QuotaAvailable, ret.data[i].QuotaTotal);
-                                        let button = $('.button-click-physician-section');
-                                        if (ret.data[i].QuotaAvailable == 0) {
-                                            button.prop('disabled', true);
-                                            button.css({
-                                                'cursor': 'not-allowed',
-                                                'color': 'gray',
-                                                'opacity': '0.5'
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        ShowAllInfo();
-                    } else {
+                    if (ret.status !== 'OK') {
                         alert(ret.data);
+                        return;
                     }
+
+                    for (let i = 0; i < ret.data.length; i++) {
+
+                        const q = ret.data[i];
+
+                        if (q.ServiceUnit.ServiceUnitID !== serviceUnitId) continue;
+
+                        if (q.QuotaTotal <= 0) continue;
+
+                        AddNewPhysician(
+                            q.Paramedic.ParamedicID,
+                            q.Paramedic.ParamedicName,
+                            q.QuotaAvailable,
+                            q.QuotaTotal,
+                            q.IsAvailable
+                        );
+                    }
+
+                    ShowAllInfo();
                 },
-                error: function (xhr, ajaxoptions, thrownerror) {
-                    alert(xhr.responsetext);
-                },
-                dataType: 'json'
+                error: function (xhr) {
+                    alert(xhr.responseText);
+                }
             });
         }
 
-        function AddNewPhysician(physicianId, physicianName, quotaAvailable, quotaTotal) {
+        function AddNewPhysician(physicianId, physicianName, quotaAvailable, quotaTotal, isAvailable) {
+            const closedBadge = !isAvailable
+                ? `<span class="badge badge-danger ml-2">CLOSED</span>`
+                : '';
+
             let str = $(`
-                <a data-toggle="modal" data-target="#PopupGuarantor" data-backdrop="static" data-dismiss="modal" class="button-click-physician-section">
+                <a data-toggle="modal" data-target="#PopupGuarantor" data-backdrop="static" data-dismiss="modal"
+                   class="button-click-physician-section">
                     <div class="d-flex align-items-center">
                         <div class="button-click-physician-section-quota justify-content-center">
                             <p><span>Tersedia</span><br>${quotaAvailable}/${quotaTotal}</p>
                         </div>
                         <div class="button-click-physician-section-name flex-shrink-1 justify-content-start">
-                            <p class="physician" id="${physicianId}">${physicianName}</p>
+                            <p class="physician" id="${physicianId}">
+                                ${physicianName} ${closedBadge}
+                            </p>
                         </div>
                     </div>
-                </a>`
-            );
+                </a>
+            `);
 
-            let isExist = $('.button-click-physician-section').find('.physician').filter(function () {
-                return $(this).attr('id') === physicianId;
-            }).length > 0;
+            if (!isAvailable) {
+                str.addClass("disabled");
+                str.css({
+                    'cursor': 'not-allowed',
+                    'pointer-events': 'none',
+                    'opacity': '0.4'
+                });
+            }
+            else if (quotaAvailable == 0) {
+                str.css({
+                    'cursor': 'not-allowed',
+                    'pointer-events': 'none',
+                    'opacity': '0.5'
+                });
+            }
+
+            let isExist = $('.button-click-physician-section')
+                .find('.physician')
+                .filter(function () {
+                    return $(this).attr('id') === physicianId;
+                }).length > 0;
+
             if (!isExist) {
                 $('#divModalPhysician').append(str);
             }

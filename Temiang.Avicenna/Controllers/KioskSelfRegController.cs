@@ -23,6 +23,7 @@ namespace Temiang.Avicenna.Controllers
             ViewData["enableBPJS"] = AppSession.Parameter.IsKioskEnableBPJS;
             ViewData["isBpjsAntrolIntegration"] = Helper.IsBpjsAntrolIntegration;
             ViewData["enableQRCode"] = AppSession.Parameter.IsKioskEnableQRCode;
+            ViewData["isDirectButtonBetweenKioskVersion"] = AppSession.Parameter.IsDirectButtonBetweenKioskVersion;
         }
 
         private void SetUserLoginSession()
