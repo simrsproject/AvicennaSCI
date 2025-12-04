@@ -1270,6 +1270,10 @@ namespace Temiang.Avicenna.Module.RADT
 
             if (AppSession.Parameter.IsByPassEmrUserTypeRestriction) return true;
 
+            // Jika user fisioterapis bisa isi
+            if (AppSession.UserLogin.SRUserType == AppUser.UserType.Physiotherapy)
+                return true;
+
             // Hanya dokter team
             if (AppSession.UserLogin.SRUserType == AppUser.UserType.Doctor && IsUserInParamedicTeam())
                 return true;

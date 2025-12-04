@@ -4,6 +4,49 @@
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <telerik:RadCodeBlock runat="server" ID="RadCodeBlock1">
+        <style type="text/css">
+            .xnoti_Container {
+                position: relative; /*border:1px solid blue;*/
+                width: 16px;
+                height: 16px;
+                cursor: pointer;
+            }
+            .btn-app {
+              border-radius: 3px;
+              background-color: #f8f9fa;
+              border: 1px solid #ddd;
+              color: #6c757d;
+              font-size: 12px;
+              height: 55px;
+              margin: 0 0 5px 5px;
+              min-width: 70px;
+              padding: 5px 1px;
+              position: relative;
+              text-align: center;
+              transition: transform 0.2s ease, box-shadow 0.2s ease;
+              text-decoration: none !important;
+
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            }
+            .btn-app .btn-label {
+              font-size: 12px;
+              text-decoration: none !important;
+              color: #6c757d;
+            }
+            .btn-app i {
+              color: #6c757d !important;
+              font-size: 20px;
+            }
+            .btn-app:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                background-color: #f0f0f0;
+                text-decoration: none !important;
+            }
+        </style>
 
         <script type="text/javascript">
             var refreshTimeout = "1";
@@ -683,6 +726,46 @@
                         <legend>Close Clinic</legend>
                         <asp:ImageButton ID="btnCloseClinic" runat="server" ImageUrl="~/Images/doctor_with_closed_sign.png"
                             OnClientClick="javascript:openWinCloseClinic();return false;" />
+                    </fieldset>
+                </td>
+                <td style="vertical-align: central;">
+                    <fieldset id="pnlQCaller" style="width: 180px; height: 210px; text-align:center; padding: 5px;" runat="server" visible="false">
+                        <legend>Queuing Caller Control</legend>
+                            <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+                                <ContentTemplate>
+                                    <div style="height: 50px; margin: 0 0 5px 5px; background-color: #003872;">
+                                        <div class="inner" style="text-align:center">
+                                            <h3 style="margin: 0; font-size: 1.4rem; color:#FFFFFF;">
+                                                <asp:Label ID="lblCurrentNumber" runat="server" Text="000" />
+                                            </h3>
+                                        </div>
+                                        <div class="small-box-footer">
+                                            <span style="font-size: 0.65rem; color:#d5e0eb;">Current Number</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid" style="gap: 4px; display: grid; grid-template-columns: 1fr 1fr;">              
+                                        <asp:LinkButton ID="btnNext" runat="server" CssClass="btn btn-app" OnClick="btnNext_Click">
+                                            <i class="fas fa-step-forward"></i><br />
+                                            <span class="btn-label">Next</span>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="btnRecall" runat="server" CssClass="btn btn-app" 
+                                            CommandName="Recall" CommandArgument='' 
+                                            OnCommand="btnRecall_Command">
+                                            <i class="fas fa-retweet"></i><br />
+                                            <span class="btn-label">Recall</span>
+                                        </asp:LinkButton>
+                                        <asp:LinkButton ID="btnStop" runat="server" CssClass="btn btn-app" OnClick="btnStop_Click">
+                                             <i class="far fa-stop-circle"></i><br />
+                                             <span class="btn-label">Stop</span>
+                                         </asp:LinkButton>
+                                         <asp:LinkButton ID="btnClear" runat="server" CssClass="btn btn-app" OnClick="btnClear_Click">
+                                             <i class="fas fa-trash"></i><br />
+                                             <span class="btn-label">Clear</span>
+                                         </asp:LinkButton>
+                                    </div>
+                              </ContentTemplate>
+                        </asp:UpdatePanel>
                     </fieldset>
                 </td>
             </tr>

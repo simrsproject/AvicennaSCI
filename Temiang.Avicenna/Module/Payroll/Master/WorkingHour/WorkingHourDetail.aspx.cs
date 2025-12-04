@@ -134,6 +134,14 @@ namespace Temiang.Avicenna.Module.Payroll.Master
 
             cboSRWorkingDay.SelectedValue = wh.SRWorkingDay;
 
+            chkIsOvertimeAfterShift.Checked = wh.IsOvertimeAfterShift ?? false;
+            chkIsOvertimeBeforeShift.Checked = wh.IsOvertimeBeforeShift ?? false;
+            chkIsTunjShift.Checked = wh.IsShiftLeader ?? false;
+
+            chkIsOvertimeAfterShift2.Checked = wh.IsOvertimeAfterShift2 ?? false;
+            chkIsOvertimeBeforeShift2.Checked = wh.IsOvertimeBeforeShift2 ?? false;
+            chkIsTunjShift2.Checked = wh.IsTunjShift2 ?? false;
+
             PopulateWorkingHourOrganizationUnitGrid();
         }
 
@@ -167,6 +175,14 @@ namespace Temiang.Avicenna.Module.Payroll.Master
             entity.MaximumEndTime2 = txtMaxEndTime2.TextWithLiterals;
 
             entity.SRWorkingDay = cboSRWorkingDay.SelectedValue;
+
+            entity.IsOvertimeAfterShift = chkIsOvertimeAfterShift.Checked;
+            entity.IsOvertimeBeforeShift = chkIsOvertimeBeforeShift.Checked;
+            entity.IsTunjShift = chkIsTunjShift.Checked;
+
+            entity.IsOvertimeAfterShift2 = chkIsOvertimeAfterShift2.Checked;
+            entity.IsOvertimeBeforeShift2 = chkIsOvertimeBeforeShift2.Checked;
+            entity.IsTunjShift2 = chkIsTunjShift2.Checked;
 
             //Last Update Status
             if (entity.es.IsAdded || entity.es.IsModified)

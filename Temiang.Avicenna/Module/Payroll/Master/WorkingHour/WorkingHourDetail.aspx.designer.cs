@@ -240,6 +240,33 @@ namespace Temiang.Avicenna.Module.Payroll.Master
         protected global::System.Web.UI.WebControls.CheckBox chkIsLongShift;
 
         /// <summary>
+        /// chkIsOvertimeAfterShift control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsOvertimeAfterShift;
+
+        /// <summary>
+        /// chkIsOvertimeBeforeShift control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsOvertimeBeforeShift;
+
+        /// <summary>
+        /// chkIsTunjShift control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsTunjShift;
+
+        /// <summary>
         /// txtStartTime2 control.
         /// </summary>
         /// <remarks>
@@ -409,6 +436,33 @@ namespace Temiang.Avicenna.Module.Payroll.Master
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIsShiftLeader2;
+
+        /// <summary>
+        /// chkIsOvertimeAfterShift2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsOvertimeAfterShift2;
+
+        /// <summary>
+        /// chkIsOvertimeBeforeShift2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsOvertimeBeforeShift2;
+
+        /// <summary>
+        /// chkIsTunjShift2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsTunjShift2;
 
         /// <summary>
         /// txtMealQty control.

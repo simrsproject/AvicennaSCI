@@ -1283,7 +1283,9 @@ namespace Temiang.Avicenna.BusinessObject
             IsNewDisplayCasemixCenter,
             IsNotesforCompoundPresc,
             IsiDRGIntegration,
-            IsUseCurrentDateRegistration
+            IsUseCurrentDateRegistration,
+            IsCallQueueingListEmrV2,
+            IsDirectButtonBetweenKioskVersion
         }
 
         public class DefaultRecordValue
@@ -2524,6 +2526,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsNewDisplayCasemixCenter = "Is New Display Casemix Center (Yes/No)?|No;RSI:Yes| |false";
             public const string IsNotesforCompoundPresc = "Is Notes for Compound Prescription? (Yes/No)|No;RSI:No| |False";
             public const string IsUseCurrentDateRegistration = "Is This Filter Use Current Date Registration? (Yes/No)|No;RSI:No| |False";
+            public const string IsCallQueueingListEmrV2 = "Is Call Queueing V2 in EMR List? (Yes/No)|No;RSI:Yes| |False";
+            public const string IsDirectButtonBetweenKioskVersion = "Is Direct Button Between Kiosk Version? (Yes/No)|No;RSI:Yes| |False";
         }
 
         public static AppParameter GetParameter(ParameterItem parameterItem)

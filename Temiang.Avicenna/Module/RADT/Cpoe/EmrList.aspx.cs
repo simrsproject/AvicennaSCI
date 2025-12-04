@@ -14,6 +14,7 @@ using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Avicenna.Module.RADT.Emr.MainContent;
 using Temiang.Dal.Interfaces;
 using Newtonsoft.Json;
+using System.Web.UI.WebControls;
 
 namespace Temiang.Avicenna.Module.RADT.Cpoe
 {
@@ -138,6 +139,34 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                     btnCloseClinic.ImageUrl = "~/Images/doctor_with_closed_sign_d.png";
                     btnCloseClinic.Enabled = false;
                     btnCloseClinic.Style[HtmlTextWriterStyle.Cursor] = "default";
+                }
+                if (AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsCallQueueingListEmrV2))
+                {
+                    pnlQCaller.Visible = true;
+
+                    var qQuee = new AppointmentQueueingQuery("a");
+
+                    qQuee.Where(
+                        qQuee.SRKioskQueueStatus == "02" &&
+                        qQuee.QueueingDate == DateTime.Now.Date.NowAtSqlServer() &&
+                        (AppSession.UserLogin.UserID != null
+                            ? qQuee.ProcessByUserID == AppSession.UserLogin.UserID
+                            : qQuee.ProcessByUserID.IsNull()) &&
+                        (AppSession.UserLogin.ParamedicID != null
+                            ? qQuee.ParamedicID == AppSession.UserLogin.ParamedicID
+                            : qQuee.ParamedicID.IsNull())
+                    );
+
+                    qQuee.OrderBy(qQuee.Id.Ascending);
+                    qQuee.es.Top = 1;
+
+                    var dtb = qQuee.LoadDataTable();
+                    if (dtb.Rows.Count > 0)
+                    {
+                        string formattedNo = dtb.Rows[0]["FormattedNo"].ToString();
+                        lblCurrentNumber.Text = formattedNo;
+                        btnRecall.CommandArgument = formattedNo;
+                    }
                 }
             }
         }
@@ -3260,6 +3289,124 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             base.OnLoadComplete(e);
             if (IsPostBack)
                 AjaxManager.ResponseScripts.Add(StrbResponseScripts.ToString());
+        }
+        protected void btnNext_Click(object sender, EventArgs e)
+        {
+            var userId = AppSession.UserLogin.UserID;
+            var queColl = GetAndMarkPrev(AppSession.UserLogin.UserID);
+            // booking next
+            var queNextColl = new AppointmentQueueingCollection();
+            queNextColl.Query.Where(
+                //queNextColl.Query.SRQueueingLocation == "02",
+                queNextColl.Query.SRQueueingGroup == "02",
+                //queNextColl.Query.SRQueueingType.In("01","02"),
+                queNextColl.Query.SRKioskQueueStatus == "01",
+                queNextColl.Query.ParamedicID == AppSession.UserLogin.ParamedicID,
+                queNextColl.Query.QueueingDate == DateTime.Now.NowAtSqlServer().Date)
+                .OrderBy(queNextColl.Query.Id.Ascending);
+            queNextColl.Query.es.Top = 1;
+
+            var queeNext = new AppointmentQueueing();
+            if (queNextColl.LoadAll())
+            {
+                queeNext = queNextColl.First();
+                queeNext.SRKioskQueueStatus = "02";
+                queeNext.ProcessByUserID = userId;
+                queeNext.ProcessDateTime = (new DateTime()).NowAtSqlServer();
+                queeNext.Recall = true;
+                queeNext.LastUpdateByUserID = userId;
+                queeNext.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                queeNext.CounterCode = queeNext.ServiceUnitID;
+                lblCurrentNumber.Text = queeNext.FormattedNo;
+                btnRecall.CommandArgument = queeNext.FormattedNo;
+                queColl.AttachEntity(queeNext);
+            }
+            queColl.Save();
+        }
+        protected void btnRecall_Command(object sender, CommandEventArgs e)
+        {
+
+            string currentNo = e.CommandArgument.ToString();
+            if (string.IsNullOrWhiteSpace(currentNo))
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alertError", "alert('Recall is not available, current queueing number is empty ');", true);
+                return;
+            }
+            var userId = AppSession.UserLogin.UserID;
+            var queColl = new AppointmentQueueingCollection();
+            queColl.Query.Where(
+                queColl.Query.FormattedNo == currentNo,
+                queColl.Query.SRKioskQueueStatus == "02",
+                queColl.Query.SRQueueingGroup == "02",
+                queColl.Query.QueueingDate == DateTime.Now.NowAtSqlServer().Date,
+                queColl.Query.ProcessByUserID == userId);
+            if (queColl.LoadAll())
+            {
+                foreach (var k in queColl)
+                {
+                    k.Recall = true;
+                    k.LastUpdateByUserID = userId;
+                    k.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                }
+                queColl.Save();
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alertSuccess", "alert('Recall berhasil!');", true);
+            }
+        }
+
+        protected void btnStop_Click(object sender, EventArgs e)
+        {
+
+            if (lblCurrentNumber.Text == "000")
+            {
+                ScriptManager.RegisterStartupScript(this, this.GetType(), "alertError", "alert('Stop is not available, current queueing number is empty ');", true);
+                return;
+            }
+            var queColl = GetAndMarkPrev(AppSession.UserLogin.UserID);
+            queColl.Save();
+            lblCurrentNumber.Text = "STOPPED";
+            btnRecall.CommandArgument = "";
+        }
+
+        protected void btnClear_Click(object sender, EventArgs e)
+        {
+
+            var queColl = new AppointmentQueueingCollection();
+            queColl.Query.Where(queColl.Query.SRKioskQueueStatus == "01",
+                queColl.Query.QueueingDate < DateTime.Now.NowAtSqlServer().Date,
+                queColl.Query.SRQueueingLocation == "02",
+                queColl.Query.SRQueueingGroup == "02",
+                queColl.Query.SRKioskQueueStatus == "01"
+            );
+            var i = 0;
+            if (queColl.LoadAll())
+            {
+                var dNow = (new DateTime()).NowAtSqlServer();
+                foreach (var k in queColl)
+                {
+                    k.SRKioskQueueStatus = "03";
+                    k.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                    k.LastUpdateDateTime = dNow;
+                    i++;
+                }
+                queColl.Save();
+            }
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "alertSuccess", $"alert('{i} record(s) cleaned up!');", true);
+        }
+
+        private AppointmentQueueingCollection GetAndMarkPrev(string userId)
+        {
+            var queColl = new AppointmentQueueingCollection();
+            queColl.Query.Where(queColl.Query.SRKioskQueueStatus == "02", queColl.Query.ProcessByUserID == userId, queColl.Query.ParamedicID == AppSession.UserLogin.ParamedicID, queColl.Query.SRQueueingGroup == "02");
+            if (queColl.LoadAll())
+            {
+                foreach (var k in queColl)
+                {
+                    k.SRKioskQueueStatus = "03";
+                    k.LastUpdateByUserID = userId;
+                    k.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                }
+            }
+            return queColl;
         }
     }
 }
