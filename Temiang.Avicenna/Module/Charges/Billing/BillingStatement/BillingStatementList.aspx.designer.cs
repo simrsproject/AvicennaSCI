@@ -204,6 +204,33 @@ namespace Temiang.Avicenna.Module.Charges.Billing
         protected global::System.Web.UI.WebControls.ImageButton btnFilterServiceUnit;
 
         /// <summary>
+        /// lblGuarantorID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblGuarantorID;
+
+        /// <summary>
+        /// cboGuarantorID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboGuarantorID;
+
+        /// <summary>
+        /// btnFilterGuarantor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterGuarantor;
+
+        /// <summary>
         /// grdRegisteredList control.
         /// </summary>
         /// <remarks>

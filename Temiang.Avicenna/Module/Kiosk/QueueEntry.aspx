@@ -32,10 +32,64 @@
             "sub1Title": { "ind": "Silahkan pilih antrian berikut", "en": "Please choose one of the following queue" }
         };
         var databtn = {};
+        var IsDirectButtonBetweenKioskVersion = <%= IsDirectButtonBetweenKioskVersion.ToString().ToLower() %>;
 
-        $(document).ready(function() {
+        let idleTime = 0;
+        let stopIdle = false;
+        const idleLimit = 6;
+        let isPopupShown = false;
+
+        function resetIdle() {
+            idleTime = 0;
+        }
+
+        function ShowIdlePopup() {
+            if (isPopupShown) return;
+            isPopupShown = true;
+
+            Swal.fire({
+                title: 'Sudah punya kode booking?',
+                text: '',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sudah',
+                cancelButtonText: 'Belum',
+                reverseButtons: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false
+            }).then((result) => {
+                idleTime = 0;
+                isPopupShown = false;
+
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    stopIdle = true;
+                    window.location.href = BaseURL + "/Queueing/GetQueue";
+                }
+            });
+        }
+
+        if (IsDirectButtonBetweenKioskVersion) {
+            document.onmousemove = resetIdle;
+            document.onkeydown = resetIdle;
+            document.ontouchstart = resetIdle;
+
+            setInterval(function () {
+                if (stopIdle) return;
+                if (!isPopupShown) { 
+                    idleTime++;
+                }
+
+                if (idleTime >= idleLimit) {
+                    ShowIdlePopup();
+                }
+            }, 1000);
+        }
+        $(document).ready(function () {
+            //if (IsDirectButtonBetweenKioskVersion) {
+            //    ShowIdlePopup();
+            //}
             //alert(BaseURL + "/WebService/jQueryWS.asmx/NPCGetList");    
-
             $.ajaxSetup({
                 beforeSend: function (xhr) {
                     if (xhr.overrideMimeType) {
@@ -43,12 +97,14 @@
                     }
                 }
             });
-
             SetLang("Ind");
             //SetLeftMenu("Bahasa", "SetLang('Ind')", "flag flag-id");
             //SetLeftMenu("English", "SetLang('En')", "flag flag-us");
             SetLeftMenu("Bahasa", "SetLang('Ind')", "flag-icon flag-icon-id");
             SetLeftMenu("English", "SetLang('En')", "flag-icon flag-icon-us");
+            if (IsDirectButtonBetweenKioskVersion) {
+                SetLeftMenu("Kiosk V2", "window.location.href='" + BaseURL + "/Queueing/GetQueue'", "fas fa-desktop");
+            }
 
             // load queue buttons
             GetRefID();

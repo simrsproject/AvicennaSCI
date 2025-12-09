@@ -916,9 +916,21 @@ namespace Temiang.Avicenna.Module.RADT
                     qr.LeftJoin(appttype).On(appttype.StandardReferenceID == "AppoinmentType" && appttype.ItemID == appt.SRAppoinmentType);
                     qr.Select(@"<ISNULL(appttype.ItemName, '') AS AppoinmentTypeName>");
 
-                    var apptQue = new AppointmentQueueingQuery("apptQue");
-                    qr.LeftJoin(apptQue).On(appt.AppointmentNo == apptQue.AppointmentNo && apptQue.SRQueueingGroup == "01");
-                    qr.Select(apptQue.FormattedNo);
+                    var apptQueByAppt = new AppointmentQueueingQuery("apptQueByAppt");
+                    var apptQueByReg = new AppointmentQueueingQuery("apptQueByReg");
+
+                    qr.LeftJoin(apptQueByAppt).On(
+                        appt.AppointmentNo == apptQueByAppt.AppointmentNo
+                        && apptQueByAppt.SRQueueingGroup == "01"
+                    );
+
+                    qr.LeftJoin(apptQueByReg).On(
+                        qr.RegistrationNo == apptQueByReg.AppointmentNo
+                        && apptQueByReg.SRQueueingGroup == "02"
+                    );
+
+                    qr.Select(apptQueByAppt.FormattedNo.As("FormattedNoFromAppt"));
+                    qr.Select(apptQueByReg.FormattedNo.As("FormattedNoFromReg"));
                 }
                 else
                 {
@@ -966,6 +978,21 @@ namespace Temiang.Avicenna.Module.RADT
 
                 var dtb = qr.LoadDataTable();
 
+                //return dtb;
+                if (RegistrationType == "OPR")
+                {
+                    if (!dtb.Columns.Contains("FormattedNo"))
+                        dtb.Columns.Add("FormattedNo", typeof(string));
+
+                    foreach (DataRow row in dtb.Rows)
+                    {
+                        var fromAppt = row["FormattedNoFromAppt"].ToString();
+                        var fromReg = row["FormattedNoFromReg"].ToString();
+
+                        row["FormattedNo"] =
+                            !string.IsNullOrEmpty(fromAppt) ? fromAppt : fromReg;
+                    }
+                }
                 return dtb;
             }
         }
