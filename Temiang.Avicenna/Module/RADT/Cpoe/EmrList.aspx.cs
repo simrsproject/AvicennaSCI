@@ -961,10 +961,25 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 reg.LeftJoin(appt).On(appt.AppointmentNo == reg.AppointmentNo);
                 var appttype = new AppStandardReferenceItemQuery("appttype");
                 reg.LeftJoin(appttype).On(appttype.StandardReferenceID == "AppoinmentType" && appttype.ItemID == appt.SRAppoinmentType);
-                var apptQue = new AppointmentQueueingQuery("apptQue");
-                reg.LeftJoin(apptQue).On(appt.AppointmentNo == apptQue.AppointmentNo && apptQue.SRQueueingGroup == "01");
+                //var apptQue = new AppointmentQueueingQuery("apptQue");
+                //reg.LeftJoin(apptQue).On(appt.AppointmentNo == apptQue.AppointmentNo && apptQue.SRQueueingGroup == "01");
+                var apptQueByAppt = new AppointmentQueueingQuery("apptQueByAppt");
+                var apptQueByReg = new AppointmentQueueingQuery("apptQueByReg");
 
-                reg.Select(@"<apptQue.FormattedNo>", reg.RegistrationQue, reg.ExternalQueNo);
+                reg.LeftJoin(apptQueByAppt).On(
+                    appt.AppointmentNo == apptQueByAppt.AppointmentNo
+                    && apptQueByAppt.SRQueueingGroup == "01"
+                );
+
+                reg.LeftJoin(apptQueByReg).On(
+                    reg.RegistrationNo == apptQueByReg.AppointmentNo
+                    && apptQueByReg.SRQueueingGroup == "02"
+                );
+
+                reg.Select(apptQueByAppt.FormattedNo.As("FormattedNoFromAppt"));
+                reg.Select(apptQueByReg.FormattedNo.As("FormattedNoFromReg"));
+
+                reg.Select(reg.RegistrationQue, reg.ExternalQueNo);
                 reg.OrderBy(reg.RegistrationDate.Descending, reg.RegistrationQue.Ascending, reg.ExternalQueNo.Ascending, reg.RegistrationTime.Ascending);
             }
             else
@@ -974,7 +989,20 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             }
 
             var dtb = reg.LoadDataTable();
+            if (AppParameter.IsYes(AppParameter.ParameterItem.IsUsingKioskQueNoFormat))
+            {
+                if (!dtb.Columns.Contains("FormattedNo"))
+                    dtb.Columns.Add("FormattedNo", typeof(string));
 
+                foreach (DataRow row in dtb.Rows)
+                {
+                    var fromAppt = row["FormattedNoFromAppt"].ToString();
+                    var fromReg = row["FormattedNoFromReg"].ToString();
+
+                    row["FormattedNo"] =
+                        !string.IsNullOrEmpty(fromAppt) ? fromAppt : fromReg;
+                }
+            }
             // Update aditional
             SetAdditionalFieldOutPatient(dtb);
 
