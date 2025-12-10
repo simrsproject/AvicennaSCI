@@ -136,7 +136,7 @@ namespace Temiang.Avicenna.Module.Payroll.Master
 
             chkIsOvertimeAfterShift.Checked = wh.IsOvertimeAfterShift ?? false;
             chkIsOvertimeBeforeShift.Checked = wh.IsOvertimeBeforeShift ?? false;
-            chkIsTunjShift.Checked = wh.IsShiftLeader ?? false;
+            chkIsTunjShift.Checked = wh.IsTunjShift ?? false;
 
             chkIsOvertimeAfterShift2.Checked = wh.IsOvertimeAfterShift2 ?? false;
             chkIsOvertimeBeforeShift2.Checked = wh.IsOvertimeBeforeShift2 ?? false;
