@@ -889,6 +889,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             litDiagnosis.Text = EpisodeDiagnose.DiagnoseSummaryHtml(RegistrationNo);
             litWorkDiagnosis.Text = RegistrationInfoMedicDiagnose.DiagnoseSummaryHtml(RegistrationNo);
             litInitialDiagnose.Text = RegistrationCurrent.InitialDiagnose;
+            litSuggestion.Text = RegistrationCurrent.Suggestion;
         }
 
         private void PopulateImmunizationHistory()

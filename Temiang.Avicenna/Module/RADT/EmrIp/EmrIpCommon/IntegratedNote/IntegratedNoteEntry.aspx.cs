@@ -118,6 +118,10 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 cboInputType.Items.Add(new RadComboBoxItem("SBAR", "SBAR"));
                 cboInputType.Items.Add(new RadComboBoxItem("ADIME", "ADIME"));
                 cboInputType.Items.Add(new RadComboBoxItem("Notes", "Notes"));
+
+                var reg = new Registration();
+                reg.LoadByPrimaryKey(RegistrationNo);
+                litSuggestion.Text = reg.Suggestion;
             }
         }
 
