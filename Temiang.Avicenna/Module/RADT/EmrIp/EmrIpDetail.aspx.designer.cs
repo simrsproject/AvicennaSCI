@@ -393,6 +393,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         protected global::System.Web.UI.WebControls.Literal litInitialDiagnose;
 
         /// <summary>
+        /// fsSuggestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl fsSuggestion;
+
+        /// <summary>
         /// litSuggestion control.
         /// </summary>
         /// <remarks>

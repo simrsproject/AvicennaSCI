@@ -130,6 +130,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 btnAdd.Visible = isVisible;
                 grdPlafondHistory.Columns[0].Visible = isVisible;
                 grdPlafondHistory.Columns[grdPlafondHistory.Columns.Count - 1].Visible = isVisible;
+                tsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
             }
         }
 

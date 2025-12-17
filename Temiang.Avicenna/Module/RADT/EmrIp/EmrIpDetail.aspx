@@ -1668,7 +1668,7 @@
                         <legend>Initial Diagnose (Casemix)</legend>
                         <asp:Literal runat="server" ID="litInitialDiagnose"></asp:Literal>
                     </fieldset>
-                    <fieldset style="background-color: #FFFF00;">
+                    <fieldset runat="server" id="fsSuggestion" style="background-color: #FFFF00;">
                         <legend>Suggestion</legend>
                         <asp:Literal runat="server" ID="litSuggestion"></asp:Literal>
                     </fieldset>

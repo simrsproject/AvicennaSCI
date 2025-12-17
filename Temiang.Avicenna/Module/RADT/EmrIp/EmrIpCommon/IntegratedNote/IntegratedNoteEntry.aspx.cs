@@ -121,6 +121,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
                 var reg = new Registration();
                 reg.LoadByPrimaryKey(RegistrationNo);
+                rsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
                 litSuggestion.Text = reg.Suggestion;
             }
         }

@@ -438,6 +438,15 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         protected global::Telerik.Web.UI.RadGrid grdAntibioticItem;
 
         /// <summary>
+        /// rsSuggestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl rsSuggestion;
+
+        /// <summary>
         /// litSuggestion control.
         /// </summary>
         /// <remarks>

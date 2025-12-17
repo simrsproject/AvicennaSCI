@@ -434,7 +434,7 @@
                         </ClientSettings>
                     </telerik:RadGrid>
                 </fieldset>
-                <fieldset style="background-color: #FFFF00;">
+                <fieldset runat="server" id="rsSuggestion" style="background-color: #FFFF00;">
                     <legend>Suggestion</legend>
                     <asp:Literal runat="server" ID="litSuggestion"></asp:Literal>
                 </fieldset>

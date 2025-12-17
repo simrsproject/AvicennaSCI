@@ -256,7 +256,7 @@
         </tr>
         <tr>
             <td>
-                <fieldset>
+                <fieldset runat="server" id="tsSuggestion">
                     <legend>SUGGESTION</legend>
                     <table width="100%">
                         <tr>

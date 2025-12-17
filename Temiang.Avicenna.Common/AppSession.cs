@@ -5740,6 +5740,11 @@ namespace Temiang.Avicenna.Common
             {
                 get { return IsYes(AppParameter.ParameterItem.IsDirectButtonBetweenKioskVersion); }
             }
+
+            public static bool IsUsingSuggestion
+            {
+                get { return IsYes(AppParameter.ParameterItem.IsUsingSuggestion); }
+            }
         }
 
         public class Application

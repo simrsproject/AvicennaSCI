@@ -1285,7 +1285,8 @@ namespace Temiang.Avicenna.BusinessObject
             IsiDRGIntegration,
             IsUseCurrentDateRegistration,
             IsCallQueueingListEmrV2,
-            IsDirectButtonBetweenKioskVersion
+            IsDirectButtonBetweenKioskVersion,
+            IsUsingSuggestion
         }
 
         public class DefaultRecordValue
@@ -2528,6 +2529,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsUseCurrentDateRegistration = "Is This Filter Use Current Date Registration? (Yes/No)|No;RSI:No| |False";
             public const string IsCallQueueingListEmrV2 = "Is Call Queueing V2 in EMR List? (Yes/No)|No;RSI:Yes| |False";
             public const string IsDirectButtonBetweenKioskVersion = "Is Direct Button Between Kiosk Version? (Yes/No)|No;RSI:Yes| |False";
+            public const string IsUsingSuggestion = "Is Using Suggestion? (Yes/No)|No;RSI:Yes| |False";
         }
 
         public static AppParameter GetParameter(ParameterItem parameterItem)
