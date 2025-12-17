@@ -400,3 +400,7 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 	- Pop up untuk konfirmasi sudah apt apa belum di QueueEntry(V1) dan GetQueue(V2) dan tombol untuk perpindahan versi pengambilan antrian => param: IsDirectButtonBetweenKioskVersion
 2. Modif akses user type Physiotherapy bisa isi assessment dokter
 
+---[17-12-2025 - Dewi]---
+1. Menambahkan kolom Suggestion di Plafond Information, EMR Detail dan Progress Note
+2. Menaikann urutan kolom Patient Billing dan Diagnosis menjadi dibawah Physician Team
+3. insert document 17122025 - 01
