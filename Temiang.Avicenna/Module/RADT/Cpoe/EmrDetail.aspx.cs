@@ -826,6 +826,8 @@ namespace Temiang.Avicenna.Module.RADT
         {
             cpnDiagnosis.Title = "Diagnosis";
             litDiagnosis.Text = EpisodeDiagnose.DiagnoseSummaryHtml(RegistrationNo);
+            fsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
+            litSuggestion.Text = RegistrationCurrent.Suggestion;
         }
 
         private void PopulateImmunizationHistory()
