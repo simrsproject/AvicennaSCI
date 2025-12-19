@@ -404,3 +404,6 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 1. Menambahkan kolom Suggestion di Plafond Information, EMR Detail dan Progress Note
 2. Menaikann urutan kolom Patient Billing dan Diagnosis menjadi dibawah Physician Team
 3. insert document 17122025 - 01
+
+---[19-12-2025 - Apip]---
+1.	Mantis : 4242 -> Hitungan Cetak ulang kwitanasi - Titipan Rizki
