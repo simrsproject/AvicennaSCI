@@ -3497,6 +3497,18 @@ namespace Temiang.Avicenna.Common
                 }
             }
 
+            public static bool IsCountPrintNumberForSpecificProgram
+            {
+                get
+                {
+                    return IsYes(AppParameter.ParameterItem.IsCountPrintNumberForSpecificProgram);
+                }
+            }
+            public static string ProgramIdPrintNumberForSpecificProgram
+            {
+                get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.ProgramIdPrintNumberForSpecificProgram)); }
+            }
+
             public static string FirstTimeCheckMarkForTransfusionMonitoring
             {
                 get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.FirstTimeCheckMarkForTransfusionMonitoring)); }

@@ -827,6 +827,8 @@ namespace Temiang.Avicenna.BusinessObject
             IsValidateProductAccountOnItem,
             IsRunTheCostCalculationCleanUpProcess,
             IsCheckinConfirmationUsingDetails,
+            IsCountPrintNumberForSpecificProgram,
+            ProgramIdPrintNumberForSpecificProgram,
             FirstTimeCheckMarkForTransfusionMonitoring,
             LblCaptionCheckMarkForTransfusionMonitoring,
             IsBypassBloodCrossMatching,
@@ -1651,7 +1653,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsUsingPettyCash = "Is Using Petty Cash? (1:Yes, 0:No)|0| |False";
             public const string IsUsingPrescriptionOrder = "Is Using Prescription Order for Inpatient (Yes / No)|No| |True";
             public const string IsUsingRoomingIn = "Is Using Rooming In? (Yes or No)|No| |True";
-            public const string IsShowGenderOnBedInformationStatus = "Is Show Gender On Bed Information Status? (Yes or No)|Yes;RSMMP:No|�|True";
+            public const string IsShowGenderOnBedInformationStatus = "Is Show Gender On Bed Information Status? (Yes or No)|Yes;RSMMP:No| |True";
             //public const string IsUsingSeparateNoForEachPharmacyUnit = "Is Using Separate No For Each Pharmacy Unit? (Yes/No)|No| |True";
             public const string IsUsingTerminalDigitMedicalNo = "Is Using Terminal Digit MedicalNo|No||True";
             public const string IsPOWithStockInfo = "PO With Stock Info (Yes/No) |No||False";
@@ -2074,6 +2076,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsValidateProductAccountOnItem = "Is Validate Product Account On Item Product Medic, Non Medic and Kitchen? (Yes/No)|Yes;RSSMCB:No| |False";
             public const string IsRunTheCostCalculationCleanUpProcess = "Is Run The Cost Calculation Clean Up Process On Billing Recalculation? (Yes/No)|No| |True";
             public const string IsCheckinConfirmationUsingDetails = "Is Checkin Confirmation Using Details? (Yes/No)|No;RSMM:Yes| |True";
+            public const string IsCountPrintNumberForSpecificProgram = "Is Count Print Number For Specific Program? (Yes/No)|No;RSI:Yes| |True";
+            public const string ProgramIdPrintNumberForSpecificProgram = "ProgramID Print Number For Specific ProgramID| ;RSI:SLP.02.0027| |False";
             public const string FirstTimeCheckMarkForTransfusionMonitoring = "First Time Check Mark For Transfusion Monitoring|15| |True";
             public const string LblCaptionCheckMarkForTransfusionMonitoring = "Label Caption Check Mark For Transfusion Monitoring (Separate by [,])|-| |True";
 
@@ -2481,8 +2485,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsSeparatedRounding = "Is Separated Rounding? (Yes/No)|No;RSKS:Yes| |False";
             public const string IsUsingRoundingPaymentAR = "Is Using Rounding Payment AR? (Yes,No)|No;RSKS:Yes| |False";
             public const string IsCheckallDistributedPrint = " Defult Check all print Distribution Portion (Yes/No) |No||False";
-            public const string IsUsingRoundingPaymentAP = "Is Using Rounding Payment AP? (Yes/No)|No;RSKS:Yes|�|False";
-            public const string IsHandHygieneNoteNoValidation = "Is HandH ygiene Note No Validation? (Yes/No)|No;RSISB:Yes|�|False";
+            public const string IsUsingRoundingPaymentAP = "Is Using Rounding Payment AP? (Yes/No)|No;RSKS:Yes| |False";
+            public const string IsHandHygieneNoteNoValidation = "Is HandH ygiene Note No Validation? (Yes/No)|No;RSISB:Yes| |False";
             public const string IsUsingParamedicFeeByTeam = "Is Using Paramedic Fee By Team? (Yes/No)|No;RSKS:Yes| |False";
             public const string IsUsingGuarantorPrefixForQueueCodeKioskV2 = "Is Using Guarantor Prefix For Queue Code Kiosk V2? (Yes/No)|No;RSKS:Yes| |False";
             public const string IsValidateParamedicSBAR = "Is Validate Paramedic SBAR (Yes/No)|Yes;RSISB:No| |False";
@@ -2501,20 +2505,20 @@ namespace Temiang.Avicenna.BusinessObject
             public const string AssessmentTypeIDsForShowPanelFdolm = "List Asesment Yang Menggunakan Panel First day of last menstruation, gunakan titik koma (;) jika lebih dari satu|||false";
             public const string IsUsingSplitPainScaleAndFlaccBasedOnAge = "Is Using Split Pain Scale And Flacc Based On Age (Yes/No)?|No;RSSTJ:Yes| |false";
             public const string SplitPainScaleAndFlaccAgeValue = "Split Pain Scale And Flacc Age Value in number|| |false";
-            public const string IsEmrHideDivPeEntryOnAssessmentEntry = "Is Emr Hide Div Physical Exam Entry On Assessment Entry (Yes/No)?|No;RSSTJ:Yes|�|false";
-            public const string OperatingRoomBookingLimit = "Operating Room Booking Limit�(in�hours)|0| |False";
+            public const string IsEmrHideDivPeEntryOnAssessmentEntry = "Is Emr Hide Div Physical Exam Entry On Assessment Entry (Yes/No)?|No;RSSTJ:Yes| |false";
+            public const string OperatingRoomBookingLimit = "Operating Room Booking Limit (in hours)|0| |False";
 
             public const string RptTableToImageReducePctg = "Percentage of Image Size from Html Table to be reduced in report|100| |false";
             public const string PrescriptionDisplayColumnsDef = "Prescription Display Columns Definition|MedicalNo,PrescriptionNo,Flag;RSIMT:QueueNo,Flag| |false";
             public const string IsSoapFromPysicalExamIncludeNormalValue = "Is Soap From Pysical Exam Include Normal Value? (Yes/No)|Yes| |false";
-            
+
             public const string MaxChronicDrugPrescriptionInDays = "Maximum Chronic Drug Prescription in days|7| |False";
             public const string Is23DaysPrescriptionUseChronicGuarantor = "Is 23 Days Prescription Use Kronis Guarantor|;RSI:B2294| |False";
             public const string ValueForTakingQueueBeforeStartTime = "Waktu Yang Diizinkan Untuk Mengambil Antrian Sebelum Jam Mulai (dalam menit)|60| |False";
             public const string DischargeMethodDefaultOpr = "Default Value Discharge Method MDS Outpatient|O07;RSBK:O01;RSRG:O04| |False";
             public const string DischargeMethodDefaultEmr = "Default Value Discharge Method MDS Emergency|E03| |False";
             public const string IsSignMandatoryOnAssessmentEntry = "Is Sign Mandatory On Assessment Entry? (Yes/No)|No| |False";
-            public const string IsShowCurb65ScoreInAssesmentAndMDS = "Show CURB 65 Score In Assesment and MDS (Yes/No)?|No;RSI:Yes|�|false";
+            public const string IsShowCurb65ScoreInAssesmentAndMDS = "Show CURB 65 Score In Assesment and MDS (Yes/No)?|No;RSI:Yes| |false";
             public const string IsUsingNumberingSettingAppointmentNoWebService = "Numbering Setting for Appointment Web Service (Yes/No)?|No;RSI:Yes| |false";
             public const string IsMultipleSynonymValueForDiagnoseAndProcedure = "Is Multiple Synonym Value For Diagnose And Procedure (Yes/No)?|No;RSI:Yes| |false";
             public const string TablePatientBirthRecordFieldValidation = "Table Patient Birth Record Field Validation|| |false";
