@@ -30237,9 +30237,9 @@ namespace Temiang.Avicenna.BusinessObject
                 pphAmount = e.PphAmount.HasValue ? e.PphAmount.Value * e.CurrencyRate.Value : 0;
 
                 foreach (var p in eItems)
-                    //dAmt += (p.Quantity.Value * p.PriceInCurrency.Value) - (p.Quantity.Value * p.DiscountInCurrency.Value);
-                    dAmt += (p.Quantity.Value * p.PriceInCurrency.Value) - (p.Quantity.Value * p.DiscountInCurrency.Value) +
-                        (e.TaxPercentage.Value / 100 * ((p.Quantity.Value * p.PriceInCurrency.Value) - (p.Quantity.Value * p.DiscountInCurrency.Value)));
+                    dAmt += (p.Quantity.Value * p.PriceInCurrency.Value) - (p.Quantity.Value * p.DiscountInCurrency.Value);
+                //dAmt += (p.Quantity.Value * p.PriceInCurrency.Value) - (p.Quantity.Value * p.DiscountInCurrency.Value) +
+                //    (e.TaxPercentage.Value / 100 * ((p.Quantity.Value * p.PriceInCurrency.Value) - (p.Quantity.Value * p.DiscountInCurrency.Value))); -> Remake karena tidak balance , tapi dari tampilan app tidak selisih - Apip - 20260102
 
 
                 JournalTransactionDetails d = new JournalTransactionDetails();
@@ -30247,8 +30247,8 @@ namespace Temiang.Avicenna.BusinessObject
                 d.JournalId = header.JournalId;
                 d.ChartOfAccountId = ValidateCOA(isMedic ? dAccountM : dAccountNM, coaColl, string.Format("Supplier {0}: Chart Of Account Id PO Return {1}", sup.SupplierName, isMedic ? "Medical" : "Non Medical"));
                 d.SubLedgerId = isMedic ? dSubLedgerIdM : dSubLedgerIdNM;
-                //d.Debit = dAmt + taxAmount + pphAmount + discGolobal;
-                d.Debit = dAmt + pphAmount + discGolobal;
+                d.Debit = dAmt + taxAmount + pphAmount + discGolobal;
+                //d.Debit = dAmt + pphAmount + discGolobal;
                 d.Credit = 0;
                 d.Description = string.Format("RET#:{0}. SUP:{1}. POR#:{2}", e.TransactionNo, supplierName, e.ReferenceNo);
                 d.DocumentNumber = e.TransactionNo;
