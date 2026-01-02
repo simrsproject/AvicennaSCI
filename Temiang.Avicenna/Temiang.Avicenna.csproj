@@ -2183,6 +2183,7 @@
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\3. Insert RlMasterReportItemV2025 RL 3.9 V2025.sql" />
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\4. Insert Cetakan AppProgram RL 3.9 V2025.sql" />
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\5. Create Procedure spxml_RL3_9V2025.sql" />
+    <Content Include="Document\Version-2026.txt" />
     <Content Include="Document\Version-2025.txt" />
     <Content Include="Document\Version-2024.txt" />
     <Content Include="Document\Version-2023.txt" />

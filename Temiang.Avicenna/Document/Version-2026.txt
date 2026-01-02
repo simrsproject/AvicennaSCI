@@ -1,0 +1,2 @@
+﻿---[02-01-2026 - Apip]---
+1.	- Modif Perhitungan dAmt jadi taxamount di simpan dibawah, jurnal Return POR 
