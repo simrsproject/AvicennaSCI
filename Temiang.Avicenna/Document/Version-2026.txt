@@ -1,2 +1,5 @@
 ﻿---[02-01-2026 - Apip]---
 1.	- Modif Perhitungan dAmt jadi taxamount di simpan dibawah, jurnal Return POR 
+
+---[07-01-2026 - Luthfi]---
+1.	- Bugfix isi Exam Order tab Other, replace </br>

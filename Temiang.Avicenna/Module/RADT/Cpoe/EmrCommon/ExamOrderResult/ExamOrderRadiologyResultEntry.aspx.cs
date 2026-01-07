@@ -91,9 +91,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
                     foreach (var rim in rimColl)
                     {
-                        txtS.Text = string.IsNullOrEmpty(rim.Info1.Trim()) ? txtS.Text : txtS.Text + rim.Info1 + System.Environment.NewLine;
-                        txtO.Text = string.IsNullOrEmpty(rim.Info2.Trim()) ? txtO.Text : txtO.Text + rim.Info2 + System.Environment.NewLine;
-                        txtA.Text = string.IsNullOrEmpty(rim.Info3.Trim()) ? txtA.Text : txtA.Text + rim.Info3 + System.Environment.NewLine;
+                        txtS.Text = string.IsNullOrEmpty(rim.Info1.Trim()) ? txtS.Text : txtS.Text + rim.Info1.Replace("<br />", Environment.NewLine) + System.Environment.NewLine;
+                        txtO.Text = string.IsNullOrEmpty(rim.Info2.Trim()) ? txtO.Text : txtO.Text + rim.Info2.Replace("<br />", Environment.NewLine) + System.Environment.NewLine;
+                        txtA.Text = string.IsNullOrEmpty(rim.Info3.Trim()) ? txtA.Text : txtA.Text + rim.Info3.Replace("<br />", Environment.NewLine) + System.Environment.NewLine;
                         txtP.Text = string.IsNullOrEmpty(rim.Info4.Trim()) ? txtP.Text : txtP.Text + rim.Info4.Replace("<br />", Environment.NewLine) + System.Environment.NewLine;
                     }
                 }
