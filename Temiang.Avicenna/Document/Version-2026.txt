@@ -3,3 +3,6 @@
 
 ---[07-01-2026 - Luthfi]---
 1.	- Bugfix isi Exam Order tab Other, replace </br>
+
+--[12-01-2026 - APip]---
+1. allow paging nya di false di history fluid balance - titipan rama
