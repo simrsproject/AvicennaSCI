@@ -28,6 +28,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.Mds.Ctl
     public partial class MdsDiagnoseCtl : System.Web.UI.UserControl
     {
         private bool IsCallFromCaseMix => Request.QueryString["csmix"] == "1";
+        private bool IsToValidate => Request.QueryString["toValidate"] == "1";
         private string _sessionName = null;
         private string SessionName
         {
@@ -585,7 +586,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.Mds.Ctl
                 qr.OrderBy(qr.SequenceNo.Ascending);
                 var coll = new MedicalDischargeSummaryDiagnoseCollection();
 
-                if (IsCallFromCaseMix)
+                if (IsCallFromCaseMix || IsToValidate)
                 {
                     // Switch query source
                     coll.Query.es.QuerySource = "MedicalDischargeSummaryDiagnoseCmx";
@@ -596,7 +597,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.Mds.Ctl
                 coll.Load(qr);
 
                 // Harus direset ke aslinya karena jika tidak maka akan selalu pakai setingan terakhir walaupun untuk variable baru
-                if (IsCallFromCaseMix)
+                if (IsCallFromCaseMix || IsToValidate)
                 {
                     // Switch query source
                     coll.Query.es.QuerySource = "MedicalDischargeSummaryDiagnose";

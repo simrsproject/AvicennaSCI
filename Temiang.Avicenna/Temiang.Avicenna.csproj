@@ -2033,6 +2033,7 @@
     <Content Include="Document\2025\08\01. SatuSehatKfaZa.sql" />
     <Content Include="Document\2025\12\17\01. ALTER TABLE Registration ADD Suggestion.sql" />
     <Content Include="Document\2025\12\ALTER TABLE WorkingHour.sql" />
+    <Content Include="Document\2026\01\12\Add AppProgram DPJP Validation.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />
@@ -2814,6 +2815,7 @@
     <Content Include="Module\RADT\Bpjs\Casemix\CasemixExceptionItemProductDetail.ascx" />
     <Content Include="Module\RADT\Bpjs\Casemix\CasemixExceptionRegistrationRuleItemDetail.ascx" />
     <Content Include="Module\RADT\Bpjs\Casemix\CasemixPrint.aspx" />
+    <Content Include="Module\RADT\Bpjs\Casemix\CasemixPhysicianInChargeValidation.aspx" />
     <Content Include="Module\RADT\Bpjs\Fingerprint\FingerprintList.aspx" />
     <Content Include="Module\RADT\Bpjs\InternalSep\InternalSepList.aspx" />
     <Content Include="Module\RADT\Bpjs\JasaRaharja\DataIndukKecelakaan.aspx" />
@@ -15797,6 +15799,13 @@
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Casemix\CasemixPrint.aspx.designer.cs">
       <DependentUpon>CasemixPrint.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\Casemix\CasemixPhysicianInChargeValidation.aspx.cs">
+      <DependentUpon>CasemixPhysicianInChargeValidation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\Casemix\CasemixPhysicianInChargeValidation.aspx.designer.cs">
+      <DependentUpon>CasemixPhysicianInChargeValidation.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Fingerprint\FingerprintList.aspx.cs">
       <DependentUpon>FingerprintList.aspx</DependentUpon>

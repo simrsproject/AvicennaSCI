@@ -226,6 +226,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "Instruction5": this.str.Instruction5 = (string)value; break;
                         case "IsInstruction6": this.str.IsInstruction6 = (string)value; break;
                         case "Instruction6": this.str.Instruction6 = (string)value; break;
+                        case "IsNeedDPJPValidation": this.str.Instruction6 = (string)value; break;
                     }
                 }
                 else
@@ -301,6 +302,11 @@ namespace Temiang.Avicenna.BusinessObject
 
                             if (value == null || value is System.Boolean)
                                 this.IsInstruction6 = (System.Boolean?)value;
+                            break;
+                        case "IsNeedDPJPValidation":
+
+                            if (value == null || value is System.Boolean)
+                                this.IsNeedDPJPValidation = (System.Boolean?)value;
                             break;
 
                         default:
@@ -1278,6 +1284,21 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(MedicalDischargeSummaryCmxMetadata.ColumnNames.Instruction6, value);
             }
         }
+        /// <summary>
+        /// Maps to MedicalDischargeSummaryCmx.IsNeedDPJPValidation
+        /// </summary>
+        virtual public System.Boolean? IsNeedDPJPValidation
+        {
+            get
+            {
+                return base.GetSystemBoolean(MedicalDischargeSummaryCmxMetadata.ColumnNames.IsNeedDPJPValidation);
+            }
+
+            set
+            {
+                base.SetSystemBoolean(MedicalDischargeSummaryCmxMetadata.ColumnNames.IsNeedDPJPValidation, value);
+            }
+        }
 
         #endregion
 
@@ -2195,6 +2216,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.Instruction6 = Convert.ToString(value);
                 }
             }
+            public System.String IsNeedDPJPValidation
+            {
+                get
+                {
+                    System.Boolean? data = entity.IsNeedDPJPValidation;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.IsNeedDPJPValidation = null;
+                    else entity.IsNeedDPJPValidation = Convert.ToBoolean(value);
+                }
+            }
             private esMedicalDischargeSummaryCmx entity;
         }
         #endregion
@@ -2750,6 +2785,13 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, MedicalDischargeSummaryCmxMetadata.ColumnNames.Instruction6, esSystemType.String);
+            }
+        }
+        public esQueryItem IsNeedDPJPValidation
+        {
+            get
+            {
+                return new esQueryItem(this, MedicalDischargeSummaryCmxMetadata.ColumnNames.IsNeedDPJPValidation, esSystemType.Boolean);
             }
         }
 
@@ -3506,6 +3548,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
+            c = new esColumnMetadata(MedicalDischargeSummaryCmxMetadata.ColumnNames.IsNeedDPJPValidation, 64, typeof(System.Boolean), esSystemType.Boolean);
+            c.PropertyName = MedicalDischargeSummaryCmxMetadata.PropertyNames.IsNeedDPJPValidation;
+            c.IsNullable = true;
+            _columns.Add(c);
+
 
         }
         #endregion
@@ -3597,6 +3644,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string Instruction5 = "Instruction5";
             public const string IsInstruction6 = "IsInstruction6";
             public const string Instruction6 = "Instruction6";
+            public const string IsNeedDPJPValidation = "IsNeedDPJPValidation";
         }
         #endregion
 
@@ -3667,6 +3715,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string Instruction5 = "Instruction5";
             public const string IsInstruction6 = "IsInstruction6";
             public const string Instruction6 = "Instruction6";
+            public const string IsNeedDPJPValidation = "IsNeedDPJPValidation";
         }
         #endregion
 
@@ -3774,6 +3823,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("Instruction5", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("IsInstruction6", new esTypeMap("bit", "System.Boolean"));
                 meta.AddTypeMap("Instruction6", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("IsNeedDPJPValidation", new esTypeMap("bit", "System.Boolean"));
 
 
                 meta.Source = "MedicalDischargeSummaryCmx";

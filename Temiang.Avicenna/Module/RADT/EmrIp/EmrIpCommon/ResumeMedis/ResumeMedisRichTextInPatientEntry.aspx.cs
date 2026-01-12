@@ -49,7 +49,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
     public partial class ResumeMedisRichTextInPatientEntry : BasePageDialogEntry
     {
         private bool IsCallFromCaseMix => Request.QueryString["csmix"] == "1";
-
+        private bool IsToValidate => Request.QueryString["toValidate"] == "1";
         protected void Page_Init(object sender, EventArgs e)
         {
             if (IsCallFromCaseMix)
@@ -86,7 +86,12 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 ToolBar.EditVisible = false;
 
             // -------------------
-
+            if (IsToValidate)
+            {
+                ToolBar.PrintVisible = false;
+                ToolBar.SaveAndEditVisible = false;
+                ToolBar.AutoSaveVisible = false;
+            }
             if (!IsPostBack)
             {
                 var pat = new Patient();
@@ -96,7 +101,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 }
 
                 // Add Toolbar Button
-                if (!IsCallFromCaseMix)
+                if (!IsCallFromCaseMix && !IsToValidate)
                 {
                     var tbi = new RadToolBarButton();
                     tbi.Text = "Copy To SLP&nbsp;&nbsp;&nbsp;";
@@ -105,10 +110,12 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                     tbi.Enabled = !ToolBarMenuSave.Enabled;
                     ToolBarMenuData.Items.Add(tbi);
                 }
-                else
-                {
+                
+                if (IsToValidate)
+                    this.Title = this.Title + " (Casemix Validation)";
+                else if (IsCallFromCaseMix)
                     this.Title = this.Title + " (Casemix)";
-                }
+
                 mdsDiagnoseCtl.RegistrationType = "IPR";
             }
 
@@ -121,6 +128,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             {
                 StandardReference.InitializeIncludeSpace(cboSRUnitIntended, AppEnum.StandardReference.UnitIntended);
                 ComboBox.PopulateWithParamedic(cboTreatingPhysician);
+                if (IsToValidate)
+                    ToolBarMenuSave.Text = "Set as Final MDS";
 
             }
 
@@ -165,7 +174,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 }
 
                 // Harus direset ke aslinya karena jika tidak maka akan selalu pakai setingan terakhir walaupun untuk variable baru
-                if (IsCallFromCaseMix)
+                if (IsCallFromCaseMix || IsToValidate)
                 {
                     // Switch query source
                     medRes.Query.es.QuerySource = "MedicalDischargeSummary";
@@ -173,7 +182,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
             base.OnLoadComplete(e);
 
-            if (!IsCallFromCaseMix)
+            if (!IsCallFromCaseMix && !IsToValidate)
             {
                 var tbiCopyToSlp = (RadToolBarButton)ToolBarMenuData.Items[ToolBarMenuData.Items.Count - 1]; // Last Toolbar item
                 if (tbiCopyToSlp != null && tbiCopyToSlp.Value == "copytoslp")
@@ -201,17 +210,17 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         }
         public override string OnGetAdditionalMenuScript()
         {
-            if (!IsCallFromCaseMix)
+            if (!IsCallFromCaseMix && !IsToValidate)
             {
                 return @"
-case 'copytoslp':
-if (!window.confirm('Are you sure to copy this data ?')) {
-    args.set_cancel(true);
-    return;
-}
-fw_lastTbiDisabled = args.get_item();
-fw_lastTbiDisabled.disable();
-break;";
+                case 'copytoslp':
+                if (!window.confirm('Are you sure to copy this data ?')) {
+                    args.set_cancel(true);
+                    return;
+                }
+                fw_lastTbiDisabled = args.get_item();
+                fw_lastTbiDisabled.disable();
+                break;";
             }
 
             return string.Empty;
@@ -531,7 +540,7 @@ break;";
             txtRegistrationDate.SelectedDate = reg.RegistrationDate;
 
             var medRes = new MedicalDischargeSummary();
-            if (IsCallFromCaseMix)
+            if (IsCallFromCaseMix || IsToValidate)
                 medRes.Query.es.QuerySource = "MedicalDischargeSummaryCmx";
 
             if (medRes.LoadByPrimaryKey(RegistrationNo))
@@ -580,6 +589,8 @@ break;";
 
                 // Dianggap dirujuk jika cboReferralID dipilih krn kalau dari cboSRDischargeMethod jadi repot setingnya (Handono 231109)
                 var refExt = new ReferExternal();
+                if (IsCallFromCaseMix || IsToValidate)
+                    refExt.Query.es.QuerySource = "ReferExternalCmx";
                 if (refExt.LoadByPrimaryKey(RegistrationNo))
                 {
                     ComboBox.PopulateWithOneRow(cboReferralID, refExt.ReferralID, Enums.EntityClassName.Referral);
@@ -591,13 +602,15 @@ break;";
                     txtUnitOffice.Text = refExt.UnitOfficer;
                     txtContactTime.SelectedDate = refExt.ContactTime;
                 }
+                if (IsCallFromCaseMix || IsToValidate)
+                    refExt.Query.es.QuerySource = "ReferExternal";
             }
             else
                 hdnIsNewMds.Value = "1"; // Untuk kondisi otomatis Copy To SLP saat save
 
             // Control Plan
             var plan = new MedicalDischargeSummaryByNurse();
-            if (IsCallFromCaseMix)
+            if (IsCallFromCaseMix || IsToValidate)
                 plan.Query.es.QuerySource = "MedicalDischargeSummaryCmx"; // ControlPlan untuk casemix disimpan di table MedicalDischargeSummaryCmx
 
             if (plan.LoadByPrimaryKey(RegistrationNo))
@@ -671,7 +684,7 @@ break;";
             }
 
             // Harus direset ke aslinya karena jika tidak maka akan selalu pakai setingan terakhir walaupun untuk variable baru
-            if (IsCallFromCaseMix)
+            if (IsCallFromCaseMix || IsToValidate)
             {
                 // Switch query source
                 medRes.Query.es.QuerySource = "MedicalDischargeSummary";
@@ -1489,6 +1502,8 @@ break;";
         protected override void OnMenuSaveEditClick(ValidateArgs args)
         {
             SaveMedicalResume(args);
+            if (IsToValidate && !args.IsCancel)
+                args.MessageText = "Medical Discharge Summary has saved. View the data changes in MDS EMR.";
         }
 
         public override void OnMenuSaveAndEditClick(ValidateArgs args)
@@ -1700,7 +1715,7 @@ break;";
                 SaveReferExternal();
                 SavePlanControl(args);
 
-                if (!IsCallFromCaseMix)
+                if (!IsCallFromCaseMix || IsToValidate)
                 {
                     SaveRegistrationInfoMedic(reg.RegistrationNo, reg.ServiceUnitID);
                     SavePrescriptionHome();
@@ -1721,7 +1736,7 @@ break;";
                 CopyToBak();
             }
 
-            if (!IsCallFromCaseMix)
+            if (!IsCallFromCaseMix || IsToValidate)
             {
                 // Copy ulang ke MDS Casemix selama Mds Casemix belum di approve
                 var mdsCmx = new MedicalDischargeSummaryCmx();
@@ -1730,7 +1745,7 @@ break;";
             }
 
             // Save to SEP Doc source code copy from ReportViewer
-            if (IsCallFromCaseMix || (!IsCallFromCaseMix && AppParameter.IsYes(AppParameter.ParameterItem.IsAutoSaveMdsDpjpToSepFolderAfterSave)))
+            if ((IsCallFromCaseMix) || ((!IsCallFromCaseMix || IsToValidate) && AppParameter.IsYes(AppParameter.ParameterItem.IsAutoSaveMdsDpjpToSepFolderAfterSave)))
             {
                 try
                 {

@@ -188,6 +188,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             PopulatePathwayItemGrid();
             PopulateRegistrationGuarantorGrid();
             PopulateCasemixCoveredRegistrationRuleItemGrid();
+            InitSendValidateButton();
         }
 
         private void CalculateDetailTransactionByGroup()
@@ -1161,9 +1162,20 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         protected override void RaisePostBackEvent(IPostBackEventHandler source, string eventArgument)
         {
+            var argsCust = eventArgument.Split('|')[0];
+
+            if (argsCust == "sendvalidate")
+            {
+                var mode = eventArgument.Contains("|")
+                    ? eventArgument.Split('|')[1]
+                    : "send";
+
+                HandleSendValidate(mode);
+                return;
+            }
             base.RaisePostBackEvent(source, eventArgument);
             if (string.IsNullOrEmpty(eventArgument)) return;
-
+           
             RegistrationPathwayCollection rpc;
 
             var args = eventArgument.Split('|').Count() > 0 ? eventArgument.Split('|')[0] : eventArgument;
@@ -2342,7 +2354,222 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             reg.BpjsSepNo = txtSepNo.Text;
             reg.Save();
         }
+        protected void btnCopyToMds_Click(object sender, EventArgs e)
+        {
+            using (var trans = new esTransactionScope())
+            {
+                var medsumCmx = new MedicalDischargeSummaryCmx();
+                if (medsumCmx.LoadByPrimaryKey(RegistrationNo))
+                {
+                    CopyToMdsEMR(medsumCmx);
 
+                    //Commit if success, Rollback if failed
+                    trans.Complete();
+                    var notif = Helper.FindControlRecursive(Page, "fw_RadNotification") as RadNotification;
+                    if (notif != null)
+                    {
+                        notif.Text = "MDS Casemix has been successfully copied to EMR MDS.";
+                        notif.Title = "Success";
+                        notif.Show();
+                    }
+                }
+                else
+                {
+                    ScriptManager.RegisterStartupScript(
+                        this,
+                        GetType(),
+                        "warnMds",
+                        "alert('Medical Discharge Summary Casemix for this patient is not available.');",
+                        true
+                    );
+                    return;
+                }
+            }
+        }
+        private void CopyToMdsEMR(MedicalDischargeSummaryCmx medsumCmx)
+        {
+            //1. Copy MedicalDischargeSummaryCmx
+            var medsum = new MedicalDischargeSummary();
+            if (!medsum.LoadByPrimaryKey(medsumCmx.RegistrationNo))
+                medsum = new MedicalDischargeSummary();
+            foreach (esColumnMetadata col in medsumCmx.es.Meta.Columns)
+            {
+                medsum.SetColumn(col.Name, medsumCmx.GetColumn(col.Name));
+            }
+            medsum.Save();
+
+            var medsumNurse = new MedicalDischargeSummaryByNurse();
+            if (!medsumNurse.LoadByPrimaryKey(medsumCmx.RegistrationNo))
+            {
+                medsumNurse = new MedicalDischargeSummaryByNurse();
+                if (HasControlPlanItems(medsumCmx.ControlPlan))
+                {
+                    medsumNurse.RegistrationNo = medsumCmx.RegistrationNo;
+                    medsumNurse.ControlPlan = medsumCmx.ControlPlan;
+                    medsumNurse.Save();
+                }
+            }
+            else
+            {
+                medsumNurse.ControlPlan = medsumCmx.ControlPlan;
+                medsumNurse.Save();
+            }
+                
+            //2. Copy MedicalDischargeSummaryProcedureCmx
+            var procs = new MedicalDischargeSummaryProcedureCollection();
+            procs.Query.Where(procs.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            if(procs.Query.Load())
+            {
+                procs.MarkAllAsDeleted();
+                procs.Save();
+            }
+            var procCmxs = new MedicalDischargeSummaryProcedureCmxCollection();
+            procCmxs.Query.Where(procCmxs.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            if(procCmxs.Query.Load())
+            {
+                foreach (var procCmx in procCmxs)
+                {
+                    var pro = procs.AddNew();
+                    foreach (esColumnMetadata col in procCmx.es.Meta.Columns)
+                    {
+                        pro.SetColumn(col.Name, procCmx.GetColumn(col.Name));
+                    }
+                }
+                procs.Save();
+            }
+
+            //3. Copy MedicalDischargeSummaryDiagnoseCmx
+            var diags = new MedicalDischargeSummaryDiagnoseCollection();
+            diags.Query.Where(diags.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            if (diags.Query.Load())
+            { 
+                diags.MarkAllAsDeleted();
+                diags.Save();
+            }
+
+            var diagCmxs = new MedicalDischargeSummaryDiagnoseCmxCollection();
+            diagCmxs.Query.Where(diagCmxs.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            if(diagCmxs.Query.Load())
+            {
+                foreach (var diagCmx in diagCmxs)
+                {
+                    var diag = diags.AddNew();
+                    foreach (esColumnMetadata col in diagCmx.es.Meta.Columns)
+                    {
+                        diag.SetColumn(col.Name, diagCmx.GetColumn(col.Name));
+                    }
+                }
+                diags.Save();
+            }
+
+            //4. Copy MedicalDischargeSummaryBodyDiagramCmx
+            var bds = new MedicalDischargeSummaryBodyDiagramCollection();
+            bds.Query.Where(bds.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            if (bds.Query.Load())
+            { 
+                bds.MarkAllAsDeleted();
+                bds.Save();
+            }
+            var bdCmxs = new MedicalDischargeSummaryBodyDiagramCmxCollection();
+            bdCmxs.Query.Where(bdCmxs.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            if (bdCmxs.Query.Load())
+            {
+
+                foreach (var bdCmx in bdCmxs)
+                {
+                    var bd = bds.AddNew();
+                    foreach (esColumnMetadata col in bdCmx.es.Meta.Columns)
+                    {
+                        bd.SetColumn(col.Name, bdCmx.GetColumn(col.Name));
+                    }
+                }
+                bds.Save();
+            }
+
+            //5. Copy ReferExternal
+            var refEx = new ReferExternal();
+            if (refEx.LoadByPrimaryKey(RegistrationNo))
+            {
+                refEx.MarkAsDeleted();
+                refEx.Save();
+            }
+            var refExCmx = new ReferExternalCmx();
+            if (refExCmx.LoadByPrimaryKey(medsumCmx.RegistrationNo))
+            {
+                refEx = new ReferExternal();
+                foreach (esColumnMetadata col in refExCmx.es.Meta.Columns)
+                {
+                    refEx.SetColumn(col.Name, refExCmx.GetColumn(col.Name));
+                }
+                refEx.Save();
+            }
+
+            //6. Copy Home prescription
+            var hpCmxs = new MedicalDischargeSummaryPrescHomeCmxCollection();
+            hpCmxs.Query.Where(hpCmxs.Query.RegistrationNo == medsumCmx.RegistrationNo);
+            hpCmxs.Query.Load();
+
+            var hps = new MedicationReceiveCollection();
+            hps.Query.Where(hps.Query.RegistrationNo == medsumCmx.RegistrationNo, hps.Query.IsBroughtHome == true);
+            if (hps.Query.Load())
+            {
+                hps.MarkAllAsDeleted();
+                hps.Save();
+            }
+
+            foreach (var hpCmx in hpCmxs)
+            {
+                var hp = hps.AddNew();
+                foreach (esColumnMetadata col in hpCmx.es.Meta.Columns)
+                {
+                    hp.SetColumn(col.Name, hpCmx.GetColumn(col.Name));
+                }
+            }
+            hps.Save();
+        }
+        private void SendToDpjpValidation(bool IsSend)
+        {
+            using (var trans = new esTransactionScope())
+            {
+                // Load MDS Cmx
+                var medsum = new MedicalDischargeSummaryCmx();
+                if (!medsum.LoadByPrimaryKey(RegistrationNo))
+                {
+                    ScriptManager.RegisterStartupScript(
+                                this,
+                                GetType(),
+                                "mdsNotFound",
+                                "alert('MDS Casemix data not found.');",
+                                true
+                            );
+                    return;
+                }
+
+                medsum.IsNeedDPJPValidation = IsSend;
+                medsum.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                medsum.LastUpdateDateTime = DateTime.Now;
+                medsum.Save();
+
+                trans.Complete();
+            }
+        }
+        private bool HasControlPlanItems(string controlPlanJson)
+        {
+            if (string.IsNullOrWhiteSpace(controlPlanJson))
+                return false;
+
+            try
+            {
+                var json = Newtonsoft.Json.Linq.JObject.Parse(controlPlanJson);
+                var items = json["Items"] as Newtonsoft.Json.Linq.JArray;
+
+                return items != null && items.Count > 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         private void PopulatePlafonBar()
         {
             txtEstimatedPlafon.Value = Convert.ToDouble(TotalPlafond);
@@ -2548,6 +2775,34 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             grdRegistrationRule.DataBind();
         }
 
+        private void InitSendValidateButton()
+        {
+            var btn = RadToolBar2.FindItemByValue("sendvalidate") as RadToolBarButton;
+            var mdsCmx = new MedicalDischargeSummaryCmx();
+            mdsCmx.LoadByPrimaryKey(RegistrationNo);
+            if (mdsCmx.IsNeedDPJPValidation == true)
+            {
+                btn.Text = "Cancel DPJP Validation";
+                btn.ImageUrl = "~/Images/Toolbar/docClose.png";
+                btn.CommandArgument = "cancel";
+            }
+            else
+            {
+                btn.Text = "Send MDS for DPJP Validation";
+                btn.ImageUrl = "~/Images/Toolbar/docOpen.png";
+                btn.CommandArgument = "send";
+            }
+        }
+        private void HandleSendValidate(string mode)
+        {
+            var btn = RadToolBar2.FindItemByValue("sendvalidate") as RadToolBarButton;
+
+            bool isSend = mode == "send";
+
+            SendToDpjpValidation(isSend);
+            InitSendValidateButton();
+            RadToolBar2.DataBind();
+        }
         protected void grdRegistrationRule_NeedDataSource(object sender, Telerik.Web.UI.GridNeedDataSourceEventArgs e)
         {
             if (txtFilterItemService.Text.Trim() != string.Empty)
