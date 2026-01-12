@@ -55,7 +55,7 @@
     <telerik:RadSplitter ID="splMain" runat="server" Width="100%" Height="590px" HeightOffset="30" Orientation="Vertical">
         <telerik:RadPane ID="paneLeft" runat="server" Width="250px">
             <telerik:RadGrid ID="grdHeader" runat="server" ShowStatusBar="true" OnNeedDataSource="grdHeader_NeedDataSource" OnSelectedIndexChanged="grdHeader_OnSelectedIndexChanged"
-                AllowPaging="True" AutoGenerateColumns="False" AllowSorting="true">
+                AllowPaging="False" AutoGenerateColumns="False" AllowSorting="true">
                 <PagerStyle Mode="NextPrevAndNumeric" />
                 <MasterTableView DataKeyNames="RegistrationNo,SequenceNo"
                     PageSize="24">
