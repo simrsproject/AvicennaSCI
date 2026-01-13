@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
@@ -50,10 +51,10 @@ namespace Temiang.Avicenna.BusinessObject
                     if (prevStockGroup != newStockGroup)
                     {
                         if (!string.IsNullOrEmpty(prevStockGroup))
-                            UpdateHistStockPerStockGroup(prevStockGroup);
+                            UpdateHistStockPerStockGroupV2(prevStockGroup, base.LastUpdateByUserID); // UpdateHistStockPerStockGroup(prevStockGroup);
 
                         if (!string.IsNullOrEmpty(newStockGroup))
-                            UpdateHistStockPerStockGroup(newStockGroup);
+                            UpdateHistStockPerStockGroupV2(newStockGroup, base.LastUpdateByUserID); // UpdateHistStockPerStockGroup(newStockGroup);
                     }
                 }
 
@@ -76,6 +77,17 @@ namespace Temiang.Avicenna.BusinessObject
 
                 trans.Complete();
             }
+        }
+        private void UpdateHistStockPerStockGroupV2(string stockGroup, string userId)
+        {
+            esParameters prms = new esParameters();
+
+            prms.Add("p_StockGroup", stockGroup, esParameterDirection.Input, DbType.String, 20);
+            prms.Add("p_UserID", userId, esParameterDirection.Input, DbType.String, 20);
+
+            Location entity = new Location();
+            entity.es.Connection.CommandTimeout = 60 * 10; //5 mins 
+            entity.ExecuteNonQuery(esQueryType.StoredProcedure, "sp_UpdateHistStockPerStockGroup", prms);
         }
 
         private void UpdateHistStockPerStockGroup(string stockGroup)

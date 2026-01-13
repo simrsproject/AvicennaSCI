@@ -1,7 +1,18 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Temiang.Avicenna",
+    "\\Temiang.Avicenna.Common",
+    "\\Temiang.Avicenna.Common\\BaseControl",
+    "\\Temiang.Avicenna\\Module",
+    "\\Temiang.Avicenna\\Module\\Charges",
+    "\\Temiang.Avicenna\\Module\\Charges\\ServiceUnit",
+    "\\Temiang.Avicenna\\Module\\Charges\\ServiceUnit\\ServiceUnitTransaction",
+    "\\Temiang.Avicenna\\Module\\RADT",
+    "\\Temiang.Avicenna\\Module\\RADT\\Cpoe",
+    "\\Temiang.Avicenna\\Module\\RADT\\Cpoe\\EmrCommon",
+    "\\Temiang.Avicenna\\Module\\RADT\\Cpoe\\EmrCommon\\Medication"
   ],
-  "SelectedNode": "\\Temiang.Avicenna.sln",
+  "SelectedNode": "\\Temiang.Avicenna\\Module\\Charges\\ServiceUnit\\ServiceUnitTransaction\\ServiceUnitTransactionDetail.aspx.cs",
   "PreviewInSolutionExplorer": false
 }
