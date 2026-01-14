@@ -13,11 +13,10 @@
 
         <script language="javascript" type="text/javascript">
             function openWinProcess(regNo, fregNo, isDpjp, regType, mode) {
-                if (!isDpjp) {
-                    failure({
-                        d: "Anda bukan DPJP pada registrasi ini."
-                    });
-                    return;
+                const isAllowed = String(isDpjp).toLowerCase() === "true";
+                if (!isAllowed) {
+                    alert("This menu can only be accessed by the paramedic team.");
+                    return false;
                 }
                 entryResumeMedis(regNo, fregNo, '', regType, mode);
             }
