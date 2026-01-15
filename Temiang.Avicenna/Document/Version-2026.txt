@@ -3,3 +3,14 @@
 
 ---[07-01-2026 - Luthfi]---
 1.	- Bugfix isi Exam Order tab Other, replace </br>
+
+--[12-01-2026 - APip]---
+1. allow paging nya di false di history fluid balance - titipan rama
+
+--[12-01-2026 - Naufal]---
+1. CR RSI Validasi MDS dari Casemix Center untuk menjadi MDS akhir di EMR Pasien //https://www.sciptaintegrasi.com/mantis/view.php?id=3585
+	script 12/01/26
+
+---[13-11-2026 - Deby]---
+1. optimalisasi proses saat save location jika ada perubahan stockgroup
+   --> insert document 20260113 - 01

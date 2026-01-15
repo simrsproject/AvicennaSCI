@@ -39,6 +39,7 @@ namespace Temiang.Avicenna.Common
 
             public const string CasemixApproval = "01.20.12";
             public const string CasemixCoverage = "01.20.12A";
+            public const string CasemixDPJPValidation = "01.20.12B";
 
 
             // RADT

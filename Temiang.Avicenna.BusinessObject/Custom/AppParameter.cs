@@ -866,6 +866,7 @@ namespace Temiang.Avicenna.BusinessObject
             ItemIdBloodCrossMatching,
             IsShowExternalQueue,
             PorBaseSalesDay,
+            PorBaseSalesDayMax,
             PorForStockDay,
             IsValidateDiagnosisOnRealizationOrderOp,
             IsFoodSelectedByType,
@@ -2114,6 +2115,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string ProgramIdPrintJobDescription = "Program ID Print Job Description (Employee Position)|| |False";
             public const string ProgramIdPrintExamOrderOtherResult = "Program ID Print Exam Order Other Result|XML.02.0027| |False";
             public const string PorBaseSalesDay = "POR Automated Request Base Sales Day COunt|30| |False";
+            public const string PorBaseSalesDayMax = "POR Automated Request Base Sales Day Count Max|90| |False";
             public const string PorForStockDay = "POR Automated Request For Stock Day Count|7| |False";
             public const string IsValidateDiagnosisOnRealizationOrderOp = "Is Validate Diagnosis On Realization Order for Outpatient? (Yes/No)|Yes| |False";
             public const string IsFoodSelectedByType = "Is Food Selected By Type? (Yes/No)|No| |True";

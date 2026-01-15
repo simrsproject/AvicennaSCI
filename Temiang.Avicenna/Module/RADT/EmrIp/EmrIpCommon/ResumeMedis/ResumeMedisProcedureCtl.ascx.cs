@@ -11,6 +11,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
     {
         private string SessionName => string.Format("mdsproc_{0}", Helper.PageID(this.Page));
         private bool IsCallFromCaseMix => Request.QueryString["csmix"] == "1";
+        private bool IsToValidate => Request.QueryString["toValidate"] == "1";
 
         private RadComboBox cboProcedureSynonym
         {
@@ -146,7 +147,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 qr.OrderBy(qr.SequenceNo.Ascending);
 
                 var coll = new MedicalDischargeSummaryProcedureCollection();
-                if (IsCallFromCaseMix)
+                if (IsCallFromCaseMix || IsToValidate)
                 {
                     qr.es.QuerySource = "MedicalDischargeSummaryProcedureCmx";
                     coll.Query.es.QuerySource = "MedicalDischargeSummaryProcedureCmx";
@@ -154,7 +155,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 coll.Load(qr);
 
                 // Harus direset ke aslinya karena jika tidak maka akan selalu pakai setingan terakhir walaupun untuk variable baru
-                if (IsCallFromCaseMix)
+                if (IsCallFromCaseMix || IsToValidate)
                 {
                     // Switch query source
                     qr.es.QuerySource = "MedicalDischargeSummaryProcedure";

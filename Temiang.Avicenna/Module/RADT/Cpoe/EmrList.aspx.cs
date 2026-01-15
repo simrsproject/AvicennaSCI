@@ -3330,8 +3330,11 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 //queNextColl.Query.SRQueueingType.In("01","02"),
                 queNextColl.Query.SRKioskQueueStatus == "01",
                 queNextColl.Query.ParamedicID == AppSession.UserLogin.ParamedicID,
-                queNextColl.Query.QueueingDate == DateTime.Now.NowAtSqlServer().Date)
-                .OrderBy(queNextColl.Query.Id.Ascending);
+                queNextColl.Query.QueueingDate == DateTime.Now.NowAtSqlServer().Date);
+
+                if(!string.IsNullOrWhiteSpace(cboServiceUnitID.SelectedValue))
+                    queNextColl.Query.Where(queNextColl.Query.ServiceUnitID == cboServiceUnitID.SelectedValue)
+            .OrderBy(queNextColl.Query.Id.Ascending);
             queNextColl.Query.es.Top = 1;
 
             var queeNext = new AppointmentQueueing();

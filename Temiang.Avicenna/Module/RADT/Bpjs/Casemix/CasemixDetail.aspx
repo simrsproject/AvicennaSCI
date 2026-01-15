@@ -32,8 +32,8 @@
             }
 
             function OnClientButtonClicking(sender, args) {
+                var item = args.get_item();
                 var val = args.get_item().get_value();
-
                 switch (val) {
                     case "list":
                         var appst = "<%= Request.QueryString["appst"] ?? "" %>";
@@ -45,6 +45,25 @@
                         break;
                     case "mds":
                         entryResumeMedis('<%= RegistrationNo %>', '', '');
+                        break;
+                    case "copymds":
+                        if (!confirm("Are you sure want to Copy MDS Casemix data To MDS EMR?")) {
+                            args.set_cancel(true);
+                            return;
+                        }
+                        copyResumeMedis('<%= RegistrationNo %>', '', '');
+                        break;
+                    case "sendvalidate":
+                        var mode = item.get_commandArgument() || "send";
+                        var msg = mode === "send"
+                            ? "Are you sure want to send MDS data for DPJP validation?"
+                            : "Are you sure want to cancel DPJP validation?";
+                        if (!confirm(msg)) {
+                            args.set_cancel(true);
+                            return;
+                        }
+                        __doPostBack("<%= RadToolBar2.UniqueID %>", "sendvalidate|" + mode);
+                        args.set_cancel(true);
                         break;
                 }
             }
@@ -83,7 +102,9 @@
                     oWnd.maximize();
                 }
             }
-
+            function copyResumeMedis(regno) {
+                __doPostBack('<%= btnCopyToMds.UniqueID %>', '');
+            }
             function ReloadBilling() {
                 __doPostBack("<%= grdTransChargesItem.UniqueID %>", "rebindBilling");
             }
@@ -175,6 +196,7 @@
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="RadToolBar2">
                 <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="RadToolBar2" />
                     <telerik:AjaxUpdatedControl ControlID="txtCoverageAmount" LoadingPanelID="fw_ajxLoadingPanel" />
                     <telerik:AjaxUpdatedControl ControlID="txtProsedurNonBedah" LoadingPanelID="fw_ajxLoadingPanel" />
                     <telerik:AjaxUpdatedControl ControlID="txtTenagaAhli" LoadingPanelID="fw_ajxLoadingPanel" />
@@ -304,11 +326,14 @@
     <telerik:RadWindow ID="winRegInfo" Animation="None" Width="900px" Height="500px" OnClientClose="onClientClose"
         runat="server" ShowContentDuringLoad="false" Behavior="Close" VisibleStatusbar="false"
         Modal="true" />
+    <asp:Button ID="btnCopyToMds" runat="server" OnClick="btnCopyToMds_Click" Style="display:none;" />
     <telerik:RadToolBar ID="RadToolBar2" runat="server" Width="100%" OnClientButtonClicking="OnClientButtonClicking">
         <Items>
             <telerik:RadToolBarButton ID="RadToolBarButton1" runat="server" Text="List" Value="list" ImageUrl="~/Images/Toolbar/details16.png"
                 HoveredImageUrl="~/Images/Toolbar/details16_h.png" DisabledImageUrl="~/Images/Toolbar/details16_d.png" />
             <telerik:RadToolBarButton runat="server" Text="MDS" Value="mds" ImageUrl="~/Images/Toolbar/ordering16.png" DisabledImageUrl="~/Images/Toolbar/ordering16_d.png" />
+            <telerik:RadToolBarButton runat="server" Text="Copy To MDS EMR" Value="copymds" ImageUrl="~/Images/Toolbar/save16.png" DisabledImageUrl="~/Images/Toolbar/save16_d.png" />
+            <telerik:RadToolBarButton runat="server" Text="Send MDS Data for DPJP Validation" Value="sendvalidate" ImageUrl="~/Images/Toolbar/docOpen.png" />
             <telerik:RadToolBarButton ID="RadToolBarButton2" runat="server" Text="Refresh" Value="reload" ImageUrl="~/Images/Toolbar/refresh16.png"
                 HoveredImageUrl="~/Images/Toolbar/refresh16_h.png" DisabledImageUrl="~/Images/Toolbar/refresh16_d.png" />
         </Items>

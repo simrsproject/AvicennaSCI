@@ -29,7 +29,21 @@
 
         var lang = {
             "title": { "ind": "Sistem Antrian", "en": "Queuing System" },
-            "sub1Title": { "ind": "Silahkan pilih antrian berikut", "en": "Please choose one of the following queue" }
+            "sub1Title": { "ind": "Silahkan pilih antrian berikut", "en": "Please choose one of the following queue" },
+            "idlePopup": {
+                "title": {
+                    "ind": "Sudah punya kode booking?",
+                    "en": "Do you already have a booking code?"
+                },
+                "confirm": {
+                    "ind": "Sudah",
+                    "en": "Yes"
+                },
+                "cancel": {
+                    "ind": "Belum",
+                    "en": "No"
+                }
+            }
         };
         var databtn = {};
         var IsDirectButtonBetweenKioskVersion = <%= IsDirectButtonBetweenKioskVersion.ToString().ToLower() %>;
@@ -38,6 +52,8 @@
         let stopIdle = false;
         const idleLimit = 6;
         let isPopupShown = false;
+        let isInModal = false;
+        var activeLang = "ind";
 
         function resetIdle() {
             idleTime = 0;
@@ -46,14 +62,14 @@
         function ShowIdlePopup() {
             if (isPopupShown) return;
             isPopupShown = true;
-
+            const txt = lang.idlePopup;
             Swal.fire({
-                title: 'Sudah punya kode booking?',
+                title: txt.title[activeLang],
                 text: '',
                 type: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Sudah',
-                cancelButtonText: 'Belum',
+                confirmButtonText: txt.confirm[activeLang],
+                cancelButtonText: txt.cancel[activeLang],
                 reverseButtons: true,
                 allowOutsideClick: false,
                 allowEscapeKey: false,
@@ -76,6 +92,7 @@
 
             setInterval(function () {
                 if (stopIdle) return;
+                if (isInModal) return;
                 if (!isPopupShown) { 
                     idleTime++;
                 }
@@ -86,10 +103,16 @@
             }, 1000);
         }
         $(document).ready(function () {
-            //if (IsDirectButtonBetweenKioskVersion) {
-            //    ShowIdlePopup();
-            //}
-            //alert(BaseURL + "/WebService/jQueryWS.asmx/NPCGetList");    
+            $(document).on('shown.bs.modal', '.modal', function () {
+                isInModal = true;
+                idleTime = 0;
+            });
+
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                isInModal = false;
+                idleTime = 0;
+            });
+
             $.ajaxSetup({
                 beforeSend: function (xhr) {
                     if (xhr.overrideMimeType) {
@@ -112,6 +135,7 @@
         });
 
         function SetLang(l) {
+            activeLang = l.toLowerCase();
             SetHtml('spanPageTitle', l == "Ind" ? lang.title.ind : lang.title.en);
             SetHtml('spanSub1Title', l == "Ind" ? lang.sub1Title.ind : lang.sub1Title.en);
             // set button lang
