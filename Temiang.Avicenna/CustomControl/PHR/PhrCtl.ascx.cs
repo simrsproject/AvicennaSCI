@@ -1178,6 +1178,31 @@ namespace Temiang.Avicenna.CustomControl.Phr
             script.AppendLine("<script type='text/javascript' language='javascript'>");
             script.AppendLine("function fillFormulaField(){");
 
+            //Update by Wiliam - 20260112 tambahkan radiobutton
+            // Include getValueSafe function
+            script.AppendLine(@"
+            function getValueSafe(id) {
+            if (typeof $find === 'function') {
+            var o = $find(id);
+            if (o && typeof o.get_value === 'function') {
+            var v = o.get_value();
+            return (v === null || v === '') ? 0 : v;
+            }
+            }
+
+            var radios = document.querySelectorAll(
+            ""input[type='radio'][id^='"" + id + ""_'], "" +
+            ""input[type='radio'][name*='"" + id.replace(/_/g, '$') + ""']""
+            );
+
+            for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked) return radios[i].value;
+            }
+
+            return 0;
+            }
+            ");
+
             foreach (DictionaryEntry dictionaryEntry in formulas)
             {
 
@@ -1200,8 +1225,13 @@ namespace Temiang.Avicenna.CustomControl.Phr
                 }
 
                 formula = formula.Replace("/.", "d0t").Replace('.', '_').Replace("d0t", ".");
-                formula = formula.Replace("[", "$find('" + baseClientID);
-                formula = formula.Replace("]", "').get_value()");
+                /*lama
+                 formula = formula.Replace("[", "$find('" + baseClientID);
+                 formula = formula.Replace("]", "').get_value()");*/
+
+                //baru untuk radiobutton juga
+                formula = formula.Replace("[", $"getValueSafe('{baseClientID}");
+                formula = formula.Replace("]", "')");
 
                 // combobox
                 if (formula.Length > 3)
@@ -1219,11 +1249,21 @@ namespace Temiang.Avicenna.CustomControl.Phr
                         script.AppendFormat("item{0}.select();", id);
                         continue;
                     }
+
+                    if (answerType == "RBT")
+                    {
+                        formula = formula.Substring(3);
+                        script.AppendLine($"var value{id} = {formula};");
+                        script.AppendLine($"var radios{id} = document.querySelectorAll(\"input[type='radio'][name*='{baseClientID}{id}']\");");
+                        script.AppendLine($"for(var i=0;i<radios{id}.length;i++){{ if(radios{id}[i].value==value{id}) radios{id}[i].checked=true; }}");
+                        continue;
+                    }
                 }
 
                 script.AppendFormat("var value{0}={1};", id, formula);
                 script.AppendLine();
-                script.AppendFormat("$find('{0}{1}').set_value(value{1});", baseClientID, id);
+                // script.AppendFormat("$find('{0}{1}').set_value(value{1});", baseClientID, id);
+                script.AppendLine($"var obj{id} = $find('{baseClientID}{id}'); if(obj{id}) obj{id}.set_value(value{id});");
             }
             script.AppendLine();
             script.AppendLine("}");
