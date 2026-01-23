@@ -516,5 +516,7 @@ namespace Temiang.Avicenna.BusinessObject.JsonField.Assesment
 
         public string Notes { get; set; }
         public string NutritionSkrinning { get; set; }
+
+        public string CaseType { get; set; }
     }
 }
