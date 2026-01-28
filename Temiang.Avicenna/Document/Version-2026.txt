@@ -14,3 +14,6 @@
 ---[13-11-2026 - Deby]---
 1. optimalisasi proses saat save location jika ada perubahan stockgroup
    --> insert document 20260113 - 01
+
+---[28-01-2026 - Luthfi]---
+1. Bugfix session ItemBridging di master lab
