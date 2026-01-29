@@ -2035,6 +2035,7 @@
     <Content Include="Document\2025\12\ALTER TABLE WorkingHour.sql" />
     <Content Include="Document\2026\01\12\Add AppProgram DPJP Validation.sql" />
     <Content Include="Document\2026\01\13\01. sp_UpdateHistStockPerStockGroup - create sp.sql" />
+    <Content Include="Document\2026\01\29\01. ItemTransaction - alter table add column.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />
