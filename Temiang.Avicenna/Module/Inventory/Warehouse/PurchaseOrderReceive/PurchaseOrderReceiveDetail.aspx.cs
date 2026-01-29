@@ -247,6 +247,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             ajax.AddAjaxSetting(AjaxManager, rblTypesOfTaxes);
             ajax.AddAjaxSetting(AjaxManager, txtTaxPercentage);
             ajax.AddAjaxSetting(AjaxManager, cboFromLocationID);
+            ajax.AddAjaxSetting(AjaxManager, chkIsNewTaxCalculation);
 
             if (AppSession.Parameter.IsPphUsesAfixedValue)
             {
@@ -507,6 +508,9 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             btnGetItem.Enabled = true;
             btnResetItem.Enabled = true;
             chkIsInventoryItem.Checked = IsGrantsReceiving || IsDirectPurchase;
+            if (IsGrantsReceiving || IsDirectPurchase)
+                chkIsNewTaxCalculation.Checked = true;
+
             if (IsDirectPurchase)
             {
                 txtInvoiceNo.Text = "-";
@@ -864,6 +868,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
 
             if (itemTransaction.IsTaxable != null)
                 rblTypesOfTaxes.SelectedIndex = itemTransaction.IsTaxable == 2 ? 2 : (itemTransaction.IsTaxable == 1 ? 0 : 1);
+            chkIsNewTaxCalculation.Checked = itemTransaction.IsNewTaxCalculation ?? false;
 
             CalculateTotal();
         }
@@ -928,6 +933,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                 entity.ServiceUnitCostID = cboFromServiceUnitID.SelectedValue;
             else
                 entity.ServiceUnitCostID = refs.ServiceUnitCostID;
+            entity.IsNewTaxCalculation = chkIsNewTaxCalculation.Checked;
                 
             //Last Update Status
             if (entity.es.IsAdded || entity.es.IsModified)
@@ -1026,7 +1032,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             var supp = new Supplier();
             supp.LoadByPrimaryKey(cboBusinessPartnerID.SelectedValue);
 
-            if (rblTypesOfTaxes.SelectedIndex == 0)
+            if (rblTypesOfTaxes.SelectedIndex != 2)
                 txtTaxPercentage.Value = Convert.ToDouble(supp.TaxPercentage ?? 0);
             else
                 txtTaxPercentage.Value = 0;
@@ -1079,6 +1085,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             chkIsConsignmentAlreadyReceived.Checked = header.IsConsignmentAlreadyReceived ?? false;
             chkIsAssets.Enabled = !(chkIsConsignment.Checked); //&& !AppSession.Application.IsModuleAssetActive;
             rblTypesOfTaxes.SelectedIndex = header.IsTaxable == 2 ? 2 : (header.IsTaxable == 1 ? 0 : 1);
+            chkIsNewTaxCalculation.Checked = header.IsNewTaxCalculation ?? false;
                 
             if (chkIsConsignment.Checked)
             {
@@ -1197,7 +1204,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                     entity.Discount2Percentage = (decimal)row["Discount2Percentage"];
                     entity.Discount = (decimal)row["Discount"];
 
-                    if (header.IsTaxable == 0)
+                    if (header.IsTaxable == 0 && !(chkIsNewTaxCalculation.Checked))
                     {
                         //var prices = Helper.GetReversePriceValueV2((decimal)row["Price"], entity.Discount1Percentage ?? 0, entity.Discount ?? 0);
                         var prices = Helper.GetReversePriceValueV2((decimal)row["Price"], entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);

@@ -1080,6 +1080,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 chkIsConsignment.Enabled = false;
             }
 
+            chkIsNewTaxCalculation.Checked = true;
+
             PopulateNewTransactionNo();
             GetTax(cboBusinessPartnerID.SelectedValue);
         }
@@ -1435,6 +1437,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             }
 
             chkIsInstallmentOrder.Checked = itemTransaction.IsInstallmentType ?? false;
+            chkIsNewTaxCalculation.Checked = itemTransaction.IsNewTaxCalculation ?? false;
 
             CalculateDetailTransaction(false);
             grdApproval.Rebind();
@@ -1507,6 +1510,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             entity.SRPurchaseCategorization = cboCategorization.SelectedValue;
             entity.SRProcurementType = cboSRProcurementType.SelectedValue;
             entity.IsInstallmentType = chkIsInstallmentOrder.Checked;
+            entity.IsNewTaxCalculation = chkIsNewTaxCalculation.Checked;
 
             if (entity.es.IsAdded)
             {
@@ -2184,7 +2188,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 entity.SRItemUnit = userControl.SRItemUnit;
                 entity.ConversionFactor = userControl.ConversionFactor;
                 entity.Price = userControl.Price;
-                entity.PriceInCurrency = entity.Price * Convert.ToDecimal(txtCurrencyRate.Value);
+                entity.IsTaxable = userControl.IsTaxable;
+                
                 entity.IsDiscountInPercent = userControl.IsDiscountInPercent;
                 if (entity.IsDiscountInPercent == true)
                 {
@@ -2200,11 +2205,22 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     entity.Discount2Percentage = 0;
                     entity.Discount = userControl.DiscountAmount;
                 }
+
+                //db:20260129 - ppn dikeluarkan dari price
+                if (rblTypesOfTaxes.SelectedIndex == 1 && (entity.IsTaxable ?? false) && chkIsNewTaxCalculation.Checked)
+                {
+                    var prices = Helper.GetReversePriceValueV2((entity.Price ?? 0), entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
+
+                    entity.Price = prices[0];
+                    entity.Discount = prices[1];
+                }
+
+                entity.PriceInCurrency = entity.Price * Convert.ToDecimal(txtCurrencyRate.Value);
                 entity.DiscountInCurrency = entity.Discount * Convert.ToDecimal(txtCurrencyRate.Text);
                 entity.IsBonusItem = userControl.IsBonusItem;
                 entity.IsClosed = userControl.IsClosed;
                 entity.Specification = userControl.Specs;
-                entity.IsTaxable = userControl.IsTaxable;
+                
 
                 ProcurementUtils.PopulateBalanceInfoByBlankValue(entity);
 
@@ -2345,7 +2361,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             var supp = new Supplier();
             supp.LoadByPrimaryKey(cboBusinessPartnerID.SelectedValue);
 
-            if (rblTypesOfTaxes.SelectedIndex == 0)
+            if (rblTypesOfTaxes.SelectedIndex != 2)
                 txtTaxPercentage.Value = Convert.ToDouble(supp.TaxPercentage ?? 0);
             else
                 txtTaxPercentage.Value = 0;
