@@ -1299,7 +1299,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             }
             set
             {
-                Session["collParamedicBridging"] = value;
+                Session["collItemBridging"] = value;
             }
         }
 

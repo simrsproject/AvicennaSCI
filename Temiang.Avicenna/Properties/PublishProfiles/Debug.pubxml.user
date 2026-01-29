@@ -6,7 +6,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_PublishTargetUrl>D:\SCI\PublishSCIAvicennaLive</_PublishTargetUrl>
-    <History>True|2025-11-26T08:53:17.2830937Z||;True|2025-11-25T09:53:36.1190510+07:00||;True|2025-11-24T16:01:06.4025282+07:00||;True|2025-11-24T12:28:44.5287490+07:00||;True|2024-10-11T17:11:57.2735175+07:00||;True|2023-05-19T10:59:04.2960956+07:00||;True|2023-05-11T09:56:35.5908613+07:00||;True|2023-05-10T15:11:29.0710509+07:00||;True|2023-05-03T10:08:06.8589082+07:00||;True|2022-08-23T08:19:41.4474339+07:00||;True|2022-07-14T16:03:26.6392853+07:00||;False|2022-02-23T20:48:58.2771145+07:00||;True|2022-02-23T11:30:43.4333989+07:00||;True|2022-02-21T19:48:47.8597427+07:00||;True|2022-02-19T18:33:17.6379332+07:00||;True|2022-02-19T18:03:22.2077148+07:00||;True|2022-02-18T17:23:06.7939241+07:00||;False|2022-02-18T12:46:42.4422956+07:00||;False|2022-02-18T12:45:06.2159839+07:00||;True|2022-02-17T14:07:12.6682919+07:00||;True|2022-02-17T12:04:18.0622055+07:00||;True|2022-02-15T18:26:58.3621327+07:00||;True|2022-02-14T15:01:51.9273868+07:00||;True|2022-02-10T11:33:54.9732701+07:00||;True|2022-02-10T10:19:22.2634112+07:00||;True|2022-02-03T13:53:23.2657998+07:00||;True|2022-01-28T16:53:14.6913190+07:00||;True|2022-01-19T22:56:50.9610701+07:00||;True|2022-01-17T12:57:07.3271191+07:00||;True|2022-01-14T16:00:30.1385608+07:00||;False|2022-01-14T15:57:59.1521712+07:00||;True|2022-01-14T15:27:39.7464634+07:00||;True|2021-11-23T15:19:35.2615443+07:00||;True|2021-11-23T14:02:30.4266898+07:00||;True|2021-06-30T11:57:29.4850043+07:00||;</History>
+    <History>True|2026-01-15T06:46:55.8072059Z||;True|2025-11-26T15:53:17.2830937+07:00||;True|2025-11-25T09:53:36.1190510+07:00||;True|2025-11-24T16:01:06.4025282+07:00||;True|2025-11-24T12:28:44.5287490+07:00||;True|2024-10-11T17:11:57.2735175+07:00||;True|2023-05-19T10:59:04.2960956+07:00||;True|2023-05-11T09:56:35.5908613+07:00||;True|2023-05-10T15:11:29.0710509+07:00||;True|2023-05-03T10:08:06.8589082+07:00||;True|2022-08-23T08:19:41.4474339+07:00||;True|2022-07-14T16:03:26.6392853+07:00||;False|2022-02-23T20:48:58.2771145+07:00||;True|2022-02-23T11:30:43.4333989+07:00||;True|2022-02-21T19:48:47.8597427+07:00||;True|2022-02-19T18:33:17.6379332+07:00||;True|2022-02-19T18:03:22.2077148+07:00||;True|2022-02-18T17:23:06.7939241+07:00||;False|2022-02-18T12:46:42.4422956+07:00||;False|2022-02-18T12:45:06.2159839+07:00||;True|2022-02-17T14:07:12.6682919+07:00||;True|2022-02-17T12:04:18.0622055+07:00||;True|2022-02-15T18:26:58.3621327+07:00||;True|2022-02-14T15:01:51.9273868+07:00||;True|2022-02-10T11:33:54.9732701+07:00||;True|2022-02-10T10:19:22.2634112+07:00||;True|2022-02-03T13:53:23.2657998+07:00||;True|2022-01-28T16:53:14.6913190+07:00||;True|2022-01-19T22:56:50.9610701+07:00||;True|2022-01-17T12:57:07.3271191+07:00||;True|2022-01-14T16:00:30.1385608+07:00||;False|2022-01-14T15:57:59.1521712+07:00||;True|2022-01-14T15:27:39.7464634+07:00||;True|2021-11-23T15:19:35.2615443+07:00||;True|2021-11-23T14:02:30.4266898+07:00||;True|2021-06-30T11:57:29.4850043+07:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -1082,52 +1082,52 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:23</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.PCare.dll">
-      <publishTime>11/24/2025 12:21:19</publishTime>
+      <publishTime>01/15/2026 13:44:09</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.PCare.pdb">
-      <publishTime>11/24/2025 12:21:19</publishTime>
+      <publishTime>01/15/2026 13:44:09</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.dll">
-      <publishTime>11/24/2025 12:21:19</publishTime>
+      <publishTime>01/15/2026 13:44:09</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.dll.config">
       <publishTime>11/03/2025 16:03:16</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.pdb">
-      <publishTime>11/24/2025 12:21:19</publishTime>
+      <publishTime>01/15/2026 13:44:09</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.BusinessObject.dll">
-      <publishTime>11/24/2025 12:21:16</publishTime>
+      <publishTime>01/15/2026 13:44:07</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.BusinessObject.pdb">
-      <publishTime>11/24/2025 12:21:16</publishTime>
+      <publishTime>01/15/2026 13:44:07</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.dll">
-      <publishTime>11/26/2025 15:51:36</publishTime>
+      <publishTime>01/15/2026 13:44:10</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.dll.config">
       <publishTime>11/03/2025 16:03:17</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.pdb">
-      <publishTime>11/26/2025 15:51:36</publishTime>
+      <publishTime>01/15/2026 13:44:10</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.dll">
-      <publishTime>11/26/2025 15:52:55</publishTime>
+      <publishTime>01/15/2026 13:46:35</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.dll.config">
       <publishTime>07/14/2022 14:33:02</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.pdb">
-      <publishTime>11/26/2025 15:52:55</publishTime>
+      <publishTime>01/15/2026 13:46:35</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.dll">
-      <publishTime>11/26/2025 15:52:09</publishTime>
+      <publishTime>01/15/2026 13:45:10</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.dll.config">
       <publishTime>11/03/2025 16:03:18</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.pdb">
-      <publishTime>11/26/2025 15:52:09</publishTime>
+      <publishTime>01/15/2026 13:45:10</publishTime>
     </File>
     <File Include="bin/Temiang.Dal.Core.dll">
       <publishTime>11/03/2025 16:03:16</publishTime>
@@ -5087,7 +5087,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
     <File Include="CustomControl/PHR/PhrCtl.ascx">
-      <publishTime>11/03/2025 16:03:19</publishTime>
+      <publishTime>01/15/2026 13:21:07</publishTime>
     </File>
     <File Include="CustomControl/PHR/PhrWebService.asmx">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -9385,6 +9385,18 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Document/2025/09/iDRG/index.php">
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
+    <File Include="Document/2025/12/17/01. ALTER TABLE Registration ADD Suggestion.sql">
+      <publishTime>01/09/2026 10:35:30</publishTime>
+    </File>
+    <File Include="Document/2025/12/ALTER TABLE WorkingHour.sql">
+      <publishTime>12/04/2025 15:50:51</publishTime>
+    </File>
+    <File Include="Document/2026/01/12/Add AppProgram DPJP Validation.sql">
+      <publishTime>01/15/2026 13:16:32</publishTime>
+    </File>
+    <File Include="Document/2026/01/13/01. sp_UpdateHistStockPerStockGroup - create sp.sql">
+      <publishTime>01/15/2026 13:16:32</publishTime>
+    </File>
     <File Include="Document/dll/Antlr3.Runtime.dll">
       <publishTime>08/13/2022 13:44:19</publishTime>
     </File>
@@ -9950,7 +9962,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
     <File Include="Document/Version-2025.txt">
-      <publishTime>11/26/2025 15:27:07</publishTime>
+      <publishTime>01/09/2026 10:35:30</publishTime>
+    </File>
+    <File Include="Document/Version-2026.txt">
+      <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
     <File Include="ErrorPage.aspx">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -11663,7 +11678,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
     <File Include="MasterPage/MasterCustom.Master">
-      <publishTime>11/03/2025 16:03:19</publishTime>
+      <publishTime>12/04/2025 15:50:51</publishTime>
     </File>
     <File Include="MasterPage/MasterCustomBootstrap.Master">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -15545,7 +15560,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/Kiosk/QueueEntry.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
     <File Include="Module/Kiosk/QueueingV2/QueueCaller.aspx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -16286,7 +16301,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/Payroll/Master/WorkingHour/WorkingHourDetail.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>12/04/2025 15:50:51</publishTime>
     </File>
     <File Include="Module/Payroll/Master/WorkingHour/WorkingHourItem.ascx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -16595,7 +16610,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/RADT/Bpjs/Casemix/CasemixDetail.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
     <File Include="Module/RADT/Bpjs/Casemix/CasemixExceptionDialog.aspx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -16614,6 +16629,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Module/RADT/Bpjs/Casemix/CasemixList.aspx">
       <publishTime>11/03/2025 16:03:20</publishTime>
+    </File>
+    <File Include="Module/RADT/Bpjs/Casemix/CasemixPhysicianInChargeValidation.aspx">
+      <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
     <File Include="Module/RADT/Bpjs/Casemix/CasemixPrint.aspx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -16643,7 +16661,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/RADT/Bpjs/PlafondInformation/PlafondInformationDialog.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>01/09/2026 10:35:30</publishTime>
     </File>
     <File Include="Module/RADT/Bpjs/PlafondInformation/PlafondInformationList.aspx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -17345,10 +17363,10 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/RADT/Cpoe/EmrDetail.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>01/09/2026 10:35:30</publishTime>
     </File>
     <File Include="Module/RADT/Cpoe/EmrList.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>12/04/2025 15:50:51</publishTime>
     </File>
     <File Include="Module/RADT/Cpoe/EmrWebService.asmx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -17396,7 +17414,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/RADT/EmrIp/EmrIpCommon/FluidBalance/FluidBalanceHist.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
     <File Include="Module/RADT/EmrIp/EmrIpCommon/FluidBalance/FluidBalanceSchemaInfusDetail.ascx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -17408,7 +17426,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/RADT/EmrIp/EmrIpCommon/IntegratedNote/IntegratedNoteEntry.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>01/09/2026 10:35:30</publishTime>
     </File>
     <File Include="Module/RADT/EmrIp/EmrIpCommon/IntegratedNote/NursingCareStandardTransDTDetail.ascx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -17708,7 +17726,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
     <File Include="Module/RADT/EmrIp/EmrIpDetail.aspx">
-      <publishTime>11/03/2025 16:03:21</publishTime>
+      <publishTime>01/09/2026 10:35:30</publishTime>
     </File>
     <File Include="Module/RADT/ESign/DischargeSummaryESignList.aspx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -20294,7 +20312,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
     <File Include="Views/Queueing/GetQueue.cshtml">
-      <publishTime>11/03/2025 16:03:21</publishTime>
+      <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
     <File Include="Views/Queueing/HomePage.cshtml">
       <publishTime>11/03/2025 16:03:21</publishTime>
@@ -20330,7 +20348,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
     <File Include="web.config">
-      <publishTime>11/26/2025 15:44:16</publishTime>
+      <publishTime>01/15/2026 13:25:10</publishTime>
     </File>
     <File Include="WebService/Antrol.asmx">
       <publishTime>11/03/2025 16:03:21</publishTime>
