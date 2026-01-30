@@ -223,7 +223,7 @@ namespace Temiang.Avicenna.Module.Finance.Payable
         {
             return "oWnd.argument.command = 'rebind:'";
         }
-
+        
         public override bool OnButtonOkClicked()
         {
             string transNo = Request.QueryString["tno"].ToString();
@@ -279,7 +279,21 @@ namespace Temiang.Avicenna.Module.Finance.Payable
                 //string srPph = ((RadComboBox)dataItem.FindControl("cboSRPph")).SelectedValue;
 
                 if (isDiscInPercent)
-                    currentdiscAmt = (currentprice * currentdisc1 / 100) + ((currentprice - (currentprice * currentdisc1 / 100)) * currentdisc2 / 100);
+                {
+                    if (it.IsTaxable == 0) // INCLUDE TAX cari harga asli exclude tax dan itu yang dipakai untuk diskon (naufal 29/01/26)
+                    {
+                        double currentpricefordisc = currentprice; 
+                        decimal ppn = (it.TaxPercentage ?? 0) / 100m; 
+                        decimal priceExclude = Convert.ToDecimal(currentprice);
+                        decimal discountVal = Convert.ToDecimal(currentdiscAmt); 
+                        decimal priceInclude = (priceExclude - discountVal) * (1 + ppn) + discountVal; 
+                        currentpricefordisc = (double)priceInclude;
+
+                        currentdiscAmt = (currentpricefordisc * currentdisc1 / 100) + ((currentpricefordisc - (currentpricefordisc * currentdisc1 / 100)) * currentdisc2 / 100);
+                    }
+                    else
+                        currentdiscAmt = (currentprice * currentdisc1 / 100) + ((currentprice - (currentprice * currentdisc1 / 100)) * currentdisc2 / 100);
+                }
                 else
                 {
                     currentdisc1 = 0;

@@ -22,3 +22,6 @@
 1. odoo task: 6980 - saat pembuatan PO include tax, nilai pembagiannya tidak dapat terhitung otomatis seolah2 tanpa PPN
    --> modif form po & por sehubungan dg status include tax hanya sebagai alat bantu perhitungan price (perhitungan price sudah dihitung pada saat po)
    --> insert document 20260129 - 01
+
+---[30-01-2026 - Naufal]---
+1. Bugfix PO, POR, AP. nilai bertambah saat edit POR di AP
