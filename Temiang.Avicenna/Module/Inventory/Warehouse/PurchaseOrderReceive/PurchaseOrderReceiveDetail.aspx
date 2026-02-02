@@ -86,13 +86,20 @@
                             <asp:Label ID="lblTransactionNo" runat="server" Text="Received No"></asp:Label>
                         </td>
                         <td class="entry">
-                            <telerik:RadTextBox ID="txtTransactionNo" runat="server" Width="300px" MaxLength="20"
-                                ReadOnly="true" />
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <telerik:RadTextBox ID="txtTransactionNo" runat="server" Width="283px" MaxLength="20"
+                                            ReadOnly="true" />
+                                    </td>
+                                    <td>
+                                        <asp:CheckBox ID="chkIsNewTaxCalculation" runat="server" Text="" Enabled="false" />
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
-                        <td width="20px">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20px"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -118,8 +125,7 @@
                                 <asp:Image ID="Image2" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -138,8 +144,7 @@
                                 <asp:Image ID="Image6" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -157,8 +162,7 @@
                                 <asp:Image ID="Image5" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                     <tr id="trFromServiceUnitID" runat="server">
                         <td class="label">
@@ -169,10 +173,8 @@
                                 Filter="Contains">
                             </telerik:RadComboBox>
                         </td>
-                        <td width="20px">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20px"></td>
+                        <td></td>
                     </tr>
                     <tr id="trRefNo" runat="server">
                         <td class="label">
@@ -195,10 +197,8 @@
                                 </tr>
                             </table>
                         </td>
-                        <td width="20px">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20px"></td>
+                        <td></td>
                     </tr>
                     <tr id="trCurrType" runat="server">
                         <td class="label">
@@ -210,8 +210,7 @@
                                     <td>
                                         <telerik:RadComboBox ID="cboCurrencyType" runat="server" Width="179px" Enabled="false" />
                                     </td>
-                                    <td>
-                                        &nbsp;&nbsp;
+                                    <td>&nbsp;&nbsp;
                                     </td>
                                     <td>
                                         <telerik:RadNumericTextBox ID="txtCurrencyRate" runat="server" Width="114px" ReadOnly="true" />
@@ -219,10 +218,8 @@
                                 </tr>
                             </table>
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -231,10 +228,8 @@
                         <td class="entry">
                             <telerik:RadComboBox ID="cboSRItemType" runat="server" Width="300px" />
                         </td>
-                        <td width="20px">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20px"></td>
+                        <td></td>
                     </tr>
                     <tr id="trPOType" runat="server">
                         <td class="label">
@@ -250,8 +245,7 @@
                                 <asp:Image ID="Image1" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -263,10 +257,10 @@
                         </td>
                         <td>
                             <telerik:RadComboBox runat="server" ID="cboBusinessPartnerID" Width="300px" EnableLoadOnDemand="true"
-                                HighlightTemplatedItems="true" OnItemDataBound="cboSupplierID_ItemDataBound" 
+                                HighlightTemplatedItems="true" OnItemDataBound="cboSupplierID_ItemDataBound"
                                 AutoPostBack="true" OnSelectedIndexChanged="cboBusinessPartnerID_OnSelectedIndexChanged"
                                 ValidationGroup="other"
-                                OnItemsRequested="cboSupplier_ItemsRequested" EmptyMessage="Select..." >
+                                OnItemsRequested="cboSupplier_ItemsRequested" EmptyMessage="Select...">
                                 <FooterTemplate>
                                     Note : Show max 20 items
                                 </FooterTemplate>
@@ -282,20 +276,17 @@
                         <td />
                     </tr>
                     <tr id="trTaxType" runat="server">
-                        <td class="label">
-                        </td>
+                        <td class="label"></td>
                         <td class="entry">
                             <asp:RadioButtonList ID="rblTypesOfTaxes" runat="server" RepeatDirection="Horizontal"
-                                OnTextChanged="rblTypesOfTaxes_OnTextChanged" AutoPostBack="True" >
+                                OnTextChanged="rblTypesOfTaxes_OnTextChanged" AutoPostBack="True">
                                 <asp:ListItem>Exclude Tax</asp:ListItem>
                                 <asp:ListItem>Include Tax</asp:ListItem>
                                 <asp:ListItem>No Tax</asp:ListItem>
                             </asp:RadioButtonList>
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -307,8 +298,7 @@
                                     <td>
                                         <telerik:RadTextBox ID="txtInvoiceNo" runat="server" Width="200px" MaxLength="100" />
                                     </td>
-                                    <td style="width: 5px">
-                                    </td>
+                                    <td style="width: 5px"></td>
                                     <td>
                                         <telerik:RadDatePicker ID="txtInvoiceSupplierDate" runat="server" Width="100px" />
                                     </td>
@@ -322,8 +312,7 @@
                                 <asp:Image ID="Image4" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                     <tr id="trDeliveryNo" runat="server">
                         <td class="label">
@@ -332,10 +321,8 @@
                         <td class="entry">
                             <telerik:RadTextBox ID="txtDeliveryOrdersNo" runat="server" Width="300px" MaxLength="50" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <asp:Panel runat="server" ID="pnlPphNonFixedValue">
                         <tr>
@@ -350,8 +337,7 @@
                                                 Filter="Contains" AutoPostBack="True" OnSelectedIndexChanged="cboSRPph_OnSelectedIndexChanged">
                                             </telerik:RadComboBox>
                                         </td>
-                                        <td>
-                                            &nbsp;&nbsp;
+                                        <td>&nbsp;&nbsp;
                                         </td>
                                         <td>
                                             <telerik:RadNumericTextBox ID="txtPphPercentage" runat="server" Width="80px" MaxLength="10"
@@ -360,10 +346,8 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="20">
-                            </td>
-                            <td>
-                            </td>
+                            <td width="20"></td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td class="label">
@@ -373,15 +357,12 @@
                                 <telerik:RadNumericTextBox ID="txtPphAmount" runat="server" Width="150px" MaxLength="10"
                                     MinValue="0" NumberFormat-DecimalDigits="2" ReadOnly="True" />
                             </td>
-                            <td width="20">
-                            </td>
-                            <td>
-                            </td>
+                            <td width="20"></td>
+                            <td></td>
                         </tr>
                     </asp:Panel>
                     <tr>
-                        <td class="label">
-                        </td>
+                        <td class="label"></td>
                         <td class="entry" colspan="3">
                             <table width="100%" cellspacing="0" cellpadding="0">
                                 <tr>
@@ -399,8 +380,7 @@
                         </td>
                     </tr>
                     <tr id="trCons" runat="server">
-                        <td class="label">
-                        </td>
+                        <td class="label"></td>
                         <td class="entry" colspan="3">
                             <table width="100%" cellspacing="0" cellpadding="0">
                                 <tr>
@@ -422,10 +402,8 @@
                         <td class="entry">
                             <telerik:RadComboBox ID="cboSRProductAccountID" runat="server" Width="300px" Enabled="false" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr id="trConsLoc" runat="server">
                         <td class="label">
@@ -436,22 +414,17 @@
                                 Filter="Contains">
                             </telerik:RadComboBox>
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr style="display: none">
-                        <td class="label">
-                        </td>
+                        <td class="label"></td>
                         <td class="entry">
                             <asp:CheckBox ID="chkIsApproved" runat="server" Text="Approved" Enabled="false" />
                             <asp:CheckBox ID="chkIsVoid" runat="server" Text="Void" Enabled="false" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -556,10 +529,8 @@
                         <td class="entry">
                             <telerik:RadTextBox ID="txtNotes" runat="server" Width="300px" TextMode="MultiLine" />
                         </td>
-                        <td width="20px">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20px"></td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -573,8 +544,7 @@
                             <telerik:RadNumericTextBox ID="txtTransactionAmount" runat="server" Width="100px"
                                 MaxLength="16" MinValue="0" ReadOnly="true" />
                         </td>
-                        <td width="20">
-                        </td>
+                        <td width="20"></td>
                         <td />
                     </tr>
                     <tr>
@@ -602,10 +572,8 @@
                             <telerik:RadNumericTextBox ID="txtReceiveAmount" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" ReadOnly="true" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -615,10 +583,8 @@
                             <telerik:RadNumericTextBox ID="txtAmountTaxed" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" ReadOnly="true" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -628,10 +594,8 @@
                             <telerik:RadNumericTextBox ID="txtTaxPercentage" runat="server" Type="Percent" Width="100px"
                                 MaxLength="5" MaxValue="999.99" MinValue="0" ReadOnly="true" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -641,10 +605,8 @@
                             <telerik:RadNumericTextBox ID="txtTaxAmount" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" AutoPostBack="False" OnTextChanged="txtTaxAmount_TextChanged" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr runat="server" id="trShippingCharges">
                         <td class="label">
@@ -654,10 +616,8 @@
                             <telerik:RadNumericTextBox ID="txtShippingCharges" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" AutoPostBack="True" OnTextChanged="txtShippingCharges_TextChanged" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -667,10 +627,8 @@
                             <telerik:RadNumericTextBox ID="txtStampAmount" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" AutoPostBack="True" OnTextChanged="txtStampAmount_TextChanged" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr style="display: none">
                         <td class="label">
@@ -680,10 +638,8 @@
                             <telerik:RadNumericTextBox ID="txtAdvanceAmount" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" AutoPostBack="True" OnTextChanged="AdvanceAmount_TextChanged" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td class="label">
@@ -693,10 +649,8 @@
                             <telerik:RadNumericTextBox ID="txtTotal" runat="server" Width="100px" MaxLength="16"
                                 MaxValue="9999999999999.99" MinValue="0" ReadOnly="True" />
                         </td>
-                        <td width="20">
-                        </td>
-                        <td>
-                        </td>
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                 </table>
             </td>

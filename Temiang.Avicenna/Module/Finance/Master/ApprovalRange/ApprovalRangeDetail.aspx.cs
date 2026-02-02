@@ -228,6 +228,7 @@ namespace Temiang.Avicenna.Module.Finance.Master
             //Toogle grid command
             bool isVisible = (newVal != AppEnum.DataMode.Read);
             grdApprovalRangeUser.MasterTableView.CommandItemDisplay = isVisible ? GridCommandItemDisplay.Top : GridCommandItemDisplay.None;
+            grdApprovalRangeUser.Columns.FindByUniqueName("DeleteColumn").Visible = isVisible;
 
             //Reset Detail
             if (oldVal != AppEnum.DataMode.Read)

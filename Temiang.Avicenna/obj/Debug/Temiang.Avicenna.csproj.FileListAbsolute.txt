@@ -593,7 +593,6 @@ D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Telerik.ReportViewe
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Telerik.ReportViewer.WebForms.pdb
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Telerik.ReportViewer.WebForms.xml
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\MySqlConnector.xml
-D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\EnvDTE.xml
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\System.Diagnostics.DiagnosticSource.xml
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\de\Microsoft.ReportViewer.Common.resources.dll
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\es\Microsoft.ReportViewer.Common.resources.dll
@@ -990,3 +989,9 @@ D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.c
 D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna\obj\Debug\Temiang..CC9DA868.Up2Date
 D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.dll
 D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna\obj\Debug\Temiang.Avicenna.pdb
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.Shell.Interop.dll
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.Shell.Interop.8.0.dll
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.OLE.Interop.dll
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.TextManager.Interop.dll
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.TextManager.Interop.8.0.dll
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.MSXML.dll

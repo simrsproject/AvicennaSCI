@@ -11,6 +11,17 @@
 1. CR RSI Validasi MDS dari Casemix Center untuk menjadi MDS akhir di EMR Pasien //https://www.sciptaintegrasi.com/mantis/view.php?id=3585
 	script 12/01/26
 
----[13-11-2026 - Deby]---
+---[13-01-2026 - Deby]---
 1. optimalisasi proses saat save location jika ada perubahan stockgroup
    --> insert document 20260113 - 01
+
+---[28-01-2026 - Luthfi]---
+1. Bugfix session ItemBridging di master lab
+
+---[29-01-2026 - Deby]---
+1. odoo task: 6980 - saat pembuatan PO include tax, nilai pembagiannya tidak dapat terhitung otomatis seolah2 tanpa PPN
+   --> modif form po & por sehubungan dg status include tax hanya sebagai alat bantu perhitungan price (perhitungan price sudah dihitung pada saat po)
+   --> insert document 20260129 - 01
+
+---[30-01-2026 - Naufal]---
+1. Bugfix PO, POR, AP. nilai bertambah saat edit POR di AP

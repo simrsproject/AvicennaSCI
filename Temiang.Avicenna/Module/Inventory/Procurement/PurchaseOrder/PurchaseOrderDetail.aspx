@@ -67,8 +67,17 @@
                             <asp:Label ID="lblTransactionNo" runat="server" Text="Purchase Order No" />
                         </td>
                         <td>
-                            <telerik:RadTextBox ID="txtTransactionNo" runat="server" Width="300px" MaxLength="20"
-                                ReadOnly="true" />
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <telerik:RadTextBox ID="txtTransactionNo" runat="server" Width="283px" MaxLength="20"
+                                            ReadOnly="true" />
+                                    </td>
+                                    <td>
+                                        <asp:CheckBox ID="chkIsNewTaxCalculation" runat="server" Text="" Enabled="false" />
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                         <td width="20" />
                         <td />
@@ -143,8 +152,8 @@
                                 <asp:ListItem>No Tax</asp:ListItem>
                             </asp:RadioButtonList>
                         </td>
-                        <td width="20" />
-                        <td />
+                        <td width="20"></td>
+                        <td></td>
                     </tr>
                     <tr runat="server" id="trContractNo">
                         <td class="label">
