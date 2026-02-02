@@ -1082,52 +1082,52 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:23</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.PCare.dll">
-      <publishTime>01/23/2026 14:57:19</publishTime>
+      <publishTime>02/02/2026 12:27:52</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.PCare.pdb">
-      <publishTime>01/23/2026 14:57:19</publishTime>
+      <publishTime>02/02/2026 12:27:52</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.dll">
-      <publishTime>01/23/2026 14:57:19</publishTime>
+      <publishTime>02/02/2026 12:27:52</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.dll.config">
       <publishTime>11/03/2025 16:03:16</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.pdb">
-      <publishTime>01/23/2026 14:57:19</publishTime>
+      <publishTime>02/02/2026 12:27:52</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.BusinessObject.dll">
-      <publishTime>01/23/2026 14:57:18</publishTime>
+      <publishTime>02/02/2026 12:27:50</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.BusinessObject.pdb">
-      <publishTime>01/23/2026 14:57:18</publishTime>
+      <publishTime>02/02/2026 12:27:50</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.dll">
-      <publishTime>01/23/2026 14:57:21</publishTime>
+      <publishTime>02/02/2026 12:27:53</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.dll.config">
       <publishTime>11/03/2025 16:03:17</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.pdb">
-      <publishTime>01/23/2026 14:57:21</publishTime>
+      <publishTime>02/02/2026 12:27:53</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.dll">
-      <publishTime>01/23/2026 14:59:48</publishTime>
+      <publishTime>02/02/2026 12:29:03</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.dll.config">
       <publishTime>07/14/2022 14:33:02</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.pdb">
-      <publishTime>01/23/2026 14:59:48</publishTime>
+      <publishTime>02/02/2026 12:29:03</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.dll">
-      <publishTime>01/23/2026 14:57:46</publishTime>
+      <publishTime>02/02/2026 12:28:18</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.dll.config">
       <publishTime>11/03/2025 16:03:18</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.pdb">
-      <publishTime>01/23/2026 14:57:46</publishTime>
+      <publishTime>02/02/2026 12:28:18</publishTime>
     </File>
     <File Include="bin/Temiang.Dal.Core.dll">
       <publishTime>11/03/2025 16:03:16</publishTime>
@@ -9397,6 +9397,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Document/2026/01/13/01. sp_UpdateHistStockPerStockGroup - create sp.sql">
       <publishTime>01/15/2026 13:16:32</publishTime>
     </File>
+    <File Include="Document/2026/01/29/01. ItemTransaction - alter table add column.sql">
+      <publishTime>02/02/2026 12:17:52</publishTime>
+    </File>
     <File Include="Document/dll/Antlr3.Runtime.dll">
       <publishTime>08/13/2022 13:44:19</publishTime>
     </File>
@@ -9965,7 +9968,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/09/2026 10:35:30</publishTime>
     </File>
     <File Include="Document/Version-2026.txt">
-      <publishTime>01/15/2026 13:16:32</publishTime>
+      <publishTime>02/02/2026 12:17:52</publishTime>
     </File>
     <File Include="ErrorPage.aspx">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -15164,7 +15167,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/Inventory/Procurement/PurchaseOrder/PurchaseOrderDetail.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>02/02/2026 12:17:52</publishTime>
     </File>
     <File Include="Module/Inventory/Procurement/PurchaseOrder/PurchaseOrderItemDetail.ascx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -15455,7 +15458,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/Inventory/Warehouse/PurchaseOrderReceive/PurchaseOrderReceiveDetail.aspx">
-      <publishTime>11/03/2025 16:03:20</publishTime>
+      <publishTime>02/02/2026 12:17:52</publishTime>
     </File>
     <File Include="Module/Inventory/Warehouse/PurchaseOrderReceive/PurchaseOrderReceiveItemDetail.ascx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -20348,7 +20351,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
     <File Include="web.config">
-      <publishTime>01/15/2026 13:25:10</publishTime>
+      <publishTime>02/02/2026 12:17:52</publishTime>
     </File>
     <File Include="WebService/Antrol.asmx">
       <publishTime>11/03/2025 16:03:21</publishTime>
