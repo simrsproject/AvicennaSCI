@@ -280,7 +280,7 @@ namespace Temiang.Avicenna.Module.Finance.Payable
 
                 if (isDiscInPercent)
                 {
-                    if (it.IsTaxable == 0) // INCLUDE TAX cari harga asli exclude tax dan itu yang dipakai untuk diskon (naufal 29/01/26)
+                    if (it.IsTaxable == 0 && !(it.IsNewTaxCalculation ?? false)) // INCLUDE TAX cari harga asli exclude tax dan itu yang dipakai untuk diskon (naufal 29/01/26)
                     {
                         double currentpricefordisc = currentprice; 
                         decimal ppn = (it.TaxPercentage ?? 0) / 100m; 
