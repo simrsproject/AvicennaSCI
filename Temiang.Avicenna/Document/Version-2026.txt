@@ -25,3 +25,7 @@
 
 ---[30-01-2026 - Naufal]---
 1. Bugfix PO, POR, AP. nilai bertambah saat edit POR di AP
+
+---[03-02-2026 - Luthfi]---
+	Titipan Daniel
+1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
