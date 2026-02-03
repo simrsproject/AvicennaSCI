@@ -255,7 +255,7 @@
 
     <script type="text/javascript">
         var _location = '@(ViewBag.qLocation)';
-        var _addjustStartTime = '@(ViewBag.addjustStartTime)' != '' ? '@(ViewBag.addjustStartTime)' : '120';
+        ////var _addjustStartTime = '@(ViewBag.addjustStartTime)' != '' ? '@(ViewBag.addjustStartTime)' : '0';
         var _IsDirectButtonBetweenKioskVersion = @(((bool)ViewBag.IsDirectButtonBetweenKioskVersion).ToString().ToLower());
         var _poliID = "";
         var _physicianID = "";
@@ -374,19 +374,19 @@
             return formattedDate;
         }
 
-        function IsWithinRange(range, currentTime) {
-            const [startHour, startMinute] = range.startTime.split(":").map(Number);
-            const [endHour, endMinute] = range.endTime.split(":").map(Number);
-            const [currentHour, currentMinute] = currentTime.split(":").map(Number);
+        //function IsWithinRange(range, currentTime) {
+        //    const [startHour, startMinute] = range.startTime.split(":").map(Number);
+        //    const [endHour, endMinute] = range.endTime.split(":").map(Number);
+        //    const [currentHour, currentMinute] = currentTime.split(":").map(Number);
 
-            const startMinutes = startHour * 60 + startMinute - _addjustStartTime;
-            const endMinutes = endHour * 60 + endMinute;
-            const currentMinutes = currentHour * 60 + currentMinute;
+        //    const startMinutes = startHour * 60 + startMinute - _addjustStartTime;
+        //    const endMinutes = endHour * 60 + endMinute;
+        //    const currentMinutes = currentHour * 60 + currentMinute;
 
-            const adjustedStartMinutes = startMinutes < 0 ? 24 * 60 + startMinutes : startMinutes;
+        //    const adjustedStartMinutes = startMinutes < 0 ? 24 * 60 + startMinutes : startMinutes;
 
-            return currentMinutes >= adjustedStartMinutes && currentMinutes <= endMinutes;
-        }
+        //    return currentMinutes >= adjustedStartMinutes && currentMinutes <= endMinutes;
+        //}
 
         function GetListPoli() {
             $.ajax({

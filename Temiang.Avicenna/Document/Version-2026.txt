@@ -25,6 +25,7 @@
 
 ---[30-01-2026 - Naufal]---
 1. Bugfix PO, POR, AP. nilai bertambah saat edit POR di AP
+2. Bugfix bisa ambil antrian ketika parameter ValueForTakingQueueBeforeStartTime terisi. (isi dengan menit)
 
 ---[03-02-2026 - Luthfi]---
 	Titipan Daniel
