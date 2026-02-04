@@ -2206,10 +2206,10 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     entity.Discount = userControl.DiscountAmount;
                 }
 
-                //db:20260129 - ppn dikeluarkan dari price
+                //db:tax 20260129 - ppn dikeluarkan dari price
                 if (rblTypesOfTaxes.SelectedIndex == 1 && (entity.IsTaxable ?? false) && chkIsNewTaxCalculation.Checked)
                 {
-                    var prices = Helper.GetReversePriceValueV2((entity.Price ?? 0), entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
+                    var prices = Helper.GetReversePriceValueV3((entity.Price ?? 0), entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
 
                     entity.Price = prices[0];
                     entity.Discount = prices[1];
@@ -2361,6 +2361,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             var supp = new Supplier();
             supp.LoadByPrimaryKey(cboBusinessPartnerID.SelectedValue);
 
+            //db:20260129 - include tax tetep munculin tax
+            //if (rblTypesOfTaxes.SelectedIndex == 0)
             if (rblTypesOfTaxes.SelectedIndex != 2)
                 txtTaxPercentage.Value = Convert.ToDouble(supp.TaxPercentage ?? 0);
             else

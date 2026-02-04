@@ -1203,6 +1203,34 @@ namespace Temiang.Avicenna.Common
             return prices;
         }
 
+        public static decimal[] GetReversePriceValueV3(decimal value, decimal discountPercentage1, decimal discountPercentage2, decimal discountValue, decimal ppn)
+        {
+            var prices = new decimal[2];
+
+            decimal priceIncPpn = value;
+            decimal priceExcPpn = priceIncPpn / (1 + ppn);
+            decimal priceAfterDisc = priceExcPpn;
+            if (discountPercentage1 > 0 || discountPercentage2 > 0)
+            {
+                var dVal1 = priceExcPpn * discountPercentage1 / 100;
+                priceAfterDisc = priceAfterDisc - dVal1;
+                var dVal2 = priceAfterDisc * discountPercentage2 / 100;
+                priceAfterDisc = priceAfterDisc - dVal2;
+                discountValue = dVal1 + dVal2;
+            }
+
+            priceExcPpn = Math.Round(priceExcPpn, 2, MidpointRounding.ToEven);
+            discountValue = Math.Round(discountValue, 2, MidpointRounding.ToEven);
+
+            decimal discount = 0, price = 0;
+            discount = discountValue;
+            price = priceExcPpn;
+
+            prices.SetValue(price, 0);
+            prices.SetValue(discount, 1);
+            return prices;
+        }
+
         public static bool IsSu()
         {
             var grUsr = new AppUserUserGroupQuery("a");

@@ -995,3 +995,4 @@ D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStu
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.TextManager.Interop.dll
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.VisualStudio.TextManager.Interop.8.0.dll
 D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\Microsoft.MSXML.dll
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna\bin\EnvDTE.xml

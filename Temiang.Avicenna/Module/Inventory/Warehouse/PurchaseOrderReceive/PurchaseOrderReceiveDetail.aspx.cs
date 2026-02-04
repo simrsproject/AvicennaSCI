@@ -45,7 +45,8 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
         }
 
         #region Page Event & Initialize
-        private void InitGrantsReceiving() {
+        private void InitGrantsReceiving()
+        {
             trRefNo.Visible = !IsGrantsReceiving && !IsDirectPurchase;
             trCurrType.Visible = !IsGrantsReceiving && !IsDirectPurchase;
             trPOType.Visible = !IsGrantsReceiving;
@@ -384,7 +385,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             //        return;
             //    }
             //}
-            
+
             if (chkIsNonMasterOrder.Checked)
             {
                 var retval = (new ItemTransaction()).ApproveNonMaster(txtTransactionNo.Text, ItemTransactionItems, AppSession.UserLogin.UserID);
@@ -788,7 +789,8 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             {
                 cboBusinessPartnerID.SelectedValue = cboi.Value;
             }
-            else {
+            else
+            {
                 //cboBusinessPartnerID.SelectedIndex = 0;
             }
 
@@ -891,7 +893,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             entity.ReferenceNo = txtReferenceNo.Text;
             entity.ToServiceUnitID = cboToServiceUnitID.SelectedItem.Value;
             entity.ToLocationID = cboToLocationID.SelectedValue;
-            
+
             entity.SRItemType = cboSRItemType.SelectedValue;
             //-db (6/6/2023): ditambah default value u/ kasus di rsi dimana por consignment jd terisi "020" (belum nemu sumber masalahnya)
             entity.SRPurchaseOrderType = (cboSRPurchaseOrderType.SelectedValue == "CS" || cboSRPurchaseOrderType.SelectedValue == "CR") ? cboSRPurchaseOrderType.SelectedValue : (IsDirectPurchase ? "CS" : "CR");
@@ -934,7 +936,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             else
                 entity.ServiceUnitCostID = refs.ServiceUnitCostID;
             entity.IsNewTaxCalculation = chkIsNewTaxCalculation.Checked;
-                
+
             //Last Update Status
             if (entity.es.IsAdded || entity.es.IsModified)
             {
@@ -1086,7 +1088,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             chkIsAssets.Enabled = !(chkIsConsignment.Checked); //&& !AppSession.Application.IsModuleAssetActive;
             rblTypesOfTaxes.SelectedIndex = header.IsTaxable == 2 ? 2 : (header.IsTaxable == 1 ? 0 : 1);
             chkIsNewTaxCalculation.Checked = header.IsNewTaxCalculation ?? false;
-                
+
             if (chkIsConsignment.Checked)
             {
                 ComboBox.PopulateWithSupplierForLocation(cboFromLocationID, cboBusinessPartnerID.SelectedValue);
@@ -1204,11 +1206,13 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                     entity.Discount2Percentage = (decimal)row["Discount2Percentage"];
                     entity.Discount = (decimal)row["Discount"];
 
+                    //db:20260129 - include tax
+                    //if (header.IsTaxable == 0)
                     if (header.IsTaxable == 0 && !(chkIsNewTaxCalculation.Checked))
                     {
                         //var prices = Helper.GetReversePriceValueV2((decimal)row["Price"], entity.Discount1Percentage ?? 0, entity.Discount ?? 0);
                         var prices = Helper.GetReversePriceValueV2((decimal)row["Price"], entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
-
+                        
                         entity.Price = prices[0];
                         entity.Discount = prices[1];
                         //tax += prices[3];
@@ -1405,7 +1409,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                 query.Select(iq.Barcode.As("refToItem_Barcode"),
                     @"<CASE WHEN a.Quantity * a.ConversionFactor > ISNULL((SELECT SUM(itie.Quantity * itie.ConversionFactor)
                         FROM ItemTransactionItemEd AS itie 
-                        WHERE itie.TransactionNo = a.TransactionNo AND itie.SequenceNo = a.SequenceNo), 0) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS 'refToItemProduct_IsNotCompleteED'>", 
+                        WHERE itie.TransactionNo = a.TransactionNo AND itie.SequenceNo = a.SequenceNo), 0) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS 'refToItemProduct_IsNotCompleteED'>",
                     fq.FabricName.As("refToFabric_FabricName"));
                 coll.Load(query);
 
