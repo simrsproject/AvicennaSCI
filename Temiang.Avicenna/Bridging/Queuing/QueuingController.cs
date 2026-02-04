@@ -52,7 +52,7 @@ namespace Temiang.Avicenna.Bridging.Queuing
                 var suColl = new ServiceUnitCollection();
                 suColl.Query.Where(suColl.Query.ServiceUnitID.In(supColl.Select(s => s.ServiceUnitID)));
                 suColl.LoadAll();
-
+                double beginQue = AppSession.Parameter.ValueForTakingQueueBeforeStartTime.ToDouble();
                 foreach (var sup in supColl) {
                     var dtbSlotTime = AppointmentNRegistrationDataService
                         .AppointmentSlotTime("", sup.ServiceUnitID, sup.ParamedicID, dDate.Date, dDate.Date);
@@ -86,15 +86,26 @@ namespace Temiang.Avicenna.Bridging.Queuing
                             var st = schData[r.Start]?.ToString()?.Trim();
                             var et = schData[r.End]?.ToString()?.Trim();
 
-                            if (TimeSpan.TryParse(st, out var start) && TimeSpan.TryParse(et, out var end))
+                            if (!TimeSpan.TryParse(st, out var start) ||
+                                !TimeSpan.TryParse(et, out var end))
+                                continue;
+
+                            var c = schData[r.Closed]?.ToString()?.Trim().ToLower();
+                            var closed = c == "true" || c == "1";
+                            if (closed) continue;
+
+                            var preOpen = start.Add(TimeSpan.FromMinutes(-beginQue));
+
+                            if (now >= start && now < end)
                             {
-                                if (now >= start && now < end)
-                                {
-                                    var c = schData[r.Closed]?.ToString()?.Trim().ToLower();
-                                    var closed = c == "true" || c == "1";
-                                    isAvailable = !closed;
-                                    break;
-                                }
+                                isAvailable = true;
+                                break;
+                            }
+
+                            if (now >= preOpen && now < start)
+                            {
+                                isAvailable = true;
+                                break;
                             }
                         }
                     }

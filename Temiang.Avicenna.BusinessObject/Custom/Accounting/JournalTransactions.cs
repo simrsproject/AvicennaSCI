@@ -14198,7 +14198,8 @@ namespace Temiang.Avicenna.BusinessObject
                                     var jtdCcD = jtdCC.Where(j => j.Debit != 0).FirstOrDefault();
                                     if (jtdCcD != null)
                                     {
-                                        jtdCcC.Debit += sPembulatan;
+                                        //jtdCcC.Debit += sPembulatan;sebelum 
+                                        jtdCcD.Debit = (jtdCcD.Debit ?? 0) + sPembulatan;//sesudah
                                     }
                                 }
                             }
