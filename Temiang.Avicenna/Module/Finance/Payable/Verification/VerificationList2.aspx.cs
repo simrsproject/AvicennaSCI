@@ -124,7 +124,19 @@ namespace Temiang.Avicenna.Module.Finance.Payable
                 inv.VerifyByUserID = null;
                 inv.VerifyDate = null;
 
-                inv.Save();
+                inv.Save();               
+
+                var invi = new InvoiceSupplierItemCollection();
+                invi.Query.Where(invi.Query.InvoiceNo == invNo);
+                invi.LoadAll();
+                foreach (var detil in invi)
+                {
+                    detil.VerifyAmount = null;
+                    detil.VerifyByUserID = null;
+                    detil.VerifyDate = null;
+                }
+                invi.Save();
+
 
                 //rebind data
                 grdList.Rebind();

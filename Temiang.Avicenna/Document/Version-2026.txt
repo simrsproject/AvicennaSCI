@@ -31,6 +31,10 @@
 	Titipan Daniel
 1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
 
+---[05-02-2026 - Dewi]---
+1. Bugfix VerificationList2, ketika transaksi AP yang sudah di verifikasi dan di batalkan tetap muncul di payment process
+1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
+
 ---[05-02-2026 - Danang]---
 1. Rewrite Feature Satusehat Inpatient
 	- Script Ada Pada Folder SatuSehat Inpatient
