@@ -30,3 +30,6 @@
 ---[03-02-2026 - Luthfi]---
 	Titipan Daniel
 1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
+
+---[05-02-2026 - Dewi]---
+1. Bugfix VerificationList2, ketika transaksi AP yang sudah di verifikasi dan di batalkan tetap muncul di payment process
