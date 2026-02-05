@@ -452,6 +452,8 @@ namespace Temiang.Avicenna.Module.Finance.Payable
             it.PriorChargesAmount = it.ChargesAmount;
             it.PriorTaxAmount = it.TaxAmount;
 
+            taxAmt = Math.Round(taxAmt, 2);
+
             if (it.TransactionCode == TransactionCode.PurchaseOrderReceive)
             {
                 it.ChargesAmount = receiveAmt;

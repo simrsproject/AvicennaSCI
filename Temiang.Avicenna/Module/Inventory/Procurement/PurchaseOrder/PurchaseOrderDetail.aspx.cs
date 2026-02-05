@@ -1675,7 +1675,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 txtTaxAmount.Value = 0.00;
             else
             {
-                txtTaxAmount.Value = ((txtAmountTaxed.Value * txtTaxPercentage.Value) / Convert.ToDouble(100));
+                //txtTaxAmount.Value = ((txtAmountTaxed.Value * txtTaxPercentage.Value) / Convert.ToDouble(100));
+                txtTaxAmount.Value = Math.Round(txtAmountTaxed.Value.Value * (txtTaxPercentage.Value.Value / 100), 2);
                 if (AppSession.Parameter.IsPORoundingDownZeroDigit)
                 {
                     txtTaxAmount.Value = System.Convert.ToInt64(txtTaxAmount.Value);
