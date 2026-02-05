@@ -2186,6 +2186,20 @@
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\3. Insert RlMasterReportItemV2025 RL 3.9 V2025.sql" />
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\4. Insert Cetakan AppProgram RL 3.9 V2025.sql" />
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\5. Create Procedure spxml_RL3_9V2025.sql" />
+    <Content Include="Document\SatuSehat Inpatient\01. ALTER TABLE ItemRadiology ADD IsPreparation.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Add AppStandardReference.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Add Column in Itemlaboratory and PatientAssesment.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Alter Table Bed.sql" />
+    <Content Include="Document\SatuSehat Inpatient\BridgingTemplate.sql" />
+    <Content Include="Document\SatuSehat Inpatient\DietBridging.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert AppProgram SatuSehat Inpatient.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert_AppStandardReference Class Satusehat.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert_AppStandardReferenceItemBridging.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert_Snomedct.sql" />
+    <Content Include="Document\SatuSehat Inpatient\SatuSehatILPPreparation.sql" />
+    <Content Include="Document\SatuSehat Inpatient\SatuSehatILPTemplateDetail.sql" />
+    <Content Include="Document\SatuSehat Inpatient\SatuSehatILPTemplateDetailKeyWord.sql" />
+    <Content Include="Document\SatuSehat Inpatient\ServiceRoomBridging-Create.sql" />
     <Content Include="Document\Version-2026.txt" />
     <Content Include="Document\Version-2025.txt" />
     <Content Include="Document\Version-2024.txt" />
@@ -3135,7 +3149,10 @@
     <Content Include="Module\RADT\Registration\RegistrationDisplayEmergency.aspx" />
     <Content Include="Module\RADT\Registration\WebCamCaptureDocument.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatConsent.aspx" />
+    <Content Include="Module\RADT\SatuSehat\SatuSehatILP.aspx" />
+    <Content Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx" />
+    <Content Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatResultInfo.aspx" />
     <Content Include="Module\RADT\SatuSehat\ProcessDataToSatuSehat.aspx" />
     <Content Include="Module\RADT\UpdateReferral\UpdateReferralDetail.aspx" />
@@ -21585,12 +21602,33 @@
     <Compile Include="Module\RADT\SatuSehat\SatuSehatConsent.aspx.designer.cs">
       <DependentUpon>SatuSehatConsent.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILP.aspx.cs">
+      <DependentUpon>SatuSehatILP.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILP.aspx.designer.cs">
+      <DependentUpon>SatuSehatILP.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx.cs">
+      <DependentUpon>SatuSehatILPDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx.designer.cs">
+      <DependentUpon>SatuSehatILPDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx.cs">
       <DependentUpon>SatuSehatKYC.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx.designer.cs">
       <DependentUpon>SatuSehatKYC.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx.cs">
+      <DependentUpon>SatuSehatRawatInap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx.designer.cs">
+      <DependentUpon>SatuSehatRawatInap.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatResultInfo.aspx.cs">
       <DependentUpon>SatuSehatResultInfo.aspx</DependentUpon>
@@ -22307,6 +22345,10 @@
       <DependentUpon>SesssionStretch.aspx</DependentUpon>
     </Compile>
     <Compile Include="Util\ApprovalLevelUtil.cs" />
+    <Compile Include="Util\DynamicInvoker.cs" />
+    <Compile Include="Util\Extentions.cs" />
+    <Compile Include="Util\JsonHelper.cs" />
+    <Compile Include="Util\SatuSehatHelper.cs" />
     <Compile Include="WebService\Antrol.asmx.cs">
       <DependentUpon>Antrol.asmx</DependentUpon>
       <SubType>Component</SubType>

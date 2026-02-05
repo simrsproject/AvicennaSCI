@@ -36,6 +36,8 @@ namespace Temiang.Avicenna.Common
             #endregion
 
             public const string ProcessDataToSatuSehat = "01.15.20";
+            public const string ProcessDataToSatuSehatILP = "01.15.21";
+            public const string ProcessDataToSatuSehatIPR = "01.15.22";
 
             public const string CasemixApproval = "01.20.12";
             public const string CasemixCoverage = "01.20.12A";
