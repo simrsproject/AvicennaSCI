@@ -290,6 +290,7 @@ namespace Temiang.Avicenna.Module.Finance.Payable
                         currentpricefordisc = (double)priceInclude;
 
                         currentdiscAmt = (currentpricefordisc * currentdisc1 / 100) + ((currentpricefordisc - (currentpricefordisc * currentdisc1 / 100)) * currentdisc2 / 100);
+                        currentdiscAmt = (double)Math.Round(Convert.ToDecimal(currentdiscAmt), 2, MidpointRounding.AwayFromZero);
                     }
                     else
                         currentdiscAmt = (currentprice * currentdisc1 / 100) + ((currentprice - (currentprice * currentdisc1 / 100)) * currentdisc2 / 100);
@@ -444,10 +445,10 @@ namespace Temiang.Avicenna.Module.Finance.Payable
             decimal? totaltax = iticoll.Where(item => !Convert.ToBoolean(item.IsBonusItem) && Convert.ToBoolean(item.IsTaxable)).Aggregate<ItemTransactionItem, decimal?>(0, (current, item) => current + ((item.Price - item.Discount)*item.Quantity));
             decimal? totaltaxPph = iticoll.Where(item => !Convert.ToBoolean(item.IsBonusItem) && Convert.ToBoolean(item.IsTaxablePph)).Aggregate<ItemTransactionItem, decimal?>(0, (current, item) => current + ((item.Price - item.Discount) * item.Quantity));
             //decimal? totaltaxPph = iticoll.Where(item => !Convert.ToBoolean(item.IsBonusItem) && Convert.ToBoolean(item.IsTaxablePph)).Aggregate<ItemTransactionItem, decimal?>(0, (current, item) => current + item.PphAmount);
-            decimal? receiveAmt = (totaltransaction ?? 0) - (totaldiscitem ?? 0) - discAmt;
+            decimal receiveAmt = Math.Round(((totaltransaction ?? 0) - (totaldiscitem ?? 0) - discAmt), 2, MidpointRounding.AwayFromZero);
             decimal? amtTaxed = (totaltax ?? 0) - discAmt;
 
-            if (tax > 0) taxAmt = (((amtTaxed ?? 0) * tax) / Convert.ToDecimal(100));
+            if (tax > 0) { taxAmt = Math.Round((((amtTaxed ?? 0) * tax) / 100), 2, MidpointRounding.AwayFromZero); }
 
             it.PriorChargesAmount = it.ChargesAmount;
             it.PriorTaxAmount = it.TaxAmount;
