@@ -38,3 +38,7 @@
 ---[05-02-2026 - Danang]---
 1. Rewrite Feature Satusehat Inpatient
 	- Script Ada Pada Folder SatuSehat Inpatient
+
+---[10-02-2026 - Luthfi]---
+Titipan Daniel
+1. Mengubah grid grdLocationException menjadi grdLocationExceptionDistConfirm pada method PopulateLocationExceptionDistributionConfirmGrid
