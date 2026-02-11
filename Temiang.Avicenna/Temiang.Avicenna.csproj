@@ -3230,6 +3230,7 @@
     <Content Include="Document\Rl Reporting %282025%29\2. RL Report 3.2\RL3_2_RawatInapV2025.trdx" />
     <Content Include="Document\Rl Reporting %282025%29\12.RL Report 3.13\Rl_3_13_RehabMedikV2025.trdx" />
     <Content Include="Document\Rl Reporting %282025%29\22. RL Report 5.1\RL51_KompilasiMorbiditasRawatJalan.trdx" />
+    <Content Include="Document\Rl Reporting %282025%29\5. RL Report 3.5\settingan RL 3_5 v 2025.xlsx" />
     <None Include="Properties\PublishProfiles\Publish FJ.pubxml" />
     <None Include="Properties\PublishProfiles\Publish-DB.pubxml" />
     <None Include="Scripts\jquery-1.6.3-vsdoc.js" />

@@ -42,3 +42,7 @@
 ---[10-02-2026 - Luthfi]---
 Titipan Daniel
 1. Mengubah grid grdLocationException menjadi grdLocationExceptionDistConfirm pada method PopulateLocationExceptionDistributionConfirmGrid
+
+---[11-02-2026 - Luthfi]---
+Titipan Daniel
+1.  Replace telerik sama sp dan nambah excel di rl 3.5 v2025
