@@ -46,3 +46,6 @@ Titipan Daniel
 ---[11-02-2026 - Luthfi]---
 Titipan Daniel
 1.  Replace telerik sama sp dan nambah excel di rl 3.5 v2025
+
+---[23-02-2026 - Apip]---
+1. Modif RL 4.1 2025 titipan rama
