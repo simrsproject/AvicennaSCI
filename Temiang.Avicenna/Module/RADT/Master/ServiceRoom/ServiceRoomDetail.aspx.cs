@@ -1,13 +1,14 @@
+using DocumentFormat.OpenXml.VariantTypes;
 using System;
 using System.Data;
 using System.Linq;
-using Temiang.Dal.Core;
-using Temiang.Dal.Interfaces;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+using Temiang.Dal.Core;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
@@ -140,6 +141,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
             RefreshCommandItemBed(newVal);
             RefreshCommandItemAutoBill(newVal);
+            RefreshCommandItemServiceRoomBridging(newVal);
         }
 
         protected override void OnPopulateEntryControl(params string[] parameters)
@@ -217,6 +219,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             PopulateBedGrid();
             PopulatePhotoGrid();
             PopulateAutoBillItemGrid();
+            PopulateServiceRoomBirdgingGrid();
         }
 
         #endregion
@@ -266,6 +269,12 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 abi.LastUpdateByUserID = AppSession.UserLogin.UserID;
                 abi.LastUpdateDateTime = DateTime.Now;
             }
+
+            foreach (ServiceRoomBridging abi in ServiceRoomBridgings)
+            {
+                abi.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                abi.LastUpdateDateTime = DateTime.Now;
+            }
         }
 
         private void SaveEntity(ServiceRoom entity)
@@ -283,6 +292,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 }
                 Photos.Save();
                 ServiceRoomAutoBillItems.Save();
+                ServiceRoomBridgings.Save();
 
                 //Commit if success, Rollback if failed
                 trans.Complete();
@@ -792,6 +802,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 grdImages.Rebind();
             }
         }
+
         protected void grdImages_DeleteCommand(object sender, GridCommandEventArgs e)
         {
             GridDataItem item = e.Item as GridDataItem;
@@ -805,5 +816,120 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 entity.MarkAsDeleted();
             grdImages.Rebind();
         }
+
+        #region Record Detail Method Function ClassBridging
+
+        private ServiceRoomBridgingCollection ServiceRoomBridgings
+        {
+            get
+            {
+                if (IsPostBack)
+                {
+                    object obj = Session["collServiceRoomBridging"];
+                    if (obj != null) return ((ServiceRoomBridgingCollection)(obj));
+                }
+
+                ServiceRoomBridgingCollection coll = new ServiceRoomBridgingCollection();
+
+                ServiceRoomBridgingQuery query = new ServiceRoomBridgingQuery("a");
+                AppStandardReferenceItemQuery asri = new AppStandardReferenceItemQuery("b");
+
+                query.Select(query, asri.ItemName.As("refToAppStandardReferenceItem_ItemName"));
+                query.InnerJoin(asri).On(query.SRBridgingType == asri.ItemID && asri.StandardReferenceID == AppEnum.StandardReference.BridgingType.ToString());
+                query.Where(query.RoomID == txtRoomID.Text);
+                coll.Load(query);
+
+                Session["collServiceRoomBridging"] = coll;
+                return coll;
+            }
+            set
+            {
+                Session["collServiceRoomBridging"] = value;
+            }
+        }
+
+        private void RefreshCommandItemServiceRoomBridging(Temiang.Avicenna.Common.AppEnum.DataMode newVal)
+        {
+            //Toogle grid command
+            bool isVisible = (newVal != AppEnum.DataMode.Read);
+            grdAliasName.Columns[0].Visible = isVisible;
+            grdAliasName.Columns[grdAliasName.Columns.Count - 1].Visible = isVisible;
+
+            grdAliasName.MasterTableView.CommandItemDisplay = isVisible ? GridCommandItemDisplay.Top : GridCommandItemDisplay.None;
+
+            //Perbaharui tampilan dan data
+            grdAliasName.Rebind();
+        }
+
+        private void PopulateServiceRoomBirdgingGrid()
+        {
+            //Display Data Detail
+            ServiceRoomBridgings = null; //Reset Record Detail
+            grdAliasName.DataSource = ServiceRoomBridgings; //Requery
+            grdAliasName.MasterTableView.IsItemInserted = false;
+            grdAliasName.MasterTableView.ClearEditItems();
+            grdAliasName.DataBind();
+        }
+
+        protected void grdAliasName_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
+        {
+            grdAliasName.DataSource = ServiceRoomBridgings;
+        }
+
+        protected void grdAliasName_UpdateCommand(object source, GridCommandEventArgs e)
+        {
+            GridEditableItem editedItem = e.Item as GridEditableItem;
+            if (editedItem == null) return;
+
+            String type = Convert.ToString(editedItem.OwnerTableView.DataKeyValues[editedItem.ItemIndex][ServiceRoomBridgingMetadata.ColumnNames.SRBridgingType]);
+            String id = Convert.ToString(editedItem.OwnerTableView.DataKeyValues[editedItem.ItemIndex][ServiceRoomBridgingMetadata.ColumnNames.BridgingID]);
+
+            var entity = FindServiceRoomBridging(type, id);
+            if (entity != null) SetEntityValue(entity, e);
+        }
+
+        protected void grdAliasName_DeleteCommand(object source, GridCommandEventArgs e)
+        {
+            GridDataItem item = e.Item as GridDataItem;
+            if (item == null) return;
+
+            String type = Convert.ToString(item.OwnerTableView.DataKeyValues[item.ItemIndex][ServiceRoomBridgingMetadata.ColumnNames.SRBridgingType]);
+            String id = Convert.ToString(item.OwnerTableView.DataKeyValues[item.ItemIndex][ServiceRoomBridgingMetadata.ColumnNames.BridgingID]);
+
+            var entity = FindServiceRoomBridging(type, id);
+            if (entity != null) entity.MarkAsDeleted();
+        }
+
+        protected void grdAliasName_InsertCommand(object source, GridCommandEventArgs e)
+        {
+            var entity = ServiceRoomBridgings.AddNew();
+            SetEntityValue(entity, e);
+
+            //Stay in insert mode
+            e.Canceled = true;
+            grdAliasName.Rebind();
+        }
+
+        private ServiceRoomBridging FindServiceRoomBridging(String type, string id)
+        {
+            var coll = ServiceRoomBridgings;
+            return coll.FirstOrDefault(rec => rec.SRBridgingType.Equals(type) && rec.BridgingID.Equals(id));
+        }
+
+        private void SetEntityValue(ServiceRoomBridging entity, GridCommandEventArgs e)
+        {
+            ServiceRoomAliasDetail userControl = (ServiceRoomAliasDetail)e.Item.FindControl(GridEditFormItem.EditFormUserControlID);
+            if (userControl != null)
+            {
+                entity.RoomID = txtRoomID.Text;
+                entity.SRBridgingType = userControl.BridgingType;
+                entity.BridgingTypeName = userControl.BridgingTypeName;
+                entity.BridgingID = userControl.BridgingID;
+                entity.BridgingName = userControl.BridgingName;
+                entity.IsActive = userControl.IsActive;
+            }
+        }
+
+        #endregion
     }
 }

@@ -776,8 +776,8 @@ namespace Temiang.Avicenna.Module.RADT.OutPatient
                             //    ShowInformationHeader("Poli tidak ditemukan, Antrian Online Bpjs");
                             //    return;
                             //}
-                            var exclude = new[] { "HDL", "IRM" };
-                            if (!exclude.Contains(sub.BridgingID.Split(';')[0]))
+                            //var exclude = new[] { "HDL", "IRM" };
+                            //if (!exclude.Contains(sub.BridgingID.Split(';')[0]))
                             {
                                 var p = new Paramedic();
                                 p.LoadByPrimaryKey(entity.ParamedicID);

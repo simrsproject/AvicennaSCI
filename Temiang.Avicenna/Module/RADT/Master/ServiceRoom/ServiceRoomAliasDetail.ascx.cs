@@ -10,7 +10,7 @@ using Temiang.Avicenna.BusinessObject;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
-    public partial class ClassAliasDetail : BaseUserControl
+    public partial class ServiceRoomAliasDetail : BaseUserControl
     {
         private object _dataItem;
 
@@ -101,7 +101,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             //Check duplicate key
             if (ViewState["IsNewRecord"].Equals(true))
             {
-                var coll = (ClassBridgingCollection)Session["collClassBridging"];
+                var coll = (ServiceRoomBridgingCollection)Session["collServiceRoomBridging"];
 
                 string itemID = cboServiceUnitAliasID.SelectedValue;
                 bool isExist = false;
@@ -140,7 +140,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
         {
             get
             {
-                return string.IsNullOrWhiteSpace(txtServiceUnitAliasName.Text) ? (Helper.FindControlRecursive(this.Page, "txtClassName") as RadTextBox).Text : txtServiceUnitAliasName.Text;
+                return string.IsNullOrWhiteSpace(txtServiceUnitAliasName.Text) ? (Helper.FindControlRecursive(this.Page, "txtRoomName") as RadTextBox).Text : txtServiceUnitAliasName.Text;
             }
         }
 

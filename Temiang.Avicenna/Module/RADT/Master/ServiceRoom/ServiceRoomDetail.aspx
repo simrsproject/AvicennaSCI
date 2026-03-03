@@ -295,6 +295,8 @@
                         </telerik:RadTab>
                         <telerik:RadTab runat="server" Text="Auto Bill Item" PageViewID="pgAutoBillItem">
                         </telerik:RadTab>
+                        <telerik:RadTab runat="server" Text="Bridging & Integration" PageViewID="pgvAliasName">
+                        </telerik:RadTab>
                     </Tabs>
                 </telerik:RadTabStrip>
                 <telerik:RadMultiPage ID="RadMultiPage1" runat="server" BorderStyle="Solid" SelectedIndex="0"
@@ -431,6 +433,50 @@
                                 </Columns>
                                 <EditFormSettings UserControlName="ServiceRoomAutoBillItemDetail.ascx" EditFormType="WebUserControl">
                                     <EditColumn UniqueName="ServiceRoomAutoBillItemEditCommand">
+                                    </EditColumn>
+                                </EditFormSettings>
+                            </MasterTableView>
+                            <FilterMenu>
+                            </FilterMenu>
+                            <ClientSettings EnableRowHoverStyle="true">
+                                <Resizing AllowColumnResize="True" />
+                                <Selecting AllowRowSelect="True" />
+                            </ClientSettings>
+                        </telerik:RadGrid>
+                    </telerik:RadPageView>
+                    <telerik:RadPageView runat="server" ID="pgvAliasName">
+                        <telerik:RadGrid ID="grdAliasName" runat="server" OnNeedDataSource="grdAliasName_NeedDataSource"
+                            AutoGenerateColumns="False" GridLines="None" OnUpdateCommand="grdAliasName_UpdateCommand"
+                            OnDeleteCommand="grdAliasName_DeleteCommand" OnInsertCommand="grdAliasName_InsertCommand"
+                            AllowPaging="true">
+                            <HeaderContextMenu>
+                            </HeaderContextMenu>
+                            <MasterTableView CommandItemDisplay="None" DataKeyNames="RoomID, SRBridgingType, BridgingID"
+                                PageSize="15">
+                                <Columns>
+                                    <telerik:GridEditCommandColumn ButtonType="ImageButton">
+                                        <HeaderStyle Width="35px" />
+                                        <ItemStyle CssClass="MyImageButton" />
+                                    </telerik:GridEditCommandColumn>
+                                    <telerik:GridBoundColumn DataField="BridgingTypeName" HeaderText="Bridging Type"
+                                        UniqueName="BridgingTypeName" SortExpression="BridgingTypeName" HeaderStyle-HorizontalAlign="Left"
+                                        ItemStyle-HorizontalAlign="Left" />
+                                    <telerik:GridBoundColumn HeaderStyle-Width="100px" DataField="BridgingID" HeaderText="Bridging ID"
+                                        UniqueName="BridgingID" SortExpression="BridgingID" HeaderStyle-HorizontalAlign="Left"
+                                        ItemStyle-HorizontalAlign="Left" />
+                                    <telerik:GridBoundColumn DataField="BridgingName" HeaderText="Bridging Name" UniqueName="BridgingName"
+                                        SortExpression="BridgingName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                                    <telerik:GridCheckBoxColumn HeaderStyle-Width="80px" DataField="IsActive" HeaderText="Active"
+                                        UniqueName="IsActive" SortExpression="IsActive" HeaderStyle-HorizontalAlign="Center"
+                                        ItemStyle-HorizontalAlign="Center" />
+                                    <telerik:GridButtonColumn UniqueName="DeleteColumn" Text="Delete" CommandName="Delete"
+                                        ButtonType="ImageButton" ConfirmText="Delete this row?">
+                                        <HeaderStyle Width="35px" />
+                                        <ItemStyle HorizontalAlign="Center" CssClass="MyImageButton" />
+                                    </telerik:GridButtonColumn>
+                                </Columns>
+                                <EditFormSettings UserControlName="ServiceRoomAliasDetail.ascx" EditFormType="WebUserControl">
+                                    <EditColumn UniqueName="ServiceRoomAliasEditCommand">
                                     </EditColumn>
                                 </EditFormSettings>
                             </MasterTableView>

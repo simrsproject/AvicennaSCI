@@ -481,5 +481,23 @@ namespace Temiang.Avicenna.Module.RADT.Master
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadGrid grdAutoBillItem;
+
+        /// <summary>
+        /// pgvAliasName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadPageView pgvAliasName;
+
+        /// <summary>
+        /// grdAliasName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadGrid grdAliasName;
     }
 }

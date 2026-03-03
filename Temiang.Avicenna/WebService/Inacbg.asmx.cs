@@ -7,12 +7,10 @@ using Temiang.Avicenna.BusinessObject;
 using System.Data;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.BusinessObject.Reference;
-using System.Web.Script.Services;
-using Telerik.Web.UI.Diagram;
 using Newtonsoft.Json;
-using static Temiang.Avicenna.Common.BPJS.VClaim.v11.RujukanBalik.Select.Response;
 using System.Configuration;
 using System.Globalization;
+using Temiang.Avicenna.Common.Inacbg.v510.Detail;
 
 namespace Temiang.Avicenna.WebService
 {
@@ -482,8 +480,11 @@ namespace Temiang.Avicenna.WebService
                         }
 
                         reg.ApproximatePlafondAmount = Convert.ToDecimal(Convert.ToDecimal(cbg.Tariff));
-                        reg.PlavonAmount = Convert.ToDecimal(cbg.Tariff);
-                        reg.Save();
+                        if (reg.PlavonAmount == 0)
+                        {
+                            reg.PlavonAmount = Convert.ToDecimal(cbg.Tariff);
+                            reg.Save();
+                        }
 
                         var cov = new RegistrationApproximateCoverageDetail();
                         if (!cov.LoadByPrimaryKey(reg.RegistrationNo, reg.CoverageClassID)) cov = new RegistrationApproximateCoverageDetail();
@@ -515,19 +516,41 @@ namespace Temiang.Avicenna.WebService
         {
             var regs = new RegistrationCollection();
             regs.Query.Where(regs.Query.SRRegistrationType.In(AppConstant.RegistrationType.OutPatient, AppConstant.RegistrationType.EmergencyPatient), //regs.Query.RegistrationDate.Date() == DateTime.Now.Date,
-                regs.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID), 
+                regs.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
                 regs.Query.IsVoid == false,
                 regs.Query.IsFromDispensary == false,
-                regs.Query.GuarantorCardNo.IsNotNull(), 
+                regs.Query.GuarantorCardNo.IsNotNull(),
                 regs.Query.GuarantorCardNo != string.Empty,
-                regs.Query.BpjsSepNo.IsNotNull(), 
-                regs.Query.BpjsSepNo != string.Empty, regs.Query.RegistrationDate.Date() == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
+                regs.Query.BpjsSepNo.IsNotNull(),
+                regs.Query.BpjsSepNo != string.Empty, regs.Query.RegistrationDate == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
             regs.Query.Load();
             var count = 0;
             foreach (var reg in regs)
             {
-                GroupperOutpatient(reg.RegistrationNo);
-                count++;
+                try
+                {
+                    GroupperOutpatient(reg.RegistrationNo);
+                    count++;
+                }
+                catch (Exception e)
+                {
+                    var log = new WebServiceAPILog();
+                    log.Query.Where(log.Query.IPAddress == "EklaimGroupper", log.Query.UrlAddress == reg.RegistrationNo, log.Query.Params == reg.BpjsSepNo);
+                    log.Query.es.Top = 1;
+                    if (log.Query.Load())
+                    {
+                        log = new WebServiceAPILog
+                        {
+                            DateRequest = DateTime.Now,
+                            IPAddress = "EklaimGroupper",
+                            UrlAddress = reg.RegistrationNo,
+                            Params = reg.BpjsSepNo,
+                            Totalms = 0
+                        };
+                    }
+                    log.Response = e.Message;
+                    log.Save();
+                }
             }
 
             return $"success, {count} data";
@@ -554,10 +577,29 @@ namespace Temiang.Avicenna.WebService
 
             var reg = new Registration();
             reg.Query.Where(reg.Query.SRRegistrationType.In(AppConstant.RegistrationType.OutPatient, AppConstant.RegistrationType.EmergencyPatient), //regs.Query.RegistrationDate.Date() == DateTime.Now.Date,
-                reg.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID), reg.Query.IsVoid == false,
-                reg.Query.GuarantorCardNo.IsNotNull(), reg.Query.GuarantorCardNo != string.Empty,
-                reg.Query.BpjsSepNo.IsNotNull(), reg.Query.BpjsSepNo != string.Empty, reg.Query.RegistrationNo == registrationNo);
-            reg.Query.Load();
+                reg.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
+                reg.Query.IsVoid == false,
+                reg.Query.IsFromDispensary == false,
+                reg.Query.GuarantorCardNo.IsNotNull(),
+                reg.Query.GuarantorCardNo != string.Empty,
+                reg.Query.BpjsSepNo.IsNotNull(),
+                reg.Query.BpjsSepNo != string.Empty,
+                reg.Query.RegistrationNo == registrationNo);
+            if (!reg.Query.Load())
+            {
+                reg = new Registration();
+                reg.Query.Where(
+                    reg.Query.SRRegistrationType.In(AppConstant.RegistrationType.OutPatient, AppConstant.RegistrationType.EmergencyPatient), //regs.Query.RegistrationDate.Date() == DateTime.Now.Date,
+                    reg.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
+                    reg.Query.IsVoid == false,
+                    reg.Query.IsFromDispensary == false,
+                    reg.Query.GuarantorCardNo.IsNotNull(),
+                    reg.Query.GuarantorCardNo != string.Empty,
+                    reg.Query.BpjsSepNo.IsNotNull(),
+                    reg.Query.BpjsSepNo != string.Empty,
+                    reg.Query.BpjsSepNo == registrationNo);
+                if (reg.Query.Load()) registrationNo = reg.RegistrationNo;
+            }
 
             var log = new WebServiceAPILog
             {
@@ -676,8 +718,8 @@ namespace Temiang.Avicenna.WebService
             var lab_albumin = !tbl.AsEnumerable().Any(t => t.Field<string>("SREklaimFactorGroup") == "lab_albumin");
             var rad_thorax_ap_pa = !tbl.AsEnumerable().Any(t => t.Field<string>("SREklaimFactorGroup") == "rad_thorax_ap_pa");
 
-            var svc = new Common.Inacbg.v51.Service();
-            var param51 = new Common.Inacbg.v51.Claim.Create.Data()
+            var svc54 = new Common.Inacbg.v510.Service();
+            var param51 = new Common.Inacbg.v510.Claim.Create.Data()
             {
                 nomor_kartu = reg.GuarantorCardNo,
                 nomor_sep = reg.BpjsSepNo,
@@ -686,7 +728,10 @@ namespace Temiang.Avicenna.WebService
                 tgl_lahir = patient.DateOfBirth?.ToString("yyyy-MM-dd HH:mm:ss"),
                 gender = (patient.Sex == "M" ? "1" : "2")
             };
-            var response51 = svc.Insert(param51);
+            var response51 = svc54.Insert(param51);
+            if (!response51.Metadata.IsValid && response51.Metadata.ErrorNo == "E2007") // Duplikasi nomor SEP
+                response51.Metadata.Code = "200";
+
             if (!response51.Metadata.IsDuplicate && !response51.Metadata.IsValid)
             {
                 log.Params = JsonConvert.SerializeObject(param51);
@@ -696,20 +741,25 @@ namespace Temiang.Avicenna.WebService
             }
 
             var ncc = new NccInacbg();
-            if (!ncc.LoadByPrimaryKey(reg.RegistrationNo)) ncc = new NccInacbg();
-            ncc.RegistrationNo = reg.RegistrationNo;
-            ncc.PatientId = response51.Response.PatientId;
-            ncc.AdmissionId = response51.Response.AdmissionId;
-            ncc.HospitalAdmissionId = response51.Response.HospitalAdmissionId;
-            ncc.LastUpdateDateTime = DateTime.Now;
-            ncc.LastUpdateByUserID = AppSession.UserLogin.UserID;
-            ncc.AddPaymentAmt = 0;
-            ncc.Save();
+            if (!ncc.LoadByPrimaryKey(reg.RegistrationNo))
+            {
+                ncc = new NccInacbg();
+                ncc.RegistrationNo = reg.RegistrationNo;
+                ncc.PatientId = response51.Response.PatientId;
+                ncc.AdmissionId = response51.Response.AdmissionId;
+                ncc.HospitalAdmissionId = response51.Response.HospitalAdmissionId;
+                ncc.LastUpdateDateTime = DateTime.Now;
+                ncc.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                ncc.AddPaymentAmt = 0;
+                ncc.Save();
+
+                SaveNccIdrg(registrationNo, "ClaimData", param51, response51);
+            }
 
             var diagnose = EpisodeDiagnoses(reg.RegistrationNo).OrderBy(e => e.SRDiagnoseType).Aggregate(string.Empty, (current, d) => current + (d.DiagnoseID + "#"));
             if (string.IsNullOrEmpty(diagnose)) diagnose = "#";
 
-            var procedure = EpisodeProcedures(reg.RegistrationNo).Aggregate(string.Empty, (current, d) => current + (d.ProcedureID + "#"));
+            var procedure = BuildProcedureStringWithQty(EpisodeProcedures(reg.RegistrationNo));
             if (string.IsNullOrEmpty(procedure)) procedure = "#";
 
             var sistolic = 0;
@@ -822,8 +872,8 @@ namespace Temiang.Avicenna.WebService
                 }
             }
 
-            var svc54 = new Common.Inacbg.v58.Service();
-            var params54 = new Common.Inacbg.v58.Detail.Data()
+            svc54 = new Common.Inacbg.v510.Service();
+            var params54 = new Common.Inacbg.v510.Detail.Datass()
             {
                 nomor_sep = reg.BpjsSepNo,
                 nomor_kartu = reg.GuarantorCardNo,
@@ -851,11 +901,11 @@ namespace Temiang.Avicenna.WebService
                 sistole = sistolic.ToString(),
                 diastole = diastolic.ToString(),
                 discharge_status = asri.NumericValue.ToString(),
-                diagnosa = diagnose,
-                procedure = procedure,
-                diagnosa_inagrouper = diagnose,
-                procedure_inagrouper = procedure,
-                tarif_rs = new Common.Inacbg.v54.Detail.TarifRs()
+                //diagnosa = diagnose,
+                //procedure = procedure,
+                //diagnosa_inagrouper = diagnose,
+                //procedure_inagrouper = procedure,
+                tarif_rs = new TarifRss()
                 {
                     prosedur_non_bedah = prosedur_non_bedah.ToInt().ToString(),
                     prosedur_bedah = prosedur_bedah.ToInt().ToString(),
@@ -889,7 +939,7 @@ namespace Temiang.Avicenna.WebService
                 covid19_cc_ind = string.Empty,
                 covid19_rs_darurat_ind = string.Empty, //
                 covid19_co_insidense_ind = string.Empty, //
-                covid19_penunjang_pengurang = new Common.Inacbg.v54.Detail.Covid19PenunjangPengurang()
+                covid19_penunjang_pengurang = new Covid19PenunjangPengurang()
                 {
                     lab_asam_laktat = lab_asam_laktat ? "1" : "0", //
                     lab_procalcitonin = lab_procalcitonin ? "1" : "0", //
@@ -910,8 +960,8 @@ namespace Temiang.Avicenna.WebService
                 bayi_lahir_status_cd = string.Empty, //
 
                 dializer_single_use = "1",
-                kantong_darah = pelayanan_darah.ToInt() == 0 ? "0" : 
-                    (pelayanan_darah.ToInt() > 0 && pelayanan_darah.ToInt() <= 1000000 ? "1" : 
+                kantong_darah = pelayanan_darah.ToInt() == 0 ? "0" :
+                    (pelayanan_darah.ToInt() > 0 && pelayanan_darah.ToInt() <= 1000000 ? "1" :
                         ((pelayanan_darah.ToInt() > 1000000 && pelayanan_darah.ToInt() <= 1800000 ? "2" :
                         "3"))),
                 menit_1_appearance = string.Empty,
@@ -940,6 +990,7 @@ namespace Temiang.Avicenna.WebService
                 coder_nik = ConfigurationManager.AppSettings["InacbgUserID"]
             };
             var response54 = svc54.Insert(params54);
+            //if (response54.Metadata.ErrorNo == "E2102") response54.Metadata.Code = "200"; // idrg final
             if (!response54.Metadata.IsValid)
             {
                 log.Params = JsonConvert.SerializeObject(params54);
@@ -948,12 +999,211 @@ namespace Temiang.Avicenna.WebService
                 return "not ok";
             }
 
-            svc = new Common.Inacbg.v51.Service();
-            var paramsGrouper = new Common.Inacbg.v51.Grouper.Grouper1.Data()
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramDiag54 = new Common.Inacbg.v510.Diagnose.Data
+            {
+                nomor_sep = reg.BpjsSepNo,
+                diagnosa = diagnose
+            };
+            var responseDiag54 = svc54.IDRGSetDiagnose(paramDiag54);
+            //if (responseDiag54.Metadata.ErrorNo == "E2102") responseDiag54.Metadata.Code = "200"; // idrg final
+            if (!responseDiag54.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramDiag54);
+                log.Response = JsonConvert.SerializeObject(responseDiag54);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "IdrgDiagnosaSet", paramDiag54, responseDiag54);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramGetDiag54 = new Common.Inacbg.v510.Diagnose.Get.Data { nomor_sep = reg.BpjsSepNo };
+            var responseGetDiag54 = svc54.IDRGGetDiagnose(paramGetDiag54);
+            //if (responseGetDiag54.Metadata.ErrorNo == "E2102") responseGetDiag54.Metadata.Code = "200"; // idrg final
+            if (!responseGetDiag54.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramGetDiag54);
+                log.Response = JsonConvert.SerializeObject(responseGetDiag54);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "IdrgDiagnosaGet", paramGetDiag54, responseGetDiag54);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramProc54 = new Common.Inacbg.v510.Procedure.Data
+            {
+                nomor_sep = reg.BpjsSepNo,
+                procedure = procedure
+            };
+            var responseProc54 = svc54.IDRGSetProcedure(paramProc54);
+            //if (responseProc54.Metadata.ErrorNo == "E2102") responseProc54.Metadata.Code = "200"; // idrg final
+            if (!responseProc54.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramProc54);
+                log.Response = JsonConvert.SerializeObject(responseProc54);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "IdrgProcedureSet", paramProc54, responseProc54);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramGetProc54 = new Common.Inacbg.v510.Procedure.Get.Data { nomor_sep = reg.BpjsSepNo };
+            var responseGetProc54 = svc54.IDRGGetProcedure(paramGetProc54);
+            //if (responseGetProc54.Metadata.ErrorNo == "E2102") responseGetProc54.Metadata.Code = "200"; // idrg final
+            if (!responseGetProc54.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramGetProc54);
+                log.Response = JsonConvert.SerializeObject(responseGetProc54);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "IdrgProcedureGet", paramGetProc54, responseGetProc54);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramIdrgGroup = new Common.Inacbg.v510.Gruoper.IdrgGrouper.Data { nomor_sep = reg.BpjsSepNo };
+            var responseIdrgGroup = svc54.IdrgGrouper(paramIdrgGroup);
+            //if (responseIdrgGroup.Meta.ErrorNo == "E2102") responseIdrgGroup.Meta.Code = "200"; // idrg final
+            if (!responseIdrgGroup.Meta.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramIdrgGroup);
+                log.Response = JsonConvert.SerializeObject(responseIdrgGroup);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "IdrgGroup", paramIdrgGroup, responseIdrgGroup);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramIdrgFinal = new Common.Inacbg.v510.Gruoper.IdrgGrouper.Data { nomor_sep = reg.BpjsSepNo };
+            var responseIdrgFinal = svc54.FinalIdrgGrouper(paramIdrgFinal);
+            //if (responseIdrgFinal.Meta.ErrorNo == "E2102") responseIdrgFinal.Meta.Code = "200"; // idrg final
+            if (!responseIdrgFinal.Meta.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramIdrgFinal);
+                log.Response = JsonConvert.SerializeObject(responseIdrgFinal);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "IdrgFinal", paramIdrgFinal, responseIdrgFinal);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramImport54 = new Common.Inacbg.v510.Gruoper.importcoding.Data
             {
                 nomor_sep = reg.BpjsSepNo
             };
-            var responseGrouper = svc.Grouper1(paramsGrouper);
+            var responseImport54 = svc54.ImportIdrgToInacbg(paramImport54);
+            if (!responseImport54.Meta.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramImport54);
+                log.Response = JsonConvert.SerializeObject(responseImport54);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "ImportIdrgToInacbg", paramImport54, responseImport54);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramGetDiag = new Common.Inacbg.v510.Diagnose.Get.Data { nomor_sep = reg.BpjsSepNo };
+            var responseGetDiag = svc54.InacbgGetDiagnose(paramGetDiag);
+            if (!responseGetDiag.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramGetDiag);
+                log.Response = JsonConvert.SerializeObject(responseGetDiag);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "InacbgDiagnosaGet", paramGetDiag, responseGetDiag);
+
+            var diagInas = new EpisodeDiagnoseInaGroupperCollection();
+            foreach (var diag in responseGetDiag.Data.Expanded.Where(d => d.ValidCode == "1"))
+            {
+                var diagIna = diagInas.AddNew();
+                diagIna.RegistrationNo = registrationNo;
+                diagIna.SequenceNo = diag.No;
+                diagIna.DiagnoseID = diag.Code;
+                diagIna.SRDiagnoseType = diag.No == "1" ? "DiagnoseType-001" : "DiagnoseType-003";
+                diagIna.DiagnosisText = diag.Display;
+                diagIna.MorphologyID = string.Empty;
+                diagIna.ParamedicID = string.Empty;
+                diagIna.IsAcuteDisease = false;
+                diagIna.IsChronicDisease = false;
+                diagIna.IsOldCase = false;
+                diagIna.IsConfirmed = true;
+                diagIna.IsVoid = false;
+                diagIna.Notes = string.Empty;
+                diagIna.LastUpdateDateTime = DateTime.Now;
+                diagIna.LastUpdateByUserName = "idrg";
+                diagIna.ExternalCauseID = string.Empty;
+                diagIna.CreateDateTime = DateTime.Now;
+                diagIna.CreateByUserID = "idrg";
+                diagIna.DiagnoseSynonym = string.Empty;
+            }
+            if (diagInas.Any()) diagInas.Save();
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramGetProc = new Common.Inacbg.v510.Procedure.Get.Data { nomor_sep = reg.BpjsSepNo };
+            var responseGetProc = svc54.InacbgGetProcedure(paramGetProc);
+            if (!responseGetProc.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramGetProc);
+                log.Response = JsonConvert.SerializeObject(responseGetProc);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "InacbgProcedureGet", paramGetProc, responseGetProc);
+
+            var diagProcs = new EpisodeProcedureInaGroupperCollection();
+            foreach (var proc in responseGetProc.Data.Expanded.Where(d => d.ValidCode == "1"))
+            {
+                var diagProc = diagProcs.AddNew();
+                diagProc.RegistrationNo = registrationNo;
+                diagProc.SequenceNo = proc.No;
+                diagProc.ProcedureDate = DateTime.Now.Date;
+                diagProc.ProcedureTime = string.Empty;
+                diagProc.ProcedureDate2 = DateTime.Now.Date;
+                diagProc.ProcedureTime2 = string.Empty;
+                diagProc.ParamedicID = string.Empty;
+                diagProc.ParamedicID2 = string.Empty;
+                diagProc.ProcedureID = proc.Code;
+                diagProc.SRProcedureCategory = string.Empty;
+                diagProc.SRAnestesi = string.Empty;
+                diagProc.RoomID = string.Empty;
+                diagProc.IsCito = false;
+                diagProc.IsVoid = false;
+                diagProc.LastUpdateDateTime = DateTime.Now;
+                diagProc.LastUpdateByUserName = "idrg";
+                diagProc.AssistantID1 = string.Empty;
+                diagProc.AssistantID2 = string.Empty;
+                diagProc.Notes = string.Empty;
+                diagProc.BookingNo = string.Empty;
+                diagProc.ParamedicID2a = string.Empty;
+                diagProc.ParamedicID3a = string.Empty;
+                diagProc.ParamedicID4a = string.Empty;
+                diagProc.ParamedicIDAnestesi = string.Empty;
+                diagProc.AssistantIDAnestesi = string.Empty;
+                diagProc.InstrumentatorID1 = string.Empty;
+                diagProc.InstrumentatorID2 = string.Empty;
+                diagProc.IsFromOperatingRoom = true;
+                diagProc.CreateDateTime = DateTime.Now;
+                diagProc.CreateByUserID = "idrg";
+                diagProc.AnestesyNotes = string.Empty;
+                diagProc.ProcedureName = proc.Display;
+                diagProc.OpNotesSeqNo = string.Empty;
+                diagProc.OperatingNotes = string.Empty;
+                diagProc.ProcedureSynonym = string.Empty;
+            }
+            if (diagProcs.Any()) diagProcs.Save();
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramsGrouper = new Common.Inacbg.v510.Gruoper.Grouper1.Data() { nomor_sep = reg.BpjsSepNo };
+            var responseGrouper = svc54.InacbgGrouper1(paramsGrouper);
             if (!responseGrouper.Metadata.IsValid)
             {
                 log.Params = JsonConvert.SerializeObject(paramsGrouper);
@@ -962,6 +1212,8 @@ namespace Temiang.Avicenna.WebService
                 return "not ok";
             }
 
+            SaveNccIdrg(registrationNo, "InacbgStage1", paramsGrouper, responseGrouper);
+
             ncc = new NccInacbg();
             if (!ncc.LoadByPrimaryKey(reg.RegistrationNo))
             {
@@ -969,20 +1221,32 @@ namespace Temiang.Avicenna.WebService
                 log.Save();
                 return "not ok";
             }
-            ncc.AddPaymentAmt = string.IsNullOrEmpty(responseGrouper.Response.AddPaymentAmt) ? 0 : Convert.ToDecimal(responseGrouper.Response.AddPaymentAmt);
-            ncc.CoverageAmount = Convert.ToDecimal(responseGrouper.Response.Cbg.Tariff);
-            ncc.CbgID = responseGrouper.Response.Cbg.Code;
-            ncc.CbgName = responseGrouper.Response.Cbg.Description;
+            if (responseGrouper.ResponseInacbg == null)
+            {
+                log.Response = "Response Inacbg null";
+                log.Save();
+                return "not ok";
+            }
+
+            ncc.AddPaymentAmt = string.IsNullOrEmpty(responseGrouper.ResponseInacbg.AddPaymentAmt) ? 0 : Convert.ToDecimal(responseGrouper.ResponseInacbg.AddPaymentAmt);
+            ncc.CoverageAmount = Convert.ToDecimal(responseGrouper.ResponseInacbg.Cbg.Tariff);
+            ncc.CbgID = responseGrouper.ResponseInacbg.Cbg.Code;
+            ncc.CbgName = responseGrouper.ResponseInacbg.Cbg.Description;
             ncc.Save();
 
-            svc = new Common.Inacbg.v51.Service();
-            var paramsFinal = new Common.Inacbg.v51.Claim.Final.Data()
+            if (AppSession.Parameter.HealthcareInitial == "RSI")
             {
-                nomor_sep = reg.BpjsSepNo,
-                coder_nik = ConfigurationManager.AppSettings["InacbgUserID"]
-            };
-            var responseFinal = svc.Final(paramsFinal);
-            if (!responseFinal.Metadata.IsValid)
+                if (reg.PlavonAmount == 0)
+                {
+                    reg.PlavonAmount = Convert.ToDecimal(responseGrouper.ResponseInacbg.Cbg.Tariff) == 0 ? Convert.ToDecimal(responseGrouper.ResponseInacbg.Tariff) : Convert.ToDecimal(responseGrouper.ResponseInacbg.Cbg.Tariff);
+                    reg.Save();
+                }
+            }
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramsFinal = new Common.Inacbg.v510.Gruoper.IdrgGrouper.Data { nomor_sep = reg.BpjsSepNo };
+            var responseFinal = svc54.FinalInacbgGrouper(paramsFinal);
+            if (!responseFinal.Meta.IsValid)
             {
                 log.Params = JsonConvert.SerializeObject(paramsFinal);
                 log.Response = JsonConvert.SerializeObject(responseFinal);
@@ -990,12 +1254,31 @@ namespace Temiang.Avicenna.WebService
                 return "not ok";
             }
 
-            svc = new Common.Inacbg.v51.Service();
-            var paramsKirim = new Common.Inacbg.v51.Claim.Create.Data()
+            SaveNccIdrg(registrationNo, "InacbgFinal", paramsFinal, responseFinal);
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramsFinalClaim = new Common.Inacbg.v510.Claim.Final.Data()
             {
-                nomor_sep = reg.BpjsSepNo
+                nomor_sep = reg.BpjsSepNo,
+                coder_nik = ConfigurationManager.AppSettings["InacbgUserID"]
             };
-            var responseKirim = svc.Send(paramsKirim);
+            var responseFinalClaim = svc54.Final(paramsFinalClaim);
+            if (!responseFinalClaim.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramsFinalClaim);
+                log.Response = JsonConvert.SerializeObject(responseFinalClaim);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "ClaimFinal", paramsFinalClaim, responseFinalClaim);
+
+            ncc.CbgStatus = "final";
+            ncc.Save();
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramsKirim = new Common.Inacbg.v510.Claim.Create.Data() { nomor_sep = reg.BpjsSepNo };
+            var responseKirim = svc54.Send(paramsKirim);
             if (!responseKirim.Metadata.IsValid)
             {
                 log.Params = JsonConvert.SerializeObject(paramsKirim);
@@ -1004,16 +1287,101 @@ namespace Temiang.Avicenna.WebService
                 return "not ok";
             }
 
+            SaveNccIdrg(registrationNo, "ClaimSend", paramsKirim, responseKirim);
+
+            ncc.CbgSentStatus = responseKirim.Response.Data.First().KemkesDcStatus;
+            ncc.Save();
+
+            svc54 = new Common.Inacbg.v510.Service();
+            var paramDetail = new Common.Inacbg.v510.Claim.Get.GetDetail.Data() { nomor_sep = reg.BpjsSepNo };
+            var responseDetail = svc54.GetDetail(paramDetail);
+            if (!responseDetail.Metadata.IsValid)
+            {
+                log.Params = JsonConvert.SerializeObject(paramDetail);
+                log.Response = JsonConvert.SerializeObject(responseDetail);
+                log.Save();
+                return "not ok";
+            }
+
+            SaveNccIdrg(registrationNo, "GetClaimData", paramDetail, responseDetail);
+
             //svc = new Common.Inacbg.v51.Service();
             //var print = svc.Print(new Common.Inacbg.v51.Claim.Create.Data()
             //{
             //    nomor_sep = reg.BpjsSepNo
             //});
             //if (!kirim.Metadata.IsValid) continue;
+            
             log.Response = "ok";
             log.Save();
 
             return "ok";
+        }
+
+        private static string BuildProcedureStringWithQty(IEnumerable<EpisodeProcedure> rows)
+        {
+            var tokens = rows
+                .Where(x => x != null && x.IsVoid == false)
+                .OrderBy(x => x.SequenceNo.ToInt())
+                .Select(x =>
+                {
+                    var q = (x.QtyICD <= 0 ? 1 : x.QtyICD);
+                    return q > 1 ? $"{x.ProcedureID}+{q}" : x.ProcedureID;
+                })
+                .ToList();
+
+            return tokens.Count == 0 ? "#" : string.Join("#", tokens);
+        }
+
+        private void SaveNccIdrg(string registrationNo, string action, object reqObj, object resObj)
+        {
+            var row = new NccIDRG();
+            if (!row.LoadByPrimaryKey(registrationNo))
+                row = new NccIDRG { RegistrationNo = registrationNo };
+
+            var reg = new Registration();
+            reg.LoadByPrimaryKey(registrationNo);
+
+            var patient = new Patient();
+            patient.LoadByPrimaryKey(reg.PatientID);
+
+            row.MedicalNo = patient.MedicalNo;
+            row.SEP = reg.BpjsSepNo;
+
+            string reqJson = reqObj == null ? null : JsonConvert.SerializeObject(reqObj);
+            string resJson = resObj == null ? null : JsonConvert.SerializeObject(resObj);
+
+            switch (action)
+            {
+                case "ClaimData": row.ClaimDataRequest = reqJson; row.ClaimDataResponse = resJson; break;
+                case "IdrgDiagnosaSet": row.IdrgDiagnosaSetReq = reqJson; row.IdrgDiagnosaSetRes = resJson; break;
+                case "IdrgDiagnosaGet": row.IdrgDiagnosaGetReq = reqJson; row.IdrgDiagnosaGetRes = resJson; break;
+                case "IdrgProcedureSet": row.IdrgProcedureSetReq = reqJson; row.IdrgProcedureSetRes = resJson; break;
+                case "IdrgProcedureGet": row.IdrgProcedureGetReq = reqJson; row.IdrgProcedureGetRes = resJson; break;
+                case "IdrgGroup": row.GroupingIdrgReq = reqJson; row.GroupingIdrgRes = resJson; break;
+                case "IdrgFinal": row.FinalIdrgReq = reqJson; row.FinalIdrgRes = resJson; break;
+                case "IdrgReEdit": row.ReEditIdrgReq = reqJson; row.ReEditIdrgRes = resJson; break;
+                case "ImportIdrgToInacbg": row.IdrgToInacbgImportReq = reqJson; row.IdrgToInacbgImportRes = resJson; break;
+
+                case "InacbgDiagnosaGet": row.InacbgDiagnosaGetReq = reqJson; row.InacbgDiagnosaGetRes = resJson; break;
+                case "InacbgDiagnosaSet": row.InacbgDiagnosaSetReq = reqJson; row.InacbgDiagnosaSetRes = resJson; break;
+                case "InacbgProcedureSet": row.InacbgProcedureSetReq = reqJson; row.InacbgProcedureSetRes = resJson; break;
+                case "InacbgProcedureGet": row.InacbgProcedureGetReq = reqJson; row.InacbgProcedureGetRes = resJson; break;
+                case "InacbgStage1": row.GroupingInacbgStage1Req = reqJson; row.GroupingInacbgStage1Res = resJson; break;
+                case "InacbgStage2": row.GroupingInacbgStage2Req = reqJson; row.GroupingInacbgStage2Res = resJson; break;
+                case "InacbgFinal": row.FinalInacbgReq = reqJson; row.FinalInacbgRes = resJson; break;
+                case "InacbgReEdit": row.ReEditInacbgReq = reqJson; row.ReEditInacbgRes = resJson; break;
+                case "ClaimFinal": row.ClaimFinalReq = reqJson; row.ClaimFinalRes = resJson; break;
+                case "ClaimReEdit": row.ClaimReEditReq = reqJson; row.ClaimReEditRes = resJson; break;
+                case "ClaimSend": row.ClaimSendReq = reqJson; row.ClaimSendRes = resJson; break;
+                case "GetClaimData": row.GetClaimDataReq = reqJson; row.GetClaimDataRes = resJson; break;
+                default:
+                    break;
+            }
+
+            row.LastUpdateDateTime = DateTime.Now;
+            row.LastUpdateByUserID = AppSession.UserLogin.UserID;
+            row.Save();
         }
 
         private EpisodeDiagnoseCollection EpisodeDiagnoses(string registrationNo)

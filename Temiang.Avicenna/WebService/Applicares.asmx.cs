@@ -385,8 +385,8 @@ namespace Temiang.Avicenna.WebService
                                 sub.Query.SRBridgingType == AppEnum.BridgingType.ANTROL.ToString());
                 sub.Query.Load();
 
-                var exclude = new[] { "HDL", "IRM" };
-                if (!exclude.Contains(sub.BridgingID.Split(';')[0]))
+                //var exclude = new[] { "HDL", "IRM" };
+                //if (!exclude.Contains(sub.BridgingID.Split(';')[0]))
                 {
                     var p = new Paramedic();
                     p.LoadByPrimaryKey(entity.ParamedicID);

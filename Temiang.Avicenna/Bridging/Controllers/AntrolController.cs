@@ -464,7 +464,7 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 //}
 
                 var minDayBefore = 0;
-                if (AppSession.Parameter.HealthcareInitial == "RSI") minDayBefore = 1;
+                //if (AppSession.Parameter.HealthcareInitial == "RSI") minDayBefore = 1;
                 if (AppSession.Parameter.MinDayBeforeBookingMJkn > -1) minDayBefore = AppSession.Parameter.MinDayBeforeBookingMJkn ?? 0;
                 var tglMaxRencana = parsed.Date.AddDays(-1 * minDayBefore);
 
@@ -2910,6 +2910,38 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 }
             }
 
+            if (AppSession.Parameter.HealthcareInitial == "RSI")
+            {
+                var antreanDateTime = Convert.ToDateTime(appt.AppointmentDate?.ToString("yyyy-MM-dd") + " " + appt.AppointmentTime + ":00").AddHours(-1);
+                if (DateTime.Now < antreanDateTime)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Created, new
+                    {
+                        metadata = new Antrol.CheckIn.Response.Metadata()
+                        {
+                            Code = (int)HttpStatusCode.Created,
+                            Message = $"Waktu check in minimal 1 jam sebelum waktu pelayanan, {antreanDateTime.ToString("dd/MM/yyyy HH:mm:ss")}"
+                        }
+                    });
+                }
+            }
+
+            var psd = new ParamedicScheduleDate();
+            if (!psd.LoadByPrimaryKey(appt.ServiceUnitID, appt.ParamedicID, appt.AppointmentDate?.Year.ToString(), appt.AppointmentDate?.Date ?? new DateTime()))
+            {
+                var pmedic = new Paramedic();
+                pmedic.LoadByPrimaryKey(appt.ParamedicID);
+
+                return Request.CreateResponse(HttpStatusCode.Created, new
+                {
+                    metadata = new Antrol.CheckIn.Response.Metadata()
+                    {
+                        Code = (int)HttpStatusCode.Created,
+                        Message = $"Jadwal Dokter {pmedic.ParamedicName} Tersebut Belum Tersedia, Silahkan Reschedule Tanggal dan Jam Praktek Lainnya"
+                    }
+                });
+            }
+
             appt.SRAppointmentStatus = AppSession.Parameter.AppointmentStatusConfirmed;
             appt.LastUpdateDateTime = DateTime.Now;
             appt.LastUpdateByUserID = "mjkn";
@@ -4359,6 +4391,28 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     {
                         waktu1 = ot1;
                         waktu2 = ot2;
+                    }
+                }
+
+                if (AppSession.Parameter.HealthcareInitial == "RSI")
+                {
+                    if (TimeSpan.ParseExact(DateTime.Now.ToString("HH:mm"), "hh\\:mm", null) > waktu2)
+                    {
+                        log.Response = JsonConvert.SerializeObject(new
+                        {
+                            Code = (int)HttpStatusCode.Created,
+                            Message = $"Jadwal Dokter {pmedic.ParamedicName} Sudah Lewat : {waktu1.Value.ToString("hh\\:mm")}-{waktu2.Value.ToString("hh\\:mm")}, Silahkan Reschedule Tanggal dan Jam Praktek Lainnya"
+                        });
+                        log.Save();
+
+                        return Request.CreateResponse(HttpStatusCode.Created, new
+                        {
+                            metadata = new
+                            {
+                                Code = (int)HttpStatusCode.Created,
+                                Message = $"Jadwal Dokter {pmedic.ParamedicName} Sudah Lewat : {waktu1.Value.ToString("hh\\:mm")}-{waktu2.Value.ToString("hh\\:mm")}, Silahkan Reschedule Tanggal dan Jam Praktek Lainnya"
+                            }
+                        });
                     }
                 }
 
