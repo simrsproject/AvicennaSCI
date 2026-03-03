@@ -1,21 +1,23 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
-using Newtonsoft.Json;
+using System.Web;
+using Temiang.Avicenna.Bridging.SatuSehat.BusinessObject;
 using Temiang.Avicenna.Bridging.SatuSehat.Common;
 using Temiang.Avicenna.BusinessObject;
-using RestSharp;
-using Temiang.Avicenna.Bridging.SatuSehat.BusinessObject;
-using System.Collections.Generic;
-using System.Web;
-using System.Data;
 using Temiang.Avicenna.BusinessObject.Common;
-using System.Linq;
-using System.Globalization;
 
 namespace Temiang.Avicenna.Bridging.SatuSehat
 {
@@ -43,7 +45,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
         private string[] _dayNames = { "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" };
         private int _gmtDif = 0 - AppParameter.GetParameterValue(AppParameter.ParameterItem.GMT).ToInt();
 
-        private static string SatuSehatKey(string key)
+        // diganti public karena akan di-invoke dari DynamicInvoker
+        public static string SatuSehatKey(string key)
         {
             var configKey = string.Empty;
 
@@ -310,6 +313,465 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             return null;
         }
         #endregion Common Method
+
+        #region Satu Sehat Generic
+        #region Utils
+        public string SSDateYMD(DateTime dtm)
+        {
+            return string.Format("{0}+00:00", dtm.AddHours(_gmtDif).ToString(_dateFormat));
+        }
+        public string SSDateIdDDMMMMYYYY(DateTime dtm)
+        {
+            // Gunakan CultureInfo Indonesia
+            System.Globalization.CultureInfo culture = new System.Globalization.CultureInfo("id-ID");
+            // Format tanggal
+            return dtm.ToString("dd MMMM yyyy", culture);
+        }
+        public string SSDateIdDDDDMMMMYYYY(DateTime dtm)
+        {
+            // Format tanggal
+            return String.Format("{0}, {1}", SSDateIdDDDD(dtm), SSDateIdDDMMMMYYYY(dtm));
+        }
+        public string SSDateIdDDDD(DateTime dtm)
+        {
+            // Format tanggal
+            return String.Format("{0}", _dayNames[dtm.DayOfWeek.ToInt()]);
+        }
+        public string SSDateYYYYMMDD(DateTime dtm)
+        {
+            return dtm.ToString("yyyy-MM-dd");
+        }
+        #endregion
+        #region Patient Bridging
+        public string PatientBridging(string patientID, ref string accessToken, string fieldToReturn, bool isDev)
+        {
+            if (isDev)
+            {
+                switch (fieldToReturn)
+                {
+                    case "BridgingID": return "Dummy Patient ID";
+                    case "BridgingName": return "Dummy Patient Name";
+                    default: return "Dummy Patient unknown field";
+                }
+            }
+            return PatientBridging(patientID, ref accessToken, fieldToReturn);
+        }
+        public string PatientBridging(string patientID, ref string accessToken, string fieldToReturn)
+        {
+            //object oVal = null;
+            var patSs = new PatientBridging();
+            if (!patSs.LoadByPrimaryKey(patientID, _satuSehatBridgingType) || string.IsNullOrWhiteSpace(patSs.BridgingID))
+            {
+                var pat = new Patient();
+                if (pat.LoadByPrimaryKey(patientID))
+                {
+                    if (string.IsNullOrWhiteSpace(pat.Ssn))
+                        throw new Exception(string.Format("SSN {0} not found for {1}", pat.Ssn, pat.PatientName));
+
+                    var response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id", string.Concat("nik|", pat.Ssn), ref accessToken);
+                    if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var patientSearchResponse = JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.PatientSearch.PatientSearchResponse>(response.Content);
+                        if (patientSearchResponse.Total == 1)
+                        {
+                            // Add PatientBridging
+                            if (string.IsNullOrEmpty(patSs.PatientID))
+                            {
+                                patSs = new PatientBridging();
+                            }
+
+                            patSs.PatientID = patientID;
+                            patSs.BridgingID = patientSearchResponse.Entry[0].Resource.Id;
+                            patSs.BridgingName = pat.PatientName;
+                            patSs.SRBridgingType = _satuSehatBridgingType;
+                            patSs.IsActive = true;
+                            patSs.Save();
+
+                            //oVal = FieldValue(patSs, fieldToReturn);
+                            //if (oVal != null) return oVal.ToString();
+                            return FieldValue<string>(patSs, fieldToReturn);
+                        }
+                        else
+                        {
+                            throw new Exception(string.Format("SSN {0} not found at fhir.kemkes.go.id", pat.Ssn));
+                            //satuSehatLog.ErrorResponse = string.Format("SSN {0} not found at fhir.kemkes.go.id", pat.Ssn);
+                            //satuSehatLog.Save();
+                            //return;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new Exception(string.Format("Patient {0} not found.", patientID));
+                }
+            }
+
+            //oVal = FieldValue(patSs, fieldToReturn);
+            //if (oVal != null) return oVal.ToString();
+            return FieldValue<string>(patSs, fieldToReturn);
+
+            return string.Empty;
+        }
+
+        public string ParamedicBridging(string paramedicID, string fieldToReturn, bool isDev)
+        {
+            if (isDev)
+            {
+                switch (fieldToReturn)
+                {
+                    case "BridgingID": return "Dummy Paramedic ID";
+                    case "BridgingName": return "Dummy Paramedic Name";
+                    default: return "Dummy Paramedic unknown field";
+                }
+            }
+            return ParamedicBridging(paramedicID, fieldToReturn);
+        }
+        public string ParamedicBridging(string paramedicID, string fieldToReturn)
+        {
+            var parMedSs = new ParamedicBridging();
+            parMedSs.Query.Where(parMedSs.Query.ParamedicID == paramedicID, parMedSs.Query.SRBridgingType == _satuSehatBridgingType);
+            parMedSs.Query.es.Top = 1;
+            if (parMedSs.Query.Load())
+            {
+                return FieldValue<string>(parMedSs, fieldToReturn);
+            }
+            return string.Empty;
+        }
+
+        private T FieldValue<T>(object dataObject, string fieldToReturn)
+        {
+            if (string.IsNullOrWhiteSpace(fieldToReturn) || dataObject == null)
+                return default;
+
+            var propInfo = dataObject.GetType().GetProperty(fieldToReturn);
+            if (propInfo != null)
+            {
+                var value = propInfo.GetValue(dataObject);
+                if (value is T typedValue)
+                    return typedValue;
+            }
+
+            return default;
+        }
+
+        //private object FieldValue(PatientBridging patSs, string fieldToReturn) {
+        //    if (string.IsNullOrWhiteSpace(fieldToReturn)) fieldToReturn = "BridgingID";
+        //    PropertyInfo propInfo = typeof(PatientBridging).GetProperty(fieldToReturn);
+
+        //    if (propInfo != null)
+        //    {
+        //        object value = propInfo.GetValue(patSs);
+        //        return value;
+        //    }
+        //    return null;
+        //}
+        #endregion
+        #region Encounter
+        public bool SendToSatuSehat(SatuSehatILPPreparation ssp, SatuSehatILPTemplateDetail sstd, ref string accessToken)
+        {
+            //bool testingDummy = true;
+            try
+            {
+                Method method = (Method)Enum.Parse(typeof(Method), sstd.PostMethod, true);
+                // tgl, sementara buat testing
+                ssp.SentDateTime = DateTime.Now.NowAtSqlServer();
+
+                //throw new Exception("test error aja");
+
+                var response = RestClientExecute(ssp.PostData, sstd.PostUrl.Replace("{{base_url}}", _baseUrl), ref accessToken, method);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    ssp.IsSent = true;
+                    ssp.IsError = false;
+                    //ssp.SentDateTime = DateTime.Now;
+                    ssp.RespondData = response.Content;
+                    SyncKeSSLama(ssp, sstd, "");
+                    return true;
+                }
+                else
+                {
+                    ssp.IsSent = true;
+                    ssp.IsError = true;
+                    ssp.RespondData = response.Content;
+                    SyncKeSSLama(ssp, sstd, response.Content);
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ssp.IsSent = false;
+                ssp.IsError = true;
+                ssp.RespondData = ex.Message;
+                SyncKeSSLama(ssp, sstd, ex.Message);
+                return false;
+            }
+        }
+
+        private void SyncKeSSLama(SatuSehatILPPreparation ssp, SatuSehatILPTemplateDetail sstd, string errMsg)
+        {
+            if (sstd.PostUrl.EndsWith("Encounter", true, null))
+            {
+                // simpan encounter
+                var satuSehatLog = new SatuSehatKunjungan();
+                if (!satuSehatLog.LoadByPrimaryKey(ssp.RegistrationNo))
+                    satuSehatLog = new SatuSehatKunjungan();
+
+                satuSehatLog.KunjunganPostData = ssp.PostData;
+                satuSehatLog.RegistrationNo = ssp.RegistrationNo;
+                satuSehatLog.str.ErrorResponse = string.Empty;
+
+                if (string.IsNullOrWhiteSpace(errMsg))
+                {
+                    var obj = JObject.Parse(ssp.RespondData);
+                    string id = (string)obj["id"];
+
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        ssp.AnswerText = id;
+                        satuSehatLog.EncounterID = new Guid(id);
+                    }
+                }
+                else
+                {
+                    satuSehatLog.ErrorResponse = errMsg;
+                }
+
+                satuSehatLog.Save();
+            }
+        }
+        #endregion
+        public string PatientPhysicalExam(string registrationNo, string ExamKeyowrd)
+        {
+            var valToReturn = string.Empty;
+            var paq = new PatientAssessmentQuery("paq");
+            paq.Where(paq.RegistrationNo == registrationNo);
+            paq.Select(paq.PhysicalExam);
+            paq.es.Top = 1;
+            paq.OrderBy(paq.CreatedDateTime.Descending);
+            var dtb = paq.LoadDataTable();
+            if (dtb.Rows.Count > 0)
+            {
+                var json = dtb.Rows[0]["PhysicalExam"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    using (var doc = JsonDocument.Parse(json))
+                    {
+                        var root = doc.RootElement;
+
+                        string rightSummary = ExtractSide(root, "Right", ExamKeyowrd);
+                        string leftSummary = ExtractSide(root, "Left", ExamKeyowrd);
+
+                        valToReturn = string.Join(" ; ", new[] { rightSummary, leftSummary }
+                            .Where(x => !string.IsNullOrWhiteSpace(x)));
+                        if (string.IsNullOrWhiteSpace(valToReturn))
+                        {
+                            valToReturn = ExtractTopLevel(root, ExamKeyowrd);
+                        }
+                    }
+
+                }
+            }
+            if (string.IsNullOrWhiteSpace(valToReturn) && (ExamKeyowrd == "Telinga" || ExamKeyowrd == "Hidung" || ExamKeyowrd == "Tenggorok"))
+            {
+                string query = string.Format(
+                    "SELECT CASE WHEN JSON_VALUE(PhysicalExam, '$.Tht.IsAbNormal') = 'true' " +
+                    "THEN 'Abnormal : ' + JSON_VALUE(PhysicalExam, '$.Tht.Notes') " +
+                    "ELSE 'Normal : ' + JSON_VALUE(PhysicalExam, '$.Tht.Notes') END AS THT_Status " +
+                    "FROM PatientAssessment WHERE RegistrationNo = '{0}'",
+                    registrationNo
+                );
+                var ret = (new QualityIndicatorSurveyCollection()).ExecuteQuery(query);
+                if (ret.Rows.Count > 0 && ret.Rows[0][0] != DBNull.Value)
+                    valToReturn = ret.Rows[0][0].ToString();
+            }
+            return valToReturn;
+        }
+        private string ExtractSide(JsonElement root, string side, string ExamKeyowrd)
+        {
+            if (!root.TryGetProperty(ExamKeyowrd, out JsonElement part) ||
+                !part.TryGetProperty(side, out JsonElement sideElement))
+                return "";
+
+            var items = new List<string>();
+
+            foreach (var prop in sideElement.EnumerateObject())
+            {
+                string value = prop.Value.GetString();
+                if (!string.IsNullOrWhiteSpace(value))
+                    items.Add($"{prop.Name} = {value}");
+            }
+
+            if (items.Count == 0)
+                return "";
+
+            string label = $"{ExamKeyowrd} {(side == "Right" ? "Kanan" : "Kiri")}";
+            return $"{label}: {string.Join(" ; ", items)}";
+        }
+        private string ExtractTopLevel(JsonElement root, string ExamKeyowrd)
+        {
+            if (!root.TryGetProperty(ExamKeyowrd, out JsonElement part))
+                return "";
+
+            var items = new List<string>();
+            foreach (var prop in part.EnumerateObject())
+            {
+                string value = prop.Value.GetString();
+                if (!string.IsNullOrWhiteSpace(value))
+                    items.Add($"{prop.Name} = {value}");
+            }
+
+            return items.Count > 0 ? $"{ExamKeyowrd}: {string.Join(" ; ", items)}" : null;
+        }
+
+        public string PatientRoomBed(string registrationNo, string columnToReturn)
+        {
+            var bq = new BedQuery("bq");
+            bq.Where(bq.RegistrationNo == registrationNo);
+            var dtb = bq.LoadDataTable();
+
+            if (dtb.Rows.Count == 0)
+                return null;
+
+            var row = dtb.Rows[0];
+
+            if (!dtb.Columns.Contains(columnToReturn))
+                throw new ArgumentException($"Kolom '{columnToReturn}' tidak ditemukan dalam hasil query.");
+
+            return row[columnToReturn]?.ToString();
+        }
+        public static DataTable LabObservationIDPackageItem(string registrationNo)
+        {
+            var serviceUnitLaboratoryID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitLaboratoryID);
+            var serviceUnitLaboratoryIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitLaboratoryIdArray);
+
+            var query = new TransChargesItemQuery("tciq");
+            var tcq = new TransChargesQuery("tcq");
+            query.InnerJoin(tcq).On(query.TransactionNo == tcq.TransactionNo);
+            var parent = new TransChargesItemQuery("tcipq");
+            query.InnerJoin(parent).On(
+                (query.TransactionNo == parent.TransactionNo) &
+                (parent.SequenceNo == query.ParentNo)
+            );
+            query.Where(
+                 tcq.RegistrationNo == registrationNo,
+                 tcq.IsOrder == true,
+                 parent.IsApprove == true,
+                 parent.IsVoid == false,
+                 parent.IsOrderRealization == true,
+                 query.ResultValue.IsNotNull(),
+                 query.ResultValue != "",
+                 parent.SRCollectMethod.IsNotNull(),
+                 parent.SRCollectMethod != "",
+                 query.Or(
+                      tcq.ToServiceUnitID == serviceUnitLaboratoryID,
+                      tcq.ToServiceUnitID.In(serviceUnitLaboratoryIdArray)
+                 )
+            );
+            query.Select(parent.TransactionNo, parent.SequenceNo);
+            var dtb = query.LoadDataTable();
+
+            var ssPrep = new SatuSehatILPPreparationQuery("ssP");
+            ssPrep.Select(ssPrep.RespondData);
+            ssPrep.Where(ssPrep.RegistrationNo == registrationNo, ssPrep.TestNo == "10.1.4.02");
+            ssPrep.es.Top = 1;
+            var dtb2 = ssPrep.LoadDataTable();
+            if (dtb.Rows.Count < 1 || dtb2.Rows.Count < 1)
+                return null;
+            var jsonChek = dtb2.Rows[0][0]?.ToString()?.Trim();
+            if (string.IsNullOrEmpty(jsonChek) || !IsValidJson(jsonChek))
+                return null;
+            bool validStructure = false;
+            try
+            {
+                using (var doc = JsonDocument.Parse(jsonChek))
+                {
+                    if (doc.RootElement.TryGetProperty("entry", out var entries) && entries.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var e in entries.EnumerateArray())
+                        {
+                            if (e.TryGetProperty("response", out var response)
+                                && response.TryGetProperty("resourceID", out var _))
+                            {
+                                validStructure = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
+            if (!validStructure)
+                return null;
+            var resourceIds = new List<string>();
+            if (dtb2.Rows.Count > 0 && dtb2.Rows[0][0] != DBNull.Value)
+            {
+                var json = dtb2.Rows[0][0]?.ToString();
+                if (IsValidJson(json))
+                {
+                    try
+                    {
+                        using (var doc = JsonDocument.Parse(json))
+                        {
+                            if (doc.RootElement.TryGetProperty("entry", out var entries) && entries.ValueKind == JsonValueKind.Array)
+                            {
+                                foreach (var e in entries.EnumerateArray())
+                                {
+                                    if (e.TryGetProperty("response", out var response)
+                                        && response.TryGetProperty("resourceID", out var ridProp))
+                                    {
+                                        var rid = ridProp.GetString();
+                                        if (!string.IsNullOrWhiteSpace(rid))
+                                            resourceIds.Add(rid);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new ArgumentException(ex.Message);
+                    }
+                }
+            }
+            var merged = new DataTable();
+            merged.Columns.Add("TransactionNo", typeof(string));
+            merged.Columns.Add("ResourceID", typeof(string));
+
+            var rowCount = Math.Min(dtb.Rows.Count, resourceIds.Count);
+            for (int i = 0; i < rowCount; i++)
+            {
+                var col1 = dtb.Rows[i][0]?.ToString()?.Trim() ?? string.Empty;
+                var col2 = dtb.Rows[i][1]?.ToString()?.Trim() ?? string.Empty;
+
+                var trx = $"{col1}-{col2}";
+
+                //var trx = dtb.Rows[i][0]?.ToString()?.Trim() ?? string.Empty;
+                var rid = resourceIds[i]?.Trim() ?? string.Empty;
+                merged.Rows.Add(trx, rid);
+            }
+
+            return merged;
+        }
+        private static bool IsValidJson(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json)) return false;
+
+            try
+            {
+                using (JsonDocument.Parse(json)) { }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        #endregion
 
         #region Consent
         public Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.ConsentResponse.Root GetConsent(string patientID)

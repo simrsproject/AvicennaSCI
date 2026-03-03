@@ -63,7 +63,17 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 foreach (DataRow row in dtb.Rows)
                 {
-                    var item = coll.Where(r => r.RlMasterReportItemCode == row["DtdNo"].ToString()).Single();
+                    //var item = coll.Where(r => r.RlMasterReportItemCode == row["DtdNo"].ToString()).Single();
+                    var dtdNo = row["DtdNo"]?.ToString().Trim();
+
+                    var item = coll.SingleOrDefault(r => r.RlMasterReportItemCode.Trim() == dtdNo);
+
+                    if (item == null)
+                    {
+                        // Data DtdNo tidak ditemukan di coll
+                        // Bisa di-skip atau di-log
+                        continue;
+                    }
 
                     if (!Convert.IsDBNull(row["Selisih"]) && Convert.ToInt32(row["Selisih"]) < 60)
                     {

@@ -718,7 +718,6 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 }
             }
         }
-
         protected void grdItemPackage_InsertCommand(object source, GridCommandEventArgs e)
         {
             var entity = ItemPackages.AddNew();
@@ -726,6 +725,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
             SetEntityValueForItemComp(e);
             SetEntityValueForClassComp(e);
+
 
             e.Canceled = true;
             grdItemPackage.Rebind();
@@ -853,6 +853,17 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     entity.MarkAllColumnsAsDirty(DataRowState.Added);
 
                     ItemPackageTariffComponents.AttachEntity(entity);
+                }
+
+                foreach (var c in ItemPackages)
+                {
+                    var price = ItemPackageTariffComponents.Where(i => i.DetailItemID == c.DetailItemID)
+                                                           .Select(i => i.Price).Sum() ?? 0;
+                    var discount = ItemPackageTariffComponents.Where(i => i.DetailItemID == c.DetailItemID)
+                                                           .Select(i => i.Discount).Sum() ?? 0;
+                    c.Price = price;
+                    c.Discount = discount;
+                    c.Total = (c.Price - c.Discount) * (c.Quantity ?? 0);
                 }
 
                 grdItemPackage.Rebind();

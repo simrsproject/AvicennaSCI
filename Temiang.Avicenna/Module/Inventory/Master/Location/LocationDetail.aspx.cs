@@ -1866,10 +1866,10 @@ namespace Temiang.Avicenna.Module.Inventory.Master
         {
             //Display Data Detail
             LocationExceptionDistributionConfirms = null; //Reset Record Detail
-            grdLocationException.DataSource = LocationExceptionDistributionConfirms; //Requery
-            grdLocationException.MasterTableView.IsItemInserted = false;
-            grdLocationException.MasterTableView.ClearEditItems();
-            grdLocationException.DataBind();
+            grdLocationExceptionDistConfirm.DataSource = LocationExceptionDistributionConfirms; //Requery
+            grdLocationExceptionDistConfirm.MasterTableView.IsItemInserted = false;
+            grdLocationExceptionDistConfirm.MasterTableView.ClearEditItems();
+            grdLocationExceptionDistConfirm.DataBind();
         }
 
         protected void grdLocationExceptionDistConfirm_NeedDataSource(object source, GridNeedDataSourceEventArgs e)

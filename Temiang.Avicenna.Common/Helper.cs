@@ -73,6 +73,24 @@ namespace Temiang.Avicenna.Common
         //            stream.Close();
         //    }
         //}
+
+        public static string GetFullExceptionMessage(Exception ex)
+        {
+            if (ex == null)
+                return string.Empty;
+
+            var messages = new List<string>();
+            var currentEx = ex;
+
+            while (currentEx != null)
+            {
+                messages.Add(currentEx.Message);
+                currentEx = currentEx.InnerException;
+            }
+
+            return string.Join(" --> ", messages);
+        }
+
         public static void DownloadFile(HttpResponse response, string filePath)
         {
             var fileName = Path.GetFileName(filePath);

@@ -165,3 +165,4 @@ D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna.Common\obj\Debug\Temiang.Avi
 D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna.Common\obj\Debug\Temiang..3CCEF3B2.Up2Date
 D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna.Common\obj\Debug\Temiang.Avicenna.Common.dll
 D:\Works\YBRS\Avicenna\AvicennaSCI\Temiang.Avicenna.Common\obj\Debug\Temiang.Avicenna.Common.pdb
+D:\Work\Avicenna\Repos\ybrsgkp-avicenna\Temiang.Avicenna.Common\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll

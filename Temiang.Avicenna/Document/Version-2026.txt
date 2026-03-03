@@ -30,3 +30,25 @@
 ---[03-02-2026 - Luthfi]---
 	Titipan Daniel
 1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
+
+---[05-02-2026 - Dewi]---
+1. Bugfix VerificationList2, ketika transaksi AP yang sudah di verifikasi dan di batalkan tetap muncul di payment process
+1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
+
+---[05-02-2026 - Danang]---
+1. Rewrite Feature Satusehat Inpatient
+	- Script Ada Pada Folder SatuSehat Inpatient
+
+---[10-02-2026 - Luthfi]---
+Titipan Daniel
+1. Mengubah grid grdLocationException menjadi grdLocationExceptionDistConfirm pada method PopulateLocationExceptionDistributionConfirmGrid
+
+---[11-02-2026 - Luthfi]---
+Titipan Daniel
+1.  Replace telerik sama sp dan nambah excel di rl 3.5 v2025
+
+---[23-02-2026 - Apip]---
+1. Modif RL 4.1 2025 titipan rama
+
+---[25-02-2026 - Apip]---
+1.	Modif ketika get template di itempackage price dan totalnya akan terikut juga

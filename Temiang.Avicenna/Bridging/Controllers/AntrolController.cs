@@ -14,6 +14,7 @@ using System.Web.Http;
 using Telerik.Reporting.Svg.ExCSS;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using Temiang.Avicenna.Common.BPJS.Antrian.List;
 using Temiang.Avicenna.Common.BPJS.VClaim.v11;
 using Temiang.Dal.Interfaces;
 using Paramedic = Temiang.Avicenna.BusinessObject.Paramedic;
@@ -1249,11 +1250,6 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     var aptQue = new AppointmentQueueing();
                     if (aptQue.SetQueForReg(antrean, AppSession.Parameter.GuarantorAskesID.Contains(antrean.GuarantorID) ? "02" : AppSession.Parameter.SelfGuarantor.Equals(antrean.GuarantorID) ? "01" : "03", su, "antrol", false)) aptQue.Save();
 
-                    #region Antrian Poli
-                    // antrian v2, tambahkan antrian ke poli
-                    var aQue = new AppointmentQueueing();
-                    if (aQue.SetQueForPoli(antrean.AppointmentNo, "antrol")) aQue.Save();
-                    #endregion
 
                     trans.Complete();
                 }
@@ -2961,6 +2957,12 @@ namespace Temiang.Avicenna.Bridging.Controllers
             //if (response.Metadata.IsAntrolValid)
             //{
             appt.Save();
+
+            #region Antrian Poli
+            // antrian v2, tambahkan antrian ke poli
+            var aQue = new AppointmentQueueing();
+            if (aQue.SetQueForPoli(appt.AppointmentNo, "mjkn")) aQue.Save();
+            #endregion
 
             return Request.CreateResponse(HttpStatusCode.OK, new Antrol.CheckIn.Response.Root
             {
@@ -6175,6 +6177,12 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     responsible.Save();
                     emergencyContact.Save();
                     registrationInfoSumary.Save();
+
+                    #region Antrian Poli
+                    // antrian v2, tambahkan antrian ke poli
+                    var aQue = new AppointmentQueueing();
+                    if (aQue.SetQueForPoli(appt.AppointmentNo, "kiosk")) aQue.Save();
+                    #endregion
 
                     if (chargesHD != null) chargesHD.Save();
                     if (TransChargesItemsDT.Count > 0) TransChargesItemsDT.Save();
