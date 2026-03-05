@@ -1366,6 +1366,11 @@ namespace Temiang.Avicenna.Common
             get { return !string.IsNullOrEmpty(ConfigurationManager.AppSettings["IcareServiceUrlLocation"]); }
         }
 
+        public static bool IsRsOnlineIntegration
+        {
+            get { return !string.IsNullOrEmpty(ConfigurationManager.AppSettings["RsOnlineServiceUrlLocation"]); }
+        }
+
         public static bool IsBpjsIntegration
         {
             get { return !string.IsNullOrEmpty(ConfigurationManager.AppSettings["BPJSServiceUrlLocation"]); }
@@ -2103,7 +2108,7 @@ namespace Temiang.Avicenna.Common
 
             // Cek apakah mengandung huruf untuk search nama
             string sNumber = searchMedOrRegOrName.Replace("-", "").Replace("/", "").Replace(".", "");
-            bool containsInt = sNumber.Any(char.IsDigit); //Will return true if the string contains a digit
+            bool containsInt = sNumber.Any(char.IsDigit); //Will return true if the string containsï¿½aï¿½digit
             if (!containsInt)
             {
                 // Check by Name

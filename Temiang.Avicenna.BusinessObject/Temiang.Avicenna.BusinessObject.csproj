@@ -281,6 +281,7 @@
     <Compile Include="Custom\RenkinPeriode.cs" />
     <Compile Include="Custom\RiskManagementItem.cs" />
     <Compile Include="Custom\RlTxReport.cs" />
+    <Compile Include="Custom\ServiceRoomBridging.cs" />
     <Compile Include="Custom\System\AppField.cs" />
     <Compile Include="Custom\VisitPackageItem.cs" />
     <Compile Include="Custom\WageStructureAndScaleItem.cs" />
@@ -894,6 +895,7 @@
     <Compile Include="Generated\SatuSehatILPTemplateDetailKeyWord.cs" />
     <Compile Include="Generated\SatuSehatKfa.cs" />
     <Compile Include="Generated\SatuSehatKfaZa.cs" />
+    <Compile Include="Generated\ServiceRoomBridging.cs" />
     <Compile Include="Generated\SignPool.cs" />
     <Compile Include="Generated\PatientField.cs" />
     <Compile Include="Generated\CredentialCompetencyAssessment.cs" />

@@ -1097,6 +1097,7 @@ namespace Temiang.Avicenna.Common
             public static readonly BridgingType BPJS_PASIEN_UMUM = new BridgingType(5, "BridgingType-005");
             public static readonly BridgingType LINK_LIS = new BridgingType(6, "BridgingType-006");
             public static readonly BridgingType ANTROL = new BridgingType(6, "BridgingType-007");
+            public static readonly BridgingType RS_ONLINE = new BridgingType(18, "BridgingType-019");
             public static readonly BridgingType APOTEKONLINE = new BridgingType(18, "BridgingType-018");
             //public static readonly BridgingType SATUSEHAT = new BridgingType(8, Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
 

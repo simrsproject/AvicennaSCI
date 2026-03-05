@@ -368,6 +368,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReportParam.cs" />
+    <Compile Include="RsOnline\Json.cs" />
+    <Compile Include="RsOnline\Service.cs" />
     <Compile Include="Siranap\Json.cs" />
     <Compile Include="Siranap\Service.cs" />
     <Compile Include="SirsDinkes\Eis\Json.cs" />

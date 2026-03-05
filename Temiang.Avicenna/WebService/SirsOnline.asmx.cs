@@ -8,6 +8,7 @@ using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Newtonsoft.Json;
+using Temiang.Avicenna.Common.RsOnline;
 
 namespace Temiang.Avicenna.WebService
 {
@@ -181,6 +182,223 @@ namespace Temiang.Avicenna.WebService
                 return response;
             }
             else return "no data";
+        }
+
+        [WebMethod]
+        public string ReferensiTempatTidur()
+        {
+            var svc = new Common.RsOnline.Service();
+            var response = svc.ReferensiTempatTidur();
+
+            return JsonConvert.SerializeObject(response);
+        }
+
+        [WebMethod]
+        public string GetTempatTidur()
+        {
+            var svc = new Common.RsOnline.Service();
+            var get = svc.Get();
+
+            return JsonConvert.SerializeObject(get);
+        }
+
+        //[WebMethod]
+        //public string InsertTempatTidur()
+        //{
+        //    var delete = DeleteTempatTidur();
+
+        //    var bed = new BedQuery("a");
+        //    var cls = new ClassQuery("b");
+        //    var clb = new ClassBridgingQuery("c");
+        //    var room = new ServiceRoomQuery("d");
+        //    var unit = new ServiceUnitQuery("e");
+        //    bed.Select(
+        //            clb.BridgingID,
+        //            unit.ServiceUnitID,
+        //            unit.ServiceUnitName,
+        //            room.RoomID,
+        //            room.RoomName,
+        //            bed.BedID,
+        //            bed.SRBedStatus
+        //        );
+        //    bed.InnerJoin(cls).On(bed.ClassID == cls.ClassID && cls.IsActive == true);
+        //    bed.InnerJoin(clb).On(bed.ClassID == clb.ClassID && clb.SRBridgingType == AppEnum.BridgingType.RS_ONLINE.ToString());
+        //    bed.InnerJoin(room).On(bed.RoomID == room.RoomID && room.IsActive == true);
+        //    bed.InnerJoin(unit).On(room.ServiceUnitID == unit.ServiceUnitID && unit.IsActive == true);
+        //    bed.Where(bed.SRBedStatus.NotIn("BedStatus-07"), bed.IsActive == true);
+        //    //bed.Where(unit.ServiceUnitID == "D2.3.14");
+        //    var src = bed.LoadDataTable();
+
+        //    var regis = new RegistrationQuery("a");
+        //    clb = new ClassBridgingQuery("b");
+        //    regis.Select(regis.RegistrationNo, regis.ServiceUnitID, clb.BridgingID);
+        //    regis.InnerJoin(clb).On(regis.ClassID == clb.ClassID && clb.SRBridgingType == AppEnum.BridgingType.RS_ONLINE.ToString());
+        //    regis.Where(regis.SRRegistrationType == AppConstant.RegistrationType.InPatient,
+        //        regis.DischargeDate.IsNull(),
+        //        regis.IsClosed == false,
+        //        regis.IsVoid == false);
+        //    //regis.Where(regis.ServiceUnitID == "D2.3.14");
+        //    var srd = regis.LoadDataTable();
+
+        //    var list = src.AsEnumerable()
+        //        .GroupBy(s => new
+        //        {
+        //            IdTt = s.Field<string>("BridgingID"),
+        //            ServiceUnitID = s.Field<string>("ServiceUnitID"),
+        //            Ruang = s.Field<string>("RoomName"),
+        //            RoomID = s.Field<string>("RoomID")
+        //        })
+        //        .Select(s => new Common.RsOnline.Json.Request.Insert()
+        //        {
+        //            IdTt = s.Key.IdTt,
+        //            ServiceUnitID = s.Key.ServiceUnitID,
+        //            Ruang = s.Key.Ruang,
+        //            JumlahRuang = src.AsEnumerable().Where(ss => ss.Field<string>("ServiceUnitID") == s.Key.ServiceUnitID && ss.Field<string>("RoomID") == s.Key.RoomID)
+        //                .GroupBy(ss => new { ServiceUnitID = ss.Field<string>("ServiceUnitID"), RoomID = ss.Field<string>("RoomID") }).Count().ToString(),
+        //            Jumlah = src.AsEnumerable().Where(ss => ss.Field<string>("ServiceUnitID") == s.Key.ServiceUnitID && ss.Field<string>("RoomID") == s.Key.RoomID)
+        //                .GroupBy(ss => new { ServiceUnitID = ss.Field<string>("ServiceUnitID"), RoomID = ss.Field<string>("RoomID"), BedID = ss.Field<string>("BedID") }).Count().ToString(),
+        //            Antrian = src.AsEnumerable().Where(ss => ss.Field<string>("ServiceUnitID") == s.Key.ServiceUnitID && ss.Field<string>("RoomID") == s.Key.RoomID && ss.Field<string>("SRBedStatus") == "BedStatus-03")
+        //                .GroupBy(ss => new { ServiceUnitID = ss.Field<string>("ServiceUnitID"), RoomID = ss.Field<string>("RoomID"), BedID = ss.Field<string>("BedID") }).Count().ToString()
+        //        });
+
+        //    var sum = list.GroupBy(l => new
+        //    {
+        //        IdTt = l.IdTt,
+        //        ServiceUnitID = l.ServiceUnitID,
+        //        Ruang = l.Ruang
+        //    }).Select(l => new Common.RsOnline.Json.Request.Insert()
+        //    {
+        //        IdTt = l.Key.IdTt,
+        //        Ruang = l.Key.Ruang,
+        //        JumlahRuang = l.Sum(x => x.JumlahRuang.ToInt()).ToString(),
+        //        Jumlah = l.Sum(x => x.Jumlah.ToInt()).ToString(),
+        //        Terpakai = srd.AsEnumerable().Count(ss => ss.Field<string>("ServiceUnitID") == l.Key.ServiceUnitID && ss.Field<string>("BridgingID") == l.Key.IdTt).ToString(),
+        //        TerpakaiSuspek = "0",
+        //        TerpakaiKonfirmasi = "0",
+        //        Antrian = l.Sum(x => x.Antrian.ToInt()).ToString(),
+        //        Prepare = "0",
+        //        PreparePlan = "0",
+        //        Covid = "0"
+        //    });
+
+        //    foreach (var data in sum)
+        //    {
+        //        var svc = new Service();
+        //        var insert = svc.Insert(data);
+        //    }
+
+        //    return JsonConvert.SerializeObject(sum);
+        //}
+
+        [WebMethod]
+        public string DeleteTempatTidur()
+        {
+            var svc = new Service();
+            var get = svc.Get();
+            if (get == null || !get.Fasyankes.Any()) return string.Empty;
+
+            foreach (var data in get.Fasyankes)
+            {
+                svc = new Service();
+                var delete = svc.Delete(new Json.Request.Delete() { IdTtt = data.IdTTt });
+            }
+
+            return string.Empty;
+        }
+
+        [WebMethod]
+        public string InsertTempatTidur()
+        {
+            var delete = DeleteTempatTidur();
+
+            var sum = JsonConvert.DeserializeObject<List<Json.Request.Insert>>(InsertTempatTidurDataOnly(string.Empty));
+
+            foreach (var data in sum)
+            {
+                var svc = new Service();
+                var insert = svc.Insert(data);
+            }
+
+            return JsonConvert.SerializeObject(sum);
+        }
+
+        [WebMethod]
+        public string InsertTempatTidurDataOnly(string serviceUnitID)
+        {
+            var bed = new BedQuery("a");
+            var room = new ServiceRoomQuery("d");
+            var clr = new ServiceRoomBridgingQuery("e");
+            bed.Select(
+                    clr.BridgingID,
+                    room.RoomID,
+                    room.RoomName,
+                    bed.BedID,
+                    bed.SRBedStatus
+                );
+            bed.InnerJoin(room).On(bed.RoomID == room.RoomID && room.IsActive == true);
+            bed.InnerJoin(clr).On(room.RoomID == clr.RoomID && clr.SRBridgingType == AppEnum.BridgingType.RS_ONLINE.ToString());
+            bed.Where(bed.SRBedStatus.NotIn("BedStatus-07"),
+                bed.IsVisibleTo3rdParty == true,
+                bed.IsActive == true);
+            if (!string.IsNullOrWhiteSpace(serviceUnitID)) bed.Where(room.ServiceUnitID == serviceUnitID);
+            var src = bed.LoadDataTable();
+
+            var regis = new RegistrationQuery("a");
+            clr = new ServiceRoomBridgingQuery("e");
+            regis.Select(
+                    regis.RegistrationNo,
+                    regis.RoomID,
+                    clr.BridgingID,
+                    regis.BedID
+                );
+            regis.InnerJoin(clr).On(regis.RoomID == clr.RoomID && clr.SRBridgingType == AppEnum.BridgingType.RS_ONLINE.ToString());
+            regis.Where(regis.SRRegistrationType == AppConstant.RegistrationType.InPatient,
+                regis.DischargeDate.IsNull(),
+                regis.IsClosed == false,
+                regis.IsVoid == false);
+            if (!string.IsNullOrWhiteSpace(serviceUnitID)) regis.Where(regis.ServiceUnitID == serviceUnitID);
+            var srd = regis.LoadDataTable();
+
+            var list = src.AsEnumerable()
+                .GroupBy(s => new
+                {
+                    IdTt = s.Field<string>("BridgingID"),
+                    RoomID = s.Field<string>("RoomID"),
+                    Ruang = s.Field<string>("RoomName")
+                }).Select(s => new Common.RsOnline.Json.Request.Insert()
+                {
+                    IdTt = s.Key.IdTt,
+                    RoomID = s.Key.RoomID,
+                    Ruang = s.Key.Ruang,
+                    JumlahRuang = src.AsEnumerable().Where(ss => ss.Field<string>("RoomID") == s.Key.RoomID)
+                        .GroupBy(ss => new { RoomID = ss.Field<string>("RoomID") }).Count().ToString(),
+                    Jumlah = src.AsEnumerable().Where(ss => ss.Field<string>("RoomID") == s.Key.RoomID)
+                        .GroupBy(ss => new { RoomID = ss.Field<string>("RoomID"), BedID = ss.Field<string>("BedID") }).Count().ToString(),
+                    Antrian = src.AsEnumerable().Where(ss => ss.Field<string>("RoomID") == s.Key.RoomID && ss.Field<string>("SRBedStatus") == "BedStatus-03")
+                        .GroupBy(ss => new { RoomID = ss.Field<string>("RoomID"), BedID = ss.Field<string>("BedID") }).Count().ToString()
+                });
+
+            var sum = list.GroupBy(l => new
+            {
+                l.IdTt,
+                l.RoomID,
+                l.Ruang
+            }).Select(l => new Common.RsOnline.Json.Request.Insert()
+            {
+                IdTt = l.Key.IdTt,
+                Ruang = l.Key.Ruang,
+                JumlahRuang = l.Sum(x => x.JumlahRuang.ToInt()).ToString(),
+                Jumlah = l.Sum(x => x.Jumlah.ToInt()).ToString(),
+                Terpakai = srd.AsEnumerable().Count(ss => ss.Field<string>("RoomID") == l.Key.RoomID && ss.Field<string>("BridgingID") == l.Key.IdTt).ToString(),
+                TerpakaiSuspek = "0",
+                TerpakaiKonfirmasi = "0",
+                Antrian = l.Sum(x => x.Antrian.ToInt()).ToString(),
+                Prepare = "0",
+                PreparePlan = "0",
+                Covid = "0"
+            }).OrderBy(l => l.Ruang);
+
+            return JsonConvert.SerializeObject(sum);
         }
     }
 }

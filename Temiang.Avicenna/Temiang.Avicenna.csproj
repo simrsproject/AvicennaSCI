@@ -2036,6 +2036,7 @@
     <Content Include="Document\2026\01\12\Add AppProgram DPJP Validation.sql" />
     <Content Include="Document\2026\01\13\01. sp_UpdateHistStockPerStockGroup - create sp.sql" />
     <Content Include="Document\2026\01\29\01. ItemTransaction - alter table add column.sql" />
+    <Content Include="Document\2026\03\03\ServiceRoomBridging.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />
@@ -3000,6 +3001,7 @@
     <Content Include="Module\RADT\Master\RL\v2025\RlMasterReportItemDetail.ascx" />
     <Content Include="Module\RADT\Master\RL\v2025\RlMasterReportList.aspx" />
     <Content Include="Module\RADT\Master\RL\v2025\RlMasterReportSearch.aspx" />
+    <Content Include="Module\RADT\Master\ServiceRoom\ServiceRoomAliasDetail.ascx" />
     <Content Include="Module\RADT\Master\ServiceRoom\ServiceRoomAutoBillItemDetail.ascx" />
     <Content Include="Module\RADT\Master\ServiceRoom\ServiceRoomUploadFoto.aspx" />
     <Content Include="Module\RADT\Master\Smf\SmfDiagnoseDetail.ascx" />
@@ -18846,6 +18848,13 @@
     </Compile>
     <Compile Include="Module\RADT\Master\RL\v2025\RlMasterReportSearch.aspx.designer.cs">
       <DependentUpon>RlMasterReportSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Master\ServiceRoom\ServiceRoomAliasDetail.ascx.cs">
+      <DependentUpon>ServiceRoomAliasDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Master\ServiceRoom\ServiceRoomAliasDetail.ascx.designer.cs">
+      <DependentUpon>ServiceRoomAliasDetail.ascx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Master\ServiceRoom\ServiceRoomAutoBillItemDetail.ascx.cs">
       <DependentUpon>ServiceRoomAutoBillItemDetail.ascx</DependentUpon>
