@@ -52,3 +52,6 @@ Titipan Daniel
 
 ---[25-02-2026 - Apip]---
 1.	Modif ketika get template di itempackage price dan totalnya akan terikut juga
+
+---[06-03-2026 - Naufal]---
+1.	Bugfix AppointmentQueFormattedNo tidak terupdate saat update appointment via endpoint AppointmentUpdate
