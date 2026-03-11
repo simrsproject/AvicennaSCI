@@ -1007,6 +1007,7 @@ namespace Temiang.Avicenna.Common
             public const string UserGroup = "95.01.01";
             public const string User = "95.01.02";
             public const string UserServiceunit = "95.01.04";
+            public const string UserDokterAsuransi = "95.01.05";
             public const string Announcement = "95.07";
             public const string ChangePassword = "95.01.03";
             public const string AuditLogView = "95.02.01";

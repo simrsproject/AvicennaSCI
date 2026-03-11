@@ -1082,52 +1082,52 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:23</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.PCare.dll">
-      <publishTime>02/04/2026 11:18:06</publishTime>
+      <publishTime>03/11/2026 14:56:28</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.PCare.pdb">
-      <publishTime>02/04/2026 11:18:06</publishTime>
+      <publishTime>03/11/2026 14:56:28</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.dll">
-      <publishTime>02/04/2026 11:18:05</publishTime>
+      <publishTime>03/11/2026 14:56:28</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.dll.config">
       <publishTime>11/03/2025 16:03:16</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Bridging.SatuSehat.pdb">
-      <publishTime>02/04/2026 11:18:05</publishTime>
+      <publishTime>03/11/2026 14:56:28</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.BusinessObject.dll">
-      <publishTime>02/04/2026 11:18:02</publishTime>
+      <publishTime>03/11/2026 14:56:27</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.BusinessObject.pdb">
-      <publishTime>02/04/2026 11:18:02</publishTime>
+      <publishTime>03/11/2026 14:56:27</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.dll">
-      <publishTime>02/04/2026 16:21:27</publishTime>
+      <publishTime>03/11/2026 14:56:30</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.dll.config">
       <publishTime>11/03/2025 16:03:17</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.Common.pdb">
-      <publishTime>02/04/2026 16:21:27</publishTime>
+      <publishTime>03/11/2026 14:56:30</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.dll">
-      <publishTime>02/04/2026 16:22:28</publishTime>
+      <publishTime>03/11/2026 14:57:38</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.dll.config">
       <publishTime>07/14/2022 14:33:02</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.pdb">
-      <publishTime>02/04/2026 16:22:28</publishTime>
+      <publishTime>03/11/2026 14:57:38</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.dll">
-      <publishTime>02/04/2026 16:21:41</publishTime>
+      <publishTime>03/11/2026 14:56:53</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.dll.config">
       <publishTime>11/03/2025 16:03:18</publishTime>
     </File>
     <File Include="bin/Temiang.Avicenna.ReportLibrary.pdb">
-      <publishTime>02/04/2026 16:21:41</publishTime>
+      <publishTime>03/11/2026 14:56:53</publishTime>
     </File>
     <File Include="bin/Temiang.Dal.Core.dll">
       <publishTime>11/03/2025 16:03:16</publishTime>
@@ -9400,6 +9400,9 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Document/2026/01/29/01. ItemTransaction - alter table add column.sql">
       <publishTime>02/02/2026 12:17:52</publishTime>
     </File>
+    <File Include="Document/2026/03/03/ServiceRoomBridging.sql">
+      <publishTime>03/05/2026 11:25:42</publishTime>
+    </File>
     <File Include="Document/dll/Antlr3.Runtime.dll">
       <publishTime>08/13/2022 13:44:19</publishTime>
     </File>
@@ -9845,10 +9848,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
     <File Include="Document/Rl Reporting %282025%29/5. RL Report 3.5/5. Create storeprocedure spxml_RL3_5V2025.sql">
-      <publishTime>11/03/2025 16:03:19</publishTime>
+      <publishTime>03/03/2026 18:19:46</publishTime>
     </File>
     <File Include="Document/Rl Reporting %282025%29/5. RL Report 3.5/RL_3_5_Rekapitulasi_Kunjungan_V2025.trdx">
-      <publishTime>11/03/2025 16:03:19</publishTime>
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/Rl Reporting %282025%29/5. RL Report 3.5/settingan RL 3_5 v 2025.xlsx">
+      <publishTime>03/03/2026 18:19:46</publishTime>
     </File>
     <File Include="Document/Rl Reporting %282025%29/6. RL Report 3.6/01. CREATE TABLE RlTxReport3_6V2025.sql">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -9946,6 +9952,48 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Document/Rl Reporting %282025%29/9. RL Report 3.9/RL3_9_PelayananRadiologiV2025.trdx">
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
+    <File Include="Document/SatuSehat Inpatient/01. ALTER TABLE ItemRadiology ADD IsPreparation.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Add AppStandardReference.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Add Column in Itemlaboratory and PatientAssesment.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Alter Table Bed.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/BridgingTemplate.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/DietBridging.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Insert AppProgram SatuSehat Inpatient.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Insert_AppStandardReference Class Satusehat.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Insert_AppStandardReferenceItemBridging.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/Insert_Snomedct.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/SatuSehatILPPreparation.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/SatuSehatILPTemplateDetail.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/SatuSehatILPTemplateDetailKeyWord.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Document/SatuSehat Inpatient/ServiceRoomBridging-Create.sql">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
     <File Include="Document/Template Upload/Sample Source Journal Import NEW.xlsx">
       <publishTime>11/03/2025 16:03:19</publishTime>
     </File>
@@ -9968,7 +10016,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/09/2026 10:35:30</publishTime>
     </File>
     <File Include="Document/Version-2026.txt">
-      <publishTime>02/04/2026 09:40:33</publishTime>
+      <publishTime>03/11/2026 08:13:32</publishTime>
     </File>
     <File Include="ErrorPage.aspx">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -12603,6 +12651,15 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     </File>
     <File Include="Module/ControlPanel/Admin/User/UserSearch.aspx">
       <publishTime>11/03/2025 16:03:19</publishTime>
+    </File>
+    <File Include="Module/ControlPanel/Admin/UserDokterAsuransi/UserDokterAsuransiDetail.aspx">
+      <publishTime>03/11/2026 14:05:21</publishTime>
+    </File>
+    <File Include="Module/ControlPanel/Admin/UserDokterAsuransi/UserDokterAsuransiDetail.js">
+      <publishTime>03/11/2026 11:14:27</publishTime>
+    </File>
+    <File Include="Module/ControlPanel/Admin/UserDokterAsuransi/UserDokterAsuransiList.aspx">
+      <publishTime>03/11/2026 11:14:27</publishTime>
     </File>
     <File Include="Module/ControlPanel/Admin/UserGroup/UserGroupDetail.aspx">
       <publishTime>11/03/2025 16:03:19</publishTime>
@@ -17003,7 +17060,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:20</publishTime>
     </File>
     <File Include="Module/RADT/Cpoe/EmrCommon/Assessment/AssessmentCtl/Initial/Igd/IgdPeCtl.ascx">
-      <publishTime>01/23/2026 14:43:39</publishTime>
+      <publishTime>03/05/2026 11:27:52</publishTime>
     </File>
     <File Include="Module/RADT/Cpoe/EmrCommon/Assessment/AssessmentCtl/Initial/Igd/IgdPeV2Ctl.ascx">
       <publishTime>11/03/2025 16:03:20</publishTime>
@@ -18409,11 +18466,14 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Module/RADT/Master/ServiceRoom/BedDetail.ascx">
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
+    <File Include="Module/RADT/Master/ServiceRoom/ServiceRoomAliasDetail.ascx">
+      <publishTime>03/05/2026 11:25:42</publishTime>
+    </File>
     <File Include="Module/RADT/Master/ServiceRoom/ServiceRoomAutoBillItemDetail.ascx">
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
     <File Include="Module/RADT/Master/ServiceRoom/ServiceRoomDetail.aspx">
-      <publishTime>11/03/2025 16:03:21</publishTime>
+      <publishTime>03/05/2026 11:25:42</publishTime>
     </File>
     <File Include="Module/RADT/Master/ServiceRoom/ServiceRoomList.aspx">
       <publishTime>11/03/2025 16:03:21</publishTime>
@@ -19438,8 +19498,17 @@ by editing this MSBuild file. In order to learn more about this please visit htt
     <File Include="Module/RADT/SatuSehat/SatuSehatConsent.aspx">
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
+    <File Include="Module/RADT/SatuSehat/SatuSehatILP.aspx">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
+    <File Include="Module/RADT/SatuSehat/SatuSehatILPDetail.aspx">
+      <publishTime>03/03/2026 18:19:46</publishTime>
+    </File>
     <File Include="Module/RADT/SatuSehat/SatuSehatKYC.aspx">
       <publishTime>11/03/2025 16:03:21</publishTime>
+    </File>
+    <File Include="Module/RADT/SatuSehat/SatuSehatRawatInap.aspx">
+      <publishTime>03/03/2026 18:19:46</publishTime>
     </File>
     <File Include="Module/RADT/SatuSehat/SatuSehatResultInfo.aspx">
       <publishTime>11/03/2025 16:03:21</publishTime>
@@ -20351,7 +20420,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/03/2025 16:03:21</publishTime>
     </File>
     <File Include="web.config">
-      <publishTime>02/04/2026 10:07:37</publishTime>
+      <publishTime>03/11/2026 14:32:26</publishTime>
     </File>
     <File Include="WebService/Antrol.asmx">
       <publishTime>11/03/2025 16:03:21</publishTime>
