@@ -810,6 +810,8 @@ namespace Temiang.Avicenna.Common
             AllergyVerificationStatus,
             AllergySatuSehat,
 
+            SatuSehatClassType,
+
         }
 
         public enum AutoNumber

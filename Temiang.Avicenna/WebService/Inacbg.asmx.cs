@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
-using System.Data;
-using Temiang.Avicenna.Common;
 using Temiang.Avicenna.BusinessObject.Reference;
-using Newtonsoft.Json;
-using System.Configuration;
-using System.Globalization;
+using Temiang.Avicenna.Common;
 using Temiang.Avicenna.Common.Inacbg.v510.Detail;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.WebService
 {
@@ -1311,7 +1312,7 @@ namespace Temiang.Avicenna.WebService
             //    nomor_sep = reg.BpjsSepNo
             //});
             //if (!kirim.Metadata.IsValid) continue;
-            
+
             log.Response = "ok";
             log.Save();
 
@@ -1442,5 +1443,474 @@ namespace Temiang.Avicenna.WebService
 
             return coll;
         }
+
+
+        [WebMethod]
+        public static IntermBillAutoResponse CreateIntermBillAuto(string regDate)
+        {
+            int total = 0;
+            int successCount = 0;
+            int failedCount = 0;
+
+            try
+            {
+                DateTime trxDate = Convert.ToDateTime(regDate);
+
+                var regis = new RegistrationCollection();
+                regis.Query
+                     .Where(regis.Query.IsVoid == false)
+                     .Where(regis.Query.SRRegistrationType == AppConstant.RegistrationType.OutPatient)
+                     .Where(regis.Query.BpjsSepNo.IsNotNull())
+                     .Where(regis.Query.BpjsSepNo != "")
+                     .Where(regis.Query.IsHoldTransactionEntry == false);
+
+                regis.Query.Where(
+                    regis.Query.RegistrationDate >= trxDate,
+                    regis.Query.RegistrationDate < trxDate.AddDays(1)
+                );
+
+                regis.LoadAll();
+
+                foreach (Registration reg in regis)
+                {
+                    try
+                    {
+                        if (!AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID))
+                            continue;
+
+                        total++;
+
+                        string registrationNo = reg.RegistrationNo;
+
+                        var autoNumber = Helper.GetNewAutoNumber(
+                            (new DateTime()).NowAtSqlServer().Date,
+                            AppEnum.AutoNumber.IntermBill);
+
+                        var ibNo = autoNumber.LastCompleteNumber;
+                        autoNumber.Save();
+
+                        using (var trans = new esTransactionScope())
+                        {
+                            DateTime startDate = (new DateTime()).NowAtSqlServer();
+                            DateTime endDate = (new DateTime()).NowAtSqlServer().Date.AddDays(-100);
+
+                            decimal patAmount = 0;
+                            decimal guarAmount = 0;
+
+                            var costCalculations = new CostCalculationCollection();
+                            costCalculations.Query.Where(costCalculations.Query.RegistrationNo == registrationNo);
+                            costCalculations.LoadAll();
+
+                            foreach (CostCalculation item in costCalculations)
+                            {
+                                item.IntermBillNo = ibNo;
+
+                                if (item.TransactionDate < startDate)
+                                    startDate = item.TransactionDate ?? DateTime.Now;
+
+                                if (item.TransactionDate > endDate)
+                                    endDate = item.TransactionDate ?? DateTime.Now;
+
+                                patAmount += item.PatientAmount ?? 0;
+                                guarAmount += item.GuarantorAmount ?? 0;
+                            }
+
+                            var entity = new IntermBill();
+                            entity.AddNew();
+                            entity.IntermBillNo = ibNo;
+                            entity.IntermBillDate = DateTime.Now;
+                            entity.RegistrationNo = registrationNo;
+                            entity.StartDate = startDate;
+                            entity.EndDate = endDate;
+                            entity.PatientAmount = patAmount;
+                            entity.GuarantorAmount = guarAmount;
+                            entity.AdministrationAmount = 0;
+                            entity.GuarantorAdministrationAmount = 0;
+                            entity.DiscAdmPatient = 0;
+                            entity.DiscAdmGuarantor = 0;
+                            entity.IsVoid = false;
+                            entity.IsApproved = false;
+
+                            costCalculations.Save();
+                            entity.Save();
+
+                            trans.Complete();
+                        }
+
+                        //---------------------------------------------
+                        // UPDATE TOTAL
+                        //---------------------------------------------
+
+                        var ccq = new CostCalculationQuery("a");
+                        ccq.Where(ccq.IntermBillNo == ibNo);
+
+                        ccq.Select(
+                            ccq.PatientAmount.Sum().As("PatientAmount"),
+                            ccq.GuarantorAmount.Sum().As("GuarantorAmount"),
+                            ccq.DiscountAmount.Sum().As("DiscountAmount"),
+                            @"<SUM(ISNULL(a.DiscountAmount2,0)) AS DiscountAmount2>"
+                        );
+
+                        DataTable dtb = ccq.LoadDataTable();
+
+                        if (dtb.Rows.Count == 0)
+                            continue;
+
+                        decimal tpatient = dtb.AsEnumerable().Sum(t => t.Field<decimal>("PatientAmount"));
+                        decimal tguarantor = dtb.AsEnumerable().Sum(t => t.Field<decimal>("GuarantorAmount"));
+                        decimal tdiscount = dtb.AsEnumerable().Sum(t => t.Field<decimal>("DiscountAmount"));
+
+                        var intermBill = new IntermBill();
+                        if (intermBill.LoadByPrimaryKey(ibNo))
+                        {
+                            intermBill.PatientAmount = tpatient;
+                            intermBill.GuarantorAmount = tguarantor;
+                            intermBill.Save();
+                        }
+
+                        //---------------------------------------------
+                        // HITUNG ADMIN
+                        //---------------------------------------------
+
+                        var grr = new Guarantor();
+                        grr.LoadByPrimaryKey(reg.GuarantorID);
+
+                        decimal admin = 0;
+                        decimal admingr = 0;
+
+                        if (grr.IsIncludeAdminValue ?? false)
+                        {
+                            admin = Helper.CostCalculation.GetAdminValue(
+                                reg.GuarantorID,
+                                tpatient + tdiscount,
+                                reg.SRRegistrationType);
+
+                            admingr = Helper.CostCalculation.GetAdminValue(
+                                reg.GuarantorID,
+                                tguarantor,
+                                reg.SRRegistrationType);
+                        }
+                        else
+                        {
+                            admin = Helper.CostCalculation.GetAdminValue(
+                                reg.GuarantorID,
+                                tpatient + tguarantor,
+                                reg.SRRegistrationType);
+                        }
+
+                        admin = Convert.ToDecimal(string.Format("{0:n2}", admin));
+                        admingr = Convert.ToDecimal(string.Format("{0:n2}", admingr));
+
+                        if (admin + admingr != 0)
+                        {
+                            intermBill = new IntermBill();
+                            if (intermBill.LoadByPrimaryKey(ibNo))
+                            {
+                                intermBill.AdministrationAmount = admin;
+                                intermBill.GuarantorAdministrationAmount = admingr;
+                                intermBill.Save();
+                            }
+                        }
+
+                        reg.AdministrationAmount += (admin + admingr);
+                        reg.PatientAdm += admin;
+                        reg.GuarantorAdm += admingr;
+
+                        reg.IsHoldTransactionEntry = true;
+
+                        reg.Save();
+
+                        successCount++;
+                    }
+                    catch
+                    {
+                        failedCount++;
+                    }
+                }
+
+                return new IntermBillAutoResponse
+                {
+                    success = true,
+                    total = total,
+                    successCount = successCount,
+                    failedCount = failedCount
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IntermBillAutoResponse
+                {
+                    success = false,
+                    message = ex.Message
+                };
+            }
+        }
+
+        [WebMethod]
+        public IntermBillAutoResponse CreateIntermBillByRegistration(string registrationNo)
+        {
+            try
+            {
+                var reg = new Registration();
+                if (!reg.LoadByPrimaryKey(registrationNo))
+                {
+                    return new IntermBillAutoResponse
+                    {
+                        success = false,
+                        message = "Registration not found"
+                    };
+                }
+
+                if (reg.IsVoid ?? false)
+                {
+                    return new IntermBillAutoResponse
+                    {
+                        success = false,
+                        message = "Registration is void"
+                    };
+                }
+
+                if (reg.SRRegistrationType != AppConstant.RegistrationType.OutPatient)
+                {
+                    return new IntermBillAutoResponse
+                    {
+                        success = false,
+                        message = "Not OutPatient"
+                    };
+                }
+
+                if (!AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID))
+                {
+                    return new IntermBillAutoResponse
+                    {
+                        success = false,
+                        message = "Not BPJS guarantor"
+                    };
+                }
+
+                if (string.IsNullOrWhiteSpace(reg.BpjsSepNo))
+                {
+                    return new IntermBillAutoResponse
+                    {
+                        success = false,
+                        message = "SEP not found"
+                    };
+                }
+
+                if (reg.IsHoldTransactionEntry ?? false)
+                {
+                    return new IntermBillAutoResponse
+                    {
+                        success = false,
+                        message = "IntermBill already created"
+                    };
+                }
+
+                //---------------------------------
+                // GENERATE INTERMBILL
+                //---------------------------------
+
+                var autoNumber = Helper.GetNewAutoNumber(
+                    (new DateTime()).NowAtSqlServer().Date,
+                    AppEnum.AutoNumber.IntermBill);
+
+                var ibNo = autoNumber.LastCompleteNumber;
+                autoNumber.Save();
+
+                using (var trans = new esTransactionScope())
+                {
+                    DateTime startDate = (new DateTime()).NowAtSqlServer();
+                    DateTime endDate = (new DateTime()).NowAtSqlServer().Date.AddDays(-100);
+
+                    decimal patAmount = 0;
+                    decimal guarAmount = 0;
+
+                    var costCalculations = new CostCalculationCollection();
+                    costCalculations.Query.Where(costCalculations.Query.RegistrationNo == registrationNo);
+                    costCalculations.LoadAll();
+
+                    foreach (CostCalculation item in costCalculations)
+                    {
+                        item.IntermBillNo = ibNo;
+
+                        if (item.TransactionDate < startDate)
+                            startDate = item.TransactionDate ?? DateTime.Now;
+
+                        if (item.TransactionDate > endDate)
+                            endDate = item.TransactionDate ?? DateTime.Now;
+
+                        patAmount += item.PatientAmount ?? 0;
+                        guarAmount += item.GuarantorAmount ?? 0;
+                    }
+
+                    var entity = new IntermBill();
+                    entity.AddNew();
+                    entity.IntermBillNo = ibNo;
+                    entity.IntermBillDate = DateTime.Now;
+                    entity.RegistrationNo = registrationNo;
+                    entity.StartDate = startDate;
+                    entity.EndDate = endDate;
+                    entity.PatientAmount = patAmount;
+                    entity.GuarantorAmount = guarAmount;
+                    entity.IsVoid = false;
+                    entity.IsApproved = false;
+                    entity.LastUpdateByUserID = "WEBSERVICE";
+                    entity.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                    entity.AskesCoveredSeqNo = string.Empty;
+                    entity.AdministrationAmount = 0;
+                    entity.GuarantorAdministrationAmount = 0;
+                    entity.DiscAdmPatient = 0;
+                    entity.DiscAdmGuarantor = 0;
+                    entity.CreatedDateTime = (new DateTime()).NowAtSqlServer();
+                    entity.CreatedByUserID = "WEBSERVICE";
+
+                    costCalculations.Save();
+                    entity.Save();
+
+                    trans.Complete();
+                }
+
+                //---------------------------------
+                // HITUNG ADMIN
+                //---------------------------------
+
+                decimal admin = 0;
+
+                var grr = new Guarantor();
+                grr.LoadByPrimaryKey(reg.GuarantorID);
+
+                admin = Helper.CostCalculation.GetAdminValue(
+                    reg.GuarantorID,
+                    reg.AdministrationAmount ?? 0,
+                    reg.SRRegistrationType);
+
+                reg.AdministrationAmount += admin;
+                reg.PatientAdm += admin;
+                reg.IsHoldTransactionEntry = true;
+
+                reg.Save();
+
+                return new IntermBillAutoResponse
+                {
+                    success = true,
+                    intermBillNo = ibNo,
+                    adminValue = admin,
+                    message = "IntermBill created"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new IntermBillAutoResponse
+                {
+                    success = false,
+                    message = ex.Message
+                };
+            }
+        }
+
+        public class IntermBillAutoResponse
+        {
+            public bool success { get; set; }
+            public int total { get; set; }
+            public int successCount { get; set; }
+            public int failedCount { get; set; }
+            public string message { get; set; }
+            public string intermBillNo { get; set; }
+            public decimal adminValue { get; set; }
+        }
+
+        //SP
+        /********************
+         * AUTO INTERMBILL CALL WS
+         ********************/
+
+        //CREATE PROCEDURE dbo.sp_exec_auto_intermbill_auto
+        //    @response VARCHAR(MAX) OUTPUT
+        //AS
+        //    BEGIN
+
+        //    SET NOCOUNT ON
+
+        //    DECLARE @date VARCHAR(10)
+        //    DECLARE @url VARCHAR(MAX)
+        //    DECLARE @postData VARCHAR(MAX)
+
+        //    DECLARE @obj INT
+        //    DECLARE @hr INT
+        //    DECLARE @status INT
+        //    DECLARE @msg VARCHAR(255)
+
+        //    -- tanggal kemarin
+        //    SET @date = CONVERT(VARCHAR(10), DATEADD(DAY, -1, GETDATE()), 23)
+
+        //    SET @url = 'http://10.10.10.5/vklaim/webservice/inacbg.asmx/CreateIntermBillAuto'
+
+        //    -- JSON BODY
+        //    SET @postData = '{"regDate":"' + @date + '"}'
+
+        //    EXEC @hr = sp_OACreate 'MSXML2.ServerXMLHttp', @obj OUT
+        //    IF @hr<> 0
+        //    BEGIN
+        //    RAISERROR('sp_OACreate MSXML2.ServerXMLHttp failed',16,1)
+        //    RETURN
+        //    END
+
+        //    EXEC @hr = sp_OAMethod @obj, 'open', NULL, 'POST', @url, FALSE
+        //    IF @hr<> 0
+        //    BEGIN
+        //    SET @msg = 'sp_OAMethod Open failed'
+        //    GOTO eh
+        //    END
+
+        //    EXEC @hr = sp_OAMethod @obj, 'setRequestHeader', NULL, 'Content-Type', 'application/json'
+        //    IF @hr<> 0
+        //    BEGIN
+        //    SET @msg = 'setRequestHeader failed'
+        //    GOTO eh
+        //    END
+
+        //    EXEC @hr = sp_OAMethod @obj, 'send', NULL, @postData
+        //    IF @hr<> 0
+        //    BEGIN
+        //    SET @msg = 'Send failed'
+        //    GOTO eh
+        //    END
+
+        //    EXEC @hr = sp_OAGetProperty @obj, 'status', @status OUT
+        //    IF @hr <> 0
+        //    BEGIN
+        //    SET @msg = 'read status failed'
+        //    GOTO eh
+        //    END
+
+        //    IF @status<> 200
+        //    BEGIN
+        //    SET @msg = 'HTTP status ' + CAST(@status AS VARCHAR)
+        //    GOTO eh
+        //    END
+
+        //    EXEC @hr = sp_OAGetProperty @obj, 'responseText', @response OUT
+        //    IF @hr <> 0
+        //    BEGIN
+        //    SET @msg = 'read response failed'
+        //    GOTO eh
+        //    END
+
+        //    SELECT @response AS Response
+
+        //    EXEC sp_OADestroy @obj
+        //    RETURN
+
+        //    eh:
+
+        //    EXEC sp_OADestroy @obj
+        //    SET @response = @msg
+
+        //    SELECT @response AS ErrorMessage
+
+        //    RETURN
+
+        //    END
+
     }
 }

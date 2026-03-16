@@ -1441,6 +1441,11 @@ namespace Temiang.Avicenna.Common
                 get { return IsYes(AppParameter.ParameterItem.IsUsingHisInteropToHcLab); }
             }
 
+            public static string RisPacsInteropVendor
+            {
+                get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.RisPacsInteropVendor)); }
+            }
+
             public static string HisInteropConfigName
             {
                 get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.HisInteropConfigName)); }

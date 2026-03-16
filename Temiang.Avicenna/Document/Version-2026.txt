@@ -55,3 +55,8 @@ Titipan Daniel
 
 ---[06-03-2026 - Naufal]---
 1.	Bugfix AppointmentQueFormattedNo tidak terupdate saat update appointment via endpoint AppointmentUpdate
+
+---[16-03-2026 - Danang]---
+1.	Re Write Pengiriman ServiceRequest Radiology (Bridging Sarusehat)
+2.	Odoo Otomatis IB & Lock RSI
+3.	Re Write Pengiriman SatuSehat Inpatient (Mapping Class)

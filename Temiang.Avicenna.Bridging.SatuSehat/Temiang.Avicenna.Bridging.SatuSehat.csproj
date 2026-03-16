@@ -124,6 +124,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessObject\ImagingStudyResponse.cs" />
     <Compile Include="BusinessObject\Kfa.cs" />
     <Compile Include="BusinessObject\EncounterPut.cs" />
     <Compile Include="BusinessObject\MedicationDispenseResponse.cs" />
@@ -185,6 +186,10 @@
     <ProjectReference Include="..\Temiang.Avicenna.BusinessObject\Temiang.Avicenna.BusinessObject.csproj">
       <Project>{9fbc1acc-80b1-4d9f-894b-1fceb31d337c}</Project>
       <Name>Temiang.Avicenna.BusinessObject</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Temiang.Avicenna.Common\Temiang.Avicenna.Common.csproj">
+      <Project>{7a688eee-3685-4799-add0-78507d272023}</Project>
+      <Name>Temiang.Avicenna.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

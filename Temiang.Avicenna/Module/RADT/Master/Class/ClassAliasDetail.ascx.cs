@@ -34,7 +34,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             ViewState["IsNewRecord"] = false;
 
             cboBridgingType.SelectedValue = (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.SRBridgingType);
-            cboBridgingType_SelectedIndexChanged(null, new RadComboBoxSelectedIndexChangedEventArgs(string.Empty, string.Empty, cboBridgingType.SelectedValue, string.Empty));
+            cboBridgingType_SelectedIndexChanged(null, new RadComboBoxSelectedIndexChangedEventArgs(string.Empty, string.Empty, cboBridgingType.SelectedValue, (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.BridgingID)));
             cboServiceUnitAliasID.SelectedValue = (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.BridgingID);
             txtServiceUnitAliasName.Text = (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.BridgingName);
             chkIsActive.Checked = Convert.ToBoolean(DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.IsActive));
@@ -76,6 +76,25 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 {
                     cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.ItemID + " - " + item.ItemName, item.ItemID));
                 }
+            }
+            else if (e.Value == AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID))
+            {
+                var collTitle = new AppStandardReferenceItemCollection();
+                collTitle.Query.Where(
+                    collTitle.Query.StandardReferenceID == AppEnum.StandardReference.SatuSehatClassType,
+                    collTitle.Query.IsActive == true
+                    );
+                collTitle.Query.OrderBy(collTitle.Query.ItemID.Ascending);
+                collTitle.LoadAll();
+                cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                foreach (var item in collTitle)
+                {
+                    cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.ItemID + " - " + item.ItemName, item.ItemID));
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(e.OldValue)) cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(e.OldValue, e.OldValue));
             }
         }
 

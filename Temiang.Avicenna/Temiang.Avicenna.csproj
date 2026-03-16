@@ -2037,6 +2037,7 @@
     <Content Include="Document\2026\01\13\01. sp_UpdateHistStockPerStockGroup - create sp.sql" />
     <Content Include="Document\2026\01\29\01. ItemTransaction - alter table add column.sql" />
     <Content Include="Document\2026\03\03\ServiceRoomBridging.sql" />
+    <Content Include="Document\2026\03\16\01. LoincItemRAD - Insert Master Data Loinc Radiology.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />

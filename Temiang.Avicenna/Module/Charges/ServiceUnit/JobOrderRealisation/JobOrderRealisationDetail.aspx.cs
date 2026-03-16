@@ -3193,6 +3193,8 @@ namespace Temiang.Avicenna.Module.Charges
                     int? x = ParamedicFeeTransChargesItemCompSettled.UpdateSettled(charges, collComp, AppSession.UserLogin.UserID);
                 }
 
+                SatusehatServiceRequestPostAndLogToRis(reg, charges.TransactionNo);
+
                 //Commit if success, Rollback if failed
                 trans.Complete();
             }
@@ -4512,6 +4514,19 @@ namespace Temiang.Avicenna.Module.Charges
             }
             strb.AppendLine("</table></div>");
             litSoap.Text = strb.ToString();
+        }
+
+
+        //satusehat
+        private void SatusehatServiceRequestPostAndLogToRis(Registration reg, string transactionNo)
+        {
+            var tc = new TransCharges();
+            if (!tc.LoadByPrimaryKey(transactionNo)) return;
+            var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
+            util.OrderRadRealization(transactionNo);
+            var satuSehatLog = new SatuSehatKunjungan();
+            if (!satuSehatLog.LoadByPrimaryKey(reg.RegistrationNo)) return;
+            if (!satuSehatLog.EncounterID.HasValue) return;
         }
 
     }
