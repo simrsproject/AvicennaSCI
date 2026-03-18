@@ -32,3 +32,9 @@
 /Temiang.Avicenna.ReportLibrary/obj/Debug/Temiang.Avicenna.ReportLibrary.csproj.AssemblyReference.cache
 /Temiang.Avicenna.Tests/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 /Temiang.Avicenna.Tests/obj/Debug/Temiang.Avicenna.Tests.csproj.AssemblyReference.cache
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.cache
