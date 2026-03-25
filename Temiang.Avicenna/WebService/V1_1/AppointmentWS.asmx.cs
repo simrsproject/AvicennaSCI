@@ -246,6 +246,61 @@ namespace Temiang.Avicenna.WebService.V1_1
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void AppointmentGetAllByMedicalNo(string AccessKey, string MedicalNo)
+        {
+            var log = LogAdd();
+            try
+            {
+                ValidateAccessKey(AccessKey);
+
+                InspectStringRequired("MedicalNo", MedicalNo);
+
+                var dtb = GenerateDataTableSlots(Ver);
+
+                var aptColl = new AppointmentCollection();
+                var aptq = new AppointmentQuery("apt");
+                var patq = new PatientQuery("pat");
+                var su = new ServiceUnitQuery("su");
+                var par = new ParamedicQuery("par");
+                var gr = new GuarantorQuery("gr");
+                var asri = new AppStandardReferenceItemQuery("asri");
+
+                aptq.InnerJoin(patq).On(aptq.PatientID == patq.PatientID)
+                    .InnerJoin(su).On(aptq.ServiceUnitID == su.ServiceUnitID)
+                    .InnerJoin(par).On(aptq.ParamedicID == par.ParamedicID)
+                    .InnerJoin(gr).On(aptq.GuarantorID == gr.GuarantorID)
+                    .InnerJoin(asri).On(asri.StandardReferenceID == "AppointmentStatus" && aptq.SRAppointmentStatus == asri.ItemID)
+                    .Where(patq.MedicalNo == MedicalNo)
+                    .Select(aptq, patq.MedicalNo.As("refToPatient_MedicalNo"), su.ServiceUnitName.As("refToServiceUnit_ServiceUnitName"), par.ParamedicName.As("refToParamedic_ParamedicName"), gr.GuarantorName.As("refToGuarantor_GuarantorName"), asri.ItemName.As("refToAppStandardReferenceItem_AppointmentStatus"))
+                    .OrderBy(aptq.AppointmentDate.Descending);
+                aptColl.Load(aptq);
+
+                var aptqColl = new AppointmentQueueingCollection();
+                if (aptColl.Count > 0)
+                {
+                    aptqColl.Query.Where(aptqColl.Query.AppointmentNo.In(aptColl.Select(apt => apt.AppointmentNo)));
+                    aptqColl.LoadAll();
+                }
+
+                foreach (Appointment apt in aptColl)
+                {
+                    DataRow dr = dtb.NewRow();
+                    AppointmentToDataRow(Ver, apt, dr, aptqColl);
+                    dtb.Rows.Add(dr);
+                }
+                dtb.AcceptChanges();
+
+                WriteResponseAndLog(log, JSonRetFormatted(ConvertDataTabletoObject(dtb)));
+            }
+            catch (Exception ex)
+            {
+                WriteResponseAndLog(log, JSonRetFormatted(GetErrorMessage(ex.Message), false, GetErrorCode(ex.Message)));
+            }
+        }
+
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void AppointmentGetListByMedicalNoAndAppointmentDate(string AccessKey, string MedicalNo, string DateStart, string DateEnd)
         {
             var log = LogAdd();
