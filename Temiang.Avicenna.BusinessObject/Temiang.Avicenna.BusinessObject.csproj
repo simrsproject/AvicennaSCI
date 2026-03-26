@@ -148,6 +148,7 @@
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Custom\AppStandardReferenceItemBridging.cs" />
     <Compile Include="Custom\CompliancePatientFallRiskPreventionDetail.cs" />
+    <Compile Include="Custom\DietBridging.cs" />
     <Compile Include="Custom\ErrorMessage.cs" />
     <Compile Include="Custom\ClosingVisiteDownPaymentItem.cs" />
     <Compile Include="Custom\CssdDecontaminationItem.cs" />
@@ -773,6 +774,7 @@
     <Compile Include="Generated\BpjsRujukanSatuSehat.cs" />
     <Compile Include="Generated\BridgingTemplate.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
+    <Compile Include="Generated\DietBridging.cs" />
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />
     <Compile Include="Generated\JsonBridgingRujukBalikValueTemp.cs" />
     <Compile Include="Generated\LoincItem.cs" />

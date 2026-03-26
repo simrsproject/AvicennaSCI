@@ -2746,6 +2746,7 @@
     <Content Include="Module\Laundry\Transaction\Sorting\LaundrySortingProcessItemPicklist.aspx" />
     <Content Include="Module\Laundry\Transaction\Sorting\LaundrySortingProcessList.aspx" />
     <Content Include="Module\Laundry\Transaction\Sorting\LaundrySortingProcessSearch.aspx" />
+    <Content Include="Module\Nutrient\Master\Diet\DietAliasDetail.ascx" />
     <Content Include="Module\Nutrient\Transaction\DistributionPortionOpr\DistributionPortionOprList.aspx" />
     <Content Include="Module\Nutrient\Transaction\MealOrderOpr\MealOrderOprDetail.aspx" />
     <Content Include="Module\Nutrient\Transaction\MealOrderOpr\MealOrderOprItemDetail.ascx" />
@@ -14178,6 +14179,13 @@
     </Compile>
     <Compile Include="Module\Nutrient\Initialization\UnitClassMenuSetting\UnitClassMenuSettingSearch.aspx.designer.cs">
       <DependentUpon>UnitClassMenuSettingSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Nutrient\Master\Diet\DietAliasDetail.ascx.cs">
+      <DependentUpon>DietAliasDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Nutrient\Master\Diet\DietAliasDetail.ascx.designer.cs">
+      <DependentUpon>DietAliasDetail.ascx</DependentUpon>
     </Compile>
     <Compile Include="Module\Nutrient\Master\Diet\DietComplicationDetail.ascx.cs">
       <DependentUpon>DietComplicationDetail.ascx</DependentUpon>
