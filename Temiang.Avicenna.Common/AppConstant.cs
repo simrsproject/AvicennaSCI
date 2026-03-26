@@ -259,6 +259,8 @@ namespace Temiang.Avicenna.Common
 
             public const string KemenkesLaporanKematian = "01.22.01";
             public const string KemenkesSitb = "01.22.02";
+            public const string BpjsRujukanSatuSehat = "01.20.22";
+
 
             // RADT Master
             //  Questionaire
