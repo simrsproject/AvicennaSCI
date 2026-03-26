@@ -255,6 +255,7 @@
     <Compile Include="BPJS\VClaim\v1.1\RencanaKontrol\RencanaKontrol.cs" />
     <Compile Include="BPJS\VClaim\v1.1\RujukanBalik\RujukanBalik.cs" />
     <Compile Include="BPJS\VClaim\v1.1\RujukanKhusus\RujukanKhusus.cs" />
+    <Compile Include="BPJS\VClaim\v1.1\RujukanSatuSehat\RujukanSatuSehat.cs" />
     <Compile Include="BPJS\VClaim\v1.1\Rujukan\Rujukan.cs" />
     <Compile Include="BPJS\VClaim\v1.1\Sep\Cari.cs" />
     <Compile Include="BPJS\VClaim\v1.1\Sep\DataIndukKecelakaan.cs" />

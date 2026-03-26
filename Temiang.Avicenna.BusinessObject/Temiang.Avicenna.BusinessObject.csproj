@@ -770,6 +770,7 @@
     <Compile Include="Generated\AppStandardReferenceItemBridging.cs" />
     <Compile Include="Generated\BpjsApol.cs" />
     <Compile Include="Generated\BpjsApolDetail.cs" />
+    <Compile Include="Generated\BpjsRujukanSatuSehat.cs" />
     <Compile Include="Generated\BridgingTemplate.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />

@@ -2038,6 +2038,8 @@
     <Content Include="Document\2026\01\29\01. ItemTransaction - alter table add column.sql" />
     <Content Include="Document\2026\03\03\ServiceRoomBridging.sql" />
     <Content Include="Document\2026\03\16\01. LoincItemRAD - Insert Master Data Loinc Radiology.sql" />
+    <Content Include="Document\2026\03\26\01.CreateTable_BpjsRujukanSatuSehat.sql" />
+    <Content Include="Document\2026\03\26\02.Insert_AppProgram_BpjsRujukanSatuSehat.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />
@@ -2849,6 +2851,9 @@
     <Content Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolDetail.aspx" />
     <Content Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolList.aspx" />
     <Content Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolSearch.aspx" />
+    <Content Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatDetail.aspx" />
+    <Content Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatList.aspx" />
+    <Content Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatSearch.aspx" />
     <Content Include="Module\RADT\Bpjs\Rujukan\RujukanDetail.aspx" />
     <Content Include="Module\RADT\Bpjs\Rujukan\RujukanList.aspx" />
     <Content Include="Module\RADT\Bpjs\Rujukan\RujukanSearch.aspx" />
@@ -16574,6 +16579,27 @@
     </Compile>
     <Compile Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolSearch.aspx.designer.cs">
       <DependentUpon>RencanaKontrolSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatDetail.aspx.cs">
+      <DependentUpon>RujukanSatuSehatDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatDetail.aspx.designer.cs">
+      <DependentUpon>RujukanSatuSehatDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatList.aspx.cs">
+      <DependentUpon>RujukanSatuSehatList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatList.aspx.designer.cs">
+      <DependentUpon>RujukanSatuSehatList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatSearch.aspx.cs">
+      <DependentUpon>RujukanSatuSehatSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatSearch.aspx.designer.cs">
+      <DependentUpon>RujukanSatuSehatSearch.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Rujukan\RujukanDetail.aspx.cs">
       <DependentUpon>RujukanDetail.aspx</DependentUpon>
