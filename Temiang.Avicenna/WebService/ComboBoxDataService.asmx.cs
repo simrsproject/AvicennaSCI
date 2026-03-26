@@ -2349,14 +2349,70 @@ namespace Temiang.Avicenna.WebService
             {
                 case "kfa":
                     {
-                        var qr = new SatuSehatKfaQuery("p");
-                        qr.Select(qr.SsUuid.As("Code"), qr.SsNama.As("ItemName"));
-                        qr.Where(qr.Or(qr.SsType == "farmasi", qr.SsUuid == context.Text, qr.SsNama.Like(string.Format("%{0}%", context.Text))));
-                        qr.OrderBy(qr.SsNama.Ascending);
-                        qr.es.Top = MaxQueryRecord;
-                        var dtb = qr.LoadDataTable();
-                        var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
-                        return comboData;
+                        //var qr = new SatuSehatKfaQuery("p");
+                        //qr.Select(qr.SsUuid.As("Code"), qr.SsNama.As("ItemName"));
+                        //qr.Where(qr.Or(qr.SsUuid == context.Text, qr.SsNama.Like(string.Format("%{0}%", context.Text))));
+                        //qr.OrderBy(qr.SsNama.Ascending);
+                        //qr.es.Top = MaxQueryRecord;
+                        //var dtb = qr.LoadDataTable();
+                        //var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+                        //return comboData;
+
+                        try
+                        {
+                            var tokenResponse = GetToken();
+                            if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
+                                throw new Exception("Unable to retrieve access token.");
+
+                            string keyword = context.Text;
+                            string apiUrl = $"{_KFAbaseUrl}/kfa-v2/products/all?page=1&size=100&product_type=farmasi&keyword={HttpUtility.UrlEncode(keyword)}";
+
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiUrl);
+                            request.Method = "GET";
+                            request.Headers.Add("Authorization", "Bearer " + tokenResponse.AccessToken);
+                            request.Accept = "application/json";
+
+                            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                            {
+                                string responseJson = reader.ReadToEnd();
+                                JObject json = JObject.Parse(responseJson);
+                                var items = json["items"]?["data"]?.ToList();
+
+                                if (items == null || items.Count == 0)
+                                    return null;
+
+                                // Prepare DataTable
+                                DataTable dt = new DataTable();
+                                dt.Columns.Add("Code");
+                                dt.Columns.Add("ItemName");
+
+                                foreach (var item in items)
+                                {
+                                    string code = item["kfa_code"]?.ToString();
+                                    string name = item["name"]?.ToString();
+                                    if (!string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(name))
+                                    {
+                                        dt.Rows.Add(code, name);
+                                    }
+                                }
+
+                                return PopulateComboBoxDataItems(context, dt, "Code", "Code", "ItemName");
+                            }
+                        }
+                        catch (WebException webEx)
+                        {
+                            using (var stream = webEx.Response?.GetResponseStream())
+                            using (var reader = new StreamReader(stream))
+                            {
+                                string errorText = reader.ReadToEnd();
+                                throw new Exception($"API call failed: {webEx.Message} - {errorText}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Error fetching KFA items: " + ex.Message, ex);
+                        }
                     }
                 case "kfaza":
                     {

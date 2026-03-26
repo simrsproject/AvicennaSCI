@@ -5,11 +5,124 @@ using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using System.Data;
+using System.Linq;
 
 namespace Temiang.Avicenna.Module.Nutrient.Master
 {
     public partial class DietDetail : BasePageDetail
     {
+
+        #region Record Detail Method Function DietBridging
+
+        private DietBridgingCollection DietBridgings
+        {
+            get
+            {
+                if (IsPostBack)
+                {
+                    object obj = Session["collDietBridging"];
+                    if (obj != null) return ((DietBridgingCollection)(obj));
+                }
+
+                DietBridgingCollection coll = new DietBridgingCollection();
+
+                DietBridgingQuery query = new DietBridgingQuery("a");
+                AppStandardReferenceItemQuery asri = new AppStandardReferenceItemQuery("b");
+
+                query.Select(query, asri.ItemName.As("refToAppStandardReferenceItem_ItemName"));
+                query.InnerJoin(asri).On(query.SRBridgingType == asri.ItemID && asri.StandardReferenceID == AppEnum.StandardReference.BridgingType.ToString());
+                query.Where(query.DietId == txtDietID.Text);
+                coll.Load(query);
+
+                Session["collDietBridging"] = coll;
+                return coll;
+            }
+            set
+            {
+                Session["collDietBridging"] = value;
+            }
+        }
+
+        private void RefreshCommandItemItemBridging(AppEnum.DataMode newVal)
+        {
+            bool isVisible = (newVal != AppEnum.DataMode.Read);
+            grdAliasName.Columns[0].Visible = isVisible;
+            grdAliasName.Columns[grdAliasName.Columns.Count - 1].Visible = isVisible;
+
+            grdAliasName.MasterTableView.CommandItemDisplay = isVisible ? GridCommandItemDisplay.Top : GridCommandItemDisplay.None;
+
+            grdAliasName.Rebind();
+        }
+
+        private void PopulateItemBirdgingGrid()
+        {
+            DietBridgings = null;
+            grdAliasName.DataSource = DietBridgings;
+            grdAliasName.MasterTableView.IsItemInserted = false;
+            grdAliasName.MasterTableView.ClearEditItems();
+            grdAliasName.DataBind();
+        }
+
+        protected void grdAliasName_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
+        {
+            grdAliasName.DataSource = DietBridgings;
+        }
+
+        protected void grdAliasName_UpdateCommand(object source, GridCommandEventArgs e)
+        {
+            GridEditableItem editedItem = e.Item as GridEditableItem;
+            if (editedItem == null) return;
+
+            String type = Convert.ToString(editedItem.OwnerTableView.DataKeyValues[editedItem.ItemIndex][DietBridgingMetadata.ColumnNames.SRBridgingType]);
+            String id = Convert.ToString(editedItem.OwnerTableView.DataKeyValues[editedItem.ItemIndex][DietBridgingMetadata.ColumnNames.BridgingID]);
+
+            var entity = FindItemBridging(type, id);
+            if (entity != null) SetEntityValue(entity, e);
+        }
+
+        protected void grdAliasName_DeleteCommand(object source, GridCommandEventArgs e)
+        {
+            GridDataItem item = e.Item as GridDataItem;
+            if (item == null) return;
+
+            String type = Convert.ToString(item.OwnerTableView.DataKeyValues[item.ItemIndex][DietBridgingMetadata.ColumnNames.SRBridgingType]);
+            String id = Convert.ToString(item.OwnerTableView.DataKeyValues[item.ItemIndex][DietBridgingMetadata.ColumnNames.BridgingID]);
+
+            var entity = FindItemBridging(type, id);
+            if (entity != null) entity.MarkAsDeleted();
+        }
+
+        protected void grdAliasName_InsertCommand(object source, GridCommandEventArgs e)
+        {
+            var entity = DietBridgings.AddNew();
+            SetEntityValue(entity, e);
+
+            e.Canceled = true;
+            grdAliasName.Rebind();
+        }
+
+        private DietBridging FindItemBridging(String type, string id)
+        {
+            var coll = DietBridgings;
+            return coll.FirstOrDefault(rec => rec.SRBridgingType.Equals(type) && rec.BridgingID.Equals(id));
+        }
+
+        private void SetEntityValue(DietBridging entity, GridCommandEventArgs e)
+        {
+            DietAliasDetail userControl = (DietAliasDetail)e.Item.FindControl(GridEditFormItem.EditFormUserControlID);
+            if (userControl != null)
+            {
+                entity.DietId = txtDietID.Text;
+                entity.SRBridgingType = userControl.BridgingType;
+                entity.BridgingTypeName = userControl.BridgingTypeName;
+                entity.IsActive = userControl.IsActive;
+                entity.BridgingID = userControl.BridgingID;
+                entity.BridgingName = string.IsNullOrEmpty(userControl.BridgingName) ? txtDietName.Text : userControl.BridgingName;
+            }
+        }
+
+        #endregion
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
