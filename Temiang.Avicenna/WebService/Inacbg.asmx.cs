@@ -1446,7 +1446,7 @@ namespace Temiang.Avicenna.WebService
 
 
         [WebMethod]
-        public static IntermBillAutoResponse CreateIntermBillAuto(string regDate)
+        public IntermBillAutoResponse CreateIntermBillAuto(string regDate)
         {
             int total = 0;
             int successCount = 0;
