@@ -71,7 +71,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                         reg.NomorKartu,
                         "<e.NamaPasien + ' (' + e.JenisKelamin + ')' AS NamaPasienJK>"
                         );
-                    query.Where(query.TglRujukan == DateTime.Now.Date);
+                    //query.Where(query.TglRujukan == DateTime.Now.Date);
                     query.OrderBy(query.NoRujukan.Descending);
                 }
 

@@ -2436,6 +2436,17 @@ namespace Temiang.Avicenna.WebService
                         var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
                         return comboData;
                     }
+                case "rad":
+                    {
+                        var qr = new LoincItemQuery("p");
+                        qr.Select(qr.Code, qr.Display.As("ItemName"));
+                        qr.Where(qr.SRLoinc == "rad", qr.Or(qr.Code == context.Text, qr.Display.Like(string.Format("%{0}%", context.Text))));
+                        qr.OrderBy(qr.Display.Ascending);
+                        qr.es.Top = MaxQueryRecord;
+                        var dtb = qr.LoadDataTable();
+                        var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+                        return comboData;
+                    }
                 case "alg": // Obsolete diganti zat aktif (Handono 2025-08)
                     //{
                     //    var qr = new SatuSehatKfaQuery("p");

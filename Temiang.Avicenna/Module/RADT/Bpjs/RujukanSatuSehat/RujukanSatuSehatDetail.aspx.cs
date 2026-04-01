@@ -481,6 +481,36 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                         return;
                     }
                 }
+                else if (entity.es.IsDeleted)
+                {
+                    var request = new DeleteRujukanRequest
+                    {
+                        Request = new DeleteRequestWrapper
+                        {
+                            TRujukan = new DeleteTRujukan
+                            {
+                                NoRujukan = entity.NoRujukan,
+                                User = AppSession.UserLogin.UserID
+                            }
+                        }
+                    };
+
+                    var json = JsonConvert.SerializeObject(request);
+
+                    var response = svc.DeleteRujukan(request);
+
+                    entity.RequestJson = json;
+                    entity.ResponseJson = JsonConvert.SerializeObject(response);
+                    entity.BpjsResponseCode = response?.MetaData?.Code;
+                    entity.BpjsResponseMessage = response?.MetaData?.Message;
+
+                    if (response.MetaData.Code != "200")
+                    {
+                        args.MessageText = $"{response.MetaData.Code} - {response.MetaData.Message}";
+                        args.IsCancel = true;
+                        return;
+                    }
+                }
 
                 entity.Save();
                 trans.Complete();
@@ -615,6 +645,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             {
                 try
                 {
+                    LoadKriteriaRujukan();
+
                     var list = JsonConvert.DeserializeObject<List<KriteriaAnswerItem>>(br.KriteriaRujukanJson);
 
                     ApplyKriteriaToUI(list);

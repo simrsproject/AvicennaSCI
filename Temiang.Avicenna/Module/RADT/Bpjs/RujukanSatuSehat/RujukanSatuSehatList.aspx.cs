@@ -34,8 +34,10 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         private void RedirectToPageDetail(GridDataItem dataItem, string mode)
         {
-            string id = dataItem.GetDataKeyValue(BpjsRujukanMetadata.ColumnNames.NoSep).ToString();
-            Page.Response.Redirect("RujukanSatuSehatDetail.aspx?md=" + mode + "&id=" + id, true);
+            string nosep = dataItem.GetDataKeyValue(BpjsRujukanSatuSehatMetadata.ColumnNames.NoSep).ToString();
+            string NoRujukan = dataItem.GetDataKeyValue(BpjsRujukanSatuSehatMetadata.ColumnNames.NoRujukan).ToString();
+            string noRujukanSatuSehat = dataItem.GetDataKeyValue(BpjsRujukanSatuSehatMetadata.ColumnNames.NoRujukanSatuSehat).ToString();
+            Page.Response.Redirect("RujukanSatuSehatDetail.aspx?md=" + mode + "&sep=" + nosep +"&norujukan=" + NoRujukan + "&norujukanss=" + noRujukanSatuSehat, true);
         }
 
         protected void grdList_NeedDataSource(object source, Telerik.Web.UI.GridNeedDataSourceEventArgs e)
