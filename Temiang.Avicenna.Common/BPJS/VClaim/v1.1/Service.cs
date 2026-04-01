@@ -3192,6 +3192,59 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
             }
         }
 
+        public v11.RujukanSatuSehat.DeleteRujukanResponse DeleteRujukan(v11.RujukanSatuSehat.DeleteRujukanRequest root)
+        {
+            // {BASE URL}/Rujukan/Delete
+
+            var url = _urlrujukan + "Rujukan/Delete";
+
+            using (var response = PopulateWebRequestR(url,
+                Helper.WebRequestMethod.POST, // ⚠️ BPJS biasanya tetap POST
+                Helper.WebRequestContentType.JSON,
+                JsonConvert.SerializeObject(root),
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+
+                // 🔹 NON ENCRYPT
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                    return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.DeleteRujukanResponse>(sr.ReadToEnd());
+
+                // 🔹 ENCRYPTED
+                var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
+
+                if (encryptedResponse.MetaData.IsValid)
+                {
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                    return new v11.RujukanSatuSehat.DeleteRujukanResponse
+                    {
+                        MetaData = new v11.RujukanSatuSehat.MetaData
+                        {
+                            Code = encryptedResponse.MetaData.Code,
+                            Message = encryptedResponse.MetaData.Message
+                        },
+                        Response = JsonConvert.DeserializeObject<v11.RujukanSatuSehat.DeleteResponse>(decryptResponse)
+                    };
+                }
+
+                return new v11.RujukanSatuSehat.DeleteRujukanResponse
+                {
+                    MetaData = new v11.RujukanSatuSehat.MetaData
+                    {
+                        Code = encryptedResponse.MetaData.Code,
+                        Message = encryptedResponse.MetaData.Message
+                    },
+                    Response = null
+                };
+            }
+        }
+
         //Get Sepasialistik
         public v11.RujukanSatuSehat.GetSpesialisResponse GetSpesialis()
         {

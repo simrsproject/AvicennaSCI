@@ -3409,26 +3409,26 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
             var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
 
-            // Load latest diagnosis
-            var epsdiag = new EpisodeDiagnose();
-            epsdiag.Query.es.Top = 1;
-            epsdiag.Query.Where(
-                epsdiag.Query.RegistrationNo == reg.RegistrationNo,
-                epsdiag.Query.SRDiagnoseType.In("DiagnoseType-001", "DiagnoseType-006"),
-                epsdiag.Query.IsVoid == false
-            );
-            epsdiag.Query.OrderBy(epsdiag.Query.CreateDateTime.Descending);
-            var isEpsDiag = epsdiag.Query.Load();
+            //// Load latest diagnosis
+            //var epsdiag = new EpisodeDiagnose();
+            //epsdiag.Query.es.Top = 1;
+            //epsdiag.Query.Where(
+            //    epsdiag.Query.RegistrationNo == reg.RegistrationNo,
+            //    epsdiag.Query.SRDiagnoseType.In("DiagnoseType-001", "DiagnoseType-006"),
+            //    epsdiag.Query.IsVoid == false
+            //);
+            //epsdiag.Query.OrderBy(epsdiag.Query.CreateDateTime.Descending);
+            //var isEpsDiag = epsdiag.Query.Load();
 
-            // Validate the diagnosis
-            var epDiagnose = isEpsDiag ? new Diagnose
-            {
-                DiagnoseID = epsdiag.DiagnoseID,
-                DiagnoseName = epsdiag.DiagnosisText
-            } : null;
+            //// Validate the diagnosis
+            //var epDiagnose = isEpsDiag ? new Diagnose
+            //{
+            //    DiagnoseID = epsdiag.DiagnoseID,
+            //    DiagnoseName = epsdiag.DiagnosisText
+            //} : null;
 
-            if (epDiagnose == null)
-                return; // Skip if no valid diagnosis
+            //if (epDiagnose == null)
+            //    return; // Skip if no valid diagnosis
 
             // Query charge items
             var query = new TransChargesItemQuery("a");
@@ -3498,7 +3498,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                             row["HeaderNotes"]?.ToString(),
                             row["ItemNotes"]?.ToString(),
                             loincItem,
-                            epDiagnose,
+                            //epDiagnose,
                             encounterId,
                             ref accessToken
                         );
@@ -3507,7 +3507,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             }
         }
 
-        private void PostServiceRequestItemRad(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string transactionNo, string sequenceNo, string resultValue, Item itemName, DateTime approvedDateTime, string headerNotes, string itemNotes, LoincItem loincItem, Diagnose epDiagnose, string encounterId, ref string accessToken)
+        private void PostServiceRequestItemRad(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string transactionNo, string sequenceNo, string resultValue, Item itemName, DateTime approvedDateTime, string headerNotes, string itemNotes, LoincItem loincItem,/* Diagnose epDiagnose, */ string encounterId, ref string accessToken)
         {
             //Check status kirim
             var ssResult = LoadSatuSehatResult(encounterId, "ServiceRequest", transactionNo, sequenceNo);
@@ -3640,18 +3640,18 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                             reference = $"Practitioner/{parMedSs.BridgingID}",
                             display = parMedSs.BridgingName
                         }
-                    },
-                reasonCode = new List<object>() {
-                    new {
-                        coding = new List<object>() {
-                            new {
-                                system = "http://hl7.org/fhir/sid/icd-10",
-                                code = epDiagnose.DiagnoseID,
-                                display = epDiagnose.DiagnoseName
-                            }
-                        }
                     }
-                }
+                //reasonCode = new List<object>() {
+                //    new {
+                //        coding = new List<object>() {
+                //            new {
+                //                system = "http://hl7.org/fhir/sid/icd-10",
+                //                code = epDiagnose.DiagnoseID,
+                //                display = epDiagnose.DiagnoseName
+                //            }
+                //        }
+                //    }
+                //}
             };
 
             if (ssResult == null)

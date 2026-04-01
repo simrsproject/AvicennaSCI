@@ -10,6 +10,14 @@
                 eventArgs.set_cancel(true); // Cegah enter
             }
         }
+        function onSatuSehatItemClick(name) {
+            var txt = $find("ctl00_ContentPlaceHolder1_grdAliasName_ctl00_ctl02_ctl03_EditFormControl_txtServiceUnitAliasName");
+            txt.set_value(name);
+        }
+        function cboSsBridgingID_ClientItemsRequesting(sender, eventArgs) {
+            var context = eventArgs.get_context();
+            context["tp"] = "rad";
+        }
     </script>
     <table cellpadding="0" cellspacing="0" style="width: 100%">
         <tr>

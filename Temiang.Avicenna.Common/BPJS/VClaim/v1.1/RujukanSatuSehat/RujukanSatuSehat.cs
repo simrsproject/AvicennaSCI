@@ -446,4 +446,44 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11.RujukanSatuSehat
     }
     #endregion
 
+    #region DELETE RUJUKAN
+
+    public class DeleteRujukanRequest
+    {
+        [JsonProperty("request")]
+        public DeleteRequestWrapper Request { get; set; }
+    }
+
+    public class DeleteRequestWrapper
+    {
+        [JsonProperty("t_rujukan")]
+        public DeleteTRujukan TRujukan { get; set; }
+    }
+
+    public class DeleteTRujukan
+    {
+        [JsonProperty("noRujukan")]
+        public string NoRujukan { get; set; }
+
+        [JsonProperty("user")]
+        public string User { get; set; }
+    }
+
+    public class DeleteRujukanResponse
+    {
+        [JsonProperty("metaData")]
+        public MetaData MetaData { get; set; }
+
+        [JsonProperty("response")]
+        public DeleteResponse Response { get; set; }
+    }
+
+    public class DeleteResponse
+    {
+        [JsonProperty("noRujukan")]
+        public string NoRujukan { get; set; }
+    }
+
+    #endregion
+
 }
