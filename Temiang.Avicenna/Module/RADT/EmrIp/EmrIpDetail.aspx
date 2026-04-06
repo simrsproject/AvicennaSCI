@@ -1613,6 +1613,15 @@
                                         <asp:Label runat="server" ID="lblBpjsSepNo" Font-Bold="true" />
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td style="vertical-align: top;">Tgl Ranap Terakhir
+                                    </td>
+                                    <td style="vertical-align: top;">:
+                                    </td>
+                                    <td style="vertical-align: top;">
+                                        <asp:Label runat="server" ID="lblTglRanap" Font-Bold="true"/>
+                                    </td>
+                                </tr>
                                 <tr runat="server" id="trCovClass">
                                     <td style="vertical-align: top;">Cov. Class
                                     </td>
