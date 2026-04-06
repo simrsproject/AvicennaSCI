@@ -67,3 +67,7 @@ Titipan Daniel
 
 ---[01-04-2026 - Danang]---
 1.	Mapping Item Radiology SatuSehat
+
+---[06-04-2026 - BT]---
+1.	Penambahan durasi timeout pada modul verifikasi jasa medis
+
