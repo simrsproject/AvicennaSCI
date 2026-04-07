@@ -9,6 +9,7 @@ using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using System.Data;
 using DocumentFormat.OpenXml.Bibliography;
+using System.Text;
 
 namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
@@ -86,6 +87,12 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
         {
             get
             { return (RadComboBox)Helper.FindControlRecursive(Page, "cboBusinessPartnerID"); }
+        }
+
+        private RadNumericTextBox TxtTaxPercentage
+        {
+            get
+            { return (RadNumericTextBox)Helper.FindControlRecursive(Page, "txtTaxPercentage"); }
         }
 
         protected override void OnDataBinding(EventArgs e)
@@ -505,6 +512,42 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                         args.IsValid = false;
                         ((CustomValidator)source).ErrorMessage = string.Format("Quantity can not be greather than " + (txtQtyPending.Value / txtConversionFactor.Value).ToString() + ".");
                         return;
+                    }
+                }
+
+                //db:20260406 - validasi asset u/ item product non medis
+                if (cboSRItemType.SelectedValue == ItemType.NonMedical && !chkIsNonMasterOrder.Checked)
+                {
+                    var isAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets);
+                    if (isAssetsJournaled)
+                    {
+                        var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.acc_JournalAssetsAmount));
+                        if (!(chkIsBonusItem.Checked))
+                        {
+                            var amount = (Convert.ToDecimal(txtPrice.Value) - Convert.ToDecimal(txtDiscountAmount.Value)) * (1 + (Convert.ToDecimal(TxtTaxPercentage.Value) / 100));
+                            var i = new Item();
+                            i.LoadByPrimaryKey(cboItemID.SelectedValue);
+
+                            if (ChkIsAssets.Checked || (i.IsAsset ?? false))
+                            {
+                                if ((amount < assetLimitAmount))
+                                {
+                                    args.IsValid = false;
+                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the asset classification (price less than Rp. {0}) ", assetLimitAmount.ToString("N2"));
+                                    return;
+                                }
+                            }
+                            else
+                            {
+                                if (ChkIsInventoryItem.Checked && (amount >= assetLimitAmount))
+                                {
+
+                                    args.IsValid = false;
+                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price more than Rp. {0}) ", assetLimitAmount.ToString("N2"));
+                                    return;
+                                }
+                            }
+                        }
                     }
                 }
             }

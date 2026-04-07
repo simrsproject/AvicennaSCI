@@ -71,3 +71,10 @@ Titipan Daniel
 ---[06-04-2026 - BT]---
 1.	Penambahan durasi timeout pada modul verifikasi jasa medis
 
+---[06-04-2026 - Deby]---
+1. modif form PO, ++ validasi saat pembuatan PO item non medical jika item yg diplih harganya (satuan+ppn) tidak sesuai dg klasifikasi asset atau inventory
+   >> parameter acc_JournalAssetsAmount, jika :
+      price >= paramaterValue --> asset
+      price <  paramaterValue --> inventory
+	  
+
