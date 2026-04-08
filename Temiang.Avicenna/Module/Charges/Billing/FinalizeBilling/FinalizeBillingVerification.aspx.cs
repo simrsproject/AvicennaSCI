@@ -4161,6 +4161,21 @@ namespace Temiang.Avicenna.Module.Charges
                     hist.Notes = "Verification & Finalize Billing" + (fromDischargePermit ? " >> Discharge Patient Permit" : "");
                     hist.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();;
                     hist.LastUpdateByUserID = AppSession.UserLogin.UserID;
+
+                    if (AppSession.Parameter.IsAutoSIPRegOnDischargePermit)
+                    {
+                        var bedColl = new BedCollection();
+                        bedColl.Query.Where(bedColl.Query.RegistrationNo == reg.RegistrationNo);
+                        bedColl.LoadAll();
+                        foreach (var bed in bedColl)
+                        {
+                            bed.SRBedStatus = "BedStatus-08";
+                            bed.LastUpdateDateTime = (new DateTime()).NowAtSqlServer(); ;
+                            bed.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                        }
+
+                        bedColl.Save();
+                    }
                 }
 
                 regColl.Save();
