@@ -218,7 +218,9 @@
                     runat="server"
                     Width="300px"
                     AutoPostBack="true"
-                    OnSelectedIndexChanged="cboProvinsi_SelectedIndexChanged">
+                    OnSelectedIndexChanged="cboProvinsi_SelectedIndexChanged"
+                    Filter="Contains"
+                    MarkFirstMatch="true">
                 </telerik:RadComboBox>
             </td>
         </tr>
@@ -228,7 +230,9 @@
                 <telerik:RadComboBox
                     ID="cboKabupaten"
                     runat="server"
-                    Width="300px">
+                    Width="300px"
+                    Filter="Contains"
+                    MarkFirstMatch="true">
                 </telerik:RadComboBox>
             </td>
         </tr>

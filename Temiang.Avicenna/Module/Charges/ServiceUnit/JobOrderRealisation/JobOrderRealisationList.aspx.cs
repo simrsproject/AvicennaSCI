@@ -73,6 +73,11 @@ namespace Temiang.Avicenna.Module.Charges
                     grdList2.MasterTableView.DetailTables[0].Columns.FindByUniqueName("cons").Visible = true;
                     grdList2.MasterTableView.DetailTables[0].Columns.FindByUniqueName("ExposureFactor").Visible = true;
                 }
+
+                if (!string.IsNullOrWhiteSpace(AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatOrganizationID)))
+                {
+                    grdList2.MasterTableView.Columns.FindByUniqueName("resendServiceRequestSS").Visible = true;
+                }
             }
         }
 
@@ -539,6 +544,79 @@ namespace Temiang.Avicenna.Module.Charges
 
             if (eventArgument == "rebind")
                 grdList.Rebind();
+            else
+            {
+                if (sourceControl is RadGrid && !string.IsNullOrWhiteSpace(eventArgument))
+                {
+                    var args = eventArgument.Split('|');
+                    if (args[0] == "resendSRSS")
+                    {
+                        try
+                        {
+                            var transNo = args[1];
+
+                            var charges = new TransCharges();
+                            charges.LoadByPrimaryKey(transNo);
+
+                            var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
+                            var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
+
+                            if (!string.IsNullOrWhiteSpace(serviceUnitRadiologyIdArray) &&
+                                !string.IsNullOrWhiteSpace(serviceUnitRadiologyID))
+                            {
+                                SatuSehatHelper.SendServiceRequestToRis(charges.TransactionNo, charges.RegistrationNo);
+
+                                ScriptManager.RegisterStartupScript(
+                                    this,
+                                    this.GetType(),
+                                    "alert",
+                                    $"alert('Success Send Service Request To SatuSehat (TRX: {charges.TransactionNo})');",
+                                    true
+                                );
+                            }
+                            else
+                            {
+                                ScriptManager.RegisterStartupScript(
+                                    this,
+                                    this.GetType(),
+                                    "alert",
+                                    "alert('Failed To Send Service Request, Check For Post Data Or Already Sent To SatuSehat');",
+                                    true
+                                );
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this,
+                                this.GetType(),
+                                "alert",
+                                $"alert('Error: {ex.Message}');",
+                                true
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        public class SatuSehatHelper
+        {
+            public static void SendServiceRequestToRis(string transactionNo, string registrationNo)
+            {
+                var tc = new TransCharges();
+                if (!tc.LoadByPrimaryKey(transactionNo)) return;
+
+                var reg = new Registration();
+                reg.LoadByPrimaryKey(registrationNo);
+
+                var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
+                util.OrderRadRealization(transactionNo);
+
+                var satuSehatLog = new SatuSehatKunjungan();
+                if (!satuSehatLog.LoadByPrimaryKey(reg.RegistrationNo)) return;
+                if (!satuSehatLog.EncounterID.HasValue) return;
+            }
         }
 
         protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
