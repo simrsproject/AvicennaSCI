@@ -2040,6 +2040,7 @@
     <Content Include="Document\2026\03\16\01. LoincItemRAD - Insert Master Data Loinc Radiology.sql" />
     <Content Include="Document\2026\03\26\01.CreateTable_BpjsRujukanSatuSehat.sql" />
     <Content Include="Document\2026\03\26\02.Insert_AppProgram_BpjsRujukanSatuSehat.sql" />
+    <Content Include="Document\2026\04\06\sp_GetLatestIPRRegistration.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />
