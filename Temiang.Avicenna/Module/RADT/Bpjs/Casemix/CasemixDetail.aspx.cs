@@ -1162,6 +1162,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         protected override void RaisePostBackEvent(IPostBackEventHandler source, string eventArgument)
         {
+            base.RaisePostBackEvent(source, eventArgument);
+            if (string.IsNullOrEmpty(eventArgument)) return;
             var argsCust = eventArgument.Split('|')[0];
 
             if (argsCust == "sendvalidate")
@@ -1173,8 +1175,6 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 HandleSendValidate(mode);
                 return;
             }
-            base.RaisePostBackEvent(source, eventArgument);
-            if (string.IsNullOrEmpty(eventArgument)) return;
            
             RegistrationPathwayCollection rpc;
 
