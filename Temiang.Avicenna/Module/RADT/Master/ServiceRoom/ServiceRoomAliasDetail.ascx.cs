@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Temiang.Avicenna.Common;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.Common;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
@@ -76,6 +77,33 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 {
                     cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.ItemID + " - " + item.ItemName, item.ItemID));
                 }
+            } else if (e.Value.ToLower() == AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID).ToLower())
+            {
+                if (e.Text.Length < 3)
+                {
+                    cboServiceUnitAliasID.DataSource = null;
+                    cboServiceUnitAliasID.DataBind();
+                    cboServiceUnitAliasID.Items.Clear();
+                    cboServiceUnitAliasID.SelectedValue = string.Empty;
+                    return;
+                }
+
+                var util = new Bridging.SatuSehat.Utils();
+                var token = string.Empty;
+                cboServiceUnitAliasID.Items.Clear();
+                var response = util.RestClientGet(String.Concat("Location?name==", e.Text), string.Empty, ref token);
+                if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var searchResponse = JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.LocationSearchResponse>(response.Content);
+                    if (searchResponse.Total > 0)
+                    {
+                        foreach (var item in searchResponse.Entry)
+                        {
+                            cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.Resource.Name, item.Resource.Id));
+                        }
+                    }
+                    cboServiceUnitAliasID.Items.Add(new RadComboBoxItem("Not found, create a new Bridging ID when saving", "CREATE"));
+                }
             }
         }
 
@@ -94,6 +122,12 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     );
                 if (collTitle.Query.Load()) txtServiceUnitAliasName.Text = collTitle.ItemName;
             }
+
+
+            if (cboBridgingType.SelectedValue.ToLower() == AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID).ToLower())
+                cboServiceUnitAliasID.Filter = RadComboBoxFilter.None;
+            else
+                cboServiceUnitAliasID.Filter = RadComboBoxFilter.Contains;
         }
 
         protected void customValidator_ServerValidate(object source, ServerValidateEventArgs args)

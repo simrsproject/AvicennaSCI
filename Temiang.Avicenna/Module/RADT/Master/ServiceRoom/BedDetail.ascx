@@ -56,6 +56,16 @@
                     </td>
                     <td></td>
                 </tr>
+                <tr id="SsID">
+                    <td class="label">
+                        <asp:Label ID="LblSsbID" runat="server" Text="Satu Sehat Bridging ID"></asp:Label>
+                    </td>
+                    <td class="entry">
+                        <telerik:RadTextBox ID="txtSsbID" runat="server" Width="300px" MaxLength="10" Enabled="false" />
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
                 <tr>
                     <td class="label"></td>
                     <td class="entry">

@@ -4,6 +4,7 @@ using System.Web.UI.WebControls;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using System.Configuration;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
@@ -63,6 +64,8 @@ namespace Temiang.Avicenna.Module.RADT.Master
             chkIsActive.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsActive);
             chkIsSharedTo3rdParty.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsVisibleTo3rdParty);
             txtNotes.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.Notes);
+            if (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatClientID")))
+                txtSsbID.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SatuSehatBridgingID);
 
             hdnRegistrationNo.Value = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.RegistrationNo);
             hdnSRBedStatus.Value= (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBedStatus);
