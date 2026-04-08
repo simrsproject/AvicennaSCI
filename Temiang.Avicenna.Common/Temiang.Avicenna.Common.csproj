@@ -463,17 +463,16 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Temiang.Avicenna.BusinessObject\Temiang.Avicenna.BusinessObject.csproj">
-      <Project>{9FBC1ACC-80B1-4D9F-894B-1FCEB31D337C}</Project>
-      <Name>Temiang.Avicenna.BusinessObject</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="web.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Temiang.Avicenna.BusinessObject\Temiang.Avicenna.BusinessObject.csproj">
+      <Project>{9fbc1acc-80b1-4d9f-894b-1fceb31d337c}</Project>
+      <Name>Temiang.Avicenna.BusinessObject</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

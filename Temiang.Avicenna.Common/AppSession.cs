@@ -250,8 +250,6 @@ namespace Temiang.Avicenna.Common
                 get { return IsYes(AppParameter.ParameterItem.IsEmrPhysicianAssessmentMandatory); }
             }
 
-            public static string RisPacsInteropVendor => GetParameterValueString(AppParameter.ParameterItem.RisPacsInteropVendor);
-
             public static bool IsShowSearchMenu => IsYes(AppParameter.ParameterItem.IsShowSearchMenu);
 
             public static bool IsPrescriptionOnlyInStock

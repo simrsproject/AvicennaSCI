@@ -144,7 +144,6 @@
     <Compile Include="Common\Fraction.cs" />
     <Compile Include="Common\MessageException.cs" />
     <Compile Include="Common\Brand.cs" />
-    <Compile Include="Common\ServiceRoomBridging.cs" />
     <Compile Include="Common\UserLogin.cs" />
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Custom\AppStandardReferenceItemBridging.cs" />
