@@ -286,7 +286,7 @@
                 </telerik:GridBoundColumn>
             </Columns>
             <DetailTables>
-                <telerik:GridTableView Name="detail" DataKeyNames="PatientID" AutoGenerateColumns="false"
+                <telerik:GridTableView Name="detail" DataKeyNames="PatientID" AutoGenerateColumns="false" AllowPaging="true" PageSize="30"
                     GroupLoadMode="Client">
                     <Columns>
                         <%--<telerik:GridBoundColumn HeaderStyle-Width="140px" DataField="RegistrationNo" HeaderText="Registration No"

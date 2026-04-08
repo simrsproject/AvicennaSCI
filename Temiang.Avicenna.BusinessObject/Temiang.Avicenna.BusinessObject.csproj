@@ -97,7 +97,7 @@
     </Reference>
     <Reference Include="RestSharp, Version=106.11.7.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Temiang.Avicenna\bin\RestSharp.dll</HintPath>
+      <HintPath>..\packages\RestSharp.108.0.2\lib\netstandard2.0\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -144,6 +144,7 @@
     <Compile Include="Common\Fraction.cs" />
     <Compile Include="Common\MessageException.cs" />
     <Compile Include="Common\Brand.cs" />
+    <Compile Include="Common\ServiceRoomBridging.cs" />
     <Compile Include="Common\UserLogin.cs" />
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Custom\AppStandardReferenceItemBridging.cs" />
@@ -162,7 +163,9 @@
     <Compile Include="Custom\Finance\CashTransactionTemplateDetail.cs" />
     <Compile Include="Custom\GuarantorAutoBillItem.cs" />
     <Compile Include="Custom\GuarantorServiceUnitPlafond.cs" />
+    <Compile Include="Custom\ImmunizationBridging.cs" />
     <Compile Include="Custom\ItemBalanceDetailEd.cs" />
+    <Compile Include="Custom\ItemImmunization.cs" />
     <Compile Include="Custom\ItemProductFabric.cs" />
     <Compile Include="Custom\ItemServiceProcedure.cs" />
     <Compile Include="Custom\MedicalDischargeSummaryDiagnoseCmx.cs" />
@@ -769,7 +772,10 @@
     <Compile Include="Generated\BpjsApol.cs" />
     <Compile Include="Generated\BpjsApolDetail.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
+    <Compile Include="Generated\ImmunizationBridging.cs" />
+    <Compile Include="Generated\Interop\SatusehatOrderedItems.cs" />
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />
+    <Compile Include="Generated\ItemImmunization.cs" />
     <Compile Include="Generated\JsonBridgingRujukBalikValueTemp.cs" />
     <Compile Include="Generated\LoincItem.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryBodyDiagramCmx.cs" />
@@ -887,8 +893,13 @@
     <Compile Include="Generated\RlTxReport53V2025.cs" />
     <Compile Include="Generated\RlTxReportV2025.cs" />
     <Compile Include="Generated\RlTxReport37v2025.cs" />
+    <Compile Include="Generated\SatuSehatILPPreparation.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplate.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplateDetail.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplateDetailKeyWord.cs" />
     <Compile Include="Generated\SatuSehatKfa.cs" />
     <Compile Include="Generated\SatuSehatKfaZa.cs" />
+    <Compile Include="Generated\ServiceRoomBridging.cs" />
     <Compile Include="Generated\SignPool.cs" />
     <Compile Include="Generated\PatientField.cs" />
     <Compile Include="Generated\CredentialCompetencyAssessment.cs" />

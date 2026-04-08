@@ -63,9 +63,8 @@ namespace Temiang.Avicenna.Module.RADT
             var url = $"{_authUrl}/accesstoken?grant_type=client_credentials";
             var client = new RestClient(url);
             var request = new RestRequest { Method = Method.Post };
-            var timeOutPar = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
-            int timeOut = Convert.ToInt16(timeOutPar) * 1000;
-            request.Timeout = timeOut;
+            var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
+            request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             request.AddParameter("client_id", _clientID);
             request.AddParameter("client_secret", _secretKey);

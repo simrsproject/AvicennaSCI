@@ -754,6 +754,8 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 entity.IsAutoApprove = userControl.IsAutoApprove;
                 entity.DiscountValue = userControl.DiscountValue;
                 entity.IsDiscountInPercent = userControl.IsDiscountInPercent;
+                entity.QtyDosage = userControl.QtyDosage ?? 0;
+                entity.SRDosageUnit = userControl.SRDosageUnit ?? string.Empty;
 
                 var comps = Helper.Tariff.GetItemTariffComponentCollection(DateTime.Now.Date,
                                                                           AppSession.Parameter.DefaultTariffType,

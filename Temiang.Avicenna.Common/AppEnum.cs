@@ -117,6 +117,10 @@ namespace Temiang.Avicenna.Common
 
         public enum StandardReference
         {
+            LabResultType,
+            ImmTiming,
+            ImmReason,
+            CvxName,
             Flacc,
             KelurahanKemenkes,
             KecamatanKemenkes,

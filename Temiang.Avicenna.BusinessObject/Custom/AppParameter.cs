@@ -7,6 +7,8 @@ namespace Temiang.Avicenna.BusinessObject
     {
         public enum ParameterItem
         {
+            IsSatusehatLisDataSharePerItemLab,
+            TariffComponentPrimaryPhysicianID,
             IsSatuSehatDirectSend,
             ComboBoxDataServiceMaxResultRecord,
             IsEmrChiefComplaintTextRequired,
@@ -1289,6 +1291,7 @@ namespace Temiang.Avicenna.BusinessObject
         public class DefaultRecordValue
         {
             // Urutan --> [ParameterName] | [ParameterValue]  | [ParameterType]  | [IsUsedBySystem]
+            public const string IsSatusehatLisDataSharePerItemLab = "Is Satusehat LIS Data Share split Per Item Lab (Yes/No)?|No| |false";
             public const string IsSatuSehatDirectSend = "Is SatuSehat Direct Send (Yes/No)?|No| |false";
             public const string IsEmrChiefComplaintTextRequired = "Is ChiefComplaint Mandatory in assessment entry (Yes/No)?|No| |false";
             public const string IsAutoSaveMdsDpjpToSepFolderAfterSave = "Is Auto Save MDS DPJP To SEP Folder After Save (Yes/No)?|Yes| |false";

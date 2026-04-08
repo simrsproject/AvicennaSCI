@@ -4,6 +4,15 @@
 
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <telerik:RadCodeBlock ID="cb" runat="server">
+        <script language="javascript" type="text/javascript">
+            function cboSnomedCt_ClientItemsRequesting(sender, eventArgs) {
+                var txtStdRefId = $find("<%= txtStandardReferenceID.ClientID %>");
+                var context = eventArgs.get_context();
+                context["SRSnomedCT"] = txtStdRefId.get_value();
+            }
+        </script>
+    </telerik:RadCodeBlock>
     <table width="100%">
         <tr>
             <td style="width: 50%" valign="top">
@@ -131,6 +140,9 @@
                             </telerik:GridNumericColumn>
                             <telerik:GridBoundColumn DataField="Note" HeaderText="Note" SortExpression="Note"
                                 UniqueName="Note">
+                            </telerik:GridBoundColumn>
+                            <telerik:GridBoundColumn DataField="SSBridgingID" HeaderStyle-Width="100px" HeaderText="SS BridgingID"
+                                UniqueName="SSBridgingID" SortExpression="SSBridgingID">
                             </telerik:GridBoundColumn>
                             <telerik:GridBoundColumn DataField="ReferenceID" HeaderText="Reference ID" SortExpression="ReferenceID"
                                 UniqueName="ReferenceID" HeaderStyle-Width="150px">

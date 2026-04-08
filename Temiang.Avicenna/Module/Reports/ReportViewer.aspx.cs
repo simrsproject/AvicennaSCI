@@ -1647,15 +1647,20 @@ namespace Temiang.Avicenna.Module.Reports
             var userId = AppParameter.GetParameterValue(AppParameter.ParameterItem.ESignUserId);
             var pwd = AppParameter.GetParameterValue(AppParameter.ParameterItem.ESignPassword);
 
-            var client = new RestClient(url);
-            client.Authenticator = new HttpBasicAuthenticator(userId, pwd);
+            //var client = new RestClient(url);
+            //client.Authenticator = new HttpBasicAuthenticator(userId, pwd);
+            var options = new RestClientOptions(url)
+            {
+                Authenticator = new RestSharp.Authenticators.HttpBasicAuthenticator(userId, pwd)
+            };
+            var client = new RestClient(options);
 
             var request = new RestSharp.RestRequest();
             request.Method = Method.Post;
 
-            var timeOutPar = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
-            var timeOut = Convert.ToInt16(timeOutPar) * 1000;
-            request.Timeout = timeOut;
+            var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
+            //var timeOut = Convert.ToInt16(timeOutPar) * 1000;
+            request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
 
             //request.AddHeader("Content-Type", "multipart/form-data");
 

@@ -674,6 +674,13 @@ namespace Temiang.Avicenna.Common
                                 listControlForEntry.Add(new EntryControl(ctl.ID, ctl.GetType().Name));
                             break;
                         }
+                    case "RadAsyncUpload":
+                        {
+                            var octl = (RadAsyncUpload)ctl;
+                            if (octl.Enabled)
+                                listControlForEntry.Add(new EntryControl(ctl.ID, ctl.GetType().Name));
+                            break;
+                        }
                     default:
                         if (ctl.HasControls())
                             PopulateListControlForEntry(ctl, listControlForEntry);
@@ -746,6 +753,9 @@ namespace Temiang.Avicenna.Common
                             break;
                         case "RadCheckBoxList":
                             ((RadCheckBoxList)ctl).Enabled = (datamode != AppEnum.DataMode.Read);
+                            break;
+                        case "RadAsyncUpload":
+                            ((RadAsyncUpload)ctl).Enabled = (datamode != AppEnum.DataMode.Read);
                             break;
                     }
             }
@@ -821,19 +831,22 @@ namespace Temiang.Avicenna.Common
                     if (Page.IsValid)
                     {
                         var notif = string.Empty;
-                        if (DataModeCurrent == AppEnum.DataMode.Edit)
+                        OnMenuSaveValidation(DataModeCurrent, args);
+                        if (!args.IsCancel)
                         {
-                            OnMenuSaveEditClick(args);
-                            if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
-                                notif = "Current Record has saved";
+                            if (DataModeCurrent == AppEnum.DataMode.Edit)
+                            {
+                                OnMenuSaveEditClick(args);
+                                if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
+                                    notif = "Current Record has saved";
+                            }
+                            else
+                            {
+                                OnMenuSaveNewClick(args);
+                                if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
+                                    notif = "New Record has saved";
+                            }
                         }
-                        else
-                        {
-                            OnMenuSaveNewClick(args);
-                            if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
-                                notif = "New Record has saved";
-                        }
-
                         if (!string.IsNullOrEmpty(notif))
                         {
                             var fw_radNotif = (RadNotification)Helper.FindControlRecursive(Master, "fw_radNotif");
@@ -897,7 +910,7 @@ namespace Temiang.Avicenna.Common
                         if (IsSingleRecordMode)
                         {
                             //Close
-                            ScriptManager.RegisterStartupScript(this, this.GetType(), "close", "Close()();", true);
+                            ScriptManager.RegisterStartupScript(this, this.GetType(), "close", "Close();", true);
                             return;
                         }
                         else
@@ -1175,6 +1188,10 @@ namespace Temiang.Avicenna.Common
             throw new Exception("The method or operation is not implemented.");
         }
 
+        protected virtual void OnMenuSaveValidation(AppEnum.DataMode dataMode, ValidateArgs args)
+        {
+        }
+
         protected virtual void OnMenuSaveNewClick(ValidateArgs args)
         {
             throw new Exception("The method or operation is not implemented.");
@@ -1220,17 +1237,21 @@ namespace Temiang.Avicenna.Common
         }
         public virtual void OnMenuSaveAndEditClick(ValidateArgs args)
         {
-            if (DataModeCurrent == AppEnum.DataMode.New)
+            OnMenuSaveValidation(DataModeCurrent, args);
+            if (!args.IsCancel)
             {
-                OnMenuSaveNewClick(args);
-                if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
-                    args.MessageText = "New Record has saved";
-            }
-            else if (DataModeCurrent == AppEnum.DataMode.Edit)
-            {
-                OnMenuSaveEditClick(args);
-                if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
-                    args.MessageText = "Current Record has saved";
+                if (DataModeCurrent == AppEnum.DataMode.New)
+                {
+                    OnMenuSaveNewClick(args);
+                    if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
+                        args.MessageText = "New Record has saved";
+                }
+                else if (DataModeCurrent == AppEnum.DataMode.Edit)
+                {
+                    OnMenuSaveEditClick(args);
+                    if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
+                        args.MessageText = "Current Record has saved";
+                }
             }
         }
         protected virtual void OnBeforeMenuNewClick(ValidateArgs args)

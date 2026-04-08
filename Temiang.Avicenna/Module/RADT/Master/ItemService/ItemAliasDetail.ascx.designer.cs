@@ -105,6 +105,15 @@ namespace Temiang.Avicenna.Module.RADT.Master
         protected global::Telerik.Web.UI.RadTextBox txtServiceUnitAliasName;
 
         /// <summary>
+        /// rowItemIdExternal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow rowItemIdExternal;
+
+        /// <summary>
         /// txtItemIdExternal control.
         /// </summary>
         /// <remarks>

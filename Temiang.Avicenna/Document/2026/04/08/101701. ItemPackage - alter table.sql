@@ -1,0 +1,4 @@
+ALTER TABLE dbo.ItemPackage ADD
+	QtyDosage NUMERIC(10,2) NULL,
+	SRDosageUnit VARCHAR(20) NULL
+GO

@@ -41,6 +41,9 @@
                         </telerik:GridNumericColumn>
                         <telerik:GridBoundColumn DataField="Note" HeaderText="Note" UniqueName="Note" SortExpression="Note"
                             HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                        <telerik:GridBoundColumn DataField="refTo_StdiSSBridging" HeaderStyle-Width="100px" HeaderText="SS BridgingID"
+                            UniqueName="SSBridgingID" SortExpression="SSBridgingID">
+                        </telerik:GridBoundColumn>
                         <telerik:GridBoundColumn DataField="ReferenceID" HeaderText="Reference ID" SortExpression="ReferenceID"
                             UniqueName="ReferenceID" HeaderStyle-Width="150px">
                         </telerik:GridBoundColumn>

@@ -209,7 +209,7 @@ namespace Temiang.Avicenna.Module.RADT
 
         private void PopulateToolbarHaisMonitoring()
         {
-            var tbarHais = (RadToolBarDropDown)tbMenu.Items[10];
+            var tbarHais = (RadToolBarDropDown)tbMenu.Items.FindItemByAttribute("CustomValue", "hais");
 
             var std = new AppStandardReferenceItemQuery();
             std.Where(std.StandardReferenceID == "HaisMonitoring");

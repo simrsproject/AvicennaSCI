@@ -185,7 +185,20 @@
                 </table>
             </asp:Panel>
             <table width="100%">
-               <tr>
+                <tr>
+                    <td class="label">
+                        <asp:Label ID="Label9" runat="server" Text="Satusehat Bridging ID"></asp:Label>
+                    </td>
+                    <td class="entry">
+                        <telerik:RadComboBox ID="cboSnomedCt" runat="server" Width="300px" EmptyMessage="Select a Item"
+                            EnableLoadOnDemand="true" ShowMoreResultsBox="true" EnableVirtualScrolling="true" OnClientItemsRequesting="cboSnomedCt_ClientItemsRequesting">
+                            <WebServiceSettings Method="Snomedct" Path="~/WebService/ComboBoxDataService.asmx" />
+                        </telerik:RadComboBox>
+                    </td>
+                    <td width="20px"></td>
+                    <td></td>
+                </tr>
+                <tr>
                     <td class="label">
                         <asp:Label ID="Label7" runat="server" Text="Custom Field 1"></asp:Label>
                     </td>
@@ -193,12 +206,10 @@
                         <telerik:RadTextBox ID="txtCustomField" runat="server" Width="301px" TextMode="MultiLine">
                         </telerik:RadTextBox>
                     </td>
-                    <td width="20px">
-
-                    </td>
+                    <td width="20px"></td>
                     <td></td>
                 </tr>
-               <tr>
+                <tr>
                     <td class="label">
                         <asp:Label ID="Label8" runat="server" Text="Custom Field 2"></asp:Label>
                     </td>
@@ -206,9 +217,7 @@
                         <telerik:RadTextBox ID="txtCustomField2" runat="server" Width="301px" TextMode="MultiLine">
                         </telerik:RadTextBox>
                     </td>
-                    <td width="20px">
-
-                    </td>
+                    <td width="20px"></td>
                     <td></td>
                 </tr>
             </table>

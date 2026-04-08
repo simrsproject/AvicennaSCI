@@ -72,10 +72,18 @@ namespace Temiang.Avicenna.ControlPanel.Setting
         {
             GridDataItem dataItem = e.DetailTableView.ParentItem;
             string id = dataItem.GetDataKeyValue("StandardReferenceID").ToString();
+
             //Load record
-            AppStandardReferenceItemQuery query = new AppStandardReferenceItemQuery();
-            query.Where(query.StandardReferenceID == id);
-            DataTable dtb = query.LoadDataTable();
+            var itemQuery = new AppStandardReferenceItemQuery("stdi");
+            itemQuery.Where(itemQuery.StandardReferenceID == id);
+
+            var ssbtype = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+            var bgss = new AppStandardReferenceItemBridgingQuery("bgss");
+            itemQuery.LeftJoin(bgss).On(itemQuery.ItemID == bgss.ItemID & bgss.SRBridgingType == ssbtype);
+            itemQuery.Select(itemQuery, bgss.BridgingID.As("refTo_StdiSSBridging"));
+
+
+            DataTable dtb = itemQuery.LoadDataTable();
             //Apply
             e.DetailTableView.DataSource = dtb;
         }

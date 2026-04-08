@@ -186,7 +186,7 @@ namespace Temiang.Avicenna.WebService
             ServiceUnitBridging locSs = null;
 
             var util = new Bridging.SatuSehat.Utils();
-            var encounterId = util.EncounterPost(registrationNo, ref satuSehatLog, ref reg, ref patSs, ref parMedicSs, ref locSs, ref accessToken, true);
+            var encounterId = util.EncounterPost(registrationNo, ref satuSehatLog, ref reg, ref patSs, ref parMedicSs, ref locSs, ref accessToken, "", true);
 
             return encounterId;
         }
@@ -201,7 +201,7 @@ namespace Temiang.Avicenna.WebService
             ServiceUnitBridging locSs = null;
 
             var util = new Bridging.SatuSehat.Utils();
-            var encounterId = util.EncounterPost(registrationNo, ref satuSehatLog, ref reg, ref patSs, ref parMedicSs, ref locSs, ref accessToken, false);
+            var encounterId = util.EncounterPost(registrationNo, ref satuSehatLog, ref reg, ref patSs, ref parMedicSs, ref locSs, ref accessToken, "", false);
 
             if (!string.IsNullOrEmpty(encounterId))
             {

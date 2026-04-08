@@ -17,6 +17,13 @@ using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.Charges
 {
+    /// <summary>
+    /// ServiceUnit Transaction
+    /// </summary>
+    /// 
+    /// Modification:
+    /// 10 Feb 2026 Handono
+    /// Insert record ke table TransChargesItemConsumption untuk TransChargesItem dengan flag IsVaccine == true pada saat approval untuk keperluan data Immunisasi
     public partial class ServiceUnitTransactionDetail : BasePageDetail
     {
         private AppAutoNumberLast _autoNumber, _amplopFilmAutoNumber;
@@ -458,10 +465,11 @@ namespace Temiang.Avicenna.Module.Charges
                 ajax.AddAjaxSetting(cboToServiceUnitID, cboAnalystID);
             }
 
-            if (tblTemporaryBill.Visible)
-            {
-                ajax.AddAjaxSetting(grdTransChargesItem, txtTemporaryBillTotal);
-            }
+            // Membuat error saat add item grid, dipindah ke OnMenuNew & OnPopulateEntryControl (Handono)
+            //if (tblTemporaryBill.Visible)
+            //{
+            //    ajax.AddAjaxSetting(grdTransChargesItem, txtTemporaryBillTotal);
+            //}
         }
 
         #endregion
@@ -809,6 +817,8 @@ namespace Temiang.Avicenna.Module.Charges
             tblTemporaryBill.Visible = reg.SRRegistrationType == AppConstant.RegistrationType.OutPatient && trBpjsSepNo.Visible;
             if (tblTemporaryBill.Visible)
             {
+                AjaxManager.AjaxSettings.AddAjaxSetting(grdTransChargesItem, txtTemporaryBillTotal);
+
                 txtTemporaryBillPlafond.Value = Convert.ToDouble(reg.PlavonAmount);
                 txtTemporaryBillTotal.Value = Convert.ToDouble(GetTotalTemporaryBill());
             }
@@ -864,7 +874,12 @@ namespace Temiang.Avicenna.Module.Charges
 
             // Di AppProgram di set tidak bisa delete jadi saya remark saja krn layar ini dipakai juga di EMR (Handono 2020-08-25)
         }
-
+        protected override void OnMenuSaveValidation(AppEnum.DataMode dataMode, ValidateArgs args)
+        {
+            var entity = new TransCharges();
+            entity.IsOrder = (Request.QueryString["type"] == "ds" || Request.QueryString["type"] == "jo");
+            ValidateItemImmunization(args, entity, TransChargesItemConsumptions);
+        }
         protected override void OnMenuSaveNewClick(ValidateArgs args)
         {
             if (TransChargesItems.Count == 0)
@@ -1475,6 +1490,8 @@ namespace Temiang.Avicenna.Module.Charges
             AppAutoNumberLast amplopFilmAutoNumber,
             ValidateArgs args)
         {
+            if (!ValidateItemImmunization(args, entity, TransChargesItemConsumptions)) return args.MessageText;
+
             bool detailApproved = false;
             var reg = new Registration();
             var unit = new ServiceUnit();
@@ -1837,7 +1854,7 @@ namespace Temiang.Avicenna.Module.Charges
 
                                 var cons = TransChargesItemConsumptions.Where(t => t.SequenceNo == tci.SequenceNo)
                                                                        .OrderBy(t => t.DetailItemID);
-                                //consumption
+                                //Copy Consumption
                                 #region consumption
                                 foreach (var con in cons)
                                 {
@@ -1854,10 +1871,22 @@ namespace Temiang.Avicenna.Module.Charges
                                     consumption.LastUpdateDateTime = con.LastUpdateDateTime;
                                     consumption.LastUpdateByUserID = con.LastUpdateByUserID;
                                     consumption.IsPackage = con.IsPackage;
-
+                                    consumption.QtyDosage = con.QtyDosage ?? 0;
+                                    consumption.SRDosageUnit = con.SRDosageUnit ?? string.Empty;
+                                    consumption.SRImmReason = con.SRImmReason;
+                                    consumption.BatchNumber = con.BatchNumber;
+                                    consumption.SRImmTiming = con.SRImmTiming;
+                                    consumption.ExpirationDate = con.ExpirationDate;
+                                    consumption.ParamedicID = con.ParamedicID;
                                     con.MarkAsDeleted();
                                 }
                                 #endregion
+
+                                // Add Vaccine for entry Immunization Inf
+                                if (tci.IsVaccine ?? false)
+                                {
+                                    AddTransChargesItemConsumptionsForVaccine(consumptions, detail, header);
+                                }
 
                                 tci.MarkAsDeleted();
                             }
@@ -6312,10 +6341,168 @@ namespace Temiang.Avicenna.Module.Charges
                     }
                 }
 
+                // Update Patient Immunization Summary
+                UpdatePatientImmunization(entity, TransChargesItems, TransChargesItemConsumptions, TransChargesItemComps);
+
                 //Commit if success, Rollback if failed
                 trans.Complete();
 
                 return string.Empty;
+            }
+        }
+        private static void AddTransChargesItemConsumptionsForVaccine(TransChargesItemConsumptionCollection TransChargesItemConsumptions, TransChargesItem tci, TransCharges tc)
+        {
+            var tcic = new TransChargesItemConsumption();
+            if (tcic.LoadByPrimaryKey(tc.TransactionNo, tci.SequenceNo, tci.ItemID))
+            {
+                return;
+            }
+
+            var consItem = TransChargesItemConsumptions.AddNew();
+            consItem.TransactionNo = tci.TransactionNo;
+            consItem.SequenceNo = tci.SequenceNo;
+            consItem.DetailItemID = tci.ItemID;
+
+            var i = new Item();
+            i.LoadByPrimaryKey(tci.ItemID);
+            consItem.ItemName = i.ItemName;
+
+            consItem.Qty = tci.ChargeQuantity;
+            consItem.QtyRealization = tci.ChargeQuantity;
+            consItem.MaxValue = AppSession.Parameter.IsValidateMaxQtyItemConsumptions ? consItem.Qty : 1000;
+            consItem.SRItemUnit = tci.SRItemUnit;
+            consItem.Price = tci.Price;
+
+            switch (i.SRItemType)
+            {
+                case ItemType.Medical:
+                    var im = new ItemProductMedic();
+                    im.LoadByPrimaryKey(i.ItemID);
+                    consItem.AveragePrice = tci.CostPrice;
+                    consItem.FifoPrice = im.PriceInBaseUnit;
+                    break;
+                case ItemType.NonMedical:
+                    var inm = new ItemProductNonMedic();
+                    inm.LoadByPrimaryKey(i.ItemID);
+                    consItem.AveragePrice = inm.CostPrice;
+                    consItem.FifoPrice = inm.PriceInBaseUnit;
+                    break;
+                case ItemType.Kitchen:
+                    var ik = new ItemKitchen();
+                    ik.LoadByPrimaryKey(i.ItemID);
+                    consItem.AveragePrice = ik.CostPrice;
+                    consItem.FifoPrice = ik.PriceInBaseUnit;
+                    break;
+                default:
+                    consItem.AveragePrice = consItem.Price;
+                    consItem.FifoPrice = consItem.Price;
+                    break;
+            }
+            consItem.IsPackage = true;
+
+            var tciRef = new TransChargesItem();
+            if (tciRef.LoadByPrimaryKey(tc.PackageReferenceNo, tci.SequenceNo.Substring(0, 3)))
+            {
+                var itemPack = new ItemPackage();
+                if (itemPack.LoadByPrimaryKey(tciRef.ItemID, tci.ItemID, tc.FromServiceUnitID))
+                {
+                    consItem.QtyDosage = itemPack.QtyDosage ?? 0;
+                    consItem.SRDosageUnit = itemPack.SRDosageUnit ?? string.Empty;
+                    consItem.QtyRealization = (itemPack.IsStockControl ?? false) ? consItem.Qty : 0;
+                }
+            }
+        }
+        private static bool ValidateItemImmunization(ValidateArgs args, TransCharges tc, TransChargesItemConsumptionCollection tciConsColl)
+        {
+            if ((tc.IsOrder ?? false)) return true;
+
+            // Check Vaccine Inf
+            foreach (var tciCon in tciConsColl)
+            {
+                var item = new ItemProductMedic();
+                if (item.LoadByPrimaryKey(tciCon.DetailItemID) && (item.IsVaccine ?? false))
+                {
+                    if (string.IsNullOrEmpty(tciCon.SRImmReason)
+                        || string.IsNullOrEmpty(tciCon.SRImmTiming)
+                        || string.IsNullOrEmpty(tciCon.BatchNumber)
+                        || string.IsNullOrEmpty(tciCon.SRDosageUnit)
+                        || tciCon.ExpirationDate == null
+                        || tciCon.QtyDosage == 0)
+                    {
+                        args.IsCancel = true;
+                        args.MessageText = "Item consumption containing vaccine drug that requires Immunization Reason, Routine timing , Drug Batch Number, Expiration Date, Dosage & Unit information, please completed first.";
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private static void UpdatePatientImmunization(TransCharges tc, TransChargesItemCollection tciColl, TransChargesItemConsumptionCollection tciConsColl, TransChargesItemCompCollection tciCompColl)
+        {
+            if ((tc.IsOrder ?? false) || (!tc.IsApproved ?? false)) return;
+
+            Registration reg = null;
+            foreach (var tciCon in tciConsColl)
+            {
+                var tci = tciColl.FirstOrDefault(e => e.SequenceNo == tciCon.SequenceNo);
+
+                var itemImColl = new ItemImmunizationCollection(); // Matrix List Imunisasi, 1 obat bisa untuk bbrp imunisasi
+                itemImColl.Query.Where(itemImColl.Query.ItemID == tciCon.DetailItemID);
+                itemImColl.LoadAll();
+                foreach (var itemIm in itemImColl)
+                {
+                    if (string.IsNullOrEmpty(itemIm.ImmunizationID)) continue;
+
+                    var pim = new PatientImmunization();
+                    pim.Query.Where(
+                        pim.Query.RegistrationNo == tc.RegistrationNo,
+                        pim.Query.ReferenceNo == tc.TransactionNo,
+                        pim.Query.ImmunizationID == itemIm.ImmunizationID);
+
+                    if (!pim.Query.Load())
+                    {
+                        // Add PatientImmunization
+                        pim.AddNew();
+
+                        // Get PatientID
+                        if (reg == null)
+                        {
+                            reg = new Registration();
+                            reg.Query.Select(reg.Query.PatientID);
+                            reg.LoadByPrimaryKey(tc.RegistrationNo);
+                        }
+
+                        // ImmunizationNo
+                        var newNo = 1;
+                        var pimLastNo = new PatientImmunization();
+                        pimLastNo.Query.Where(pimLastNo.Query.PatientID == reg.PatientID, pimLastNo.Query.ImmunizationID == itemIm.ImmunizationID);
+                        pimLastNo.Query.OrderBy(pimLastNo.Query.ImmunizationNo.Descending);
+                        pimLastNo.Query.es.Top = 1;
+                        if (pimLastNo.Query.Load())
+                            newNo = (pimLastNo.ImmunizationNo ?? 0) + 1;
+
+                        pim.ImmunizationNo = newNo;
+                        pim.PatientID = reg.PatientID;
+                        pim.ImmunizationID = itemIm.ImmunizationID;
+                        pim.ImmunizationDate = tc.TransactionDate;
+                        pim.ReferenceNo = tc.TransactionNo;
+                        pim.ReferenceItemID = tci.ItemID;
+                        pim.ReferenceSeqNo = tci.SequenceNo;
+                        pim.VaccineID = tciCon.DetailItemID;
+                        pim.RegistrationNo = tc.RegistrationNo;
+                    }
+
+                    pim.ParamedicID = tciCon.ParamedicID;
+                    pim.ServiceUnitID = tc.FromServiceUnitID;
+                    pim.QtyDosage = tciCon.QtyDosage;
+                    pim.SRDosageUnit = tciCon.SRDosageUnit;
+                    pim.SRImmReason = tciCon.SRImmReason;
+                    pim.BatchNumber = tciCon.BatchNumber;
+                    pim.SRImmTiming = tciCon.SRImmTiming;
+                    pim.ExpirationDate = tciCon.ExpirationDate;
+                    pim.Save();
+                }
             }
         }
 
@@ -6548,6 +6735,8 @@ namespace Temiang.Avicenna.Module.Charges
                 tblTemporaryBill.Visible = reg.SRRegistrationType == AppConstant.RegistrationType.OutPatient && trBpjsSepNo.Visible;
                 if (tblTemporaryBill.Visible)
                 {
+                    AjaxManager.AjaxSettings.AddAjaxSetting(grdTransChargesItem, txtTemporaryBillTotal);
+
                     txtTemporaryBillPlafond.Value = Convert.ToDouble(reg.PlavonAmount);
                     txtTemporaryBillTotal.Value = Convert.ToDouble(GetTotalTemporaryBill());
                 }
@@ -7132,6 +7321,7 @@ namespace Temiang.Avicenna.Module.Charges
                 var tounit = new ServiceUnitQuery("e");
                 var group = new ItemGroupQuery("f");
                 var cond = new ItemConditionRuleQuery("g");
+                var ipm = new ItemProductMedicQuery("ipm");
 
                 tci.Select(tci.TransactionNo, tci.SequenceNo);
                 tci.Where(tci.TransactionNo == query.TransactionNo, tci.SequenceNo == query.SequenceNo,
@@ -7156,10 +7346,12 @@ namespace Temiang.Avicenna.Module.Charges
                         //cond.ItemConditionRuleName.As("refToItemConditionRule_ItemConditionRuleName"),
                         "<'' as refTo_PrevOrder>",
                         @"<'' AS refTo_SpecimenTypeName>",
-                        @"<CASE WHEN ISNULL(a.CasemixNotes, '') = '' THEN '' ELSE ' (Casemix: ' + a.CasemixNotes +')' END AS 'refTo_CombinedNotes'>"
+                        @"<CASE WHEN ISNULL(a.CasemixNotes, '') = '' THEN '' ELSE ' (Casemix: ' + a.CasemixNotes +')' END AS 'refTo_CombinedNotes'>",
+                        ipm.IsVaccine.As("refToIpm_IsVaccine")
                     );
 
                 query.InnerJoin(item).On(query.ItemID == item.ItemID);
+                query.LeftJoin(ipm).On(query.ItemID == ipm.ItemID);
                 query.LeftJoin(param).On(query.ParamedicID == param.ParamedicID);
                 query.LeftJoin(tounit).On(query.ToServiceUnitID == tounit.ServiceUnitID);
                 query.LeftJoin(group).On(item.ItemGroupID == group.ItemGroupID);
@@ -7589,6 +7781,12 @@ namespace Temiang.Avicenna.Module.Charges
             entity.ItemConditionRuleID = itemConditionRuleId;
             entity.ItemConditionRuleName = !string.IsNullOrEmpty(itemConditionRuleName) ? "~ " + itemConditionRuleName : itemConditionRuleName;
 
+            var ipmVacc = new ItemProductMedic();
+            if (ipmVacc.LoadByPrimaryKey(entity.ItemID))
+                entity.IsVaccine = ipmVacc.IsVaccine ?? false;
+            else
+                entity.IsVaccine = false;
+
             if (isNewRecord)
             {
                 entity.CreatedByUserID = AppSession.UserLogin.UserID;
@@ -7641,6 +7839,21 @@ namespace Temiang.Avicenna.Module.Charges
                             }
                         }
                         item.ParamedicID = comp.ParamedicID;
+
+                        // Update ParamedicID Immunization in TransChargesItemConsumption for item Vaccine (Handono 2025-10-20)
+                        // Todo: untuk item paket tidak dapat
+                        if (comp.TariffComponentID == AppParameter.GetParameterValue(AppParameter.ParameterItem.TariffComponentPrimaryPhysicianID))
+                        {
+                            var tcicons = from qr in TransChargesItemConsumptions where qr.SequenceNo == comp.SequenceNo select qr;
+                            foreach (var tcicon in tcicons)
+                            {
+                                var ipmedic = new ItemProductMedic();
+                                if (ipmedic.LoadByPrimaryKey(tcicon.DetailItemID) && (ipmedic.IsVaccine ?? false))
+                                {
+                                    tcicon.ParamedicID = comp.ParamedicID;
+                                }
+                            }
+                        }
 
                         item.FeeDiscountPercentage = comp.FeeDiscountPercentage ?? 0;
 
@@ -8283,6 +8496,8 @@ namespace Temiang.Avicenna.Module.Charges
                         }
 
                         consItem.IsPackage = false;
+                        consItem.QtyDosage = consEntity.QtyDosage;
+                        consItem.SRDosageUnit = consEntity.SRDosageUnit;
                     }
                 }
 

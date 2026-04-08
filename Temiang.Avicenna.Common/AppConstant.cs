@@ -81,6 +81,7 @@ namespace Temiang.Avicenna.Common
             public const string INOSInfectionMonitoring = "01.02.31";
             public const string IncompleteMedicalRecordFile = "01.02.32";
 
+            public const string Immunization = "01.03.70";
             public const string Smf = "01.03.01";
             public const string Paramedic = "01.03.02";
             public const string Department = "01.03.04";

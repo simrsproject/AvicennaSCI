@@ -3706,8 +3706,8 @@ namespace Temiang.Avicenna.Module.Charges
             if (!tc.LoadByPrimaryKey(transactionNo)) return;
 
             // Stusehat post encounter & ServiceRequest
-            var util = new Temiang.Avicenna.WebService.Satusehat();
-            util.OrderLab(transactionNo);
+            var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
+            util.OrderLabRealization(transactionNo);
 
             // Update Wynakom
             var satuSehatLog = new SatuSehatKunjungan();

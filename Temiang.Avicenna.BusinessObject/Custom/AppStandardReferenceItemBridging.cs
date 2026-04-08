@@ -20,10 +20,29 @@ namespace Temiang.Avicenna.BusinessObject
 {
     public partial class AppStandardReferenceItemBridging
     {
+        public enum SatusehatRef
+        {
+            CvxName,
+            DosageUnit,
+            Route,
+            ImmReason,
+            ImmTiming
+        }
+        public static AppStandardReferenceItemBridging Load(SatusehatRef stusehatRef, string itemID, string bridgingType)
+        {
+            var br = new AppStandardReferenceItemBridging();
+            if (br.LoadByPrimaryKey(stusehatRef.ToString(), itemID, bridgingType)) return br;
+            return null;
+        }
+
+        public static string GetBridgingID(SatusehatRef stusehatRef, string itemID, string bridgingType)
+        {
+            return GetBridgingID(stusehatRef.ToString(), itemID, bridgingType);
+        }
         public static string GetBridgingID(string standardReferenceID, string itemID, string bridgingType)
         {
             var br = new AppStandardReferenceItemBridging();
-            if (br.LoadByPrimaryKey(standardReferenceID, itemID,  bridgingType)) return br.BridgingID;
+            if (br.LoadByPrimaryKey(standardReferenceID, itemID, bridgingType)) return br.BridgingID;
             return string.Empty;
         }
     }

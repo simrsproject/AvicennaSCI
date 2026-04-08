@@ -78,8 +78,7 @@
                                 OnItemsRequested="cboSRItemSubGroup_ItemsRequested">
                             </telerik:RadComboBox>
                         </td>
-                        <td width="20">
-                        </td>
+                        <td width="20"></td>
                         <td></td>
                     </tr>
                     <tr>
@@ -210,6 +209,17 @@
                         </td>
                         <td class="entry">
                             <telerik:RadComboBox ID="cboSRSpecimenType" runat="server" Width="300px">
+                            </telerik:RadComboBox>
+                        </td>
+                        <td width="20"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <asp:Label ID="lblSRResultValueType" runat="server" Text="Result Value Type"></asp:Label>
+                        </td>
+                        <td class="entry">
+                            <telerik:RadComboBox ID="cboSRResultValueType" runat="server" Width="300px">
                             </telerik:RadComboBox>
                         </td>
                         <td width="20"></td>
@@ -394,12 +404,17 @@
                         <telerik:GridBoundColumn HeaderStyle-Width="100px" DataField="DetailItemID" HeaderText="Item ID"
                             UniqueName="DetailItemID" SortExpression="DetailItemID" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
-                        <telerik:GridBoundColumn DataField="DetailItemName" HeaderText="Item Name" UniqueName="DetailItemName"
+                        <telerik:GridBoundColumn HeaderStyle-Width="500px" DataField="DetailItemName" HeaderText="Item Name" UniqueName="DetailItemName"
                             SortExpression="DetailItemName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                         <telerik:GridNumericColumn HeaderStyle-Width="60px" DataField="Qty" HeaderText="Qty"
                             UniqueName="Qty" SortExpression="Qty" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Right" />
                         <telerik:GridBoundColumn HeaderStyle-Width="60px" DataField="SRItemUnit" HeaderText="Unit"
                             UniqueName="SRItemUnit" SortExpression="SRItemUnit" HeaderStyle-HorizontalAlign="Left"
+                            ItemStyle-HorizontalAlign="Left" />
+                        <telerik:GridNumericColumn HeaderStyle-Width="80px" DataField="QtyDosage" HeaderText="Qty Dosage"
+                            UniqueName="QtyDosage" SortExpression="QtyDosage" HeaderStyle-HorizontalAlign="Right" ItemStyle-HorizontalAlign="Right" />
+                        <telerik:GridBoundColumn DataField="SRDosageUnit" HeaderText="Dosage Unit"
+                            UniqueName="SRDosageUnit" SortExpression="SRDosageUnit" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
                         <telerik:GridButtonColumn UniqueName="DeleteColumn" Text="Delete" CommandName="Delete"
                             ButtonType="ImageButton" ConfirmText="Delete this row?">
@@ -463,7 +478,7 @@
                     </Columns>
                     <DetailTables>
                         <telerik:GridTableView DataKeyNames="TariffComponentID" Name="grdItemTariffRequestItemComp"
-                            AutoGenerateColumns="false">
+                             AutoGenerateColumns="false">
                             <Columns>
                                 <telerik:GridBoundColumn DataField="TariffComponentName" HeaderText="Component Name"
                                     UniqueName="TariffComponentName" SortExpression="TariffComponentName" HeaderStyle-HorizontalAlign="Left"

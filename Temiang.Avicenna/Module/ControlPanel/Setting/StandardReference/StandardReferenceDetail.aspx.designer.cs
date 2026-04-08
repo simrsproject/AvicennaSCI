@@ -7,11 +7,22 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Temiang.Avicenna.ControlPanel.Setting {
-    
-    
-    public partial class StandardReferenceDetail {
-        
+namespace Temiang.Avicenna.ControlPanel.Setting
+{
+
+
+    public partial class StandardReferenceDetail
+    {
+
+        /// <summary>
+        /// cb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadCodeBlock cb;
+
         /// <summary>
         /// lblStandardReferenceID control.
         /// </summary>
@@ -20,7 +31,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblStandardReferenceID;
-        
+
         /// <summary>
         /// txtStandardReferenceID control.
         /// </summary>
@@ -29,7 +40,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtStandardReferenceID;
-        
+
         /// <summary>
         /// rfvStandardReferenceID control.
         /// </summary>
@@ -38,7 +49,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvStandardReferenceID;
-        
+
         /// <summary>
         /// Image1 control.
         /// </summary>
@@ -47,7 +58,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Image1;
-        
+
         /// <summary>
         /// lblStandardReferenceName control.
         /// </summary>
@@ -56,7 +67,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblStandardReferenceName;
-        
+
         /// <summary>
         /// txtStandardReferenceName control.
         /// </summary>
@@ -65,7 +76,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtStandardReferenceName;
-        
+
         /// <summary>
         /// rfvStandardReferenceName control.
         /// </summary>
@@ -74,7 +85,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvStandardReferenceName;
-        
+
         /// <summary>
         /// Image2 control.
         /// </summary>
@@ -83,7 +94,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Image2;
-        
+
         /// <summary>
         /// lblStandardReferenceGroup control.
         /// </summary>
@@ -92,7 +103,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblStandardReferenceGroup;
-        
+
         /// <summary>
         /// txtStandardReferenceGroup control.
         /// </summary>
@@ -101,7 +112,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtStandardReferenceGroup;
-        
+
         /// <summary>
         /// lblItemLength control.
         /// </summary>
@@ -110,7 +121,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblItemLength;
-        
+
         /// <summary>
         /// txtItemLength control.
         /// </summary>
@@ -119,7 +130,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtItemLength;
-        
+
         /// <summary>
         /// lblNotes control.
         /// </summary>
@@ -128,7 +139,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblNotes;
-        
+
         /// <summary>
         /// txtNotes control.
         /// </summary>
@@ -137,7 +148,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtNotes;
-        
+
         /// <summary>
         /// chkIsHasCOA control.
         /// </summary>
@@ -146,7 +157,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIsHasCOA;
-        
+
         /// <summary>
         /// chkIsUsedBySystem control.
         /// </summary>
@@ -155,7 +166,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIsUsedBySystem;
-        
+
         /// <summary>
         /// chkIsActive control.
         /// </summary>
@@ -164,7 +175,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIsActive;
-        
+
         /// <summary>
         /// grdStandardReferenceItem control.
         /// </summary>

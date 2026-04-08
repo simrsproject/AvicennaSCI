@@ -26,7 +26,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             entity.SRItemType = BusinessObject.Reference.ItemType.Service;
             entity.SRBillingGroup = cboBillingGroup.SelectedValue;
             entity.SRBpjsItemGroup = cboSRBpjsItemGroup.SelectedValue;
-            entity.ItemName = txtItemName.Text;
+            entity.ItemName = txtItemName.Text.Trim();
             entity.IsActive = chkIsActive.Checked;
             entity.IsDelegationToNurse = chkIsDelegationToNurse.Checked;
             entity.Notes = txtNotes.Text;
@@ -766,6 +766,8 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 entity.DetailItemID = userControl.DetailItemID;
                 entity.Qty = userControl.Qty ?? 0;
                 entity.SRItemUnit = userControl.SRItemUnit;
+                entity.QtyDosage = userControl.QtyDosage ?? 0;
+                entity.SRDosageUnit = userControl.SRDosageUnit;
             }
         }
         #endregion

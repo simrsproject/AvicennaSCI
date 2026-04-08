@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects  
 ===============================================================================
-                       Date Generated       : 30/07/2024 14:11:33
+                       Date Generated       : 10/02/2026 20:13:18
 ===============================================================================
 */
 
@@ -244,6 +244,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "SpecimenCollectByUserID": this.str.SpecimenCollectByUserID = (string)value; break;
                         case "SpecimenReceiveByUserID": this.str.SpecimenReceiveByUserID = (string)value; break;
                         case "SRCollectMethod": this.str.SRCollectMethod = (string)value; break;
+                        case "IsVaccine": this.str.IsVaccine = (string)value; break;
                     }
                 }
                 else
@@ -464,6 +465,11 @@ namespace Temiang.Avicenna.BusinessObject
 
                             if (value == null || value is System.DateTime)
                                 this.SpecimenReceiveDateTime = (System.DateTime?)value;
+                            break;
+                        case "IsVaccine":
+
+                            if (value == null || value is System.Boolean)
+                                this.IsVaccine = (System.Boolean?)value;
                             break;
 
                         default:
@@ -1650,7 +1656,7 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 base.SetSystemString(TransChargesItemMetadata.ColumnNames.SpecimenReceiveByUserID, value);
             }
-        }        
+        }
         /// <summary>
         /// Maps to TransChargesItem.SRCollectMethod
         /// </summary>
@@ -1664,6 +1670,21 @@ namespace Temiang.Avicenna.BusinessObject
             set
             {
                 base.SetSystemString(TransChargesItemMetadata.ColumnNames.SRCollectMethod, value);
+            }
+        }
+        /// <summary>
+        /// Maps to TransChargesItem.IsVaccine
+        /// </summary>
+        virtual public System.Boolean? IsVaccine
+        {
+            get
+            {
+                return base.GetSystemBoolean(TransChargesItemMetadata.ColumnNames.IsVaccine);
+            }
+
+            set
+            {
+                base.SetSystemBoolean(TransChargesItemMetadata.ColumnNames.IsVaccine, value);
             }
         }
 
@@ -2821,6 +2842,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.SRCollectMethod = Convert.ToString(value);
                 }
             }
+            public System.String IsVaccine
+            {
+                get
+                {
+                    System.Boolean? data = entity.IsVaccine;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.IsVaccine = null;
+                    else entity.IsVaccine = Convert.ToBoolean(value);
+                }
+            }
             private esTransChargesItem entity;
         }
         #endregion
@@ -3489,13 +3524,21 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenReceiveByUserID, esSystemType.String);
             }
-        }        
+        }
 
         public esQueryItem SRCollectMethod
         {
             get
             {
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SRCollectMethod, esSystemType.String);
+            }
+        }
+
+        public esQueryItem IsVaccine
+        {
+            get
+            {
+                return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsVaccine, esSystemType.Boolean);
             }
         }
 
@@ -4355,11 +4398,16 @@ namespace Temiang.Avicenna.BusinessObject
             c.PropertyName = TransChargesItemMetadata.PropertyNames.SpecimenReceiveByUserID;
             c.CharacterMaxLength = 15;
             c.IsNullable = true;
-            _columns.Add(c);            
+            _columns.Add(c);
 
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.SRCollectMethod, 78, typeof(System.String), esSystemType.String);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.SRCollectMethod;
             c.CharacterMaxLength = 20;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.IsVaccine, 79, typeof(System.Boolean), esSystemType.Boolean);
+            c.PropertyName = TransChargesItemMetadata.PropertyNames.IsVaccine;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -4469,6 +4517,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string SpecimenCollectByUserID = "SpecimenCollectByUserID";
             public const string SpecimenReceiveByUserID = "SpecimenReceiveByUserID";
             public const string SRCollectMethod = "SRCollectMethod";
+            public const string IsVaccine = "IsVaccine";
         }
         #endregion
 
@@ -4554,6 +4603,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string SpecimenCollectByUserID = "SpecimenCollectByUserID";
             public const string SpecimenReceiveByUserID = "SpecimenReceiveByUserID";
             public const string SRCollectMethod = "SRCollectMethod";
+            public const string IsVaccine = "IsVaccine";
         }
         #endregion
 
@@ -4676,6 +4726,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("SpecimenCollectByUserID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SpecimenReceiveByUserID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SRCollectMethod", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("IsVaccine", new esTypeMap("bit", "System.Boolean"));
 
 
                 meta.Source = "TransChargesItem";

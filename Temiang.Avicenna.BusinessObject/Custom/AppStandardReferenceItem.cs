@@ -42,5 +42,11 @@
             get { return GetColumn("refTo_CustomField2_IsReturnable").ToBoolean(); }
             set { SetColumn("refTo_CustomField2_IsReturnable", value); }
         }
+
+        public string SSBridgingID
+        {
+            get { return GetColumn("refTo_StdiSSBridging").ToString(); }
+            set { SetColumn("refTo_StdiSSBridging", value); }
+        }
     }
 }

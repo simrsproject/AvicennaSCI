@@ -6,7 +6,7 @@
     ErrorMessage="" OnServerValidate="customValidator_ServerValidate">&nbsp;</asp:CustomValidator>
 <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
-        <td width="50%">
+        <td width="50%" style="vertical-align: top">
             <table width="100%">
                 <tr>
                     <td class="label">
@@ -19,8 +19,7 @@
                                     <telerik:RadTextBox ID="txtDetailItemID" runat="server" Width="100px" MaxLength="10"
                                         AutoPostBack="true" OnTextChanged="txtDetailItemID_TextChanged" />
                                 </td>
-                                <td>
-                                    &nbsp;
+                                <td>&nbsp;
                                 </td>
                                 <td>
                                     <asp:Label ID="lblDetailItemName" runat="server" />
@@ -48,8 +47,7 @@
                                     <telerik:RadTextBox ID="txtServiceUnitID" runat="server" Width="100px" MaxLength="10"
                                         AutoPostBack="true" OnTextChanged="txtServiceUnitID_TextChanged" />
                                 </td>
-                                <td>
-                                    &nbsp;
+                                <td>&nbsp;
                                 </td>
                                 <td>
                                     <asp:Label ID="lblServiceUnitName" runat="server" Text=""></asp:Label>
@@ -64,8 +62,7 @@
                             <asp:Image ID="Image4" runat="server" SkinID="rfvImage" />
                         </asp:RequiredFieldValidator>
                     </td>
-                    <td>
-                    </td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">
@@ -77,8 +74,7 @@
                                 <td>
                                     <telerik:RadNumericTextBox ID="txtQuantity" runat="server" Width="100px" />
                                 </td>
-                                <td>
-                                    &nbsp;
+                                <td>&nbsp;
                                 </td>
                                 <td>
                                     <telerik:RadTextBox ID="txtSRItemUnit" runat="server" Width="100px" MaxLength="20"
@@ -96,6 +92,39 @@
                     </td>
                     <td />
                 </tr>
+                <tr>
+                    <td class="label">
+                        <asp:Label ID="lblDosage" runat="server" Text="Dosage & Unit"></asp:Label>
+                    </td>
+                    <td class="entry">
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <telerik:RadNumericTextBox ID="txtQtyDosage" runat="server" Width="100px" MaxLength="5"
+                                        MinValue="0" />
+                                </td>
+                                <td>&nbsp;
+                                </td>
+                                <td>
+                                    <telerik:RadComboBox ID="cboSRDosageUnit" runat="server" Width="100px" EnableLoadOnDemand="true"
+                                        MarkFirstMatch="true" HighlightTemplatedItems="true" AutoPostBack="false" OnItemDataBound="cboStandardReferenceItem_ItemDataBound"
+                                        OnItemsRequested="cboSRDosageUnit_ItemsRequested">
+                                        <ItemTemplate>
+                                            <%# DataBinder.Eval(Container.DataItem, "ItemID")%>
+                                                &nbsp;-&nbsp;
+                                                <%# DataBinder.Eval(Container.DataItem, "ItemName")%>
+                                        </ItemTemplate>
+                                        <FooterTemplate>
+                                            Note : Show max 10 items
+                                        </FooterTemplate>
+                                    </telerik:RadComboBox>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="20px"></td>
+                    <td></td>
+                </tr>
                 <tr runat="server" id="trDiscount">
                     <td class="label">
                         <asp:Label ID="Label1" runat="server" Text="Discount" />
@@ -106,8 +135,7 @@
                                 <td>
                                     <telerik:RadNumericTextBox ID="txtDiscountValue" runat="server" Width="100px" />
                                 </td>
-                                <td>
-                                    &nbsp;
+                                <td>&nbsp;
                                 </td>
                                 <td>
                                     <asp:CheckBox ID="chkIsDiscountInPercent" runat="server" Text="In Percent (%)" OnCheckedChanged="chkIsDiscountInPercent_CheckedChanged"

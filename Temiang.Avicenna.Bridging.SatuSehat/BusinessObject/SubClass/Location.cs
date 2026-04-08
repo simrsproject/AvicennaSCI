@@ -13,7 +13,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
         [JsonProperty("extension")]
         public List<ExtensionLoc> Extension { get; set; }
 
-        [JsonProperty("period", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty("period")]
         public Period Period { get; set; }
     }
     public class RefDisplay

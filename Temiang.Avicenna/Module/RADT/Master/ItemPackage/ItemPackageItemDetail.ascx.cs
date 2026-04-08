@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Telerik.Web.UI;
@@ -49,24 +50,61 @@ namespace Temiang.Avicenna.Module.RADT.Master
             txtDiscountValue.Value = Convert.ToDouble(DataBinder.Eval(DataItem, ItemPackageMetadata.ColumnNames.DiscountValue)); //DataBinder.Eval(DataItem, ItemPackageMetadata.ColumnNames.DiscountValue) as double? ?? 0;
             chkIsDiscountInPercent.Checked = (bool)DataBinder.Eval(DataItem, ItemPackageMetadata.ColumnNames.IsDiscountInPercent); //DataBinder.Eval(DataItem, ItemPackageMetadata.ColumnNames.IsDiscountInPercent) as bool? ?? true;
 
+            try
+            {
+                txtQtyDosage.Value = Convert.ToDouble(DataBinder.Eval(DataItem, ItemPackageMetadata.ColumnNames.QtyDosage));
+            }
+            catch
+            {
+                txtQtyDosage.Value = 0;
+            }
+            try
+            {
+                var dosageUnit = (String)DataBinder.Eval(DataItem, ItemPackageMetadata.ColumnNames.SRDosageUnit);
+                if (!string.IsNullOrEmpty(dosageUnit))
+                {
+                    var dosageq = new AppStandardReferenceItemQuery();
+                    dosageq.Where(dosageq.StandardReferenceID == AppEnum.StandardReference.DosageUnit.ToString(), dosageq.ItemID == dosageUnit);
+                    dosageq.Select(dosageq.ItemID, dosageq.ItemName);
+                    cboSRDosageUnit.DataSource = dosageq.LoadDataTable();
+                    cboSRDosageUnit.DataBind();
+                    cboSRDosageUnit.SelectedValue = dosageUnit;
+                }
+                else
+                {
+                    cboSRDosageUnit.Items.Clear();
+                    cboSRDosageUnit.SelectedValue = string.Empty;
+                    cboSRDosageUnit.Text = string.Empty;
+                }
+            }
+            catch
+            {
+                cboSRDosageUnit.Items.Clear();
+                cboSRDosageUnit.SelectedValue = string.Empty;
+                cboSRDosageUnit.Text = string.Empty;
+            }
+
             PopulateDetailItemName(false);
             PopulateServiceUnitName(false);
             SetEnabledDiscount();
             SetEnableChkAutoApprove();
         }
 
-        private void SetEnableChkAutoApprove() {
-            
-            chkAutoApprove.Enabled = AppSession.Parameter.IsAutoApprovePackage && 
-                !string.IsNullOrEmpty(txtDetailItemID.Text) && 
+        private void SetEnableChkAutoApprove()
+        {
+
+            chkAutoApprove.Enabled = AppSession.Parameter.IsAutoApprovePackage &&
+                !string.IsNullOrEmpty(txtDetailItemID.Text) &&
                 !string.IsNullOrEmpty(txtServiceUnitID.Text);
-            if(chkAutoApprove.Enabled){
+            if (chkAutoApprove.Enabled)
+            {
                 var su = new ServiceUnit();
                 if (su.LoadByPrimaryKey(txtServiceUnitID.Text))
                 {
                     chkAutoApprove.Enabled = !(su.IsUsingJobOrder ?? false);
                 }
-                else {
+                else
+                {
                     chkAutoApprove.Enabled = false;
                 }
             }
@@ -85,7 +123,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 string unitId = txtServiceUnitID.Text;
                 bool isExist = false;
                 bool isExistExtra = false;
-                
+
                 foreach (ItemPackage item in coll)
                 {
                     if (item.DetailItemID.Equals(detailItemID) && item.ServiceUnitID.Equals(unitId))
@@ -106,7 +144,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     ((CustomValidator)source).ErrorMessage = string.Format("Item ID: {0} on Service Unit: {1} cannot be double.", detailItemID, lblServiceUnitName.Text);
                     return;
                 }
-                
+
                 if (isExistExtra)
                 {
                     args.IsValid = false;
@@ -181,6 +219,15 @@ namespace Temiang.Avicenna.Module.RADT.Master
             get { return chkIsDiscountInPercent.Checked; }
         }
 
+        public Decimal? QtyDosage
+        {
+            get { return Convert.ToDecimal(txtQtyDosage.Value); }
+        }
+        public String SRDosageUnit
+        {
+            get { return cboSRDosageUnit.SelectedValue; }
+        }
+
         protected void txtDetailItemID_TextChanged(object sender, EventArgs e)
         {
             PopulateDetailItemName(true);
@@ -194,6 +241,11 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 txtSRItemUnit.Text = string.Empty;
                 return;
             }
+
+            txtQtyDosage.Value = 0;
+            cboSRDosageUnit.Items.Clear();
+            cboSRDosageUnit.SelectedValue = string.Empty;
+            cboSRDosageUnit.Text = string.Empty;
 
             var entity = new Item();
             if (entity.LoadByPrimaryKey(txtDetailItemID.Text))
@@ -211,6 +263,28 @@ namespace Temiang.Avicenna.Module.RADT.Master
                         det2.LoadByPrimaryKey(txtDetailItemID.Text);
                         txtSRItemUnit.Text = det2.SRItemUnit;
                         chkIsStockControl.Enabled = true;
+
+                        if (isResetIdIfNotExist)
+                        {
+                            if (!string.IsNullOrEmpty(det2.SRDosageUnit))
+                            {
+                                txtQtyDosage.Value = Convert.ToDouble(det2.Dosage);
+                                var dosageq = new AppStandardReferenceItemQuery();
+                                dosageq.Where(dosageq.StandardReferenceID == AppEnum.StandardReference.DosageUnit.ToString(), dosageq.ItemID == det2.SRDosageUnit);
+                                dosageq.Select(dosageq.ItemID, dosageq.ItemName);
+                                cboSRDosageUnit.DataSource = dosageq.LoadDataTable();
+                                cboSRDosageUnit.DataBind();
+                                cboSRDosageUnit.SelectedValue = det2.SRDosageUnit;
+                            }
+                            else
+                            {
+                                txtQtyDosage.Value = 0;
+                                cboSRDosageUnit.Items.Clear();
+                                cboSRDosageUnit.SelectedValue = string.Empty;
+                                cboSRDosageUnit.Text = string.Empty;
+                            }
+                        }
+
                         break;
                     case BusinessObject.Reference.ItemType.NonMedical:
                         var det3 = new ItemProductNonMedic();
@@ -267,6 +341,37 @@ namespace Temiang.Avicenna.Module.RADT.Master
         private void SetEnabledDiscount()
         {
             txtDiscountValue.Enabled = chkIsDiscountInPercent.Checked;
+        }
+
+        protected void cboSRDosageUnit_ItemsRequested(object o, RadComboBoxItemsRequestedEventArgs e)
+        {
+            string searchTextContain = string.Format("%{0}%", e.Text);
+            var query = new AppStandardReferenceItemQuery();
+            query.es.Top = 10;
+            query.Select
+                (
+                    query.ItemID,
+                    query.ItemName
+                );
+            query.Where
+                (
+                    query.Or
+                        (
+                            query.ItemID.Like(searchTextContain),
+                            query.ItemName.Like(searchTextContain)
+                        ),
+                        query.StandardReferenceID == AppEnum.StandardReference.DosageUnit.ToString(),
+                        query.IsActive == true
+                );
+
+            cboSRDosageUnit.DataSource = query.LoadDataTable();
+            cboSRDosageUnit.DataBind();
+        }
+
+        protected void cboStandardReferenceItem_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        {
+            e.Item.Text = ((DataRowView)e.Item.DataItem)["ItemName"].ToString();
+            e.Item.Value = ((DataRowView)e.Item.DataItem)["ItemID"].ToString();
         }
     }
 }

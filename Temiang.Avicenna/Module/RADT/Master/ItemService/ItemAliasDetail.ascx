@@ -59,7 +59,7 @@
         <td width="20px" />
         <td />
     </tr>
-    <tr>
+    <tr runat="server" id="rowItemIdExternal">
         <td class="label">Item ID External
         </td>
         <td class="entry">
