@@ -6083,6 +6083,265 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             return response;
         }
 
+        public RestResponse PostRoom(string serviceUnitID, string RoomID)
+        {
+            if (string.IsNullOrWhiteSpace(_organizationID) || string.IsNullOrWhiteSpace(_clientID))
+                return null;
+
+            var serviceUnit = new ServiceUnit();
+            if (!serviceUnit.LoadByPrimaryKey(serviceUnitID))
+                return null;
+
+            var serviceRoom = new ServiceRoom();
+            if (!serviceRoom.LoadByPrimaryKey(RoomID))
+                return null;
+
+
+            // Check Mapping SatuSehat hanya boleh 1 untuk 1 ServiceUnit
+            var sub = new ServiceUnitBridging();
+            var qr = new ServiceUnitBridgingQuery("q");
+            qr.Where(qr.ServiceUnitID == serviceUnit.ServiceUnitID, qr.SRBridgingType == Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
+            qr.es.Top = 1;
+            sub.Load(qr);
+
+            var srb = new ServiceRoomBridging();
+            var qsr = new ServiceRoomBridgingQuery("q");
+            qsr.Where(qsr.RoomID == serviceRoom.RoomID, qsr.SRBridgingType == Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
+            qsr.es.Top = 1;
+            if (srb.Load(qsr))
+                return null;
+
+            var accessToken = string.Empty;
+
+            var hc = new Healthcare();
+            hc.LoadByPrimaryKey(AppParameter.GetParameterValue(AppParameter.ParameterItem.HealthcareID));
+
+            var telecom = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Telecom>()
+            {
+                new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Telecom()
+                {
+                    System = "phone",
+                    Value = hc.PhoneNo,
+                    Use = "work",
+                },
+                 new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Telecom()
+                {
+                    System = "fax",
+                    Value = hc.FaxNo,
+                    Use = "work",
+                }
+            };
+
+            var postData = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Resource()
+            {
+                ResourceType = "Location",
+                Identifier = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Identifier>()
+                {
+                    new Bridging.SatuSehat.BusinessObject.Master.Location.Identifier()
+                    {
+                        System = String.Concat("http://sys-ids.kemkes.go.id/location/", _organizationID),
+                        Value = serviceRoom.RoomID
+                    }
+                },
+                Status = "active",
+                Name = serviceRoom.RoomName,
+                Description = string.Format("{0},{1}", serviceRoom.RoomName, serviceUnit.ServiceUnitName),
+                Mode = "instance",
+                Telecom = telecom,
+                Type = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PhysicalType>()
+                {
+                    new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PhysicalType()
+                    {
+                        Coding = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding>()
+                        {
+                            new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding()
+                            {
+                                System = "http://terminology.kemkes.go.id/CodeSystem/location-type",
+                                Code = "RT0016",
+                                Display = "Ruang Rawat Inap"
+                            }
+                        }
+                    }
+                },
+                PhysicalType = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PhysicalType()
+                {
+                    Coding = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding>()
+                    {
+                        new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding()
+                        {
+                            System = "http://terminology.hl7.org/CodeSystem/location-physical-type",
+                            Code = "ro",
+                            Display = "Room",
+                        }
+                    },
+                },
+                Position = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Position()
+                {
+                    Longitude = 1,
+                    Latitude = 1,
+                    Altitude = 1,
+                },
+                ManagingOrganization = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.ManagingOrganization()
+                {
+                    Reference = String.Concat("Organization/", _organizationID),
+                },
+                partOf = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.partOf()
+                {
+                    Reference = String.Concat("Location/", sub.BridgingID),
+                    Display = sub.BridgingName
+                }
+            };
+
+            var requestBody = JsonConvert.SerializeObject(postData);
+            var response = RestClientPost(requestBody, "Location", ref accessToken);
+            if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var resp = JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PostPutResponse>(response.Content);
+                srb = new ServiceRoomBridging();
+                srb.RoomID = serviceRoom.RoomID;
+                srb.SRBridgingType = Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+                srb.BridgingID = resp.Id;
+                srb.BridgingName = resp.Name;
+                srb.IsActive = true;
+                srb.Save();
+            }
+            return response;
+        }
+
+        public void PostBed(string serviceUnitID, string RoomID)
+        {
+            if (string.IsNullOrWhiteSpace(_organizationID) || string.IsNullOrWhiteSpace(_clientID))
+                return;
+
+            var serviceUnit = new ServiceUnit();
+            if (!serviceUnit.LoadByPrimaryKey(serviceUnitID))
+                return;
+
+            var serviceRoom = new ServiceRoom();
+            if (!serviceRoom.LoadByPrimaryKey(RoomID))
+                return;
+
+            var bed = new BedCollection();
+            bed.Query.Where(bed.Query.RoomID == RoomID, bed.Query.IsActive == true);
+            bed.LoadAll();
+
+            foreach (var bd in bed)
+            {
+                if (string.IsNullOrWhiteSpace(bd.BedID) || !string.IsNullOrWhiteSpace(bd.SatuSehatBridgingID)) continue;
+                //Process
+                PostBedJson(serviceUnit, RoomID, bd.BedID);
+            }
+        }
+        public RestResponse PostBedJson(ServiceUnit su, string RoomID, string BedID)
+        {
+
+            var srb = new ServiceRoomBridging();
+            var qsr = new ServiceRoomBridgingQuery("q");
+            qsr.Where(qsr.RoomID == RoomID, qsr.SRBridgingType == Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
+            qsr.es.Top = 1;
+            if (!srb.Load(qsr))
+                return null;
+
+            var bb = new Bed();
+            var bbq = new BedQuery("q");
+            bbq.Where(bbq.RoomID == RoomID, bbq.BedID == BedID);
+            bbq.es.Top = 1;
+            if (!bb.Load(bbq))
+                return null;
+
+            var accessToken = string.Empty;
+
+            var hc = new Healthcare();
+            hc.LoadByPrimaryKey(AppParameter.GetParameterValue(AppParameter.ParameterItem.HealthcareID));
+
+            var telecom = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Telecom>()
+            {
+                new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Telecom()
+                {
+                    System = "phone",
+                    Value = hc.PhoneNo,
+                    Use = "work",
+                },
+                 new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Telecom()
+                {
+                    System = "fax",
+                    Value = hc.FaxNo,
+                    Use = "work",
+                }
+            };
+
+            var postData = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Resource()
+            {
+                ResourceType = "Location",
+                Identifier = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Identifier>()
+                {
+                    new Bridging.SatuSehat.BusinessObject.Master.Location.Identifier()
+                    {
+                        System = String.Concat("http://sys-ids.kemkes.go.id/location/",_organizationID),
+                        Value = BedID
+                    }
+                },
+                Status = "active",
+                Name = string.Format("Bed {0},{1},{02}", BedID, srb.BridgingName, su.ServiceUnitName),
+                Description = string.Format("Bed {0},{1},{02}", BedID, srb.BridgingName, su.ServiceUnitName),
+                Mode = "instance",
+                Telecom = telecom,
+                Type = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PhysicalType>()
+                {
+                    new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PhysicalType()
+                    {
+                        Coding = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding>()
+                        {
+                            new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding()
+                            {
+                                System = "http://terminology.kemkes.go.id/CodeSystem/location-type",
+                                Code = "RT0004",
+                                Display = "Tempat Tidur"
+                            }
+                        }
+                    }
+                },
+                PhysicalType = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PhysicalType()
+                {
+                    Coding = new List<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding>()
+                    {
+                        new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Coding()
+                        {
+                            System = "http://terminology.hl7.org/CodeSystem/location-physical-type",
+                            Code = "bd",
+                            Display = "Bed",
+                        }
+                    },
+                },
+                Position = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.Position()
+                {
+                    Longitude = 1,
+                    Latitude = 1,
+                    Altitude = 1,
+                },
+                ManagingOrganization = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.ManagingOrganization()
+                {
+                    Reference = String.Concat("Organization/", _organizationID),
+                },
+                partOf = new Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.partOf()
+                {
+                    Reference = String.Concat("Location/", srb.BridgingID),
+                    Display = srb.BridgingName
+                }
+            };
+
+            var requestBody = JsonConvert.SerializeObject(postData);
+            var response = RestClientPost(requestBody, "Location", ref accessToken);
+            if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var resp = JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location.PostPutResponse>(response.Content);
+                //bb = new Bed();
+                bb.SatuSehatBridgingID = resp.Id;
+                bb.SatuSehatBridgingName = resp.Name;
+                bb.Save();
+            }
+            return response;
+        }
         #endregion
 
         #region ILP SATUSEHAT

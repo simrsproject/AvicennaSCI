@@ -180,7 +180,10 @@ namespace Temiang.Avicenna.BusinessObject
 						case "IsVisibleTo3rdParty": this.str.IsVisibleTo3rdParty = (string)value; break;
 						case "DefaultChargeClassID": this.str.DefaultChargeClassID = (string)value; break;
 						case "Notes": this.str.Notes = (string)value; break;
-					}
+                        case "BridgingID": this.str.BridgingID = (string)value; break;
+                        case "SatuSehatBridgingID": this.str.SatuSehatBridgingID = (string)value; break;
+                        case "SatuSehatBridgingName": this.str.SatuSehatBridgingName = (string)value; break;
+                    }
 				}
 				else
 				{
@@ -477,36 +480,81 @@ namespace Temiang.Avicenna.BusinessObject
 				base.SetSystemString(BedMetadata.ColumnNames.Notes, value);
 			}
 		}
+        /// <summary>
+        /// Maps to Bed.BridgingID
+        /// </summary>
+        virtual public System.String BridgingID
+        {
+            get
+            {
+                return base.GetSystemString(BedMetadata.ColumnNames.BridgingID);
+            }
 
-		#endregion
+            set
+            {
+                base.SetSystemString(BedMetadata.ColumnNames.BridgingID, value);
+            }
+        }
+        /// <summary>
+        /// Maps to Bed.SatuSehatBridgingID
+        /// </summary>
+        virtual public System.String SatuSehatBridgingID
+        {
+            get
+            {
+                return base.GetSystemString(BedMetadata.ColumnNames.SatuSehatBridgingID);
+            }
 
-		#region String Properties
+            set
+            {
+                base.SetSystemString(BedMetadata.ColumnNames.SatuSehatBridgingID, value);
+            }
+        }
+        /// <summary>
+        /// Maps to Bed.SatuSehatBridgingName
+        /// </summary>
+        virtual public System.String SatuSehatBridgingName
+        {
+            get
+            {
+                return base.GetSystemString(BedMetadata.ColumnNames.SatuSehatBridgingName);
+            }
 
-		/// <summary>
-		/// Converts an entity's properties to
-		/// and from strings.
-		/// </summary>
-		/// <remarks>
-		/// The str properties Get and Set provide easy conversion
-		/// between a string and a property's data type. Not all
-		/// data types will get a str property.
-		/// </remarks>
-		/// <example>
-		/// Set a datetime from a string.
-		/// <code>
-		/// Employees entity = new Employees();
-		/// entity.LoadByPrimaryKey(10);
-		/// entity.str.HireDate = "2007-01-01 00:00:00";
-		/// entity.Save();
-		/// </code>
-		/// Get a datetime as a string.
-		/// <code>
-		/// Employees entity = new Employees();
-		/// entity.LoadByPrimaryKey(10);
-		/// string theDate = entity.str.HireDate;
-		/// </code>
-		/// </example>
-		[BrowsableAttribute(false)]
+            set
+            {
+                base.SetSystemString(BedMetadata.ColumnNames.SatuSehatBridgingName, value);
+            }
+        }
+
+        #endregion
+
+        #region String Properties
+
+        /// <summary>
+        /// Converts an entity's properties to
+        /// and from strings.
+        /// </summary>
+        /// <remarks>
+        /// The str properties Get and Set provide easy conversion
+        /// between a string and a property's data type. Not all
+        /// data types will get a str property.
+        /// </remarks>
+        /// <example>
+        /// Set a datetime from a string.
+        /// <code>
+        /// Employees entity = new Employees();
+        /// entity.LoadByPrimaryKey(10);
+        /// entity.str.HireDate = "2007-01-01 00:00:00";
+        /// entity.Save();
+        /// </code>
+        /// Get a datetime as a string.
+        /// <code>
+        /// Employees entity = new Employees();
+        /// entity.LoadByPrimaryKey(10);
+        /// string theDate = entity.str.HireDate;
+        /// </code>
+        /// </example>
+        [BrowsableAttribute(false)]
 		public esStrings str
 		{
 			get
@@ -750,7 +798,49 @@ namespace Temiang.Avicenna.BusinessObject
 					else entity.Notes = Convert.ToString(value);
 				}
 			}
-			private esBed entity;
+            public System.String BridgingID
+            {
+                get
+                {
+                    System.String data = entity.BridgingID;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.BridgingID = null;
+                    else entity.BridgingID = Convert.ToString(value);
+                }
+            }
+            public System.String SatuSehatBridgingID
+            {
+                get
+                {
+                    System.String data = entity.SatuSehatBridgingID;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.SatuSehatBridgingID = null;
+                    else entity.SatuSehatBridgingID = Convert.ToString(value);
+                }
+            }
+            public System.String SatuSehatBridgingName
+            {
+                get
+                {
+                    System.String data = entity.SatuSehatBridgingName;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.SatuSehatBridgingName = null;
+                    else entity.SatuSehatBridgingName = Convert.ToString(value);
+                }
+            }
+            private esBed entity;
 		}
 		#endregion
 
@@ -924,7 +1014,30 @@ namespace Temiang.Avicenna.BusinessObject
 			}
 		}
 
-	}
+        public esQueryItem BridgingID
+        {
+            get
+            {
+                return new esQueryItem(this, BedMetadata.ColumnNames.BridgingID, esSystemType.String);
+            }
+        }
+
+        public esQueryItem SatuSehatBridgingID
+        {
+            get
+            {
+                return new esQueryItem(this, BedMetadata.ColumnNames.SatuSehatBridgingID, esSystemType.String);
+            }
+        }
+
+        public esQueryItem SatuSehatBridgingName
+        {
+            get
+            {
+                return new esQueryItem(this, BedMetadata.ColumnNames.SatuSehatBridgingName, esSystemType.String);
+            }
+        }
+    }
 
 	[System.Diagnostics.DebuggerDisplay("Count = {Count}")]
 	[Serializable]
@@ -1404,8 +1517,25 @@ namespace Temiang.Avicenna.BusinessObject
 			c.IsNullable = true;
 			_columns.Add(c);
 
+            c = new esColumnMetadata(BedMetadata.ColumnNames.BridgingID, 16, typeof(System.String), esSystemType.String);
+            c.PropertyName = BedMetadata.PropertyNames.BridgingID;
+            c.CharacterMaxLength = 50;
+            c.IsNullable = true;
+            _columns.Add(c);
 
-		}
+            c = new esColumnMetadata(BedMetadata.ColumnNames.SatuSehatBridgingID, 17, typeof(System.String), esSystemType.String);
+            c.PropertyName = BedMetadata.PropertyNames.SatuSehatBridgingID;
+            c.CharacterMaxLength = 50;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(BedMetadata.ColumnNames.SatuSehatBridgingName, 18, typeof(System.String), esSystemType.String);
+            c.PropertyName = BedMetadata.PropertyNames.SatuSehatBridgingName;
+            c.CharacterMaxLength = 50;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+        }
 		#endregion
 
 		static public BedMetadata Meta()
@@ -1447,7 +1577,10 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string IsVisibleTo3rdParty = "IsVisibleTo3rdParty";
 			public const string DefaultChargeClassID = "DefaultChargeClassID";
 			public const string Notes = "Notes";
-		}
+            public const string BridgingID = "BridgingID";
+            public const string SatuSehatBridgingID = "SatuSehatBridgingID";
+            public const string SatuSehatBridgingName = "SatuSehatBridgingName";
+        }
 		#endregion
 
 		#region PropertyNames
@@ -1469,7 +1602,10 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string IsVisibleTo3rdParty = "IsVisibleTo3rdParty";
 			public const string DefaultChargeClassID = "DefaultChargeClassID";
 			public const string Notes = "Notes";
-		}
+            public const string BridgingID = "BridgingID";
+            public const string SatuSehatBridgingID = "SatuSehatBridgingID";
+            public const string SatuSehatBridgingName = "SatuSehatBridgingName";
+        }
 		#endregion
 
 		public esProviderSpecificMetadata GetProviderMetadata(string mapName)
@@ -1528,9 +1664,12 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("IsVisibleTo3rdParty", new esTypeMap("bit", "System.Boolean"));
 				meta.AddTypeMap("DefaultChargeClassID", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("Notes", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("BridgingID", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("SatuSehatBridgingID", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("SatuSehatBridgingName", new esTypeMap("varchar", "System.String"));
 
 
-				meta.Source = "Bed";
+                meta.Source = "Bed";
 				meta.Destination = "Bed";
 				meta.spInsert = "proc_BedInsert";
 				meta.spUpdate = "proc_BedUpdate";

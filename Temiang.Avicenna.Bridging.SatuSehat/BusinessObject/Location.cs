@@ -48,6 +48,9 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location
         [JsonProperty("mode")]
         public string Mode { get; set; }
 
+        [JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
+        public List<PhysicalType> Type { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -65,6 +68,9 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location
 
         [JsonProperty("telecom")]
         public List<Telecom> Telecom { get; set; }
+
+        [JsonProperty("partOf", NullValueHandling = NullValueHandling.Ignore)]
+        public partOf partOf { get; set; }
     }
 
 
@@ -196,5 +202,13 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.Master.Location
         public string Use { get; set; }
     }
 
+    public class partOf
+    {
+        [JsonProperty("reference")]
+        public string Reference { get; set; }
+
+        [JsonProperty("display", NullValueHandling = NullValueHandling.Ignore)]
+        public string Display { get; set; }
+    }
 
 }
