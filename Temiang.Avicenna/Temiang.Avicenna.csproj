@@ -2043,6 +2043,7 @@
     <Content Include="Document\2026\03\26\01.CreateTable_BpjsRujukanSatuSehat.sql" />
     <Content Include="Document\2026\03\26\02.Insert_AppProgram_BpjsRujukanSatuSehat.sql" />
     <Content Include="Document\2026\04\08\080103. ReferExternal - alter table.sql" />
+    <Content Include="Document\2026\04\08\01. Insert AppStandardReferenceItem.sql" />
     <Content Include="Document\2026\04\08\103004. Snomedct - Insert.sql" />
     <Content Include="Document\2026\04\08\103003. ItemLaboratory - Alter .sql" />
     <Content Include="Document\2026\04\08\103002. TransChargesItem - Alter.sql" />
