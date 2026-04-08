@@ -2980,6 +2980,524 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
 
         #endregion Lab
 
+        #region 08.A Pemeriksaan Penunjang - Radiologi
+        public void PostServiceRequestRad(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string encounterId, ref string accessToken)
+        {
+            var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
+            var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
+
+            //// Load latest diagnosis
+            //var epsdiag = new EpisodeDiagnose();
+            //epsdiag.Query.es.Top = 1;
+            //epsdiag.Query.Where(
+            //    epsdiag.Query.RegistrationNo == reg.RegistrationNo,
+            //    epsdiag.Query.SRDiagnoseType.In("DiagnoseType-001", "DiagnoseType-006"),
+            //    epsdiag.Query.IsVoid == false
+            //);
+            //epsdiag.Query.OrderBy(epsdiag.Query.CreateDateTime.Descending);
+            //var isEpsDiag = epsdiag.Query.Load();
+
+            //// Validate the diagnosis
+            //var epDiagnose = isEpsDiag ? new Diagnose
+            //{
+            //    DiagnoseID = epsdiag.DiagnoseID,
+            //    DiagnoseName = epsdiag.DiagnosisText
+            //} : null;
+
+            //if (epDiagnose == null)
+            //    return; // Skip if no valid diagnosis
+
+            // Query charge items
+            var query = new TransChargesItemQuery("a");
+            var tc = new TransChargesQuery("b");
+            query.LeftJoin(tc).On(query.TransactionNo == tc.TransactionNo);
+            var item = new ItemQuery("i");
+            query.LeftJoin(item).On(query.ItemID == item.ItemID);
+            query.Where(
+                tc.RegistrationNo == reg.RegistrationNo,
+                tc.IsOrder == true,
+                tc.IsApproved == true,
+                query.Or(
+                    tc.ToServiceUnitID == serviceUnitRadiologyID,
+                    tc.ToServiceUnitID.In(serviceUnitRadiologyIdArray)
+                ),
+                query.IsOrderRealization == true,
+                query.IsVoid == false,
+                item.SRItemType == ItemType.Radiology
+            );
+            query.Select(
+                query.TransactionNo,
+                query.SequenceNo,
+                query.ItemID,
+                item.ItemName,
+                item.ItemGroupID,
+                query.Notes.As("ItemNotes"),
+                tc.Notes.As("HeaderNotes"),
+                tc.ApprovedDateTime,
+                query.ResultValue
+            );
+
+            var dtb = query.LoadDataTable();
+            foreach (DataRow row in dtb.Rows)
+            {
+                var itemSs = new ItemBridging();
+                itemSs.Query.Where(
+                    itemSs.Query.ItemID == row["ItemID"].ToString(),
+                    itemSs.Query.SRBridgingType == _satuSehatBridgingType
+                );
+                itemSs.Query.es.Top = 1;
+
+                if (itemSs.Query.Load() && !string.IsNullOrWhiteSpace(itemSs.BridgingID))
+                {
+                    var loincItem = new LoincItem();
+                    if (loincItem.LoadByPrimaryKey("RAD", itemSs.BridgingID))
+                    {
+                        var itemData = new Item
+                        {
+                            ItemID = row["ItemID"].ToString(),
+                            ItemName = row["ItemName"].ToString(),
+                            ItemGroupID = row["ItemGroupID"].ToString()
+                        };
+
+                        var approvedDate = row["ApprovedDateTime"] != DBNull.Value
+                            ? Convert.ToDateTime(row["ApprovedDateTime"])
+                            : DateTime.Now;
+
+                        PostServiceRequestItemRad(
+                            reg,
+                            patSs,
+                            parMedSs,
+                            row["TransactionNo"].ToString(),
+                            row["SequenceNo"].ToString(),
+                            row["ResultValue"].ToString(),
+                            itemData,
+                            approvedDate,
+                            row["HeaderNotes"]?.ToString(),
+                            row["ItemNotes"]?.ToString(),
+                            loincItem,
+                            //epDiagnose,
+                            encounterId,
+                            ref accessToken
+                        );
+                    }
+                }
+            }
+        }
+
+        private void PostServiceRequestItemRad(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string transactionNo, string sequenceNo, string resultValue, Item itemName, DateTime approvedDateTime, string headerNotes, string itemNotes, LoincItem loincItem,/* Diagnose epDiagnose, */ string encounterId, ref string accessToken)
+        {
+            //Check status kirim
+            var ssResult = LoadSatuSehatResult(encounterId, "ServiceRequest", transactionNo, sequenceNo);
+            if (ssResult != null && ssResult.ResultID != null) return;
+
+            var itg = new ItemGroup();
+            itg.LoadByPrimaryKey(itemName.ItemGroupID);
+
+            string accessionValue;
+
+            if (!string.IsNullOrWhiteSpace(resultValue)) 
+            {
+                accessionValue = resultValue;
+            }
+            else if (Temiang.Avicenna.Common.AppSession.Parameter.HealthcareInitialAppsVersion == "RSIMT")
+            {
+                accessionValue =
+                    $"{new string(transactionNo.Where(char.IsDigit).ToArray())}" +
+                    $"{sequenceNo.Substring(sequenceNo.Length - 1)}";
+            }
+            else if (Temiang.Avicenna.Common.AppSession.Parameter.RisPacsInteropVendor == "ELVA")
+            {
+                accessionValue =
+                    $"{transactionNo}" +
+                    $"{sequenceNo.Substring(sequenceNo.Length - 2)}";
+            }
+            else if (Temiang.Avicenna.Common.AppSession.Parameter.RisPacsInteropVendor == "INTIWID")
+            {
+                var orderno = string.Empty;
+
+                foreach (var c in transactionNo.ToCharArray())
+                {
+                    if (!int.TryParse(c.ToString(), out int number)) continue;
+                    if (number == 0) continue;
+                    orderno += number.ToString();
+                }
+
+                accessionValue = orderno;
+            }
+            else
+            {
+                accessionValue =
+                    $"{transactionNo.Replace("-", "")}" +
+                    $"{sequenceNo.Substring(sequenceNo.Length - 2)}";
+            }
+
+            var postData = new
+            {
+                resourceType = "ServiceRequest",
+                identifier = new List<object>() {
+                    new {
+                        system= string.Format( "http://sys-ids.kemkes.go.id/servicerequest/{0}",_organizationID),
+                        value = string.IsNullOrWhiteSpace(resultValue) ? $"{transactionNo}-{sequenceNo}" : resultValue //accession number
+                },
+                new {
+                    use = "usual",
+                    type = new {
+                        coding = new List<object>() {
+                            new {
+                                system = "http://terminology.hl7.org/CodeSystem/v2-0203",
+                                code = "ACSN"
+                            }
+                        }
+                    },
+                        system = $"http://sys-ids.kemkes.go.id/acsn/{_organizationID}",
+                        value = accessionValue //ACCNO
+                    }
+                },
+                status = "active",
+                intent = "original-order",
+                priority = "routine",
+                category = new List<object>() {
+                    new {
+                        coding= new List<object>() {
+                            new {
+                                system= "http://snomed.info/sct",
+                                code= "363679005",
+                                display= "Imaging"
+                            }
+                        }
+                    }
+                },
+                code = new
+                {
+                    coding = new List<object>() { new
+                        {
+                        system= "http://loinc.org",
+                        code= loincItem.Code,
+                        display= loincItem.Display
+                        }
+                    },
+                    text = loincItem.Display
+                },
+                orderDetail = new List<object>() {
+                    new {
+                        coding = new List<object>() {
+                            new {
+                                system = "http://dicom.nema.org/resources/ontology/DCM",
+                                code = itg.Initial.Substring(itg.Initial.Length - 2)
+                            }
+                        },
+                        text = $"Modality Code: {itg.Initial.Substring(itg.Initial.Length - 2)}"
+                    },
+                        new {
+                            coding = new List<object>() {
+                                new {
+                                    system = "http://sys-ids.kemkes.go.id/ae-title",
+                                    display = itg.Initial.Substring(itg.Initial.Length - 2)
+                                }
+                            }
+                        }
+                    },
+                subject = new
+                {
+                    reference = $"Patient/{patSs.BridgingID}"
+                },
+                encounter = new
+                {
+                    reference = $"Encounter/{encounterId}",
+                    display = $"Permintaan {loincItem.Display} {patSs.BridgingName} di hari {_dayNames[reg.RegistrationDate.Value.DayOfWeek.ToInt()]} pukul {approvedDateTime.AddHours(_gmtDif):HH:mm} WIB"
+                },
+                occurrenceDateTime = $"{approvedDateTime.AddHours(_gmtDif):yyyy-MM-ddTHH:mm:ss}+00:00",
+                requester = new
+                {
+                    reference = $"Practitioner/{parMedSs.BridgingID}",
+                    display = parMedSs.BridgingName
+                },
+                performer = new List<object>() {
+                        new {
+                            reference = $"Practitioner/{parMedSs.BridgingID}",
+                            display = parMedSs.BridgingName
+                        }
+                    }
+                //reasonCode = new List<object>() {
+                //    new {
+                //        coding = new List<object>() {
+                //            new {
+                //                system = "http://hl7.org/fhir/sid/icd-10",
+                //                code = epDiagnose.DiagnoseID,
+                //                display = epDiagnose.DiagnoseName
+                //            }
+                //        }
+                //    }
+                //}
+            };
+
+            if (ssResult == null)
+            {
+                ssResult = new SatuSehatResult()
+                {
+                    EncounterID = new Guid(encounterId),
+                    Category = transactionNo,
+                    Code = sequenceNo
+                };
+            }
+
+            var requestBody = JsonConvert.SerializeObject(postData);
+            RestClientPostAndSaveLog("ServiceRequest", requestBody, ssResult, ref accessToken);
+        }
+
+        private void GetImagingStudy(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string trno, string seqno, string encounterId, ref string accessToken)
+        {
+            var ssResult = LoadSatuSehatResult(encounterId, "ImagingStudy", trno, seqno);
+            if (ssResult != null && ssResult.ResultID != null) return;
+
+            var util = new Bridging.SatuSehat.Utils();
+            var token = accessToken;
+
+            string orgId = _organizationID;
+            string acsn = $"{trno.Replace("-", "")}{seqno.Substring(seqno.Length - 2)}"; //accession number
+            string identifierQuery = $"identifier=http://sys-ids.kemkes.go.id/acsn/{orgId}|{acsn}";
+
+            var response = util.RestClientGet($"ImagingStudy?{identifierQuery}", string.Empty, ref token);
+
+            accessToken = token;
+
+            if (response.StatusCode == System.Net.HttpStatusCode.OK || response.StatusCode == System.Net.HttpStatusCode.Created)
+            {
+                var imagingStudyResponse = JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.ImagingStudyResponse.ImagingStudyResponse>(response.Content);
+
+                if (imagingStudyResponse.Total > 0 && imagingStudyResponse.Entry != null && imagingStudyResponse.Entry.Count > 0)
+                {
+                    var firstResource = imagingStudyResponse.Entry[0].Resource;
+
+                    if (ssResult == null)
+                    {
+                        ssResult = new SatuSehatResult()
+                        {
+                            EncounterID = new Guid(encounterId),
+                            Category = trno,
+                            Code = seqno
+                        };
+                    }
+
+                    ssResult.ResultID = Guid.Parse(firstResource.Id);
+
+                    var requestBody = JsonConvert.SerializeObject(imagingStudyResponse);
+                    RestClientPostAndSaveLog("ImagingStudy", requestBody, ssResult, ref accessToken);
+
+                    //PostObservationRad(reg, patSs, parMedSs, trno, seqno, firstResource.Id ,encounterId, ref accessToken);
+                }
+                else
+                {
+                    Console.WriteLine("No ImagingStudy found for the given identifier.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Failed to retrieve ImagingStudy. StatusCode: {response.StatusCode}");
+            }
+        }
+
+        //private void PostObservationRad(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string transactionNo, string sequenceNo, Item itemName, DateTime approvedDateTime, string observationValueString, string encounterId, ref string accessToken)
+        //{
+        //    var ssResult = LoadSatuSehatResult(encounterId, "Observation", transactionNo, sequenceNo);
+        //    if (ssResult != null && ssResult.ResultID != null) return;
+
+        //    var postData = new
+        //    {
+        //        resourceType = "Observation",
+        //        identifier = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                system = $"http://sys-ids.kemkes.go.id/observation/{_organizationID}",
+        //                value = $"{transactionNo}-{sequenceNo}"
+        //            }
+        //        },
+        //        status = "final",
+        //        category = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                coding = new List<object>()
+        //                {
+        //                    new
+        //                    {
+        //                        system = "http://terminology.hl7.org/CodeSystem/observation-category",
+        //                        code = "imaging",
+        //                        display = "Imaging"
+        //                    }
+        //                }
+        //            }
+        //        },
+        //        code = new
+        //        {
+        //            coding = new List<object>()
+        //            {
+        //                new
+        //                {
+        //                    system = "http://loinc.org",
+        //                    code = itemName.ItemID,
+        //                    display = itemName.ItemName
+        //                }
+        //            }
+        //        },
+        //        subject = new
+        //        {
+        //            reference = $"Patient/{patSs.BridgingID}",
+        //            display = patSs.BridgingName
+        //        },
+        //        encounter = new
+        //        {
+        //            reference = $"Encounter/{encounterId}"
+        //        },
+        //        effectiveDateTime = $"{approvedDateTime.AddHours(_gmtDif):yyyy-MM-ddTHH:mm:ss}+00:00",
+        //        issued = $"{approvedDateTime.AddHours(_gmtDif):yyyy-MM-ddTHH:mm:ss}+00:00",
+        //        performer = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"Practitioner/{parMedSs.BridgingID}",
+        //                display = parMedSs.BridgingName
+        //            }
+        //        },
+        //        valueString = observationValueString,
+        //        basedOn = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"ServiceRequest/{serviceRequestId}"
+        //            }
+        //        },
+        //        derivedFrom = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"ImagingStudy/{imagingStudyId}"
+        //            }
+        //        }
+        //    };
+
+        //    if (ssResult == null)
+        //    {
+        //        ssResult = new SatuSehatResult()
+        //        {
+        //            EncounterID = new Guid(encounterId),
+        //            Category = transactionNo,
+        //            Code = sequenceNo
+        //        };
+        //    }
+
+        //    var requestBody = JsonConvert.SerializeObject(postData);
+        //    RestClientPostAndSaveLog("Observation", requestBody, ssResult, ref accessToken);
+        //}
+
+        //private void PostDiagnosticReportRad(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string transactionNo, string sequenceNo, Item itemName, DateTime approvedDateTime, string imagingStudyId, string observationId, string serviceRequestId, string encounterId, string conclusion, ref string accessToken)
+        //{
+        //    var ssResult = LoadSatuSehatResult(encounterId, "DiagnosticReport", transactionNo, sequenceNo);
+        //    if (ssResult != null && ssResult.ResultID != null) return;
+
+        //    var postData = new
+        //    {
+        //        resourceType = "DiagnosticReport",
+        //        identifier = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                system = $"http://sys-ids.kemkes.go.id/diagnostic/{_organizationID}/rad",
+        //                use = "official",
+        //                value = $"{transactionNo}-{sequenceNo}"
+        //            }
+        //        },
+        //        status = "final",
+        //        category = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                coding = new List<object>()
+        //                {
+        //                    new
+        //                    {
+        //                        system = "http://terminology.hl7.org/CodeSystem/v2-0074",
+        //                        code = "RAD",
+        //                        display = "Radiology"
+        //                    }
+        //                }
+        //            }
+        //        },
+        //        code = new
+        //        {
+        //            coding = new List<object>()
+        //            {
+        //                new
+        //                {
+        //                    system = "http://loinc.org",
+        //                    code = itemName.ItemID,
+        //                    display = itemName.ItemName
+        //                }
+        //            }
+        //        },
+        //        subject = new
+        //        {
+        //            reference = $"Patient/{patSs.BridgingID}"
+        //        },
+        //        encounter = new
+        //        {
+        //            reference = $"Encounter/{encounterId}"
+        //        },
+        //        effectiveDateTime = $"{approvedDateTime.AddHours(_gmtDif):yyyy-MM-ddTHH:mm:ss}+00:00",
+        //        issued = $"{approvedDateTime.AddHours(_gmtDif):yyyy-MM-ddTHH:mm:ss}+00:00",
+        //        performer = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"Practitioner/{parMedSs.BridgingID}",
+        //                display = parMedSs.BridgingName
+        //            },
+        //            new
+        //            {
+        //                reference = $"Organization/{_organizationID}"
+        //            }
+        //        },
+        //        imagingStudy = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"ImagingStudy/{imagingStudyId}"
+        //            }
+        //        },
+        //        result = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"Observation/{observationId}"
+        //            }
+        //        },
+        //        basedOn = new List<object>()
+        //        {
+        //            new
+        //            {
+        //                reference = $"ServiceRequest/{serviceRequestId}"
+        //            }
+        //        },
+        //        conclusion = conclusion
+        //    };
+
+        //    if (ssResult == null)
+        //    {
+        //        ssResult = new SatuSehatResult()
+        //        {
+        //            EncounterID = new Guid(encounterId),
+        //            Category = transactionNo,
+        //            Code = sequenceNo
+        //        };
+        //    }
+
+        //    var requestBody = JsonConvert.SerializeObject(postData);
+        //    RestClientPostAndSaveLog("DiagnosticReport", requestBody, ssResult, ref accessToken);
+        //}
+
+        #endregion Rad
+
         #region Pemeriksaan Penunjang Lab Offline
 
         public void PostServiceRequestLabOff(Registration reg, PatientBridging patSs, ParamedicBridging parMedSs, string encounterId, ref string accessToken)
@@ -6204,6 +6722,101 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
         }
 
         #endregion Pelayanan Rawat Jalan
+
+        #region RAD
+        private string EncounterAndRadOrderPost(string registrationNo)
+        {
+            string accessToken = string.Empty;
+            Registration reg = null;
+            PatientBridging patSs = null;
+            ParamedicBridging parMedicSs = null;
+            SatuSehatKunjungan satuSehatLog = null;
+            ServiceUnitBridging locSs = null;
+
+            // Step 1 Post Encounter
+            var encounterId = EncounterPost(registrationNo, ref satuSehatLog, ref reg, ref patSs, ref parMedicSs, ref locSs, ref accessToken, false);
+
+            if (!string.IsNullOrEmpty(encounterId))
+            {
+                var dtbDiagnosisResult = PostDiagnosis(reg, patSs, encounterId, ref accessToken);
+
+                PostServiceRequestRad(reg, patSs, parMedicSs, encounterId, ref accessToken);
+            }
+            return encounterId;
+        }
+
+        public string OrderRadRealization(string radOrderNo)
+        {
+            var org = new AppParameter();
+            if (!org.LoadByPrimaryKey("SatuSehatOrganizationID")) return OrderRadInfVal("error", "10", "SatuSehatOrganizationID empty");
+
+            var tc = new TransCharges();
+            if (!tc.LoadByPrimaryKey(radOrderNo)) return OrderRadInfVal("error", "10", "Rad Order not found");
+
+            var encounterId = string.Empty;
+            var satuSehatLog = new SatuSehatKunjungan();
+            if (satuSehatLog.LoadByPrimaryKey(tc.RegistrationNo))
+            {
+                if (satuSehatLog.EncounterID != null)
+                {
+                    encounterId = satuSehatLog.EncounterID.ToString();
+                }
+                else
+                    encounterId = EncounterAndRadOrderPost(tc.RegistrationNo);
+            }
+            else
+            {
+                encounterId = EncounterAndRadOrderPost(tc.RegistrationNo);
+            }
+
+            if (!string.IsNullOrEmpty(encounterId))
+            {
+                var reg = new Registration();
+                reg.LoadByPrimaryKey(tc.RegistrationNo);
+
+                var satuSehatBridgingType = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+
+                var patSs = new PatientBridging();
+                if (!patSs.LoadByPrimaryKey(reg.PatientID, satuSehatBridgingType)) return OrderRadInfVal("error", "10", "Patient bridging not found");
+
+                var parMedicSs = new ParamedicBridging();
+                var pbQr = new ParamedicBridgingQuery("pb");
+                pbQr.Where(pbQr.ParamedicID == reg.ParamedicID, pbQr.SRBridgingType == satuSehatBridgingType);
+                pbQr.es.Top = 1;
+                parMedicSs = new ParamedicBridging();
+                if (!parMedicSs.Load((pbQr))) return OrderRadInfVal("error", "10", "Requester bridging not found");
+
+                return OrderRadInfVal("success", "", "", encounterId, patSs.BridgingID, patSs.BridgingName, parMedicSs.BridgingID, parMedicSs.BridgingName, org.ParameterValue);
+            }
+
+            satuSehatLog = new SatuSehatKunjungan();
+            if (satuSehatLog.LoadByPrimaryKey(tc.RegistrationNo))
+            {
+                if (!string.IsNullOrEmpty(satuSehatLog.ErrorResponse))
+                    return OrderRadInfVal("error", "10", satuSehatLog.ErrorResponse);
+            }
+            return OrderRadInfVal("error", "10", "Please contact IT Support");
+        }
+
+        private string OrderRadInfVal(string issueSeverity, string issueCode, string issueErrorMessage, string encounterId = "", string patientId = "", string patientName = "", string requesterId = "", string requesterName = "", string organizationId = "", string serviceRequestId = "")
+        {
+            var val = new
+            {
+                issue = new { severity = issueSeverity, code = issueCode, text = issueErrorMessage },
+                satuSehat = new
+                {
+                    encounterId = encounterId,
+                    patientId = patientId,
+                    patientName = patientName,
+                    requesterId = requesterId,
+                    requesterName = requesterName,
+                    organizationId = organizationId,
+                    serviceRequestId = serviceRequestId
+                }
+            };
+            return JsonConvert.SerializeObject(val);
+        }
+        #endregion
 
         #region Mapping ID
         public RestResponse PostServiceUnit(string serviceUnitID)

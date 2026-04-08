@@ -23,22 +23,27 @@
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterRegistrationNo">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterMedicalNo">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterPatientName">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterGuarantor">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdRegisteredList">
@@ -137,6 +142,25 @@
                             </td>
                             <td>
                             </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                <asp:Label ID="lblGuarantorID" runat="server" Text="Guarantor"></asp:Label>
+                            </td>
+                            <td class="entry">
+                                <telerik:RadComboBox ID="cboGuarantorID" runat="server" Width="300px" HighlightTemplatedItems="True"
+                                    MarkFirstMatch="False" EnableLoadOnDemand="true" NoWrap="False" OnItemDataBound="cboGuarantorID_ItemDataBound"
+                                    OnItemsRequested="cboGuarantorID_ItemsRequested">
+                                    <FooterTemplate>
+                                        Note : Show max 30 result
+                                    </FooterTemplate>
+                                </telerik:RadComboBox>
+                            </td>
+                            <td width="20">
+                                <asp:ImageButton ID="btnFilterGuarantor" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                            <td></td>
                         </tr>
                     </table>
                 </td>
@@ -243,4 +267,7 @@
             <Selecting AllowRowSelect="True" />
         </ClientSettings>
     </telerik:RadGrid>
+    <telerik:RadAjaxPanel ID="RadAjaxPanel1" runat="server" Width="100%" LoadingPanelID="fw_ajxLoadingPanel"
+        EnableEmbeddedScripts="false">
+    </telerik:RadAjaxPanel>
 </asp:Content>

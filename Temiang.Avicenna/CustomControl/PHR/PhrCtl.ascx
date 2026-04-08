@@ -88,6 +88,32 @@
             oWnd.center();
             oWnd.show();
         }
+
+        //20260112 Update by Wiliam - Untuk simpan nilai formula 
+        function getValueSafe(id) {
+            if (typeof $find === "function") {
+                var o = $find(id);
+
+                if (o && typeof o.get_value === "function") {
+                    var v = o.get_value();
+                    return (v === null || v === "") ? 0 : v;
+                }
+            }
+
+            var radios = document.querySelectorAll(
+                "input[type='radio'][id^='" + id + "_'], " +
+                "input[type='radio'][name*='" + id.replace(/_/g, '$') + "']"
+            );
+
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    console.log("   RBT value:", radios[i].value);
+                    return radios[i].value;
+                }
+            }
+
+            return 0;
+        }
     </script>
 </telerik:RadCodeBlock>
 <telerik:RadWindow runat="server" Animation="None" Width="800px" Height="620px" Behavior="Move, Close,Maximize,Resize"

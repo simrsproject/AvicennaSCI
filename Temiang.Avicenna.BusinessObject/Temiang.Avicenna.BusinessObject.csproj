@@ -149,6 +149,7 @@
     <Compile Include="Common\Utils.cs" />
     <Compile Include="Custom\AppStandardReferenceItemBridging.cs" />
     <Compile Include="Custom\CompliancePatientFallRiskPreventionDetail.cs" />
+    <Compile Include="Custom\DietBridging.cs" />
     <Compile Include="Custom\ErrorMessage.cs" />
     <Compile Include="Custom\ClosingVisiteDownPaymentItem.cs" />
     <Compile Include="Custom\CssdDecontaminationItem.cs" />
@@ -220,6 +221,7 @@
     <Compile Include="Custom\RlTxReport52V2025.cs" />
     <Compile Include="Custom\RlTxReport53V2025.cs" />
     <Compile Include="Custom\RlTxReport37V2025.cs" />
+    <Compile Include="Custom\SatuSehatILPTemplateDetailKeyWord.cs" />
     <Compile Include="Custom\ServiceFee.cs" />
     <Compile Include="Custom\ServiceFeeRsucdr.cs" />
     <Compile Include="Custom\ServiceFeeRemunRsucdrDeductions.cs" />
@@ -283,6 +285,7 @@
     <Compile Include="Custom\RenkinPeriode.cs" />
     <Compile Include="Custom\RiskManagementItem.cs" />
     <Compile Include="Custom\RlTxReport.cs" />
+    <Compile Include="Custom\ServiceRoomBridging.cs" />
     <Compile Include="Custom\System\AppField.cs" />
     <Compile Include="Custom\VisitPackageItem.cs" />
     <Compile Include="Custom\WageStructureAndScaleItem.cs" />
@@ -771,7 +774,10 @@
     <Compile Include="Generated\AppStandardReferenceItemBridging.cs" />
     <Compile Include="Generated\BpjsApol.cs" />
     <Compile Include="Generated\BpjsApolDetail.cs" />
+    <Compile Include="Generated\BpjsRujukanSatuSehat.cs" />
+    <Compile Include="Generated\BridgingTemplate.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
+    <Compile Include="Generated\DietBridging.cs" />
     <Compile Include="Generated\ImmunizationBridging.cs" />
     <Compile Include="Generated\Interop\SatusehatOrderedItems.cs" />
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />
@@ -893,6 +899,9 @@
     <Compile Include="Generated\RlTxReport53V2025.cs" />
     <Compile Include="Generated\RlTxReportV2025.cs" />
     <Compile Include="Generated\RlTxReport37v2025.cs" />
+    <Compile Include="Generated\SatuSehatILPPreparation.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplateDetail.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplateDetailKeyWord.cs" />
     <Compile Include="Generated\SatuSehatILPPreparation.cs" />
     <Compile Include="Generated\SatuSehatILPTemplate.cs" />
     <Compile Include="Generated\SatuSehatILPTemplateDetail.cs" />

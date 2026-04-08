@@ -1442,6 +1442,11 @@ namespace Temiang.Avicenna.Common
                 get { return IsYes(AppParameter.ParameterItem.IsUsingHisInteropToHcLab); }
             }
 
+            public static string RisPacsInteropVendor
+            {
+                get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.RisPacsInteropVendor)); }
+            }
+
             public static string HisInteropConfigName
             {
                 get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.HisInteropConfigName)); }
@@ -3496,6 +3501,18 @@ namespace Temiang.Avicenna.Common
                 {
                     return IsYes(AppParameter.ParameterItem.IsCheckinConfirmationUsingDetails);
                 }
+            }
+
+            public static bool IsCountPrintNumberForSpecificProgram
+            {
+                get
+                {
+                    return IsYes(AppParameter.ParameterItem.IsCountPrintNumberForSpecificProgram);
+                }
+            }
+            public static string ProgramIdPrintNumberForSpecificProgram
+            {
+                get { return Convert.ToString(GetParameterValue(AppParameter.ParameterItem.ProgramIdPrintNumberForSpecificProgram)); }
             }
 
             public static string FirstTimeCheckMarkForTransfusionMonitoring
@@ -5735,6 +5752,16 @@ namespace Temiang.Avicenna.Common
             public static bool IsUsingMultipleScoringSupervisor
             {
                 get { return IsYes(AppParameter.ParameterItem.IsUsingMultipleScoringSupervisor); }
+            }
+
+            public static bool IsDirectButtonBetweenKioskVersion
+            {
+                get { return IsYes(AppParameter.ParameterItem.IsDirectButtonBetweenKioskVersion); }
+            }
+
+            public static bool IsUsingSuggestion
+            {
+                get { return IsYes(AppParameter.ParameterItem.IsUsingSuggestion); }
             }
         }
 

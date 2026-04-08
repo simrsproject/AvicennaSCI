@@ -3002,6 +3002,48 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                             (txtSpecialProcedurePrice.Value ?? 0) + (txtSpecialProsthesisPrice.Value ?? 0) +
                             (txtSpecialInvestigationPrice.Value ?? 0) + (txtSpecialDrugPrice.Value ?? 0);
 
+                        //dializer
+                        var coll = new EpisodeProcedureCollection();
+                        coll.Query.Where(coll.Query.RegistrationNo == Request.QueryString["regno"]);
+                        coll.Query.Load();
+
+                        var coll2 = new EpisodeProcedureInaGroupperCollection();
+                        coll2.Query.Where(coll2.Query.RegistrationNo == Request.QueryString["regno"]);
+                        coll2.Query.Load();
+
+                        bool has3995 = coll?.Any(p => p.ProcedureID == "39.95") == true;
+                        bool has3995B = coll2?.Any(p => p.ProcedureID == "39.95") == true;
+                        bool dialyzerNotChosen = string.IsNullOrWhiteSpace(cboDializer.SelectedValue) || cboDializer.SelectedIndex < 0;
+
+                        if (has3995 && has3995B && dialyzerNotChosen)
+                        {
+                            cboDializer.SelectedValue = (AppSession.Parameter.HealthcareInitial == "RSMP") ? "1" : "0";
+
+                            decimal groupPrice = 0;
+                            var priceCandidate = grouper.ResponseInacbg.BaseTariff;
+
+                            if (!string.IsNullOrWhiteSpace(priceCandidate))
+                            {
+                                decimal.TryParse(
+                                    priceCandidate,
+                                    System.Globalization.NumberStyles.Any,
+                                    System.Globalization.CultureInfo.InvariantCulture,
+                                    out groupPrice
+                                );
+                            }
+
+                            txtGroupPrice.Value = Convert.ToDouble(groupPrice);
+                            //txtGroupPrice.Attributes.Add("style", "text-decoration: line-through; color: #999999;");
+                            //Page.ClientScript.RegisterStartupScript(
+                            //    this.GetType(), "strikeNumeric",
+                            //    $"document.getElementById('{txtGroupPrice.ClientID}_text').style.textDecoration='line-through';" +
+                            //    $"document.getElementById('{txtGroupPrice.ClientID}_text').style.color='#999999';", true);
+
+                            txtDializerPercentage.Text = "85%";
+                            txtDializer.Text = grouper.ResponseInacbg.Tariff;
+                            txtGrouperTotal.Value = Convert.ToDouble(grouper.ResponseInacbg.Tariff);
+                        }
+
                         ncc = new NccInacbg();
                         if (!ncc.LoadByPrimaryKey(Request.QueryString["regno"])) ncc = new NccInacbg();
                         ncc.CoverageAmount = Convert.ToDecimal(txtGroupPrice.Value);
@@ -4511,6 +4553,34 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                     btnFinalIna.Visible = true;
                     btnFinalIna.Enabled = !isGagal;
 
+                    if (cboDializer.SelectedValue == "0")
+                    {
+                        decimal groupPrice = 0;
+                        var priceCandidate = data.BaseTariff;
+
+                        if (!string.IsNullOrWhiteSpace(priceCandidate))
+                        {
+                            decimal.TryParse(
+                                priceCandidate,
+                                System.Globalization.NumberStyles.Any,
+                                System.Globalization.CultureInfo.InvariantCulture,
+                                out groupPrice
+                            );
+                        }
+
+                        txtGroupPrice.Value = Convert.ToDouble(groupPrice);
+                        txtGroupPrice.Attributes.Add("style", "text-decoration: line-through; color: #999999;");
+                        Page.ClientScript.RegisterStartupScript(
+                            this.GetType(), "strikeNumeric",
+                            $"document.getElementById('{txtGroupPrice.ClientID}_text').style.textDecoration='line-through';" +
+                            $"document.getElementById('{txtGroupPrice.ClientID}_text').style.color='#999999';", true);
+
+
+                        txtDializerPercentage.Text = "85%";
+                        txtDializer.Text = data.Tariff;
+                        txtGrouperTotal.Value = Convert.ToDouble(data.Tariff);
+                    }
+
                     if (isGagal)
                     {
                         ShowAlert("inacbg-group1-gagal", $"Grouping INACBG (Tahap 1) mengembalikan status {cbgDesc}");
@@ -4641,10 +4711,13 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                 ncc.SpecialProsthesisID = cboSpecialProsthesis.SelectedValue;
                 ncc.SpecialProsthesisAmount = Convert.ToDecimal(txtSpecialProsthesisPrice.Value ?? 0);
                 ncc.Save();
+
+                txtGrouperTotal.Value = (txtGroupPrice.Value ?? 0) + (txtChronicPrice.Value ?? 0) + (txtSubAcutePrice.Value ?? 0) +
+                    (txtSpecialProcedurePrice.Value ?? 0) + (txtSpecialProsthesisPrice.Value ?? 0) + (txtSpecialInvestigationPrice.Value ?? 0) + (txtSpecialDrugPrice.Value ?? 0);
             }
 
-            txtGrouperTotal.Value = (txtGroupPrice.Value ?? 0) + (txtChronicPrice.Value ?? 0) + (txtSubAcutePrice.Value ?? 0) +
-                (txtSpecialProcedurePrice.Value ?? 0) + (txtSpecialProsthesisPrice.Value ?? 0) + (txtSpecialInvestigationPrice.Value ?? 0) + (txtSpecialDrugPrice.Value ?? 0);
+            //txtGrouperTotal.Value = (txtGroupPrice.Value ?? 0) + (txtChronicPrice.Value ?? 0) + (txtSubAcutePrice.Value ?? 0) +
+            //    (txtSpecialProcedurePrice.Value ?? 0) + (txtSpecialProsthesisPrice.Value ?? 0) + (txtSpecialInvestigationPrice.Value ?? 0) + (txtSpecialDrugPrice.Value ?? 0);
 
             var reg = new Registration();
             reg.LoadByPrimaryKey(Request.QueryString["regno"]);

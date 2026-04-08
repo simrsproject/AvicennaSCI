@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Temiang.Avicenna.Module.Nutrient.Master {
-    
-    
-    public partial class DietDetail {
-        
+namespace Temiang.Avicenna.Module.Nutrient.Master
+{
+
+
+    public partial class DietDetail
+    {
+
         /// <summary>
         /// lblDietID control.
         /// </summary>
@@ -20,7 +22,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblDietID;
-        
+
         /// <summary>
         /// txtDietID control.
         /// </summary>
@@ -29,7 +31,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtDietID;
-        
+
         /// <summary>
         /// rfvDietID control.
         /// </summary>
@@ -38,7 +40,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvDietID;
-        
+
         /// <summary>
         /// lblDietName control.
         /// </summary>
@@ -47,7 +49,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblDietName;
-        
+
         /// <summary>
         /// txtDietName control.
         /// </summary>
@@ -56,7 +58,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtDietName;
-        
+
         /// <summary>
         /// rfvDietName control.
         /// </summary>
@@ -65,7 +67,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvDietName;
-        
+
         /// <summary>
         /// lblSRDietType control.
         /// </summary>
@@ -74,7 +76,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblSRDietType;
-        
+
         /// <summary>
         /// cboSRDietType control.
         /// </summary>
@@ -83,7 +85,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadComboBox cboSRDietType;
-        
+
         /// <summary>
         /// rfvSRDietType control.
         /// </summary>
@@ -92,7 +94,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvSRDietType;
-        
+
         /// <summary>
         /// lblPriorityNo control.
         /// </summary>
@@ -101,7 +103,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblPriorityNo;
-        
+
         /// <summary>
         /// txtPriorityNo control.
         /// </summary>
@@ -110,7 +112,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtPriorityNo;
-        
+
         /// <summary>
         /// Label2 control.
         /// </summary>
@@ -119,7 +121,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label Label2;
-        
+
         /// <summary>
         /// Label3 control.
         /// </summary>
@@ -128,7 +130,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label Label3;
-        
+
         /// <summary>
         /// Label4 control.
         /// </summary>
@@ -137,7 +139,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label Label4;
-        
+
         /// <summary>
         /// lblCalorie control.
         /// </summary>
@@ -146,7 +148,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblCalorie;
-        
+
         /// <summary>
         /// txtCalorie control.
         /// </summary>
@@ -155,7 +157,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCalorie;
-        
+
         /// <summary>
         /// txtCalorieMin control.
         /// </summary>
@@ -164,7 +166,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCalorieMin;
-        
+
         /// <summary>
         /// txtCalorieMax control.
         /// </summary>
@@ -173,7 +175,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCalorieMax;
-        
+
         /// <summary>
         /// txtCalorieInterval control.
         /// </summary>
@@ -182,7 +184,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCalorieInterval;
-        
+
         /// <summary>
         /// lblProtein control.
         /// </summary>
@@ -191,7 +193,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblProtein;
-        
+
         /// <summary>
         /// txtProtein control.
         /// </summary>
@@ -200,7 +202,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtProtein;
-        
+
         /// <summary>
         /// txtProteinMin control.
         /// </summary>
@@ -209,7 +211,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtProteinMin;
-        
+
         /// <summary>
         /// txtProteinMax control.
         /// </summary>
@@ -218,7 +220,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtProteinMax;
-        
+
         /// <summary>
         /// txtProteinInterval control.
         /// </summary>
@@ -227,7 +229,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtProteinInterval;
-        
+
         /// <summary>
         /// lblFat control.
         /// </summary>
@@ -236,7 +238,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblFat;
-        
+
         /// <summary>
         /// txtFat control.
         /// </summary>
@@ -245,7 +247,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFat;
-        
+
         /// <summary>
         /// txtFatMin control.
         /// </summary>
@@ -254,7 +256,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFatMin;
-        
+
         /// <summary>
         /// txtFatMax control.
         /// </summary>
@@ -263,7 +265,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFatMax;
-        
+
         /// <summary>
         /// txtFatInterval control.
         /// </summary>
@@ -272,7 +274,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFatInterval;
-        
+
         /// <summary>
         /// lblCarbohydrate control.
         /// </summary>
@@ -281,7 +283,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblCarbohydrate;
-        
+
         /// <summary>
         /// txtCarbohydrate control.
         /// </summary>
@@ -290,7 +292,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCarbohydrate;
-        
+
         /// <summary>
         /// txtCarbohydrateMin control.
         /// </summary>
@@ -299,7 +301,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCarbohydrateMin;
-        
+
         /// <summary>
         /// txtCarbohydrateMax control.
         /// </summary>
@@ -308,7 +310,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCarbohydrateMax;
-        
+
         /// <summary>
         /// txtCarbohydrateInterval control.
         /// </summary>
@@ -317,7 +319,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtCarbohydrateInterval;
-        
+
         /// <summary>
         /// lblSalt control.
         /// </summary>
@@ -326,7 +328,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblSalt;
-        
+
         /// <summary>
         /// txtSalt control.
         /// </summary>
@@ -335,7 +337,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtSalt;
-        
+
         /// <summary>
         /// txtSaltMin control.
         /// </summary>
@@ -344,7 +346,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtSaltMin;
-        
+
         /// <summary>
         /// txtSaltMax control.
         /// </summary>
@@ -353,7 +355,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtSaltMax;
-        
+
         /// <summary>
         /// txtSaltInterval control.
         /// </summary>
@@ -362,7 +364,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtSaltInterval;
-        
+
         /// <summary>
         /// lblFiber control.
         /// </summary>
@@ -371,7 +373,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblFiber;
-        
+
         /// <summary>
         /// txtFiber control.
         /// </summary>
@@ -380,7 +382,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFiber;
-        
+
         /// <summary>
         /// txtFiberMin control.
         /// </summary>
@@ -389,7 +391,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFiberMin;
-        
+
         /// <summary>
         /// txtFiberMax control.
         /// </summary>
@@ -398,7 +400,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFiberMax;
-        
+
         /// <summary>
         /// txtFiberInterval control.
         /// </summary>
@@ -407,7 +409,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtFiberInterval;
-        
+
         /// <summary>
         /// chkIsGetSnack control.
         /// </summary>
@@ -416,7 +418,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIsGetSnack;
-        
+
         /// <summary>
         /// chkIsActive control.
         /// </summary>
@@ -425,7 +427,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox chkIsActive;
-        
+
         /// <summary>
         /// tabDetail control.
         /// </summary>
@@ -434,7 +436,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTabStrip tabDetail;
-        
+
         /// <summary>
         /// mpgDetail control.
         /// </summary>
@@ -443,7 +445,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadMultiPage mpgDetail;
-        
+
         /// <summary>
         /// pgvMenu control.
         /// </summary>
@@ -452,7 +454,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadPageView pgvMenu;
-        
+
         /// <summary>
         /// grdDietMenu control.
         /// </summary>
@@ -461,7 +463,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadGrid grdDietMenu;
-        
+
         /// <summary>
         /// pgvComplication control.
         /// </summary>
@@ -470,7 +472,7 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadPageView pgvComplication;
-        
+
         /// <summary>
         /// grdDietComplication control.
         /// </summary>
@@ -479,5 +481,23 @@ namespace Temiang.Avicenna.Module.Nutrient.Master {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadGrid grdDietComplication;
+
+        /// <summary>
+        /// pgvAliasName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadPageView pgvAliasName;
+
+        /// <summary>
+        /// grdAliasName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadGrid grdAliasName;
     }
 }

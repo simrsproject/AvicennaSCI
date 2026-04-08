@@ -1418,6 +1418,7 @@
                     <telerik:AjaxUpdatedControl ControlID="litPatientDialysis" />
                     <telerik:AjaxUpdatedControl ControlID="litDiagnosis" />
                     <telerik:AjaxUpdatedControl ControlID="litWorkDiagnosis" />
+                    <telerik:AjaxUpdatedControl ControlID="litSuggestion" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdAssessment">
@@ -1431,6 +1432,7 @@
                     <telerik:AjaxUpdatedControl ControlID="lblFromServiceUnit" />
                     <telerik:AjaxUpdatedControl ControlID="lblFromRegistrationNo" />
                     <telerik:AjaxUpdatedControl ControlID="lblFromPhysician" />
+                    <telerik:AjaxUpdatedControl ControlID="litSuggestion" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdEpisodeProcedure">
@@ -1620,6 +1622,15 @@
                                         <asp:Label runat="server" ID="lblBpjsSepNo" Font-Bold="true" />
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td style="vertical-align: top;">Tgl Ranap Terakhir
+                                    </td>
+                                    <td style="vertical-align: top;">:
+                                    </td>
+                                    <td style="vertical-align: top;">
+                                        <asp:Label runat="server" ID="lblTglRanap" Font-Bold="true"/>
+                                    </td>
+                                </tr>
                                 <tr runat="server" id="trCovClass">
                                     <td style="vertical-align: top;">Cov. Class
                                     </td>
@@ -1659,7 +1670,37 @@
                         <asp:Label runat="server" ID="lblPhysicianTeam" />
                     </fieldset>
                 </cc:CollapsePanel>
+                <cc:CollapsePanel ID="cpnPlafond" runat="server" Width="100%" Title="Patient Billing">
+                        <%= string.Format("<div id=\"plafondt{0}\"></div>", RegistrationNo.ToString().Replace("/","_")) %>
+                        <script type="text/javascript">
+                            <%= AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsEmrListShowPlafondProgress) ? 
+                                string.Format("UpdateStateEmrList(\"{6}\",\"{6}{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{7}\");", RegistrationNo.ToString().Replace("/","_"),
+                                RegistrationNo, "", "", "", "", "plafondt",""):string.Empty%>
+                        </script>
 
+                        <div style="height: 10px">
+                        </div>
+                </cc:CollapsePanel>
+                <cc:CollapsePanel ID="cpnDiagnosis" runat="server" Width="100%" Title="">
+                    <fieldset>
+                        <legend>Initial Diagnose (Casemix)</legend>
+                        <asp:Literal runat="server" ID="litInitialDiagnose"></asp:Literal>
+                    </fieldset>
+                    <fieldset runat="server" id="fsSuggestion" style="background-color: #FFFF00;">
+                        <legend>Suggestion</legend>
+                        <asp:Literal runat="server" ID="litSuggestion"></asp:Literal>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Work Diagnose</legend>
+                        <asp:Literal runat="server" ID="litWorkDiagnosis"></asp:Literal>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Final Diagnose</legend>
+                        <asp:Literal runat="server" ID="litDiagnosis"></asp:Literal>
+                    </fieldset>
+                    <div style="height: 10px">
+                    </div>
+                </cc:CollapsePanel>
                 <cc:CollapsePanel ID="cpnReferFrom" runat="server" Width="100%" Title="Refer From Unit">
                     <fieldset id="fsetReferFrom" style="min-height: 80px;">
                         <table>
@@ -1696,18 +1737,7 @@
                         </table>
                     </fieldset>
                 </cc:CollapsePanel>
-                <div style="padding-top: 4px;">
-                    <cc:CollapsePanel ID="cpnPlafond" runat="server" Width="100%" Title="Patient Billing">
-                        <%= string.Format("<div id=\"plafondt{0}\"></div>", RegistrationNo.ToString().Replace("/","_")) %>
-                        <script type="text/javascript">
-                            <%= AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsEmrListShowPlafondProgress) ? 
-                                string.Format("UpdateStateEmrList(\"{6}\",\"{6}{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{7}\");", RegistrationNo.ToString().Replace("/","_"),
-                RegistrationNo, "", "", "", "", "plafondt",""):string.Empty%>
-</script>
-
-                        <div style="height: 10px">
-                        </div>
-                    </cc:CollapsePanel>
+                <div style="padding-top: 4px;">                    
                     <cc:CollapsePanel ID="cpnAllergies" runat="server" Width="100%" Title="Allergies<div id='divEditAlg' style='float: right;padding:4px'><a  href='#' onclick='javascript:entryPatientAllergy(); event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();'> <img src='../../../Images/Toolbar/edit16.png'  alt='edit' /></a></div>">
                         <asp:Literal runat="server" ID="litPatientAllergy"></asp:Literal>
 
@@ -1743,23 +1773,7 @@
                         </fieldset>
                         <div style="height: 10px">
                         </div>
-                    </cc:CollapsePanel>
-                    <cc:CollapsePanel ID="cpnDiagnosis" runat="server" Width="100%" Title="">
-                        <fieldset>
-                            <legend>Initial Diagnose (Casemix)</legend>
-                            <asp:Literal runat="server" ID="litInitialDiagnose"></asp:Literal>
-                        </fieldset>
-                        <fieldset>
-                            <legend>Work Diagnose</legend>
-                            <asp:Literal runat="server" ID="litWorkDiagnosis"></asp:Literal>
-                        </fieldset>
-                        <fieldset>
-                            <legend>Final Diagnose</legend>
-                            <asp:Literal runat="server" ID="litDiagnosis"></asp:Literal>
-                        </fieldset>
-                        <div style="height: 10px">
-                        </div>
-                    </cc:CollapsePanel>
+                    </cc:CollapsePanel>                    
 
                     <cc:CollapsePanel ID="cpnVitalSign" runat="server" Width="100%" Title="Vital Sign">
                         <%--                        <telerik:RadGrid ID="grdVitalSign" runat="server" OnNeedDataSource="grdVitalSign_NeedDataSource"

@@ -3,6 +3,16 @@
 
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <script language="javascript" type="text/javascript">
+        function onSatuSehatItemClick(name) {
+            var txt = $find("ctl00_ContentPlaceHolder1_grdAliasName_ctl00_ctl02_ctl03_EditFormControl_txtServiceUnitAliasName");
+            txt.set_value(name);
+        }
+        function cboSsBridgingID_ClientItemsRequesting(sender, eventArgs) {
+            var context = eventArgs.get_context();
+            context["tp"] = "diet";
+        }
+    </script>
     <table width="100%">
         <tr>
             <td class="label">
@@ -17,8 +27,7 @@
                     ValidationGroup="entry" ControlToValidate="txtDietID" SetFocusOnError="True"
                     Width="100%">*</asp:RequiredFieldValidator>
             </td>
-            <td>
-            </td>
+            <td></td>
         </tr>
         <tr>
             <td class="label">
@@ -33,8 +42,7 @@
                     ValidationGroup="entry" ControlToValidate="txtDietName" SetFocusOnError="True"
                     Width="100%">*</asp:RequiredFieldValidator>
             </td>
-            <td>
-            </td>
+            <td></td>
         </tr>
         <tr>
             <td class="label">
@@ -48,8 +56,7 @@
                     ValidationGroup="entry" ControlToValidate="cboSRDietType" SetFocusOnError="True"
                     Width="100%">*</asp:RequiredFieldValidator>
             </td>
-            <td>
-            </td>
+            <td></td>
         </tr>
         <tr style="display: none">
             <td class="label">
@@ -59,14 +66,11 @@
                 <telerik:RadNumericTextBox ID="txtPriorityNo" runat="server" Width="100px" MaxLength="10"
                     MinValue="0" NumberFormat-DecimalDigits="0" />
             </td>
-            <td width="20">
-            </td>
-            <td>
-            </td>
+            <td width="20"></td>
+            <td></td>
         </tr>
         <tr>
-            <td>
-            </td>
+            <td></td>
             <td class="entry" colspan="3">
                 <table width="100%">
                     <tr>
@@ -82,8 +86,7 @@
                             <b>
                                 <asp:Label ID="Label4" runat="server" Text="Interval"></asp:Label></b>
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -110,8 +113,7 @@
                             <telerik:RadNumericTextBox ID="txtCalorieInterval" runat="server" Width="100px" MaxLength="10"
                                 MinValue="0" NumberFormat-DecimalDigits="2" />
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -138,8 +140,7 @@
                             <telerik:RadNumericTextBox ID="txtProteinInterval" runat="server" Width="100px" MaxLength="10"
                                 MinValue="0" NumberFormat-DecimalDigits="2" />
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -166,8 +167,7 @@
                             <telerik:RadNumericTextBox ID="txtFatInterval" runat="server" Width="100px" MaxLength="10"
                                 MinValue="0" NumberFormat-DecimalDigits="2" />
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -194,8 +194,7 @@
                             <telerik:RadNumericTextBox ID="txtCarbohydrateInterval" runat="server" Width="100px"
                                 MaxLength="10" MinValue="0" NumberFormat-DecimalDigits="2" />
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -222,8 +221,7 @@
                             <telerik:RadNumericTextBox ID="txtSaltInterval" runat="server" Width="100px" MaxLength="10"
                                 MinValue="0" NumberFormat-DecimalDigits="2" />
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
@@ -250,33 +248,26 @@
                             <telerik:RadNumericTextBox ID="txtFiberInterval" runat="server" Width="100px" MaxLength="10"
                                 MinValue="0" NumberFormat-DecimalDigits="2" />
                         </td>
-                        <td>
-                        </td>
+                        <td></td>
                     </tr>
                 </table>
             </td>
         </tr>
         <tr>
-            <td class="label" style="height: 22px">
-            </td>
+            <td class="label" style="height: 22px"></td>
             <td class="entry" style="height: 22px">
                 <asp:CheckBox ID="chkIsGetSnack" Text="Get Snack" runat="server" />
             </td>
-            <td width="20" style="height: 22px">
-            </td>
-            <td style="height: 22px">
-            </td>
+            <td width="20" style="height: 22px"></td>
+            <td style="height: 22px"></td>
         </tr>
         <tr>
-            <td class="label" style="height: 22px">
-            </td>
+            <td class="label" style="height: 22px"></td>
             <td class="entry" style="height: 22px">
                 <asp:CheckBox ID="chkIsActive" Text="Active" runat="server" />
             </td>
-            <td width="20" style="height: 22px">
-            </td>
-            <td style="height: 22px">
-            </td>
+            <td width="20" style="height: 22px"></td>
+            <td style="height: 22px"></td>
         </tr>
     </table>
     <telerik:RadTabStrip ID="tabDetail" runat="server" MultiPageID="mpgDetail" SelectedIndex="0">
@@ -285,6 +276,7 @@
             </telerik:RadTab>
             <telerik:RadTab runat="server" Text="Diet Complication" PageViewID="pgvComplication">
             </telerik:RadTab>
+            <telerik:RadTab runat="server" Text="Bridging & Integration" PageViewID="pgvAliasName" />
         </Tabs>
     </telerik:RadTabStrip>
     <telerik:RadMultiPage ID="mpgDetail" runat="server" SelectedIndex="0" BorderStyle="Solid"
@@ -304,7 +296,7 @@
                         <telerik:GridBoundColumn HeaderStyle-Width="180px" DataField="FormOfFood"
                             HeaderText="FormOfFood" UniqueName="FormOfFood" SortExpression="FormOfFood" Visible="False" />
                         <telerik:GridBoundColumn HeaderStyle-Width="150px" DataField="FormOfFoodName"
-                            HeaderText="Form Of Food" UniqueName="FormOfFoodName" SortExpression="FormOfFoodName" />    
+                            HeaderText="Form Of Food" UniqueName="FormOfFoodName" SortExpression="FormOfFoodName" />
                         <telerik:GridBoundColumn DataField="MenuName" HeaderText="Menu Name"
                             UniqueName="MenuName" SortExpression="MenuName" />
                         <telerik:GridCheckBoxColumn HeaderStyle-Width="80px" DataField="IsActive" HeaderText="Active"
@@ -352,6 +344,53 @@
                 <FilterMenu>
                 </FilterMenu>
                 <ClientSettings>
+                    <Resizing AllowColumnResize="True" />
+                    <Selecting AllowRowSelect="True" />
+                </ClientSettings>
+            </telerik:RadGrid>
+        </telerik:RadPageView>
+        <telerik:RadPageView runat="server" ID="pgvAliasName">
+            <telerik:RadGrid ID="grdAliasName" runat="server" OnNeedDataSource="grdAliasName_NeedDataSource"
+                AutoGenerateColumns="False" GridLines="None" OnUpdateCommand="grdAliasName_UpdateCommand"
+                OnDeleteCommand="grdAliasName_DeleteCommand" OnInsertCommand="grdAliasName_InsertCommand"
+                AllowPaging="true">
+                <HeaderContextMenu>
+                </HeaderContextMenu>
+                <MasterTableView CommandItemDisplay="None" DataKeyNames="DietID, SRBridgingType, BridgingID"
+                    PageSize="15">
+                    <Columns>
+                        <telerik:GridEditCommandColumn ButtonType="ImageButton">
+                            <HeaderStyle Width="35px" />
+                            <ItemStyle CssClass="MyImageButton" />
+                        </telerik:GridEditCommandColumn>
+                        <telerik:GridBoundColumn HeaderStyle-Width="250px" DataField="BridgingTypeName" HeaderText="Bridging Type"
+                            UniqueName="BridgingTypeName" SortExpression="BridgingTypeName" HeaderStyle-HorizontalAlign="Left"
+                            ItemStyle-HorizontalAlign="Left" />
+                        <telerik:GridBoundColumn HeaderStyle-Width="150px" DataField="BridgingID" HeaderText="Bridging ID"
+                            UniqueName="BridgingID" SortExpression="BridgingID" HeaderStyle-HorizontalAlign="Left"
+                            ItemStyle-HorizontalAlign="Left" />
+                        <telerik:GridBoundColumn DataField="BridgingName" HeaderText="Bridging Name" UniqueName="BridgingName"
+                            SortExpression="BridgingName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                        <%--<telerik:GridBoundColumn HeaderStyle-Width="200px" DataField="ItemIdExternal" HeaderText="Item ID External"
+                    UniqueName="ItemIdExternal" SortExpression="ItemIdExternal" HeaderStyle-HorizontalAlign="Left"
+                    ItemStyle-HorizontalAlign="Left" />--%>
+                        <telerik:GridCheckBoxColumn HeaderStyle-Width="80px" DataField="IsActive" HeaderText="Active"
+                            UniqueName="IsActive" SortExpression="IsActive" HeaderStyle-HorizontalAlign="Center"
+                            ItemStyle-HorizontalAlign="Center" />
+                        <telerik:GridButtonColumn UniqueName="DeleteColumn" Text="Delete" CommandName="Delete"
+                            ButtonType="ImageButton" ConfirmText="Delete this row?">
+                            <HeaderStyle Width="35px" />
+                            <ItemStyle HorizontalAlign="Center" CssClass="MyImageButton" />
+                        </telerik:GridButtonColumn>
+                    </Columns>
+                    <EditFormSettings UserControlName="~\Module\Nutrient\Master\Diet\DietAliasDetail.ascx" EditFormType="WebUserControl">
+                        <EditColumn UniqueName="ItemAliasEditCommand">
+                        </EditColumn>
+                    </EditFormSettings>
+                </MasterTableView>
+                <FilterMenu>
+                </FilterMenu>
+                <ClientSettings EnableRowHoverStyle="true">
                     <Resizing AllowColumnResize="True" />
                     <Selecting AllowRowSelect="True" />
                 </ClientSettings>

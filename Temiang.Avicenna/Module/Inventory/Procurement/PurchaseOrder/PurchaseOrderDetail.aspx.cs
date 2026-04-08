@@ -10,6 +10,9 @@ using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using System.Web;
 using Temiang.Avicenna.BusinessObject.Reference;
+using DevExpress.Web.Internal.XmlProcessor;
+using static DevExpress.XtraEditors.ViewInfo.BaseListBoxViewInfo;
+using System.Text;
 
 namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
@@ -828,6 +831,76 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             //else
             //    (new ItemTransaction()).Approve(txtTransactionNo.Text, ItemTransactionItems, AppSession.UserLogin.UserID);
 
+            //db:20260406 - validasi asset u/ item product non medis
+            if (cboSRItemType.SelectedValue == ItemType.NonMedical && !chkIsNonMasterOrder.Checked)
+            {
+                var isAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets);
+                if (isAssetsJournaled)
+                {
+                    var assetValidationMsg = string.Empty;
+                    var inventoryValidationMsg = string.Empty;
+
+                    var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.acc_JournalAssetsAmount));
+
+                    foreach (var p in ItemTransactionItems)
+                    {
+                        if (!(p.IsBonusItem ?? false))
+                        {
+                            var amount = (p.PriceInCurrency.Value - p.DiscountInCurrency.Value) * (1 + (Convert.ToDecimal(txtTaxPercentage.Value) / 100));
+                            if (chkIsAssets.Checked || p.IsAsset)
+                            {
+                                if ((amount < assetLimitAmount))
+                                {
+
+                                    if (assetValidationMsg == string.Empty)
+                                        assetValidationMsg = "[" + p.ItemID + "] " + p.Description;
+                                    else
+                                        assetValidationMsg += ", [" + p.ItemID + "] " + p.Description;
+                                }
+                            }
+                            else
+                            {
+                                if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount))
+                                {
+
+                                    if (inventoryValidationMsg == string.Empty)
+                                        inventoryValidationMsg = "[" + p.ItemID + "] " + p.Description;
+                                    else
+                                        inventoryValidationMsg += ", [" + p.ItemID + "] " + p.Description;
+                                }
+                            }
+                        }
+                    }
+
+                    if (assetValidationMsg.Length > 0 && inventoryValidationMsg.Length == 0)
+                    {
+                        args.MessageText = string.Format("The following items do not fit the asset classification (price less than Rp. {0}) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+                        args.IsCancel = true;
+                        return;
+                    }
+
+                    if (assetValidationMsg.Length == 0 && inventoryValidationMsg.Length > 0)
+                    {
+                        args.MessageText = string.Format("The following items do not fit the inventory classification (price more than Rp. {0}) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+                        args.IsCancel = true;
+                        return;
+                    }
+
+                    if (assetValidationMsg.Length > 0 && inventoryValidationMsg.Length > 0)
+                    {
+                        var msgContent = new StringBuilder();
+                        msgContent.AppendFormat("The following items do not fit the asset classification (price less than Rp. {0}) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+                        msgContent.Append("<br />");
+                        msgContent.AppendFormat("The following items do not fit the inventory classification (price more than Rp. {0}) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+
+                        args.MessageText = msgContent.ToString();
+                        args.IsCancel = true;
+                        return;
+                    }
+
+                }
+            }
+            
             if (AppSession.Parameter.IsUseApprovalLevel && ViewState["apprCount"].ToInt() > 0)
             {
                 using (var trans = new esTransactionScope())
@@ -1079,6 +1152,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 chkIsConsignment.Checked = true;
                 chkIsConsignment.Enabled = false;
             }
+
+            chkIsNewTaxCalculation.Checked = true;
 
             PopulateNewTransactionNo();
             GetTax(cboBusinessPartnerID.SelectedValue);
@@ -1435,6 +1510,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             }
 
             chkIsInstallmentOrder.Checked = itemTransaction.IsInstallmentType ?? false;
+            chkIsNewTaxCalculation.Checked = itemTransaction.IsNewTaxCalculation ?? false;
 
             CalculateDetailTransaction(false);
             grdApproval.Rebind();
@@ -1507,6 +1583,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             entity.SRPurchaseCategorization = cboCategorization.SelectedValue;
             entity.SRProcurementType = cboSRProcurementType.SelectedValue;
             entity.IsInstallmentType = chkIsInstallmentOrder.Checked;
+            entity.IsNewTaxCalculation = chkIsNewTaxCalculation.Checked;
 
             if (entity.es.IsAdded)
             {
@@ -1671,7 +1748,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 txtTaxAmount.Value = 0.00;
             else
             {
-                txtTaxAmount.Value = ((txtAmountTaxed.Value * txtTaxPercentage.Value) / Convert.ToDouble(100));
+                //txtTaxAmount.Value = ((txtAmountTaxed.Value * txtTaxPercentage.Value) / Convert.ToDouble(100));
+                txtTaxAmount.Value = Math.Round(txtAmountTaxed.Value.Value * (txtTaxPercentage.Value.Value / 100), 2);
                 if (AppSession.Parameter.IsPORoundingDownZeroDigit)
                 {
                     txtTaxAmount.Value = System.Convert.ToInt64(txtTaxAmount.Value);
@@ -2184,7 +2262,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 entity.SRItemUnit = userControl.SRItemUnit;
                 entity.ConversionFactor = userControl.ConversionFactor;
                 entity.Price = userControl.Price;
-                entity.PriceInCurrency = entity.Price * Convert.ToDecimal(txtCurrencyRate.Value);
+                entity.IsTaxable = userControl.IsTaxable;
+                
                 entity.IsDiscountInPercent = userControl.IsDiscountInPercent;
                 if (entity.IsDiscountInPercent == true)
                 {
@@ -2200,11 +2279,22 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     entity.Discount2Percentage = 0;
                     entity.Discount = userControl.DiscountAmount;
                 }
+
+                //db:tax 20260129 - ppn dikeluarkan dari price
+                if (rblTypesOfTaxes.SelectedIndex == 1 && (entity.IsTaxable ?? false) && chkIsNewTaxCalculation.Checked)
+                {
+                    var prices = Helper.GetReversePriceValueV3((entity.Price ?? 0), entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
+
+                    entity.Price = prices[0];
+                    entity.Discount = prices[1];
+                }
+
+                entity.PriceInCurrency = entity.Price * Convert.ToDecimal(txtCurrencyRate.Value);
                 entity.DiscountInCurrency = entity.Discount * Convert.ToDecimal(txtCurrencyRate.Text);
                 entity.IsBonusItem = userControl.IsBonusItem;
                 entity.IsClosed = userControl.IsClosed;
                 entity.Specification = userControl.Specs;
-                entity.IsTaxable = userControl.IsTaxable;
+                
 
                 ProcurementUtils.PopulateBalanceInfoByBlankValue(entity);
 
@@ -2345,7 +2435,9 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             var supp = new Supplier();
             supp.LoadByPrimaryKey(cboBusinessPartnerID.SelectedValue);
 
-            if (rblTypesOfTaxes.SelectedIndex == 0)
+            //db:20260129 - include tax tetep munculin tax
+            //if (rblTypesOfTaxes.SelectedIndex == 0)
+            if (rblTypesOfTaxes.SelectedIndex != 2)
                 txtTaxPercentage.Value = Convert.ToDouble(supp.TaxPercentage ?? 0);
             else
                 txtTaxPercentage.Value = 0;

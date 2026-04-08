@@ -2197,7 +2197,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
                         // ambil header APOL
                         var apol = new BpjsApol();
-                        apol.Query.Where(apol.Query.NosepKunjungan == txtBpjsSepNo.Text);
+                        apol.Query.Where(apol.Query.NosepKunjungan == txtBpjsSepNo.Text, apol.Query.PrescriptionNo == txtPrescriptionNo.Text);
                         if (!apol.Query.Load() || string.IsNullOrWhiteSpace(Convert.ToString(apol.NOAPOTIK)) || string.IsNullOrWhiteSpace(Convert.ToString(apol.NORESEP)))
                         {
                             ShowInformationHeader("APOL: NOSJP/NORESEP belum tersedia. Kirim ditunda.");
@@ -2410,16 +2410,10 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             }
             catch (Exception e)
             {
-                var log = new WebServiceAPILog
-                {
-                    DateRequest = DateTime.Now,
-                    IPAddress = "",
-                    UrlAddress = "APROV-APOL",
-                    Params = "",
-                    Response = e.Message,
-                    Totalms = 0
-                };
-                log.Save();
+                // lagi cari resep gagal approve,
+                // indikasinya detail approve header gak approve, movement kosong, costcalculation kosong
+                // reported by RSUI
+                this.LogError(e);
                 throw e;
             }
         }

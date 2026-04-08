@@ -135,6 +135,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessObject\ImagingStudyResponse.cs" />
     <Compile Include="BusinessObject\BaseUtil.cs" />
     <Compile Include="BusinessObject\ImagingStudyResponse.cs" />
     <Compile Include="BusinessObject\ImmunizationPost.cs" />

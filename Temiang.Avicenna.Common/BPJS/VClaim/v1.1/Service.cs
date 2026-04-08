@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Configuration;
-using System.Net;
-using System.IO;
+﻿using LZStringCSharp;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Security;
-using Temiang.Avicenna.Common.BPJS.VClaim.v11.Sep;
-using LZStringCSharp;
 using System.Security.Cryptography;
+using System.Security.Policy;
+using System.Text;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.Common.BPJS.VClaim.v11.Sep;
 
 namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
 {
@@ -29,6 +30,7 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
     public class Service
     {
         private string _url = ConfigurationManager.AppSettings["BPJSServiceUrlLocation"];
+        private string _urlrujukan = ConfigurationManager.AppSettings["BPJSServiceRujukanUrlLocation"];
         private string _consKey = ConfigurationManager.AppSettings["BPJSConsumerID"];
         private string _ppkKey = ConfigurationManager.AppSettings["BPJSHospitalID"];
         private string _salt = ConfigurationManager.AppSettings["BPJSSaltConsumerID"];
@@ -136,6 +138,53 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
 
             return webrequest;
         }
+
+
+        public HttpWebRequest PopulateWebRequestR(string url, Helper.WebRequestMethod method, Helper.WebRequestContentType contentType, string parameter, out string timeStamp)
+        {
+            Helper.IgnoreBadCertificates();
+
+            var webrequest = (HttpWebRequest)System.Net.WebRequest.Create(url);
+            webrequest.Method = method.ToString();
+
+            if (method != Helper.WebRequestMethod.GET) webrequest.ContentType = contentType.ToString();
+
+            webrequest.Headers.Add("X-cons-id", _consKey);
+            timeStamp = BPJS.Helper.GetUnixTimeStamp();
+            webrequest.Headers.Add("X-timestamp", timeStamp);
+            webrequest.Headers.Add("X-signature", BPJS.Helper.GetEncodedKey(timeStamp, _consKey, _salt, false));
+            webrequest.Headers.Add("user_key", _userKey);
+
+            if (method != Helper.WebRequestMethod.GET)
+            {
+                byte[] formData = Encoding.UTF8.GetBytes(parameter.ToString());
+                webrequest.ContentLength = formData.Length;
+
+                using (var post = webrequest.GetRequestStream())
+                {
+                    post.Write(formData, 0, formData.Length);
+                }
+            }
+
+            return webrequest;
+        }
+
+        public HttpWebRequest PopulateWebRequestR(string url, Helper.WebRequestMethod method, out string timeStamp)
+        {
+            Helper.IgnoreBadCertificates();
+
+            HttpWebRequest webrequest = (HttpWebRequest)System.Net.WebRequest.Create(url);
+            webrequest.Method = method.ToString();
+
+            webrequest.Headers.Add("X-cons-id", _consKey);
+            timeStamp = BPJS.Helper.GetUnixTimeStamp();
+            webrequest.Headers.Add("X-timestamp", timeStamp);
+            webrequest.Headers.Add("X-signature", BPJS.Helper.GetEncodedKey(timeStamp, _consKey, _salt, false));
+            webrequest.Headers.Add("user_key", _userKey);
+
+            return webrequest;
+        }
+
 
         public v11.Diagnosa.Diagnosa GetDiagnosa(string text)
         {
@@ -2986,5 +3035,266 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
                 }
             }
         }
+
+
+        #region RUJUKAN KOMPETENSI
+
+        public v11.RujukanSatuSehat.KriteriaRujukanResponse GetKriteriaRujukan(v11.RujukanSatuSehat.KriteriaRujukanRequest root)
+        {
+            // {BASE URL}/Rujukan/GetKriteriaRujukan
+            var url = _urlrujukan + "Rujukan/GetKriteriaRujukan";
+
+            using (var response = PopulateWebRequestR(url,
+                Helper.WebRequestMethod.POST,
+                Helper.WebRequestContentType.JSON,
+                JsonConvert.SerializeObject(root),
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                    return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.KriteriaRujukanResponse>(sr.ReadToEnd());
+
+                var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
+
+                if (encryptedResponse.MetaData.IsValid)
+                {
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                    return new v11.RujukanSatuSehat.KriteriaRujukanResponse
+                    {
+                        MetaData = new v11.RujukanSatuSehat.MetaData
+                        {
+                            Code = encryptedResponse.MetaData.Code,
+                            Message = encryptedResponse.MetaData.Message
+                        },
+                        Response = JsonConvert.DeserializeObject<v11.RujukanSatuSehat.KriteriaResponse>(decryptResponse)
+                    };
+                }
+
+                return new v11.RujukanSatuSehat.KriteriaRujukanResponse
+                {
+                    MetaData = new v11.RujukanSatuSehat.MetaData
+                    {
+                        Code = encryptedResponse.MetaData.Code,
+                        Message = encryptedResponse.MetaData.Message
+                    },
+                    Response = null
+                };
+            }
+        }
+
+
+        public v11.RujukanSatuSehat.FaskesRujukanResponse GetFaskesRujukan(v11.RujukanSatuSehat.FaskesRujukanRequest root)
+        {
+            // {BASE URL}/Sisrute/GetFaskesRujukan
+            var url = _urlrujukan + "Rujukan/GetFaskesRujukan";
+
+            using (var response = PopulateWebRequestR(url,
+                Helper.WebRequestMethod.POST,
+                Helper.WebRequestContentType.JSON,
+                JsonConvert.SerializeObject(root),
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                    return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.FaskesRujukanResponse>(sr.ReadToEnd());
+
+                var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
+
+                if (encryptedResponse.MetaData.IsValid)
+                {
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                    return new v11.RujukanSatuSehat.FaskesRujukanResponse
+                    {
+                        MetaData = new v11.RujukanSatuSehat.MetaData
+                        {
+                            Code = encryptedResponse.MetaData.Code,
+                            Message = encryptedResponse.MetaData.Message
+                        },
+                        Response = JsonConvert.DeserializeObject<v11.RujukanSatuSehat.FaskesResponse>(decryptResponse)
+                    };
+                }
+
+                return new v11.RujukanSatuSehat.FaskesRujukanResponse
+                {
+                    MetaData = new v11.RujukanSatuSehat.MetaData
+                    {
+                        Code = encryptedResponse.MetaData.Code,
+                        Message = encryptedResponse.MetaData.Message
+                    },
+                    Response = null
+                };
+            }
+        }
+
+
+        public v11.RujukanSatuSehat.CreateRujukanResponse PostKunjungan(v11.RujukanSatuSehat.CreateRujukanRequest root)
+        {
+            // {BASE URL}/Sisrute/postKunjungan
+
+            var url = _urlrujukan + "Rujukan/Insert";
+
+            using (var response = PopulateWebRequestR(url,
+                Helper.WebRequestMethod.POST,
+                Helper.WebRequestContentType.JSON,
+                JsonConvert.SerializeObject(root),
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                    return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.CreateRujukanResponse>(sr.ReadToEnd());
+
+                var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
+
+                if (encryptedResponse.MetaData.IsValid)
+                {
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                    return new v11.RujukanSatuSehat.CreateRujukanResponse
+                    {
+                        MetaData = new v11.RujukanSatuSehat.MetaData
+                        {
+                            Code = encryptedResponse.MetaData.Code,
+                            Message = encryptedResponse.MetaData.Message
+                        },
+                        Response = JsonConvert.DeserializeObject<v11.RujukanSatuSehat.RujukanResponse>(decryptResponse)
+                    };
+                }
+
+                return new v11.RujukanSatuSehat.CreateRujukanResponse
+                {
+                    MetaData = new v11.RujukanSatuSehat.MetaData
+                    {
+                        Code = encryptedResponse.MetaData.Code,
+                        Message = encryptedResponse.MetaData.Message
+                    },
+                    Response = null
+                };
+            }
+        }
+
+        public v11.RujukanSatuSehat.DeleteRujukanResponse DeleteRujukan(v11.RujukanSatuSehat.DeleteRujukanRequest root)
+        {
+            // {BASE URL}/Rujukan/Delete
+
+            var url = _urlrujukan + "Rujukan/Delete";
+
+            using (var response = PopulateWebRequestR(url,
+                Helper.WebRequestMethod.POST, // ⚠️ BPJS biasanya tetap POST
+                Helper.WebRequestContentType.JSON,
+                JsonConvert.SerializeObject(root),
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+
+                // 🔹 NON ENCRYPT
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                    return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.DeleteRujukanResponse>(sr.ReadToEnd());
+
+                // 🔹 ENCRYPTED
+                var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
+
+                if (encryptedResponse.MetaData.IsValid)
+                {
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                    return new v11.RujukanSatuSehat.DeleteRujukanResponse
+                    {
+                        MetaData = new v11.RujukanSatuSehat.MetaData
+                        {
+                            Code = encryptedResponse.MetaData.Code,
+                            Message = encryptedResponse.MetaData.Message
+                        },
+                        Response = JsonConvert.DeserializeObject<v11.RujukanSatuSehat.DeleteResponse>(decryptResponse)
+                    };
+                }
+
+                return new v11.RujukanSatuSehat.DeleteRujukanResponse
+                {
+                    MetaData = new v11.RujukanSatuSehat.MetaData
+                    {
+                        Code = encryptedResponse.MetaData.Code,
+                        Message = encryptedResponse.MetaData.Message
+                    },
+                    Response = null
+                };
+            }
+        }
+
+        //Get Sepasialistik
+        public v11.RujukanSatuSehat.GetSpesialisResponse GetSpesialis()
+        {
+            var url = _urlrujukan + "Rujukan/GetSpesialistik";
+
+            using (var response = PopulateWebRequestR(url,
+                Helper.WebRequestMethod.GET,
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                {
+                    return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.GetSpesialisResponse>(sr.ReadToEnd());
+                }
+
+                var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
+
+                if (encryptedResponse.MetaData.IsValid)
+                {
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                    return new v11.RujukanSatuSehat.GetSpesialisResponse
+                    {
+                        MetaData = new v11.RujukanSatuSehat.MetaData
+                        {
+                            Code = encryptedResponse.MetaData.Code.ToString(),
+                            Message = encryptedResponse.MetaData.Message
+                        },
+                        Response = JsonConvert.DeserializeObject<List<v11.RujukanSatuSehat.SpesialisItem>>(decryptResponse)
+                    };
+                }
+
+                return new v11.RujukanSatuSehat.GetSpesialisResponse
+                {
+                    MetaData = new v11.RujukanSatuSehat.MetaData
+                    {
+                        Code = encryptedResponse.MetaData.Code.ToString(),
+                        Message = encryptedResponse.MetaData.Message
+                    },
+                    Response = null
+                };
+            }
+        }
+
+        #endregion
+
     }
 }

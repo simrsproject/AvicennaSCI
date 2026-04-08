@@ -2357,6 +2357,70 @@ namespace Temiang.Avicenna.WebService
                                     }
                                 }
 
+            qr.es.Distinct = true;
+            qr.es.Top = MaxQueryRecord;
+
+            var comboData = PopulateComboBoxDataItems(context, qr);
+            return comboData;
+        }
+
+        [WebMethod]
+        public RadComboBoxData SatuSehatItem(RadComboBoxContext context)
+        {
+            IDictionary<string, object> contextDictionary = (IDictionary<string, object>)context;
+            var itemType = (string)contextDictionary["tp"];
+            switch (itemType)
+            {
+                case "kfa":
+                    {
+                        //var qr = new SatuSehatKfaQuery("p");
+                        //qr.Select(qr.SsUuid.As("Code"), qr.SsNama.As("ItemName"));
+                        //qr.Where(qr.Or(qr.SsUuid == context.Text, qr.SsNama.Like(string.Format("%{0}%", context.Text))));
+                        //qr.OrderBy(qr.SsNama.Ascending);
+                        //qr.es.Top = MaxQueryRecord;
+                        //var dtb = qr.LoadDataTable();
+                        //var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+                        //return comboData;
+
+                        try
+                        {
+                            var tokenResponse = GetToken();
+                            if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
+                                throw new Exception("Unable to retrieve access token.");
+
+                            string keyword = context.Text;
+                            string apiUrl = $"{_KFAbaseUrl}/kfa-v2/products/all?page=1&size=100&product_type=farmasi&keyword={HttpUtility.UrlEncode(keyword)}";
+
+                            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiUrl);
+                            request.Method = "GET";
+                            request.Headers.Add("Authorization", "Bearer " + tokenResponse.AccessToken);
+                            request.Accept = "application/json";
+
+                            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                            using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                            {
+                                string responseJson = reader.ReadToEnd();
+                                JObject json = JObject.Parse(responseJson);
+                                var items = json["items"]?["data"]?.ToList();
+
+                                if (items == null || items.Count == 0)
+                                    return null;
+
+                                // Prepare DataTable
+                                DataTable dt = new DataTable();
+                                dt.Columns.Add("Code");
+                                dt.Columns.Add("ItemName");
+
+                                foreach (var item in items)
+                                {
+                                    string code = item["kfa_code"]?.ToString();
+                                    string name = item["name"]?.ToString();
+                                    if (!string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(name))
+                                    {
+                                        dt.Rows.Add(code, name);
+                                    }
+                                }
+
                                 return PopulateComboBoxDataItems(context, dt, "Code", "Code", "ItemName");
                             }
                         }
@@ -2396,7 +2460,28 @@ namespace Temiang.Avicenna.WebService
                         var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
                         return comboData;
                     }
-                case "alg":
+                case "rad":
+                    {
+                        var qr = new LoincItemQuery("p");
+                        qr.Select(qr.Code, qr.Display.As("ItemName"));
+                        qr.Where(qr.SRLoinc == "rad", qr.Or(qr.Code == context.Text, qr.Display.Like(string.Format("%{0}%", context.Text))));
+                        qr.OrderBy(qr.Display.Ascending);
+                        qr.es.Top = MaxQueryRecord;
+                        var dtb = qr.LoadDataTable();
+                        var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+                        return comboData;
+                    }
+                case "alg": // Obsolete diganti zat aktif (Handono 2025-08)
+                    //{
+                    //    var qr = new SatuSehatKfaQuery("p");
+                    //    qr.Select(qr.SsNama.As("ItemName"), qr.SsUuid.As("Code"));
+                    //    qr.Where(qr.SsNama.Like(string.Format("%{0}%", context.Text)));
+                    //    qr.OrderBy(qr.SsNama.Ascending);
+                    //    qr.es.Top = MaxQueryRecord;
+                    //    var dtb = qr.LoadDataTable();
+                    //    var comboData = PopulateComboBoxDataItems(context, dtb, "ItemName", "Code", "ItemName");
+                    //    return comboData;
+                    //}
                     {
                         //var qr = new SatuSehatKfaQuery("p");
                         //qr.Select(qr.SsNama.As("ItemName"), qr.SsUuid.As("Code"));

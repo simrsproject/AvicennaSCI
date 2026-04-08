@@ -29,12 +29,89 @@
 
         var lang = {
             "title": { "ind": "Sistem Antrian", "en": "Queuing System" },
-            "sub1Title": { "ind": "Silahkan pilih antrian berikut", "en": "Please choose one of the following queue" }
+            "sub1Title": { "ind": "Silahkan pilih antrian berikut", "en": "Please choose one of the following queue" },
+            "idlePopup": {
+                "title": {
+                    "ind": "Sudah punya kode booking?",
+                    "en": "Do you already have a booking code?"
+                },
+                "confirm": {
+                    "ind": "Sudah",
+                    "en": "Yes"
+                },
+                "cancel": {
+                    "ind": "Belum",
+                    "en": "No"
+                }
+            }
         };
         var databtn = {};
+        var IsDirectButtonBetweenKioskVersion = <%= IsDirectButtonBetweenKioskVersion.ToString().ToLower() %>;
 
-        $(document).ready(function() {
-            //alert(BaseURL + "/WebService/jQueryWS.asmx/NPCGetList");    
+        let idleTime = 0;
+        let stopIdle = false;
+        const idleLimit = 6;
+        let isPopupShown = false;
+        let isInModal = false;
+        var activeLang = "ind";
+
+        function resetIdle() {
+            idleTime = 0;
+        }
+
+        function ShowIdlePopup() {
+            if (isPopupShown) return;
+            isPopupShown = true;
+            const txt = lang.idlePopup;
+            Swal.fire({
+                title: txt.title[activeLang],
+                text: '',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonText: txt.confirm[activeLang],
+                cancelButtonText: txt.cancel[activeLang],
+                reverseButtons: true,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                allowEnterKey: false
+            }).then((result) => {
+                idleTime = 0;
+                isPopupShown = false;
+
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    stopIdle = true;
+                    window.location.href = BaseURL + "/Queueing/GetQueue";
+                }
+            });
+        }
+
+        if (IsDirectButtonBetweenKioskVersion) {
+            document.onmousemove = resetIdle;
+            document.onkeydown = resetIdle;
+            document.ontouchstart = resetIdle;
+
+            setInterval(function () {
+                if (stopIdle) return;
+                if (isInModal) return;
+                if (!isPopupShown) { 
+                    idleTime++;
+                }
+
+                if (idleTime >= idleLimit) {
+                    ShowIdlePopup();
+                }
+            }, 1000);
+        }
+        $(document).ready(function () {
+            $(document).on('shown.bs.modal', '.modal', function () {
+                isInModal = true;
+                idleTime = 0;
+            });
+
+            $(document).on('hidden.bs.modal', '.modal', function () {
+                isInModal = false;
+                idleTime = 0;
+            });
 
             $.ajaxSetup({
                 beforeSend: function (xhr) {
@@ -43,12 +120,14 @@
                     }
                 }
             });
-
             SetLang("Ind");
             //SetLeftMenu("Bahasa", "SetLang('Ind')", "flag flag-id");
             //SetLeftMenu("English", "SetLang('En')", "flag flag-us");
             SetLeftMenu("Bahasa", "SetLang('Ind')", "flag-icon flag-icon-id");
             SetLeftMenu("English", "SetLang('En')", "flag-icon flag-icon-us");
+            if (IsDirectButtonBetweenKioskVersion) {
+                SetLeftMenu("Kiosk V2", "window.location.href='" + BaseURL + "/Queueing/GetQueue'", "fas fa-desktop");
+            }
 
             // load queue buttons
             GetRefID();
@@ -56,6 +135,7 @@
         });
 
         function SetLang(l) {
+            activeLang = l.toLowerCase();
             SetHtml('spanPageTitle', l == "Ind" ? lang.title.ind : lang.title.en);
             SetHtml('spanSub1Title', l == "Ind" ? lang.sub1Title.ind : lang.sub1Title.en);
             // set button lang

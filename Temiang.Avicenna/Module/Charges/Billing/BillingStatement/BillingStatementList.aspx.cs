@@ -70,6 +70,7 @@ namespace Temiang.Avicenna.Module.Charges.Billing
                 {
                     grdRegisteredList.Columns[4].Visible = Request.QueryString["df"].ToString() == "mkt";
                 }
+                grdRegisteredList.Columns[6].Visible = true;
             }
         }
 
@@ -153,6 +154,9 @@ namespace Temiang.Avicenna.Module.Charges.Billing
 
                 if (cboServiceUnitID.SelectedValue != string.Empty)
                     qr.Where(qr.ServiceUnitID == cboServiceUnitID.SelectedValue);
+
+                if (!string.IsNullOrEmpty(cboGuarantorID.SelectedValue))
+                    qr.Where(qr.GuarantorID == cboGuarantorID.SelectedValue);
 
                 var isFilter = false;
                 if (txtRegistrationNo.Text != string.Empty)
@@ -903,9 +907,107 @@ namespace Temiang.Avicenna.Module.Charges.Billing
                 "oWnd.Maximize();";
                 RadAjaxPanel1.ResponseScripts.Add(script);
             }
+            else if (e.CommandName == "PrintWithPrice")
+            {
+                isPrint = true;
+                string[] registrationNoList = Helper.MergeBilling.GetMergeRegistration(e.CommandArgument.ToString());
+
+                PrintJobParameterCollection jobParameters = new PrintJobParameterCollection();
+                PrintJobParameter jobParameter = jobParameters.AddNew();
+                jobParameter.Name = "RegistrationNoList";
+                jobParameter.ValueString = "";
+                foreach (var str in registrationNoList)
+                {
+                    jobParameter.ValueString += str + ",";
+                }
+                jobParameter.ValueString = jobParameter.ValueString.Substring(0, jobParameter.ValueString.Length - 1);
+
+                var itermBillList = jobParameters.AddNew();
+                itermBillList.Name = "IntermBillNoList";
+                itermBillList.ValueString = string.Empty;
+                string[] intermBillNoList = IntermBills(registrationNoList);
+                foreach (var str in intermBillNoList)
+                {
+                    itermBillList.ValueString += str + ",";
+                }
+                itermBillList.ValueString = itermBillList.ValueString.Substring(0, itermBillList.ValueString.Length - 1);
+
+                var parRegNo = jobParameters.AddNew();
+                parRegNo.Name = "RegNo";
+                parRegNo.ValueString = e.CommandArgument.ToString();
+
+                var parUserID = jobParameters.AddNew();
+                parUserID.Name = "UserID";
+                parUserID.ValueString = AppSession.UserLogin.UserID;
+
+                var parUser = jobParameters.AddNew();
+                parUser.Name = "UserName";
+                parUser.ValueString = AppSession.UserLogin.UserName;
+
+                var parplafond = jobParameters.AddNew();
+                parplafond.Name = "plafond";
+                parplafond.ValueString = "0";
+
+                var parDate1 = jobParameters.AddNew();
+                parDate1.Name = "StartDate";
+                parDate1.ValueDateTime = txtTransDate1.SelectedDate ?? Convert.ToDateTime("1900-01-01 00:00:00");
+
+                var parDate2 = jobParameters.AddNew();
+                parDate2.Name = "EndDate";
+                parDate2.ValueDateTime = txtTransDate2.SelectedDate ?? (new DateTime()).NowAtSqlServer().AddDays(10);
+
+                var parSelfGuarantor = jobParameters.AddNew();
+                parSelfGuarantor.Name = "SelfGuarantor";
+                parSelfGuarantor.ValueString = AppSession.Parameter.SelfGuarantor;
+
+                var parAksesGuarantor = jobParameters.AddNew();
+                parAksesGuarantor.Name = "AskesGuarantor";
+                parAksesGuarantor.ValueString = string.Empty;// _guarantorAskesID;
+
+                if (AppSession.Parameter.HealthcareInitialAppsVersion == "RSSMCB")
+                {
+                    var parShowPatientPaid = jobParameters.AddNew();
+                    parShowPatientPaid.Name = "ShowPatientPaid";
+                    parShowPatientPaid.ValueNumeric = 1;// _guarantorAskesID;
+                }
+
+                AppSession.PrintJobParameters = jobParameters;
+                AppSession.PrintJobReportID = AppConstant.Report.BillingStatementBpjsWithPrice;
+
+                parameterName = "IntermBillNoList";
+                parameterValue = jobParameter.ValueString;
+
+                string script = @"var oWnd = $find('" + winPrint.ClientID + "');" +
+                "oWnd.SetUrl('" + Page.ResolveUrl("~/Module/Reports/ReportViewer.aspx") + "');" +
+                "oWnd.Show();" +
+                "oWnd.Maximize();";
+                RadAjaxPanel1.ResponseScripts.Add(script);
+            }
 
             if (isPrint && AppSession.Parameter.IsUsedPrintSlipLogForBillingStatement)
                 PrintSlipLog.InsertUpdate(AppSession.PrintJobReportID, parameterName, parameterValue, AppSession.UserLogin.UserID);
         }
+        protected void cboGuarantorID_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        {
+            e.Item.Text = ((DataRowView)e.Item.DataItem)["GuarantorName"].ToString();
+            e.Item.Value = ((DataRowView)e.Item.DataItem)["GuarantorID"].ToString();
+        }
+        protected void cboGuarantorID_ItemsRequested(object o, RadComboBoxItemsRequestedEventArgs e)
+        {
+            string searchTextContain = string.Format("%{0}%", e.Text);
+            var query = new GuarantorQuery();
+            query.es.Top = 30;
+            query.Where
+                (
+                    query.GuarantorName.Like(searchTextContain),
+                    query.SRGuarantorType != AppSession.Parameter.GuarantorTypeMemberID,
+                    query.IsActive == true
+                );
+            query.OrderBy(query.GuarantorName.Ascending);
+
+            cboGuarantorID.DataSource = query.LoadDataTable();
+            cboGuarantorID.DataBind();
+        }
+
     }
 }

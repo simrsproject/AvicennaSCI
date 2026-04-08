@@ -23,6 +23,7 @@ namespace Temiang.Avicenna.Controllers
             ViewData["enableBPJS"] = AppSession.Parameter.IsKioskEnableBPJS;
             ViewData["isBpjsAntrolIntegration"] = Helper.IsBpjsAntrolIntegration;
             ViewData["enableQRCode"] = AppSession.Parameter.IsKioskEnableQRCode;
+            ViewData["isDirectButtonBetweenKioskVersion"] = AppSession.Parameter.IsDirectButtonBetweenKioskVersion;
         }
 
         private void SetUserLoginSession()
@@ -316,6 +317,13 @@ namespace Temiang.Avicenna.Controllers
                         }
                         else
                         {
+                            // CEK BLACKLIST
+                            if (Convert.ToBoolean(dtbPatient.Rows[0]["IsBlackList"]))
+                            {
+                                ViewData["ErrMsg"] = lang == "en" ? "Patient is blacklisted and cannot be processed" : "Pasien ini terdaftar dalam daftar hitam dan tidak dapat diproses";
+                                return View();
+                            }
+
                             // POPULATE POLI
                             var orderedSu = GetPoliWeeklyScheduled(lang);
                             ViewData["suColl"] = orderedSu;

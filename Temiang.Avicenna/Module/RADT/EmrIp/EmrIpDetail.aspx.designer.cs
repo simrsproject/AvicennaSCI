@@ -249,6 +249,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         protected global::System.Web.UI.WebControls.Label lblBpjsSepNo;
 
         /// <summary>
+        /// lblTglRanap control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTglRanap;
+
+        /// <summary>
         /// trCovClass control.
         /// </summary>
         /// <remarks>
@@ -366,6 +375,69 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         protected global::System.Web.UI.WebControls.Label lblPhysicianTeam;
 
         /// <summary>
+        /// cpnPlafond control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Temiang.Avicenna.CustomControl.CollapsePanel cpnPlafond;
+
+        /// <summary>
+        /// cpnDiagnosis control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Temiang.Avicenna.CustomControl.CollapsePanel cpnDiagnosis;
+
+        /// <summary>
+        /// litInitialDiagnose control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litInitialDiagnose;
+
+        /// <summary>
+        /// fsSuggestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl fsSuggestion;
+
+        /// <summary>
+        /// litSuggestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litSuggestion;
+
+        /// <summary>
+        /// litWorkDiagnosis control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litWorkDiagnosis;
+
+        /// <summary>
+        /// litDiagnosis control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litDiagnosis;
+
+        /// <summary>
         /// cpnReferFrom control.
         /// </summary>
         /// <remarks>
@@ -400,15 +472,6 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblFromPhysician;
-
-        /// <summary>
-        /// cpnPlafond control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Temiang.Avicenna.CustomControl.CollapsePanel cpnPlafond;
 
         /// <summary>
         /// cpnAllergies control.
@@ -499,42 +562,6 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litPatientDialysisKidney;
-
-        /// <summary>
-        /// cpnDiagnosis control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::Temiang.Avicenna.CustomControl.CollapsePanel cpnDiagnosis;
-
-        /// <summary>
-        /// litInitialDiagnose control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litInitialDiagnose;
-
-        /// <summary>
-        /// litWorkDiagnosis control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litWorkDiagnosis;
-
-        /// <summary>
-        /// litDiagnosis control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litDiagnosis;
 
         /// <summary>
         /// cpnVitalSign control.

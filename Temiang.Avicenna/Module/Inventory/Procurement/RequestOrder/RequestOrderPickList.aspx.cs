@@ -41,11 +41,10 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 //    }
                 //}
 
-                txtPorBaseSalesDay.Value =
-                    AppParameter.GetParameterValue(AppParameter.ParameterItem.PorBaseSalesDay).ToInt();
+                txtPorBaseSalesDay.Value = AppParameter.GetParameterValue(AppParameter.ParameterItem.PorBaseSalesDay).ToInt();
+                txtPorBaseSalesDay.MaxValue = AppParameter.GetParameterValue(AppParameter.ParameterItem.PorBaseSalesDay).ToInt();
 
-                txtPorForStockDay.Value =
-                    AppParameter.GetParameterValue(AppParameter.ParameterItem.PorForStockDay).ToInt();
+                txtPorForStockDay.Value = AppParameter.GetParameterValue(AppParameter.ParameterItem.PorForStockDay).ToInt();
 
                 var locationID = Request.QueryString["lid"];
                 var loc = new Location();

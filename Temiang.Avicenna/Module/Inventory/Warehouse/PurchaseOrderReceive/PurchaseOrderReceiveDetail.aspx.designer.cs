@@ -69,6 +69,15 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
         protected global::Telerik.Web.UI.RadTextBox txtTransactionNo;
 
         /// <summary>
+        /// chkIsNewTaxCalculation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkIsNewTaxCalculation;
+
+        /// <summary>
         /// lblTransactionDate control.
         /// </summary>
         /// <remarks>

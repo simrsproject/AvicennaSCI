@@ -14,6 +14,7 @@ using System.Web.Http;
 using Telerik.Reporting.Svg.ExCSS;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using Temiang.Avicenna.Common.BPJS.Antrian.List;
 using Temiang.Avicenna.Common.BPJS.VClaim.v11;
 using Temiang.Dal.Interfaces;
 using Paramedic = Temiang.Avicenna.BusinessObject.Paramedic;
@@ -463,7 +464,7 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 //}
 
                 var minDayBefore = 0;
-                if (AppSession.Parameter.HealthcareInitial == "RSI") minDayBefore = 1;
+                //if (AppSession.Parameter.HealthcareInitial == "RSI") minDayBefore = 1;
                 if (AppSession.Parameter.MinDayBeforeBookingMJkn > -1) minDayBefore = AppSession.Parameter.MinDayBeforeBookingMJkn ?? 0;
                 var tglMaxRencana = parsed.Date.AddDays(-1 * minDayBefore);
 
@@ -1249,11 +1250,6 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     var aptQue = new AppointmentQueueing();
                     if (aptQue.SetQueForReg(antrean, AppSession.Parameter.GuarantorAskesID.Contains(antrean.GuarantorID) ? "02" : AppSession.Parameter.SelfGuarantor.Equals(antrean.GuarantorID) ? "01" : "03", su, "antrol", false)) aptQue.Save();
 
-                    #region Antrian Poli
-                    // antrian v2, tambahkan antrian ke poli
-                    var aQue = new AppointmentQueueing();
-                    if (aQue.SetQueForPoli(antrean.AppointmentNo, "antrol")) aQue.Save();
-                    #endregion
 
                     trans.Complete();
                 }
@@ -2914,6 +2910,38 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 }
             }
 
+            if (AppSession.Parameter.HealthcareInitial == "RSI")
+            {
+                var antreanDateTime = Convert.ToDateTime(appt.AppointmentDate?.ToString("yyyy-MM-dd") + " " + appt.AppointmentTime + ":00").AddHours(-1);
+                if (DateTime.Now < antreanDateTime)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Created, new
+                    {
+                        metadata = new Antrol.CheckIn.Response.Metadata()
+                        {
+                            Code = (int)HttpStatusCode.Created,
+                            Message = $"Waktu check in minimal 1 jam sebelum waktu pelayanan, {antreanDateTime.ToString("dd/MM/yyyy HH:mm:ss")}"
+                        }
+                    });
+                }
+            }
+
+            var psd = new ParamedicScheduleDate();
+            if (!psd.LoadByPrimaryKey(appt.ServiceUnitID, appt.ParamedicID, appt.AppointmentDate?.Year.ToString(), appt.AppointmentDate?.Date ?? new DateTime()))
+            {
+                var pmedic = new Paramedic();
+                pmedic.LoadByPrimaryKey(appt.ParamedicID);
+
+                return Request.CreateResponse(HttpStatusCode.Created, new
+                {
+                    metadata = new Antrol.CheckIn.Response.Metadata()
+                    {
+                        Code = (int)HttpStatusCode.Created,
+                        Message = $"Jadwal Dokter {pmedic.ParamedicName} Tersebut Belum Tersedia, Silahkan Reschedule Tanggal dan Jam Praktek Lainnya"
+                    }
+                });
+            }
+
             appt.SRAppointmentStatus = AppSession.Parameter.AppointmentStatusConfirmed;
             appt.LastUpdateDateTime = DateTime.Now;
             appt.LastUpdateByUserID = "mjkn";
@@ -2961,6 +2989,12 @@ namespace Temiang.Avicenna.Bridging.Controllers
             //if (response.Metadata.IsAntrolValid)
             //{
             appt.Save();
+
+            #region Antrian Poli
+            // antrian v2, tambahkan antrian ke poli
+            var aQue = new AppointmentQueueing();
+            if (aQue.SetQueForPoli(appt.AppointmentNo, "mjkn")) aQue.Save();
+            #endregion
 
             return Request.CreateResponse(HttpStatusCode.OK, new Antrol.CheckIn.Response.Root
             {
@@ -4357,6 +4391,28 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     {
                         waktu1 = ot1;
                         waktu2 = ot2;
+                    }
+                }
+
+                if (AppSession.Parameter.HealthcareInitial == "RSI")
+                {
+                    if (TimeSpan.ParseExact(DateTime.Now.ToString("HH:mm"), "hh\\:mm", null) > waktu2)
+                    {
+                        log.Response = JsonConvert.SerializeObject(new
+                        {
+                            Code = (int)HttpStatusCode.Created,
+                            Message = $"Jadwal Dokter {pmedic.ParamedicName} Sudah Lewat : {waktu1.Value.ToString("hh\\:mm")}-{waktu2.Value.ToString("hh\\:mm")}, Silahkan Reschedule Tanggal dan Jam Praktek Lainnya"
+                        });
+                        log.Save();
+
+                        return Request.CreateResponse(HttpStatusCode.Created, new
+                        {
+                            metadata = new
+                            {
+                                Code = (int)HttpStatusCode.Created,
+                                Message = $"Jadwal Dokter {pmedic.ParamedicName} Sudah Lewat : {waktu1.Value.ToString("hh\\:mm")}-{waktu2.Value.ToString("hh\\:mm")}, Silahkan Reschedule Tanggal dan Jam Praktek Lainnya"
+                            }
+                        });
                     }
                 }
 
@@ -6175,6 +6231,12 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     responsible.Save();
                     emergencyContact.Save();
                     registrationInfoSumary.Save();
+
+                    #region Antrian Poli
+                    // antrian v2, tambahkan antrian ke poli
+                    var aQue = new AppointmentQueueing();
+                    if (aQue.SetQueForPoli(appt.AppointmentNo, "kiosk")) aQue.Save();
+                    #endregion
 
                     if (chargesHD != null) chargesHD.Save();
                     if (TransChargesItemsDT.Count > 0) TransChargesItemsDT.Save();

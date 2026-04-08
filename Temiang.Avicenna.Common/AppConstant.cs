@@ -36,9 +36,12 @@ namespace Temiang.Avicenna.Common
             #endregion
 
             public const string ProcessDataToSatuSehat = "01.15.20";
+            public const string ProcessDataToSatuSehatILP = "01.15.21";
+            public const string ProcessDataToSatuSehatIPR = "01.15.22";
 
             public const string CasemixApproval = "01.20.12";
             public const string CasemixCoverage = "01.20.12A";
+            public const string CasemixDPJPValidation = "01.20.12B";
 
 
             // RADT
@@ -257,6 +260,8 @@ namespace Temiang.Avicenna.Common
 
             public const string KemenkesLaporanKematian = "01.22.01";
             public const string KemenkesSitb = "01.22.02";
+            public const string BpjsRujukanSatuSehat = "01.20.22";
+
 
             // RADT Master
             //  Questionaire
@@ -1005,6 +1010,7 @@ namespace Temiang.Avicenna.Common
             public const string UserGroup = "95.01.01";
             public const string User = "95.01.02";
             public const string UserServiceunit = "95.01.04";
+            public const string UserDokterAsuransi = "95.01.05";
             public const string Announcement = "95.07";
             public const string ChangePassword = "95.01.03";
             public const string AuditLogView = "95.02.01";

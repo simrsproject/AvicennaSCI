@@ -165,6 +165,7 @@
         }
     </style>
     <link rel="stylesheet" href="../content/toastr.css" />
+    <link rel="stylesheet" href="../Bootstrap/plugins/fontawesome-free/css/all.min.css" />
 </head>
 <script language="javascript">
     function onClientPageLoad(oWnd) {

@@ -574,6 +574,12 @@ namespace Temiang.Avicenna.Module.RADT
 
             lblPhysician.Text = ParamedicName(RegistrationNo, RegistrationCurrent.ParamedicID);
 
+            /**
+             * Last Ranap Date
+             */
+            DateTime? latestRanapDate = LatestInpatientRegistrationDate();
+            lblTglRanap.Text = latestRanapDate?.ToString(AppConstant.DisplayFormat.DateShortMonth) ?? "-";
+
             hdnGuarantorCardNo.Value = reg.GuarantorCardNo;
 
             var grr = new Guarantor();
@@ -716,6 +722,23 @@ namespace Temiang.Avicenna.Module.RADT
             PopulatePatientImage(PatientID);
         }
 
+        #region latest ranap
+        private DateTime? LatestInpatientRegistrationDate()
+        {
+            var pars = new esParameters();
+            pars.Add("MedicalNo", PatientCurrent.MedicalNo);
+            var dtLatestRanap = BusinessObject.Common.Utils.LoadDataTableFromStoreProcedure("sp_GetLatestIPRRegistration", pars, 0);
+            if (dtLatestRanap.Rows.Count > 0)
+            {
+                DataRow row = dtLatestRanap.Rows[0];
+                DateTime latestRegistration = DateTime.Parse(row["RegistrationDate"].ToString());
+                return latestRegistration;
+            }
+            return null;
+        }
+
+        #endregion
+
         private string ParamedicName(string registrationNo, string paramedicID)
         {
             // Paramedic
@@ -826,6 +849,8 @@ namespace Temiang.Avicenna.Module.RADT
         {
             cpnDiagnosis.Title = "Diagnosis";
             litDiagnosis.Text = EpisodeDiagnose.DiagnoseSummaryHtml(RegistrationNo);
+            fsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
+            litSuggestion.Text = RegistrationCurrent.Suggestion;
         }
 
         private void PopulateImmunizationHistory()
@@ -1269,6 +1294,10 @@ namespace Temiang.Avicenna.Module.RADT
             if (this.IsUserAddAble.Equals(false)) return false;
 
             if (AppSession.Parameter.IsByPassEmrUserTypeRestriction) return true;
+
+            // Jika user fisioterapis bisa isi
+            if (AppSession.UserLogin.SRUserType == AppUser.UserType.Physiotherapy)
+                return true;
 
             // Hanya dokter team
             if (AppSession.UserLogin.SRUserType == AppUser.UserType.Doctor && IsUserInParamedicTeam())

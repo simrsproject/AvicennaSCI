@@ -297,9 +297,8 @@ namespace Temiang.Avicenna.Module.Payroll.Transaction
 
                 row.AcceptChanges();
 
-                if (new string[] { /*"ShiftID-023", */"ShiftID-013", "ShiftID-003" }.Contains(wh.SRShift) && (wh.IsCrossDay ?? false))
+                if (new string[] { /*"ShiftID-023", */"ShiftID-013", "ShiftID-003" }.Contains(wh.SRShift) && (wh.IsCrossDay ?? false) && (wh.StartTime2 != "00:00" && wh.EndTime2 != "00:00"))
                 {
-
                     DataRow nr = temp.NewRow();
                     nr["PersonID"] = row["PersonID"];
                     nr["EmployeeNumber"] = row["EmployeeNumber"];

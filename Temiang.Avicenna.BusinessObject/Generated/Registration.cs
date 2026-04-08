@@ -334,6 +334,7 @@ namespace Temiang.Avicenna.BusinessObject
 						case "FinishedAttendanceByUserID": this.str.FinishedAttendanceByUserID = (string)value; break;
 						case "FinishedAttendanceDateTime": this.str.FinishedAttendanceDateTime = (string)value; break;
                         case "SRPatientRiskColor": this.str.SRPatientRiskColor = (string)value; break;
+                        case "Suggestion": this.str.Suggestion = (string)value; break;
                     }
 				}
 				else
@@ -3294,6 +3295,22 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        /// <summary>
+        /// Maps to Registration.Suggestion
+        /// </summary>
+        virtual public System.String Suggestion
+        {
+            get
+            {
+                return base.GetSystemString(RegistrationMetadata.ColumnNames.Suggestion);
+            }
+
+            set
+            {
+                base.SetSystemString(RegistrationMetadata.ColumnNames.Suggestion, value);
+            }
+        }
+
         #endregion
 
         #region String Properties
@@ -5723,6 +5740,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.SRPatientRiskColor = Convert.ToString(value);
                 }
             }
+            public System.String Suggestion
+            {
+                get
+                {
+                    System.String data = entity.Suggestion;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.Suggestion = null;
+                    else entity.Suggestion = Convert.ToString(value);
+                }
+            }
             private esRegistration entity;
 		}
 		#endregion
@@ -7126,6 +7157,14 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, RegistrationMetadata.ColumnNames.SRPatientRiskColor, esSystemType.String);
+            }
+        }
+
+        public esQueryItem Suggestion
+        {
+            get
+            {
+                return new esQueryItem(this, RegistrationMetadata.ColumnNames.Suggestion, esSystemType.String);
             }
         }
 
@@ -8594,6 +8633,14 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
+            c = new esColumnMetadata(RegistrationMetadata.ColumnNames.Suggestion, 170, typeof(System.String), esSystemType.String);
+            c.PropertyName = RegistrationMetadata.PropertyNames.Suggestion;
+            c.CharacterMaxLength = 2147483647;
+            c.HasDefault = true;
+            c.Default = @"('')";
+            c.IsNullable = true;
+            _columns.Add(c);
+
 
         }
 		#endregion
@@ -8791,6 +8838,7 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string FinishedAttendanceByUserID = "FinishedAttendanceByUserID";
 			public const string FinishedAttendanceDateTime = "FinishedAttendanceDateTime";
             public const string SRPatientRiskColor = "SRPatientRiskColor";
+            public const string Suggestion = "Suggestion";
         }
 		#endregion
 
@@ -8967,6 +9015,7 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string FinishedAttendanceByUserID = "FinishedAttendanceByUserID";
 			public const string FinishedAttendanceDateTime = "FinishedAttendanceDateTime";
             public const string SRPatientRiskColor = "SRPatientRiskColor";
+            public const string Suggestion = "Suggestion";
         }
 		#endregion
 
@@ -9180,6 +9229,7 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("FinishedAttendanceByUserID", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("FinishedAttendanceDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("SRPatientRiskColor", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("Suggestion", new esTypeMap("varchar", "System.String"));
 
 
                 meta.Source = "Registration";

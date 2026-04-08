@@ -26,6 +26,11 @@
                     <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterGuarantor">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterRegDate">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisteredList" />
@@ -144,6 +149,25 @@
                             </td>
                             <td></td>
                         </tr>
+                        <tr>
+                            <td class="label">
+                                <asp:Label ID="lblGuarantorID" runat="server" Text="Guarantor"></asp:Label>
+                            </td>
+                            <td class="entry">
+                                <telerik:RadComboBox ID="cboGuarantorID" runat="server" Width="300px" HighlightTemplatedItems="True"
+                                    MarkFirstMatch="False" EnableLoadOnDemand="true" NoWrap="False" OnItemDataBound="cboGuarantorID_ItemDataBound"
+                                    OnItemsRequested="cboGuarantorID_ItemsRequested">
+                                    <FooterTemplate>
+                                        Note : Show max 30 result
+                                    </FooterTemplate>
+                                </telerik:RadComboBox>
+                            </td>
+                            <td width="20">
+                                <asp:ImageButton ID="btnFilterGuarantor" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                            <td></td>
+                        </tr>
                     </table>
                 </td>
             </tr>
@@ -206,6 +230,14 @@
                 <telerik:GridTemplateColumn UniqueName="PrintRek" HeaderStyle-Width="35px" ItemStyle-HorizontalAlign="center">
                     <ItemTemplate>
                         <asp:LinkButton ID="lbtnPrintRek" runat="server" CommandName="PrintRekap" ToolTip='Print Billing Statement Recap Patient'
+                            CommandArgument='<%# DataBinder.Eval(Container.DataItem, "RegistrationNo") %>'>
+                            <img src="../../../../Images/Toolbar/print16.png" border="0" />
+                        </asp:LinkButton>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
+                <telerik:GridTemplateColumn UniqueName="PrintWithPrice" HeaderStyle-Width="35px" ItemStyle-HorizontalAlign="center">
+                    <ItemTemplate>
+                        <asp:LinkButton ID="lbtnPrintWithPrice" runat="server" CommandName="PrintWithPrice" ToolTip='Print With Price'
                             CommandArgument='<%# DataBinder.Eval(Container.DataItem, "RegistrationNo") %>'>
                             <img src="../../../../Images/Toolbar/print16.png" border="0" />
                         </asp:LinkButton>

@@ -2033,6 +2033,15 @@
     <Content Include="Document\2025\04\10\02. AppProgram - update column.sql" />
     <Content Include="Document\2025\07\03\01. Insert Into AppParameter - Validasi Login RSI.sql" />
     <Content Include="Document\2025\08\01. SatuSehatKfaZa.sql" />
+    <Content Include="Document\2025\12\17\01. ALTER TABLE Registration ADD Suggestion.sql" />
+    <Content Include="Document\2025\12\ALTER TABLE WorkingHour.sql" />
+    <Content Include="Document\2026\01\12\Add AppProgram DPJP Validation.sql" />
+    <Content Include="Document\2026\01\13\01. sp_UpdateHistStockPerStockGroup - create sp.sql" />
+    <Content Include="Document\2026\01\29\01. ItemTransaction - alter table add column.sql" />
+    <Content Include="Document\2026\03\03\ServiceRoomBridging.sql" />
+    <Content Include="Document\2026\03\16\01. LoincItemRAD - Insert Master Data Loinc Radiology.sql" />
+    <Content Include="Document\2026\03\26\01.CreateTable_BpjsRujukanSatuSehat.sql" />
+    <Content Include="Document\2026\03\26\02.Insert_AppProgram_BpjsRujukanSatuSehat.sql" />
     <Content Include="Document\2026\04\08\080103. ReferExternal - alter table.sql" />
     <Content Include="Document\2026\04\08\103004. Snomedct - Insert.sql" />
     <Content Include="Document\2026\04\08\103003. ItemLaboratory - Alter .sql" />
@@ -2205,6 +2214,21 @@
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\3. Insert RlMasterReportItemV2025 RL 3.9 V2025.sql" />
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\4. Insert Cetakan AppProgram RL 3.9 V2025.sql" />
     <Content Include="Document\Rl Reporting %282025%29\9. RL Report 3.9\5. Create Procedure spxml_RL3_9V2025.sql" />
+    <Content Include="Document\SatuSehat Inpatient\01. ALTER TABLE ItemRadiology ADD IsPreparation.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Add AppStandardReference.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Add Column in Itemlaboratory and PatientAssesment.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Alter Table Bed.sql" />
+    <Content Include="Document\SatuSehat Inpatient\BridgingTemplate.sql" />
+    <Content Include="Document\SatuSehat Inpatient\DietBridging.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert AppProgram SatuSehat Inpatient.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert_AppStandardReference Class Satusehat.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert_AppStandardReferenceItemBridging.sql" />
+    <Content Include="Document\SatuSehat Inpatient\Insert_Snomedct.sql" />
+    <Content Include="Document\SatuSehat Inpatient\SatuSehatILPPreparation.sql" />
+    <Content Include="Document\SatuSehat Inpatient\SatuSehatILPTemplateDetail.sql" />
+    <Content Include="Document\SatuSehat Inpatient\SatuSehatILPTemplateDetailKeyWord.sql" />
+    <Content Include="Document\SatuSehat Inpatient\ServiceRoomBridging-Create.sql" />
+    <Content Include="Document\Version-2026.txt" />
     <Content Include="Document\Version-2026.txt" />
     <Content Include="Document\Version-2025.txt" />
     <Content Include="Document\Version-2024.txt" />
@@ -2343,6 +2367,9 @@
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\SpecimenCollectItem.aspx" />
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\Template\TemplateNew.aspx" />
     <Content Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx" />
+    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx" />
+    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.js" />
+    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogViewHist.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogWs.asmx" />
     <Content Include="Module\ControlPanel\Setting\StandardReferencePerGroup\WorkTradeItemDetail.ascx" />
@@ -2745,6 +2772,7 @@
     <Content Include="Module\Laundry\Transaction\Sorting\LaundrySortingProcessItemPicklist.aspx" />
     <Content Include="Module\Laundry\Transaction\Sorting\LaundrySortingProcessList.aspx" />
     <Content Include="Module\Laundry\Transaction\Sorting\LaundrySortingProcessSearch.aspx" />
+    <Content Include="Module\Nutrient\Master\Diet\DietAliasDetail.ascx" />
     <Content Include="Module\Nutrient\Transaction\DistributionPortionOpr\DistributionPortionOprList.aspx" />
     <Content Include="Module\Nutrient\Transaction\MealOrderOpr\MealOrderOprDetail.aspx" />
     <Content Include="Module\Nutrient\Transaction\MealOrderOpr\MealOrderOprItemDetail.ascx" />
@@ -2837,6 +2865,7 @@
     <Content Include="Module\RADT\Bpjs\Casemix\CasemixExceptionItemProductDetail.ascx" />
     <Content Include="Module\RADT\Bpjs\Casemix\CasemixExceptionRegistrationRuleItemDetail.ascx" />
     <Content Include="Module\RADT\Bpjs\Casemix\CasemixPrint.aspx" />
+    <Content Include="Module\RADT\Bpjs\Casemix\CasemixPhysicianInChargeValidation.aspx" />
     <Content Include="Module\RADT\Bpjs\Fingerprint\FingerprintList.aspx" />
     <Content Include="Module\RADT\Bpjs\InternalSep\InternalSepList.aspx" />
     <Content Include="Module\RADT\Bpjs\JasaRaharja\DataIndukKecelakaan.aspx" />
@@ -2849,6 +2878,9 @@
     <Content Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolDetail.aspx" />
     <Content Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolList.aspx" />
     <Content Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolSearch.aspx" />
+    <Content Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatDetail.aspx" />
+    <Content Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatList.aspx" />
+    <Content Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatSearch.aspx" />
     <Content Include="Module\RADT\Bpjs\Rujukan\RujukanDetail.aspx" />
     <Content Include="Module\RADT\Bpjs\Rujukan\RujukanList.aspx" />
     <Content Include="Module\RADT\Bpjs\Rujukan\RujukanSearch.aspx" />
@@ -3009,6 +3041,7 @@
     <Content Include="Module\RADT\Master\RL\v2025\RlMasterReportItemDetail.ascx" />
     <Content Include="Module\RADT\Master\RL\v2025\RlMasterReportList.aspx" />
     <Content Include="Module\RADT\Master\RL\v2025\RlMasterReportSearch.aspx" />
+    <Content Include="Module\RADT\Master\ServiceRoom\ServiceRoomAliasDetail.ascx" />
     <Content Include="Module\RADT\Master\ServiceRoom\ServiceRoomAutoBillItemDetail.ascx" />
     <Content Include="Module\RADT\Master\ServiceRoom\ServiceRoomUploadFoto.aspx" />
     <Content Include="Module\RADT\Master\Smf\SmfDiagnoseDetail.ascx" />
@@ -3158,7 +3191,10 @@
     <Content Include="Module\RADT\Registration\RegistrationDisplayEmergency.aspx" />
     <Content Include="Module\RADT\Registration\WebCamCaptureDocument.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatConsent.aspx" />
+    <Content Include="Module\RADT\SatuSehat\SatuSehatILP.aspx" />
+    <Content Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx" />
+    <Content Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatResultInfo.aspx" />
     <Content Include="Module\RADT\SatuSehat\ProcessDataToSatuSehat.aspx" />
     <Content Include="Module\RADT\UpdateReferral\UpdateReferralDetail.aspx" />
@@ -3236,6 +3272,7 @@
     <Content Include="Document\Rl Reporting %282025%29\2. RL Report 3.2\RL3_2_RawatInapV2025.trdx" />
     <Content Include="Document\Rl Reporting %282025%29\12.RL Report 3.13\Rl_3_13_RehabMedikV2025.trdx" />
     <Content Include="Document\Rl Reporting %282025%29\22. RL Report 5.1\RL51_KompilasiMorbiditasRawatJalan.trdx" />
+    <Content Include="Document\Rl Reporting %282025%29\5. RL Report 3.5\settingan RL 3_5 v 2025.xlsx" />
     <None Include="Properties\PublishProfiles\Publish FJ.pubxml" />
     <None Include="Properties\PublishProfiles\Publish-DB.pubxml" />
     <None Include="Scripts\jquery-1.6.3-vsdoc.js" />
@@ -7654,6 +7691,20 @@
     </Compile>
     <Compile Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx.designer.cs">
       <DependentUpon>UpdateICUPhysicianList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.cs">
+      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.designer.cs">
+      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.cs">
+      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.designer.cs">
+      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\ControlPanel\AuditLog\AuditLogSetting\AuditLogSettingDetail.aspx.cs">
       <DependentUpon>AuditLogSettingDetail.aspx</DependentUpon>
@@ -14166,6 +14217,13 @@
     <Compile Include="Module\Nutrient\Initialization\UnitClassMenuSetting\UnitClassMenuSettingSearch.aspx.designer.cs">
       <DependentUpon>UnitClassMenuSettingSearch.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\Nutrient\Master\Diet\DietAliasDetail.ascx.cs">
+      <DependentUpon>DietAliasDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Nutrient\Master\Diet\DietAliasDetail.ascx.designer.cs">
+      <DependentUpon>DietAliasDetail.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Module\Nutrient\Master\Diet\DietComplicationDetail.ascx.cs">
       <DependentUpon>DietComplicationDetail.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -15832,6 +15890,13 @@
     <Compile Include="Module\RADT\Bpjs\Casemix\CasemixPrint.aspx.designer.cs">
       <DependentUpon>CasemixPrint.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Bpjs\Casemix\CasemixPhysicianInChargeValidation.aspx.cs">
+      <DependentUpon>CasemixPhysicianInChargeValidation.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\Casemix\CasemixPhysicianInChargeValidation.aspx.designer.cs">
+      <DependentUpon>CasemixPhysicianInChargeValidation.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\Bpjs\Fingerprint\FingerprintList.aspx.cs">
       <DependentUpon>FingerprintList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -16559,6 +16624,27 @@
     </Compile>
     <Compile Include="Module\RADT\Bpjs\RencanaKontrol\RencanaKontrolSearch.aspx.designer.cs">
       <DependentUpon>RencanaKontrolSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatDetail.aspx.cs">
+      <DependentUpon>RujukanSatuSehatDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatDetail.aspx.designer.cs">
+      <DependentUpon>RujukanSatuSehatDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatList.aspx.cs">
+      <DependentUpon>RujukanSatuSehatList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatList.aspx.designer.cs">
+      <DependentUpon>RujukanSatuSehatList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatSearch.aspx.cs">
+      <DependentUpon>RujukanSatuSehatSearch.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Bpjs\RujukanSatuSehat\RujukanSatuSehatSearch.aspx.designer.cs">
+      <DependentUpon>RujukanSatuSehatSearch.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Rujukan\RujukanDetail.aspx.cs">
       <DependentUpon>RujukanDetail.aspx</DependentUpon>
@@ -18879,6 +18965,13 @@
     </Compile>
     <Compile Include="Module\RADT\Master\RL\v2025\RlMasterReportSearch.aspx.designer.cs">
       <DependentUpon>RlMasterReportSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Master\ServiceRoom\ServiceRoomAliasDetail.ascx.cs">
+      <DependentUpon>ServiceRoomAliasDetail.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Master\ServiceRoom\ServiceRoomAliasDetail.ascx.designer.cs">
+      <DependentUpon>ServiceRoomAliasDetail.ascx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Master\ServiceRoom\ServiceRoomAutoBillItemDetail.ascx.cs">
       <DependentUpon>ServiceRoomAutoBillItemDetail.ascx</DependentUpon>
@@ -21636,12 +21729,33 @@
     <Compile Include="Module\RADT\SatuSehat\SatuSehatConsent.aspx.designer.cs">
       <DependentUpon>SatuSehatConsent.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILP.aspx.cs">
+      <DependentUpon>SatuSehatILP.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILP.aspx.designer.cs">
+      <DependentUpon>SatuSehatILP.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx.cs">
+      <DependentUpon>SatuSehatILPDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx.designer.cs">
+      <DependentUpon>SatuSehatILPDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx.cs">
       <DependentUpon>SatuSehatKYC.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx.designer.cs">
       <DependentUpon>SatuSehatKYC.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx.cs">
+      <DependentUpon>SatuSehatRawatInap.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx.designer.cs">
+      <DependentUpon>SatuSehatRawatInap.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatResultInfo.aspx.cs">
       <DependentUpon>SatuSehatResultInfo.aspx</DependentUpon>
@@ -22358,6 +22472,10 @@
       <DependentUpon>SesssionStretch.aspx</DependentUpon>
     </Compile>
     <Compile Include="Util\ApprovalLevelUtil.cs" />
+    <Compile Include="Util\DynamicInvoker.cs" />
+    <Compile Include="Util\Extentions.cs" />
+    <Compile Include="Util\JsonHelper.cs" />
+    <Compile Include="Util\SatuSehatHelper.cs" />
     <Compile Include="WebService\Antrol.asmx.cs">
       <DependentUpon>Antrol.asmx</DependentUpon>
       <SubType>Component</SubType>

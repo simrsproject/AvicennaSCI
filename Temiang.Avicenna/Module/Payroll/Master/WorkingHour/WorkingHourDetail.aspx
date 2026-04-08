@@ -7,23 +7,20 @@
             <td width="50%" valign="top">
                 <table width="100%">
                     <tr>
-                        <td class="label">Working Hour Name
-                        </td>
+                        <td class="label">Working Hour Name</td>
                         <td>
                             <telerik:RadTextBox ID="txtWorkingHourName" runat="server" Width="300px" />
                         </td>
                         <td width="20px">
                             <asp:RequiredFieldValidator ID="rfvWorkingHourName" runat="server" ErrorMessage="Working Hour Name required."
-                                ValidationGroup="entry" ControlToValidate="txtWorkingHourName" SetFocusOnError="True"
-                                Width="100%">
+                                ValidationGroup="entry" ControlToValidate="txtWorkingHourName" SetFocusOnError="True" Width="100%">
                                 <asp:Image ID="Image1" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
                         <td />
                     </tr>
                     <tr>
-                        <td class="label">Shift Category
-                        </td>
+                        <td class="label">Shift Category</td>
                         <td>
                             <telerik:RadComboBox ID="cboSRShift" runat="server" Width="300px" AllowCustomText="true" />
                         </td>
@@ -31,8 +28,7 @@
                         <td />
                     </tr>
                     <tr>
-                        <td class="label">Working Day
-                        </td>
+                        <td class="label">Working Day</td>
                         <td>
                             <telerik:RadComboBox ID="cboSRWorkingDay" runat="server" Width="300px" AllowCustomText="true" />
                         </td>
@@ -50,102 +46,84 @@
                                                 <td style="text-align: center;" colspan="2"><b>Schedule 1</b></td>
                                             </tr>
                                             <tr>
-                                                <td class="label">Check In Time
-                                                </td>
+                                                <td class="label">Check In Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtStartTime" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvStartTime" runat="server" ErrorMessage="Check In Time required."
-                                                        ValidationGroup="entry" ControlToValidate="txtStartTime" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtStartTime" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image2" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Min. Check In Time
-                                                </td>
+                                                <td class="label">Min. Check In Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMinimumStartTime" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMinimumStartTime" runat="server" ErrorMessage="Min. Check In Time required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMinimumStartTime" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMinimumStartTime" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image3" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Max. Check In Time
-                                                </td>
+                                                <td class="label">Max. Check In Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMaxStartTime" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMaxStartTime" runat="server" ErrorMessage="Max. Check In Time required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMaxStartTime" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMaxStartTime" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image4" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Check Out Time
-                                                </td>
+                                                <td class="label">Check Out Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtEndTime" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvEndTime" runat="server" ErrorMessage="Check Out Time required."
-                                                        ValidationGroup="entry" ControlToValidate="txtEndTime" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtEndTime" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image5" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Min. Check Out Time
-                                                </td>
+                                                <td class="label">Min. Check Out Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMinEndTime" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMinEndTime" runat="server" ErrorMessage="Min. Check Out Time required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMinEndTime" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMinEndTime" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image6" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Max. Check Out Time
-                                                </td>
+                                                <td class="label">Max. Check Out Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMaxEndTime" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMaxEndTime" runat="server" ErrorMessage="Max. Check Out Time required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMaxEndTime" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMaxEndTime" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image7" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
@@ -167,110 +145,115 @@
                                                 <td width="20px" />
                                                 <td />
                                             </tr>
+                                            <tr>
+                                                <td class="label" />
+                                                <td>
+                                                    <asp:CheckBox ID="chkIsOvertimeAfterShift" runat="server" Text="Overtime After Shift" />
+                                                </td>
+                                                <td width="20px" />
+                                                <td />
+                                            </tr>
+                                            <tr>
+                                                <td class="label" />
+                                                <td colspan="3">
+                                                    <asp:CheckBox ID="chkIsOvertimeBeforeShift" runat="server" Text="Overtime Before Shift" CssClass="full-width-checkbox" />
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="label" />
+                                                <td>
+                                                    <asp:CheckBox ID="chkIsTunjShift" runat="server" Text="Tunj. Shift" />
+                                                </td>
+                                                <td width="20px" />
+                                                <td />
+                                            </tr>
                                         </table>
                                     </td>
-                                    <td style="vertical-align:top">
+                                    <td style="vertical-align: top">
                                         <table>
                                             <tr>
                                                 <td style="text-align: center;" colspan="2"><b>Schedule 2</b></td>
                                             </tr>
                                             <tr>
-                                                <td class="label">Check In Time
-                                                </td>
+                                                <td class="label">Check In Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtStartTime2" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvStartTime2" runat="server" ErrorMessage="Check In Time 2 required."
-                                                        ValidationGroup="entry" ControlToValidate="txtStartTime2" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtStartTime2" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image10" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Min. Check In Time
-                                                </td>
+                                                <td class="label">Min. Check In Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMinimumStartTime2" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMinimumStartTime2" runat="server" ErrorMessage="Min. Check In Time 2 required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMinimumStartTime2" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMinimumStartTime2" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image11" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Max. Check In Time
-                                                </td>
+                                                <td class="label">Max. Check In Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMaxStartTime2" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMaxStartTime2" runat="server" ErrorMessage="Max. Check In Time 2 required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMaxStartTime2" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMaxStartTime2" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image12" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Check Out Time
-                                                </td>
+                                                <td class="label">Check Out Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtEndTime2" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvEndTime2" runat="server" ErrorMessage="Check Out Time 2 required."
-                                                        ValidationGroup="entry" ControlToValidate="txtEndTime2" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtEndTime2" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image13" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Min. Check Out Time
-                                                </td>
+                                                <td class="label">Min. Check Out Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMinEndTime2" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMinEndTime2" runat="server" ErrorMessage="Min. Check Out Time 2 required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMinEndTime2" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMinEndTime2" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image14" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
                                                 <td />
                                             </tr>
                                             <tr>
-                                                <td class="label">Max. Check Out Time
-                                                </td>
+                                                <td class="label">Max. Check Out Time</td>
                                                 <td>
                                                     <telerik:RadMaskedTextBox ID="txtMaxEndTime2" runat="server" Mask="<00..23>:<00..59>"
-                                                        PromptChar="_" RoundNumericRanges="false" Width="100px">
-                                                    </telerik:RadMaskedTextBox>
+                                                        PromptChar="_" RoundNumericRanges="false" Width="100px" />
                                                 </td>
                                                 <td width="20px">
                                                     <asp:RequiredFieldValidator ID="rfvMaxEndTime2" runat="server" ErrorMessage="Max. Check Out Time 2 required."
-                                                        ValidationGroup="entry" ControlToValidate="txtMaxEndTime2" SetFocusOnError="True"
-                                                        Width="100%">
+                                                        ValidationGroup="entry" ControlToValidate="txtMaxEndTime2" SetFocusOnError="True" Width="100%">
                                                         <asp:Image ID="Image15" runat="server" SkinID="rfvImage" />
                                                     </asp:RequiredFieldValidator>
                                                 </td>
@@ -282,6 +265,29 @@
                                                     <asp:CheckBox ID="chkIsShiftLeader2" runat="server" Text="Shift Leader" />
                                                 </td>
                                                 <td width="20px"></td>
+                                                <td />
+                                            </tr>
+                                            <tr>
+                                                <td class="label" />
+                                                <td>
+                                                    <asp:CheckBox ID="chkIsOvertimeAfterShift2" runat="server" Text="Overtime After Shift" />
+                                                </td>
+                                                <td width="20px" />
+                                                <td />
+                                            </tr>
+                                            <tr>
+                                                <td class="label" />
+                                                <td colspan="3">
+                                                    <asp:CheckBox ID="chkIsOvertimeBeforeShift2" runat="server" Text="Overtime Before Shift" CssClass="full-width-checkbox" />
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td class="label" />
+                                                <td>
+                                                    <asp:CheckBox ID="chkIsTunjShift2" runat="server" Text="Tunj. Shift" />
+                                                </td>
+                                                <td width="20px" />
                                                 <td />
                                             </tr>
                                         </table>
@@ -297,8 +303,7 @@
                         </td>
                         <td width="20px">
                             <asp:RequiredFieldValidator ID="rfvMealQty" runat="server" ErrorMessage="Meal Qty required."
-                                ValidationGroup="entry" ControlToValidate="txtMealQty" SetFocusOnError="True"
-                                Width="100%">
+                                ValidationGroup="entry" ControlToValidate="txtMealQty" SetFocusOnError="True" Width="100%">
                                 <asp:Image ID="Image8" runat="server" SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
@@ -313,8 +318,7 @@
                         <td />
                     </tr>
                     <tr>
-                        <td class="label">Overtime Value In Hour
-                        </td>
+                        <td class="label">Overtime Value In Hour</td>
                         <td>
                             <telerik:RadNumericTextBox ID="txtOvertimeValueInMinutes" runat="server" Width="100px" />
                         </td>
@@ -337,7 +341,6 @@
                         <td width="20px" />
                         <td />
                     </tr>
-
                     <tr>
                         <td class="label" />
                         <td>
@@ -369,10 +372,8 @@
                     AutoGenerateColumns="False" GridLines="None" OnUpdateCommand="grdAliasName_UpdateCommand"
                     OnDeleteCommand="grdAliasName_DeleteCommand" OnInsertCommand="grdAliasName_InsertCommand"
                     AllowPaging="true">
-                    <HeaderContextMenu>
-                    </HeaderContextMenu>
-                    <MasterTableView CommandItemDisplay="None" DataKeyNames="WorkingHourID, OrganizationUnitID"
-                        PageSize="20">
+                    <HeaderContextMenu />
+                    <MasterTableView CommandItemDisplay="None" DataKeyNames="WorkingHourID, OrganizationUnitID" PageSize="20">
                         <Columns>
                             <telerik:GridEditCommandColumn ButtonType="ImageButton">
                                 <HeaderStyle Width="35px" />
@@ -387,12 +388,10 @@
                             </telerik:GridButtonColumn>
                         </Columns>
                         <EditFormSettings UserControlName="WorkingHourItem.ascx" EditFormType="WebUserControl">
-                            <EditColumn UniqueName="WorkingHourItemEditCommand">
-                            </EditColumn>
+                            <EditColumn UniqueName="WorkingHourItemEditCommand" />
                         </EditFormSettings>
                     </MasterTableView>
-                    <FilterMenu>
-                    </FilterMenu>
+                    <FilterMenu />
                     <ClientSettings EnableRowHoverStyle="true">
                         <Resizing AllowColumnResize="True" />
                         <Selecting AllowRowSelect="True" />

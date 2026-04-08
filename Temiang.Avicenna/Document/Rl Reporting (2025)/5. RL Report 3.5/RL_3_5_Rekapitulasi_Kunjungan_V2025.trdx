@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Report DataSourceName="sqlDataSource1" Width="19cm" Name="RL_3_5_Rekapitulasi_Kunjungan_V2025" ShowSnapGrid="True" SnapGridSize="0.1cm" xmlns="http://schemas.telerik.com/reporting/2023/1.0">
+<Report DataSourceName="sqlDataSource1" Width="19cm" Name="RL_3_5_Rekapitulasi_Kunjungan_V2025" Zoom="1.5" ShowSnapGrid="True" SnapGridSize="0.1cm" xmlns="http://schemas.telerik.com/reporting/2023/1.0">
   <DataSources>
-    <SqlDataSource QueryDesignerState="null" ParameterValues="{&quot;@RlTxReportNo&quot;:&quot;RL/250314-0004&quot;}" ConnectionString="RSI" SelectCommand="spxml_RL3_5V2025" SelectCommandType="StoredProcedure" Name="sqlDataSource1">
+    <SqlDataSource QueryDesignerState="null" ParameterValues="{&quot;@RlTxReportNo&quot;:&quot;RL/250903-0004&quot;}" ConnectionString="RSETASLIVE" SelectCommand="spxml_RL3_5V2025" SelectCommandType="StoredProcedure" Name="sqlDataSource1">
       <Parameters>
         <SqlDataSourceParameter DbType="AnsiString" Name="@RlTxReportNo">
           <Value>
-            <String>RL/250314-0004</String>
+            <String>RL/250903-0004</String>
           </Value>
         </SqlDataSourceParameter>
       </Parameters>
@@ -15,17 +15,17 @@
     <DetailSection Height="0.132cm" Name="detailSection1">
       <Style Visible="False" />
     </DetailSection>
-    <PageFooterSection Height="0.712cm" Name="pageFooterSection1">
+    <PageFooterSection Height="0.132cm" Name="pageFooterSection1">
       <Style Visible="False" />
     </PageFooterSection>
-    <ReportHeaderSection Height="7.056cm" Name="reportHeaderSection1">
+    <ReportHeaderSection Height="6.408cm" Name="reportHeaderSection1">
       <Items>
-        <Table DataSourceName="sqlDataSource1" Width="18.938cm" Height="3.256cm" Left="0cm" Top="3.8cm" Name="table1">
+        <Table DataSourceName="sqlDataSource1" Width="18.9cm" Height="3.108cm" Left="0cm" Top="3.3cm" Name="table1">
           <Body>
             <Cells>
               <TableCell RowIndex="0" ColumnIndex="0" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="1.087cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.No" Name="textBox9" StyleName="">
+                  <TextBox Width="1.081cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.No" Name="textBox9" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -44,7 +44,7 @@
               </TableCell>
               <TableCell RowIndex="0" ColumnIndex="1" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="6.615cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.JenisKegiatan" Name="textBox2" StyleName="">
+                  <TextBox Width="6.579cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.JenisKegiatan" Name="textBox2" StyleName="">
                     <Style TextAlign="Left" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -63,7 +63,7 @@
               </TableCell>
               <TableCell RowIndex="0" ColumnIndex="2" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.JumlahLaki" Name="textBox4" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= ISNULL(Fields.JumlahLaki,0)" Name="textBox4" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -80,7 +80,7 @@
               </TableCell>
               <TableCell RowIndex="0" ColumnIndex="3" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.JumlahPerempuan" Name="textBox6" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= ISNULL(Fields.JumlahPerempuan,0)" Name="textBox6" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -97,7 +97,7 @@
               </TableCell>
               <TableCell RowIndex="0" ColumnIndex="4" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.JumlahLaki2" Name="textBox8" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= ISNULL(Fields.JumlahLaki2,0)" Name="textBox8" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -114,7 +114,7 @@
               </TableCell>
               <TableCell RowIndex="0" ColumnIndex="5" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.JumlahPerempuan2" Name="textBox10" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= ISNULL(Fields.JumlahPerempuan2,0)" Name="textBox10" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -131,7 +131,7 @@
               </TableCell>
               <TableCell RowIndex="0" ColumnIndex="6" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.196cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= Fields.Jumlah" Name="textBox14" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.6cm" Left="7.9cm" Top="1.1cm" Value="= ISNULL(Fields.Jumlah,0)" Name="textBox14" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -140,7 +140,7 @@
               </TableCell>
               <TableCell RowIndex="1" ColumnIndex="0" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="1.087cm" Height="0.5cm" Left="0cm" Top="0cm" Value="66" Name="textBox16" StyleName="">
+                  <TextBox Width="1.081cm" Height="0.5cm" Left="0cm" Top="0cm" Value="66" Name="textBox16" StyleName="">
                     <Style VerticalAlign="Middle">
                       <Font Bold="False" />
                       <BorderStyle Default="Solid" />
@@ -150,7 +150,7 @@
               </TableCell>
               <TableCell RowIndex="1" ColumnIndex="1" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="6.615cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Rata-Rata Hari Poliklinik Buka" Name="textBox17" StyleName="">
+                  <TextBox Width="6.579cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Rata-Rata Hari Poliklinik Buka" Name="textBox17" StyleName="">
                     <Style TextAlign="Left" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -159,7 +159,7 @@
               </TableCell>
               <TableCell RowIndex="1" ColumnIndex="3" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="=Fields.RataRataHariPoliklinilBukaDalamKotaWanita" Name="textBox20" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Name="textBox20" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -168,7 +168,7 @@
               </TableCell>
               <TableCell RowIndex="1" ColumnIndex="4" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="=Fields.RataRataHariPoliklinilBukaLuarKotaPria" Name="textBox21" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Name="textBox21" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -177,7 +177,7 @@
               </TableCell>
               <TableCell RowIndex="1" ColumnIndex="5" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="=Fields.RataRataHariPoliklinilBukaLuarKotaWanita" Name="textBox22" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Name="textBox22" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -186,7 +186,7 @@
               </TableCell>
               <TableCell RowIndex="1" ColumnIndex="6" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.196cm" Height="0.5cm" Left="0cm" Top="0cm" Value="=Fields.RataRataHariPoliklinilBukaDalamKotaPria + Fields.RataRataHariPoliklinilBukaDalamKotaWanita + Fields.RataRataHariPoliklinilBukaLuarKotaPria + Fields.RataRataHariPoliklinilBukaLuarKotaWanita" Name="textBox23" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Name="textBox23" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -195,7 +195,7 @@
               </TableCell>
               <TableCell RowIndex="2" ColumnIndex="0" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="1.087cm" Height="0.5cm" Left="0cm" Top="0cm" Value="77" Name="textBox24" StyleName="">
+                  <TextBox Width="1.081cm" Height="0.5cm" Left="0cm" Top="0cm" Value="77" Name="textBox24" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <Font Bold="True" />
                       <BorderStyle Default="Solid" />
@@ -205,7 +205,7 @@
               </TableCell>
               <TableCell RowIndex="2" ColumnIndex="1" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="6.615cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Rata-Rata Kunjungan per Hari" Name="textBox25" StyleName="">
+                  <TextBox Width="6.579cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Rata-Rata Kunjungan per Hari" Name="textBox25" StyleName="">
                     <Style BackgroundColor="DarkGray" TextAlign="Left" VerticalAlign="Middle">
                       <Font Bold="True" />
                       <BorderStyle Default="Solid" />
@@ -213,9 +213,18 @@
                   </TextBox>
                 </ReportItem>
               </TableCell>
+              <TableCell RowIndex="2" ColumnIndex="6" RowSpan="1" ColumnSpan="1">
+                <ReportItem>
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Value="= ISNULL(Fields.RataA,0)+ isnull(Fields.RataB,0)+ isnull(Fields.RataC,0)+ isnull(Fields.RataD,0)" Name="textBox30" StyleName="">
+                    <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
+                      <BorderStyle Default="Solid" />
+                    </Style>
+                  </TextBox>
+                </ReportItem>
+              </TableCell>
               <TableCell RowIndex="1" ColumnIndex="2" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="=Fields.RataRataHariPoliklinilBukaDalamKotaPria" Name="textBox31" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="= ISNULL(Fields.RataRataHariPoliklinikBuka,0)" Name="textBox31" StyleName="">
                     <Style VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -224,7 +233,7 @@
               </TableCell>
               <TableCell RowIndex="2" ColumnIndex="2" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="=Fields.satu" Name="textBox29" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="= ISNULL(Fields.RataA,0)" Format="{0}" Name="textBox29" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -233,7 +242,7 @@
               </TableCell>
               <TableCell RowIndex="2" ColumnIndex="3" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="=Fields.dua" Name="textBox19" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="= ISNULL(Fields.RataB,0)" Name="textBox19" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -242,7 +251,7 @@
               </TableCell>
               <TableCell RowIndex="2" ColumnIndex="4" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="=Fields.tiga" Name="textBox28" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="= ISNULL(Fields.RataC,0)" Name="textBox26" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -251,16 +260,7 @@
               </TableCell>
               <TableCell RowIndex="2" ColumnIndex="5" RowSpan="1" ColumnSpan="1">
                 <ReportItem>
-                  <TextBox Width="2.26cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="=Fields.empat" Name="textBox26" StyleName="">
-                    <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
-                      <BorderStyle Default="Solid" />
-                    </Style>
-                  </TextBox>
-                </ReportItem>
-              </TableCell>
-              <TableCell RowIndex="2" ColumnIndex="6" RowSpan="1" ColumnSpan="1">
-                <ReportItem>
-                  <TextBox Width="2.196cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="=Fields.lima" Name="textBox27" StyleName="">
+                  <TextBox Width="2.248cm" Height="0.5cm" Left="9.2cm" Top="1.6cm" Value="= ISNULL(Fields.RataD,0)" Name="textBox27" StyleName="">
                     <Style BackgroundColor="DarkGray" VerticalAlign="Middle">
                       <BorderStyle Default="Solid" />
                     </Style>
@@ -269,13 +269,13 @@
               </TableCell>
             </Cells>
             <Columns>
-              <Column Width="1.087cm" />
-              <Column Width="6.615cm" />
-              <Column Width="2.26cm" />
-              <Column Width="2.26cm" />
-              <Column Width="2.26cm" />
-              <Column Width="2.26cm" />
-              <Column Width="2.196cm" />
+              <Column Width="1.081cm" />
+              <Column Width="6.579cm" />
+              <Column Width="2.248cm" />
+              <Column Width="2.248cm" />
+              <Column Width="2.248cm" />
+              <Column Width="2.248cm" />
+              <Column Width="2.248cm" />
             </Columns>
             <Rows>
               <Row Height="0.6cm" />
@@ -297,8 +297,8 @@
           <ColumnGroups>
             <TableGroup Name="tableGroup">
               <ReportItem>
-                <TextBox Width="1.087cm" Height="1.656cm" Left="0cm" Top="0cm" Value="No" Name="textBox1">
-                  <Style TextAlign="Center" VerticalAlign="Middle">
+                <TextBox Width="1.081cm" Height="1.508cm" Left="0cm" Top="0cm" Value="No" Name="textBox1">
+                  <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                     <Font Bold="True" />
                     <BorderStyle Default="Solid" />
                   </Style>
@@ -307,8 +307,8 @@
             </TableGroup>
             <TableGroup Name="tableGroup1">
               <ReportItem>
-                <TextBox Width="6.615cm" Height="1.656cm" Left="0cm" Top="0cm" Value="Jenis Kegiatan" Name="textBox3">
-                  <Style TextAlign="Center" VerticalAlign="Middle">
+                <TextBox Width="6.579cm" Height="1.508cm" Left="0cm" Top="0cm" Value="Jenis Kegiatan" Name="textBox3">
+                  <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                     <Font Bold="True" />
                     <BorderStyle Default="Solid" />
                   </Style>
@@ -317,8 +317,8 @@
             </TableGroup>
             <TableGroup Name="tableGroup2">
               <ReportItem>
-                <TextBox Width="4.52cm" Height="1.156cm" Left="0cm" Top="0cm" Value="Kunjungan Pasien&#xD;&#xA;Dalam Kab/Kota" Name="textBox5">
-                  <Style TextAlign="Center" VerticalAlign="Middle">
+                <TextBox Width="4.496cm" Height="1.008cm" Left="0cm" Top="0cm" Value="Kunjungan Pasien&#xD;&#xA;Dalam Kab/Kota" Name="textBox5">
+                  <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                     <Font Bold="True" />
                     <BorderStyle Default="Solid" />
                   </Style>
@@ -327,8 +327,8 @@
               <ChildGroups>
                 <TableGroup Name="group3">
                   <ReportItem>
-                    <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Laki-laki" Name="textBox11" StyleName="">
-                      <Style TextAlign="Center" VerticalAlign="Middle">
+                    <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Laki-laki" Name="textBox11" StyleName="">
+                      <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                         <Font Bold="True" />
                         <BorderStyle Default="Solid" />
                       </Style>
@@ -337,8 +337,8 @@
                 </TableGroup>
                 <TableGroup Name="group4">
                   <ReportItem>
-                    <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Perempuan" Name="textBox12" StyleName="">
-                      <Style TextAlign="Center" VerticalAlign="Middle">
+                    <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Perempuan" Name="textBox12" StyleName="">
+                      <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                         <Font Bold="True" />
                         <BorderStyle Default="Solid" />
                       </Style>
@@ -349,8 +349,8 @@
             </TableGroup>
             <TableGroup Name="group">
               <ReportItem>
-                <TextBox Width="4.52cm" Height="1.156cm" Left="0cm" Top="0cm" Value="Kunjungan Pasien&#xD;&#xA;Luar Kab/Kota" Name="textBox7" StyleName="">
-                  <Style TextAlign="Center" VerticalAlign="Middle">
+                <TextBox Width="4.496cm" Height="1.008cm" Left="0cm" Top="0cm" Value="Kunjungan Pasien&#xD;&#xA;Luar Kab/Kota" Name="textBox7" StyleName="">
+                  <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                     <Font Bold="True" />
                     <BorderStyle Default="Solid" />
                   </Style>
@@ -359,8 +359,8 @@
               <ChildGroups>
                 <TableGroup Name="group5">
                   <ReportItem>
-                    <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Laki-laki" Name="textBox18" StyleName="">
-                      <Style TextAlign="Center" VerticalAlign="Middle">
+                    <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Laki-laki" Name="textBox18" StyleName="">
+                      <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                         <Font Bold="True" />
                         <BorderStyle Default="Solid" />
                       </Style>
@@ -369,8 +369,8 @@
                 </TableGroup>
                 <TableGroup Name="group7">
                   <ReportItem>
-                    <TextBox Width="2.26cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Perempuan" Name="textBox13" StyleName="">
-                      <Style TextAlign="Center" VerticalAlign="Middle">
+                    <TextBox Width="2.248cm" Height="0.5cm" Left="0cm" Top="0cm" Value="Perempuan" Name="textBox13" StyleName="">
+                      <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                         <Font Bold="True" />
                         <BorderStyle Default="Solid" />
                       </Style>
@@ -381,8 +381,8 @@
             </TableGroup>
             <TableGroup Name="group6">
               <ReportItem>
-                <TextBox Width="2.196cm" Height="1.656cm" Left="0cm" Top="0cm" Value="Total Kunjungan" Name="textBox15" StyleName="">
-                  <Style TextAlign="Center" VerticalAlign="Middle">
+                <TextBox Width="2.248cm" Height="1.508cm" Left="0cm" Top="0cm" Value="Total Kunjungan" Name="textBox15" StyleName="">
+                  <Style BackgroundColor="255, 255, 255" Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
                     <Font Bold="True" />
                     <BorderStyle Default="Solid" />
                   </Style>
@@ -391,14 +391,19 @@
             </TableGroup>
           </ColumnGroups>
         </Table>
-        <TextBox Width="19cm" Height="0.6cm" Left="0cm" Top="2.4cm" Value="= Fields.ReportName" Name="textBox30">
-          <Style TextAlign="Center" VerticalAlign="Middle">
+        <TextBox Width="3.504in" Height="0.236in" Left="0.04in" Top="0.827in" Value="= Fields.ReportName" Name="textBox33">
+          <Style VerticalAlign="Middle">
             <Font Size="12pt" Bold="True" />
           </Style>
         </TextBox>
-        <TextBox Width="19cm" Height="0.6cm" Left="0cm" Top="3cm" Value="= Fields.Periode" Name="textBox32">
-          <Style TextAlign="Center" VerticalAlign="Middle">
-            <Font Size="12pt" Bold="True" />
+        <TextBox Width="3.504in" Height="0.236in" Left="0.04in" Top="1.063in" Value="= Fields.Periode" Name="textBox32">
+          <Style VerticalAlign="Middle">
+            <Font Size="11pt" Bold="True" />
+          </Style>
+        </TextBox>
+        <TextBox Width="3.034in" Height="0.2in" Left="2.209in" Top="0.476in" Value="= Fields.HealthcareName" Name="textBox39">
+          <Style Color="0, 0, 0" TextAlign="Center" VerticalAlign="Middle">
+            <Font Size="14pt" Bold="True" />
           </Style>
         </TextBox>
       </Items>

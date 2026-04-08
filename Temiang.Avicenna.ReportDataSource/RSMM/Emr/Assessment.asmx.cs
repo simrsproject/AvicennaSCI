@@ -330,6 +330,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                                 retField = KebidananClinic(asses, pat, reg, au, mergeRegs);
                                 break;
                             }
+                        case "RCONT":
                         case "CONT":
                             {
                                 var rim = new RegistrationInfoMedic();

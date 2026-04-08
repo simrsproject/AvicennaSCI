@@ -1,18 +1,19 @@
-﻿using System;
+﻿//using Telerik.Reporting;
+using DevExpress.Office.Utils;
+using DevExpress.Utils;
+using DevExpress.XtraPrinting;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
-using System.Web.Services;
+using System.Net;
+using System.Runtime.ConstrainedExecution;
 using System.Web.Script.Services;
+using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
-using System.Data;
 using Temiang.Dal.Interfaces;
-//using Telerik.Reporting;
-using DevExpress.Office.Utils;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using DevExpress.XtraPrinting;
-using System.IO;
-using System.Net;
 
 namespace Temiang.Avicenna.WebService.V0
 {
@@ -2037,7 +2038,7 @@ namespace Temiang.Avicenna.WebService.V0
             string StreetName, string District, string City, string County, string State, string ZipCode,
             string PhoneNo, string Email, string Ssn,
             string GuarantorID, string Notes, string AppointmentStatus, string MobilePhoneNo,
-            string Nomorkartu, string NomorReferensi, int JenisReferensi, string UserID, string AppointmentType, string fromRegistrationNo = null, string fromRegistrationNoMds = null)
+            string Nomorkartu, string NomorReferensi, int JenisReferensi, string UserID, string AppointmentType, string fromRegistrationNo = null, string fromRegistrationNoMds = null, string AccessKey = null)
         {
             ServiceUnitID = ServiceUnitID.Trim();
             ParamedicID = ParamedicID.Trim();
@@ -2355,6 +2356,15 @@ namespace Temiang.Avicenna.WebService.V0
                             // create the empty one
                             aptQue.AddNew();
                             aptQue.FormattedNo = "";
+                        }
+                        else
+                        {
+                            //update nomor antrian jika update appointment via endpoint AppointmentUpdate -naufal 6/03/26
+                            if (!string.IsNullOrEmpty(AccessKey))
+                            {
+                                aptQue.UpdateQueForReg(apt, aptQue, AppSession.Parameter.GuarantorAskesID[0].Contains(apt.GuarantorID) ? "02" : AppSession.Parameter.SelfGuarantor.Equals(apt.GuarantorID) ? "01" : "03", su, UserID, true);
+                                aptQue.Save();
+                            }
                         }
                     }
 

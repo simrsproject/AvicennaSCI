@@ -24,6 +24,24 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
         protected global::Telerik.Web.UI.RadDropDownList ddlTriage;
 
         /// <summary>
+        /// trCaseType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow trCaseType;
+
+        /// <summary>
+        /// rblCaseType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButtonList rblCaseType;
+
+        /// <summary>
         /// questJalanNapas control.
         /// </summary>
         /// <remarks>

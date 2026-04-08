@@ -24,6 +24,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 reg.LoadByPrimaryKey(Request.QueryString["regNo"]);
 
                 txtInitialDiagnosis.Text = reg.InitialDiagnose;
+                txtSuggestion.Text = reg.Suggestion;
 
                 var pat = new Patient();
                 pat.LoadByPrimaryKey(reg.PatientID);
@@ -129,6 +130,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 btnAdd.Visible = isVisible;
                 grdPlafondHistory.Columns[0].Visible = isVisible;
                 grdPlafondHistory.Columns[grdPlafondHistory.Columns.Count - 1].Visible = isVisible;
+                tsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
             }
         }
 
@@ -250,6 +252,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     reg.BpjsCoverageFormula = Convert.ToDecimal(txtBpjsCoverageFormula.Value);
                     reg.BpjsPackageID = cboBpjsPackageID.SelectedValue;
                     reg.InitialDiagnose = txtInitialDiagnosis.Text;
+                    reg.Suggestion = txtSuggestion.Text;
                     reg.BpjsSepNo = txtBpjsSepNo.Text;
                     reg.CoverageClassID = cboCoverageClass.SelectedValue;
                     reg.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();

@@ -195,6 +195,33 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::System.Web.UI.WebControls.ImageButton btnFilterPatientName;
 
         /// <summary>
+        /// lblGuarantorID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblGuarantorID;
+
+        /// <summary>
+        /// cboGuarantorID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboGuarantorID;
+
+        /// <summary>
+        /// btnFilterGuarantor control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterGuarantor;
+
+        /// <summary>
         /// grdRegisteredList control.
         /// </summary>
         /// <remarks>
@@ -202,5 +229,14 @@ namespace Temiang.Avicenna.Module.RADT
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadGrid grdRegisteredList;
+
+        /// <summary>
+        /// RadAjaxPanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadAjaxPanel RadAjaxPanel1;
     }
 }

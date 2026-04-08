@@ -13,6 +13,7 @@ using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Dal.DynamicQuery;
 using System.Configuration;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.RADT.EmrIp
 {
@@ -779,6 +780,12 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             lblClinicalPathway.Text = Registration.GetRegistrationPathwayName(RegistrationNo);
             divClinicalPathway.Visible = AppSession.Parameter.ClinicalPathwayRegistrationType.Contains(RegistrationType);
 
+            /**
+             * Last Ranap Date
+             */
+            DateTime? latestRanapDate = LatestInpatientRegistrationDate();
+            lblTglRanap.Text = latestRanapDate?.ToString(AppConstant.DisplayFormat.DateShortMonth) ?? "-";
+
             lblPhysicianTeam.Text = ParamedicTeamHtml(RegistrationNo, RegistrationCurrent.ParamedicID);
             var grr = new Guarantor();
             grr.LoadByPrimaryKey(reg.GuarantorID);
@@ -807,6 +814,23 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
 
             PopulatePatientImage(PatientID);
         }
+
+        #region latest ranap
+        private DateTime? LatestInpatientRegistrationDate()
+        {
+            var pars = new esParameters();
+            pars.Add("MedicalNo", PatientCurrent.MedicalNo);
+            var dtLatestRanap = BusinessObject.Common.Utils.LoadDataTableFromStoreProcedure("sp_GetLatestIPRRegistration", pars, 0);
+            if (dtLatestRanap.Rows.Count > 0)
+            {
+                DataRow row = dtLatestRanap.Rows[0];
+                DateTime latestRegistration = DateTime.Parse(row["RegistrationDate"].ToString());
+                return latestRegistration;
+            }
+            return null;
+        }
+
+        #endregion
 
 
         private void PopulatePatientAllergy()
@@ -889,6 +913,8 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             litDiagnosis.Text = EpisodeDiagnose.DiagnoseSummaryHtml(RegistrationNo);
             litWorkDiagnosis.Text = RegistrationInfoMedicDiagnose.DiagnoseSummaryHtml(RegistrationNo);
             litInitialDiagnose.Text = RegistrationCurrent.InitialDiagnose;
+            fsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
+            litSuggestion.Text = RegistrationCurrent.Suggestion;
         }
 
         private void PopulateImmunizationHistory()

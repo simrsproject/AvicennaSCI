@@ -367,3 +367,43 @@ penambahan validasi ketika billing di lock tidak bisa input tindakan, add resep,
 
 ---[31-10-2025 - Danang]---
 1. Apotek Online Bridging
+
+---[12-11-2025 - Apip]---
+1.	Modif ketika unapproval update juga IsPaymentReturned = 1 di table TransPaymentItemOrders, karena datanya tidak muncul ketika diklik transaction list nya lagi
+
+---[13-11-2025 - Danang]---
+1. Fix Dializer iDRG
+
+---[21-11-2025 - Apip]---
+1.	Add nontifikasi jika pasien sudah di blacklist
+
+---[26-11-2025 - Apip]---
+1.	Clear cboSREklaimGroup saat new
+
+---[02-12-2025 - dk]---
+1. modif WorkingHour tambah 
+	- IsOvertimeAfterShift,
+	- IsOvertimeBeforeShift,
+	- IsTunjShift,
+	- IsOvertimeAfterShift2,
+	- IsOvertimeBeforeShift2,
+	- IsTunjShift2
+
+---[04-12-2025 - Luthfi]---
+1. Add assessment RCONT untuk Rehab RSI
+2. Modif akses user type Physiotherapy bisa isi assessment dokter
+
+---[04-12-2025 - Naufal]---
+1.	CR Antrian V1 & V2 RSI https://www.sciptaintegrasi.com/mantis/view.php?id=3326
+	- Add Caller V2 List EMR => param: IsCallQueueingListEmrV2
+	- Tutup slot dokter (close clinic EMR) tidak bisa ambil antrian atas nama dokter tsb
+	- Pop up untuk konfirmasi sudah apt apa belum di QueueEntry(V1) dan GetQueue(V2) dan tombol untuk perpindahan versi pengambilan antrian => param: IsDirectButtonBetweenKioskVersion
+2. Modif akses user type Physiotherapy bisa isi assessment dokter
+
+---[17-12-2025 - Dewi]---
+1. Menambahkan kolom Suggestion di Plafond Information, EMR Detail dan Progress Note
+2. Menaikann urutan kolom Patient Billing dan Diagnosis menjadi dibawah Physician Team
+3. insert document 17122025 - 01
+
+---[19-12-2025 - Apip]---
+1.	Mantis : 4242 -> Hitungan Cetak ulang kwitanasi - Titipan Rizki

@@ -26,6 +26,10 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
             else
                 StandardReference.InitializeIncludeSpace(ddlTriage, triageStdRefId, true);
 
+            SetCaseTypeVisibility();
+
+            if (rblCaseType.Enabled && rblCaseType.SelectedIndex == -1)
+                rblCaseType.SelectedValue = "Non Bedah";
 
             // Seting ReviewSystem Control
             var igd = new Igd();
@@ -74,6 +78,10 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
                     gcsCtl.Condition = igd.Condition;
                     gcsCtl.Gcs = igd.Consciousness;
 
+                    // ✅ POPULATE CASE TYPE
+                    if (!string.IsNullOrEmpty(igd.CaseType))
+                        rblCaseType.SelectedValue = igd.CaseType;
+
                     // Triage
                     var reg = new Registration();
                     if (reg.LoadByPrimaryKey(assessment.RegistrationNo))
@@ -106,6 +114,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
             igd.Condition = gcsCtl.Condition;
             igd.Consciousness = gcsCtl.Gcs;
 
+            // ✅ TAMBAHAN CASE TYPE
+            igd.CaseType = rblCaseType.SelectedValue;
 
             assessment.PhysicalExam = JsonConvert.SerializeObject(igd);
 
@@ -127,6 +137,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
 
             strBuilder.AppendLine("PRIMARY SURVEY:");
             strBuilder.AppendFormat("Triase: {0}", ddlTriage.SelectedText);
+            strBuilder.AppendLine(string.Empty);
+            strBuilder.AppendFormat("Case Type: {0}", pe.CaseType);
             strBuilder.AppendLine(string.Empty);
             SoapObjectiveAppend("Jalan Nafas:", pe.JalanNapas.Summary, strBuilder);
             SoapObjectiveAppend("Pernafasan:", pe.Pernapasan.Summary, strBuilder);
@@ -151,6 +163,23 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
                 strBuilder.AppendLine(caption);
                 strBuilder.AppendLine(value);
             }
+        }
+
+        private void SetCaseTypeVisibility()
+        {
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            bool isEnable = string.Equals(
+               healthCareId,
+               "RSI",
+               StringComparison.OrdinalIgnoreCase
+            );
+
+            trCaseType.Visible = isEnable;
+            rblCaseType.Enabled = isEnable;
+
+            if (!isEnable)
+                rblCaseType.ClearSelection();
         }
 
         #endregion

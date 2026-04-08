@@ -255,6 +255,7 @@
     <Compile Include="BPJS\VClaim\v1.1\RencanaKontrol\RencanaKontrol.cs" />
     <Compile Include="BPJS\VClaim\v1.1\RujukanBalik\RujukanBalik.cs" />
     <Compile Include="BPJS\VClaim\v1.1\RujukanKhusus\RujukanKhusus.cs" />
+    <Compile Include="BPJS\VClaim\v1.1\RujukanSatuSehat\RujukanSatuSehat.cs" />
     <Compile Include="BPJS\VClaim\v1.1\Rujukan\Rujukan.cs" />
     <Compile Include="BPJS\VClaim\v1.1\Sep\Cari.cs" />
     <Compile Include="BPJS\VClaim\v1.1\Sep\DataIndukKecelakaan.cs" />
@@ -368,6 +369,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReportParam.cs" />
+    <Compile Include="RsOnline\Json.cs" />
+    <Compile Include="RsOnline\Service.cs" />
     <Compile Include="Siranap\Json.cs" />
     <Compile Include="Siranap\Service.cs" />
     <Compile Include="SirsDinkes\Eis\Json.cs" />

@@ -61,6 +61,10 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
         {
             ProgramID = AppConstant.Program.ParamedicFeeVerification;
 
+            // calculation will take a long time, 
+            var ajxmgr = (RadScriptManager)Common.Helper.FindControlRecursive(this, "fw_RadScriptManager");
+            ajxmgr.AsyncPostBackTimeout = 240;
+
             if (!IsPostBack)
             {
                 // 

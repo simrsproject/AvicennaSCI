@@ -126,14 +126,29 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
         protected override void OnMenuPrintClick(ValidateArgs args, ref string programID, PrintJobParameterCollection printJobParameters)
         {
             var hd = new TransPayment();
-            if (hd.LoadByPrimaryKey(txtPaymentNo.Text))
+            if (AppSession.Parameter.IsCountPrintNumberForSpecificProgram)
             {
-                hd.PrintNumber++;
-                if (!hd.IsPrinted ?? false)
-                    hd.IsPrinted = true;
-                hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
-                hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
-                hd.Save();
+                if (programID == AppSession.Parameter.ProgramIdPrintNumberForSpecificProgram && hd.LoadByPrimaryKey(txtPaymentNo.Text))
+                {
+                    hd.PrintNumber++;
+                    if (!hd.IsPrinted ?? false)
+                        hd.IsPrinted = true;
+                    hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
+                    hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
+                    hd.Save();
+                }
+            }
+            else
+            {
+                if (hd.LoadByPrimaryKey(txtPaymentNo.Text))
+                {
+                    hd.PrintNumber++;
+                    if (!hd.IsPrinted ?? false)
+                        hd.IsPrinted = true;
+                    hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
+                    hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
+                    hd.Save();
+                }
             }
 
             if (AppSession.Parameter.IsUsedPrintSlipLogForPaymentReceipt)
@@ -1691,6 +1706,7 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
             foreach (var item in TransPaymentItemOrders)
             {
                 item.IsPaymentProceed = false;
+                item.IsPaymentReturned = true;
                 item.LastUpdateByUserID = AppSession.UserLogin.UserID;
                 item.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
             }
@@ -1890,7 +1906,7 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
                         }
                     }
                 }
-                
+
                 var visiteRealizations = new TransPaymentItemVisiteRealizationCollection();
                 visiteRealizations.Query.Where(visiteRealizations.Query.PaymentReferenceNo == entity.PaymentNo);
                 visiteRealizations.MarkAllAsDeleted();
@@ -2280,7 +2296,7 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
 
             if (selisih > 0)
                 tpatient = (decimal)selisih;
-            
+
             txtRemainingAmountPatient.Value = (double)tpatient - txtTotalPaymentAmountPatient.Value - discPatient + (double)trounding;
 
             txtAdminCal.Value = (double)(registration.AdministrationAmount ?? 0);
@@ -2383,6 +2399,8 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
             entity.LastUpdateByUserID = AppSession.UserLogin.UserID;
             entity.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
 
+            entity.PrintNumber = 0;
+
             if (entity.es.IsAdded)
             {
                 entity.CreatedBy = AppSession.UserLogin.UserID;
@@ -2467,7 +2485,7 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
                                     if (!dp.PaymentReferenceNo.Contains(entity.PaymentNo))
                                         dp.PaymentReferenceNo += ("|" + entity.PaymentNo);
                                 }
-                                    
+
                                 dp.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                 dp.LastUpdateDateTime = (new DateTime()).NowAtSqlServer().Date;
                                 if (dp.RegistrationNo == "" && dp.IsVisiteDownPayment == false)
@@ -3119,7 +3137,8 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
             grdIntermBill.DataSource = TransPaymentItemIntermBills;
         }
 
-        public static decimal GetSelisihPasienBPJS(Registration reg, ref bool isBridging, decimal totalTx) {
+        public static decimal GetSelisihPasienBPJS(Registration reg, ref bool isBridging, decimal totalTx)
+        {
             decimal selisih = 0;
 
             if (!AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID))
@@ -3244,7 +3263,7 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
             decimal? totalTx = 0;
             totalTx = TransPaymentItemIntermBills.Where(item => item.PaymentNo != string.Empty).Aggregate(totalTx, (current, item) => current + (item.PatientAmount + item.GuarantorAmount));
             decimal selisih = GetSelisihPasienBPJS(registration, ref isBridging, (totalTx ?? 0));
-            
+
             if (selisih > 0)
             {
                 txtTransPatientAmount.Value = Convert.ToDouble(selisih);
@@ -3684,6 +3703,6 @@ namespace Temiang.Avicenna.Module.Charges.Cashier
                 btnIntermBillGuarantor.Visible = rblToGuarantor.SelectedIndex == 0;
             }
         }
-        
+
     }
 }

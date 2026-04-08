@@ -223,7 +223,7 @@ namespace Temiang.Avicenna.Module.Finance.Payable
         {
             return "oWnd.argument.command = 'rebind:'";
         }
-
+        
         public override bool OnButtonOkClicked()
         {
             string transNo = Request.QueryString["tno"].ToString();
@@ -279,7 +279,22 @@ namespace Temiang.Avicenna.Module.Finance.Payable
                 //string srPph = ((RadComboBox)dataItem.FindControl("cboSRPph")).SelectedValue;
 
                 if (isDiscInPercent)
-                    currentdiscAmt = (currentprice * currentdisc1 / 100) + ((currentprice - (currentprice * currentdisc1 / 100)) * currentdisc2 / 100);
+                {
+                    if (it.IsTaxable == 0 && !(it.IsNewTaxCalculation ?? false)) // INCLUDE TAX cari harga asli exclude tax dan itu yang dipakai untuk diskon (naufal 29/01/26)
+                    {
+                        double currentpricefordisc = currentprice; 
+                        decimal ppn = (it.TaxPercentage ?? 0) / 100m; 
+                        decimal priceExclude = Convert.ToDecimal(currentprice);
+                        decimal discountVal = Convert.ToDecimal(currentdiscAmt); 
+                        decimal priceInclude = (priceExclude - discountVal) * (1 + ppn) + discountVal; 
+                        currentpricefordisc = (double)priceInclude;
+
+                        currentdiscAmt = (currentpricefordisc * currentdisc1 / 100) + ((currentpricefordisc - (currentpricefordisc * currentdisc1 / 100)) * currentdisc2 / 100);
+                        currentdiscAmt = (double)Math.Round(Convert.ToDecimal(currentdiscAmt), 2, MidpointRounding.AwayFromZero);
+                    }
+                    else
+                        currentdiscAmt = (currentprice * currentdisc1 / 100) + ((currentprice - (currentprice * currentdisc1 / 100)) * currentdisc2 / 100);
+                }
                 else
                 {
                     currentdisc1 = 0;
@@ -430,13 +445,15 @@ namespace Temiang.Avicenna.Module.Finance.Payable
             decimal? totaltax = iticoll.Where(item => !Convert.ToBoolean(item.IsBonusItem) && Convert.ToBoolean(item.IsTaxable)).Aggregate<ItemTransactionItem, decimal?>(0, (current, item) => current + ((item.Price - item.Discount)*item.Quantity));
             decimal? totaltaxPph = iticoll.Where(item => !Convert.ToBoolean(item.IsBonusItem) && Convert.ToBoolean(item.IsTaxablePph)).Aggregate<ItemTransactionItem, decimal?>(0, (current, item) => current + ((item.Price - item.Discount) * item.Quantity));
             //decimal? totaltaxPph = iticoll.Where(item => !Convert.ToBoolean(item.IsBonusItem) && Convert.ToBoolean(item.IsTaxablePph)).Aggregate<ItemTransactionItem, decimal?>(0, (current, item) => current + item.PphAmount);
-            decimal? receiveAmt = (totaltransaction ?? 0) - (totaldiscitem ?? 0) - discAmt;
+            decimal receiveAmt = Math.Round(((totaltransaction ?? 0) - (totaldiscitem ?? 0) - discAmt), 2, MidpointRounding.AwayFromZero);
             decimal? amtTaxed = (totaltax ?? 0) - discAmt;
 
-            if (tax > 0) taxAmt = (((amtTaxed ?? 0) * tax) / Convert.ToDecimal(100));
+            if (tax > 0) { taxAmt = Math.Round((((amtTaxed ?? 0) * tax) / 100), 2, MidpointRounding.AwayFromZero); }
 
             it.PriorChargesAmount = it.ChargesAmount;
             it.PriorTaxAmount = it.TaxAmount;
+
+            //taxAmt = Math.Round(taxAmt, 2);
 
             if (it.TransactionCode == TransactionCode.PurchaseOrderReceive)
             {

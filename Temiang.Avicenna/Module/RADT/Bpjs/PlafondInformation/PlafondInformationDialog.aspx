@@ -256,6 +256,27 @@
         </tr>
         <tr>
             <td>
+                <fieldset runat="server" id="tsSuggestion">
+                    <legend>SUGGESTION</legend>
+                    <table width="100%">
+                        <tr>
+                            <td class="entry">
+                                <table cellspacing="0" cellpadding="0" width="100%">
+                                    <tr>
+                                        <td>
+                                            <telerik:RadTextBox ID="txtSuggestion" runat="server" Width="100%" TextMode="MultiLine" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+
+                        </tr>
+                    </table>
+                </fieldset>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <fieldset>
                     <legend>APPROXIMATE PLAFOND COVERAGE</legend>
                     <table width="100%">

@@ -34,7 +34,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             ViewState["IsNewRecord"] = false;
 
             cboBridgingType.SelectedValue = (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.SRBridgingType);
-            cboBridgingType_SelectedIndexChanged(null, new RadComboBoxSelectedIndexChangedEventArgs(string.Empty, string.Empty, cboBridgingType.SelectedValue, string.Empty));
+            cboBridgingType_SelectedIndexChanged(null, new RadComboBoxSelectedIndexChangedEventArgs(string.Empty, string.Empty, cboBridgingType.SelectedValue, (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.BridgingID)));
             cboServiceUnitAliasID.SelectedValue = (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.BridgingID);
             txtServiceUnitAliasName.Text = (String)DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.BridgingName);
             chkIsActive.Checked = Convert.ToBoolean(DataBinder.Eval(DataItem, ClassBridgingMetadata.ColumnNames.IsActive));
@@ -48,6 +48,19 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
             if (e.Value == AppEnum.BridgingType.BPJS.ToString() && Common.Helper.IsBpjsIntegration)
             {
+            }
+            else if (e.Value == AppEnum.BridgingType.RS_ONLINE.ToString() && Common.Helper.IsRsOnlineIntegration)
+            {
+                var svc = new Common.RsOnline.Service();
+                var response = svc.ReferensiTempatTidur();
+                if (response?.TempatTidur != null && response.TempatTidur.Any())
+                {
+                    cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                    foreach (var item in response.TempatTidur)
+                    {
+                        cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.NamaTt, item.KodeTt));
+                    }
+                }
             }
             else if (e.Value == AppEnum.BridgingType.Inhealth.ToString() && Common.Helper.IsInhealthIntegration)
             {
@@ -63,6 +76,25 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 {
                     cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.ItemID + " - " + item.ItemName, item.ItemID));
                 }
+            }
+            else if (e.Value == AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID))
+            {
+                var collTitle = new AppStandardReferenceItemCollection();
+                collTitle.Query.Where(
+                    collTitle.Query.StandardReferenceID == AppEnum.StandardReference.SatuSehatClassType,
+                    collTitle.Query.IsActive == true
+                    );
+                collTitle.Query.OrderBy(collTitle.Query.ItemID.Ascending);
+                collTitle.LoadAll();
+                cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                foreach (var item in collTitle)
+                {
+                    cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.ItemID + " - " + item.ItemName, item.ItemID));
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(e.OldValue)) cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(e.OldValue, e.OldValue));
             }
         }
 
@@ -125,7 +157,10 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
         public String BridgingName
         {
-            get { return txtServiceUnitAliasName.Text; }
+            get
+            {
+                return string.IsNullOrWhiteSpace(txtServiceUnitAliasName.Text) ? (Helper.FindControlRecursive(this.Page, "txtClassName") as RadTextBox).Text : txtServiceUnitAliasName.Text;
+            }
         }
 
         public Boolean IsActive

@@ -9,6 +9,7 @@ using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.BusinessObject.Reference;
+using System.Text;
 
 namespace Temiang.Avicenna.Module.Inventory.Warehouse
 {
@@ -45,7 +46,8 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
         }
 
         #region Page Event & Initialize
-        private void InitGrantsReceiving() {
+        private void InitGrantsReceiving()
+        {
             trRefNo.Visible = !IsGrantsReceiving && !IsDirectPurchase;
             trCurrType.Visible = !IsGrantsReceiving && !IsDirectPurchase;
             trPOType.Visible = !IsGrantsReceiving;
@@ -247,6 +249,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             ajax.AddAjaxSetting(AjaxManager, rblTypesOfTaxes);
             ajax.AddAjaxSetting(AjaxManager, txtTaxPercentage);
             ajax.AddAjaxSetting(AjaxManager, cboFromLocationID);
+            ajax.AddAjaxSetting(AjaxManager, chkIsNewTaxCalculation);
 
             if (AppSession.Parameter.IsPphUsesAfixedValue)
             {
@@ -383,7 +386,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             //        return;
             //    }
             //}
-            
+
             if (chkIsNonMasterOrder.Checked)
             {
                 var retval = (new ItemTransaction()).ApproveNonMaster(txtTransactionNo.Text, ItemTransactionItems, AppSession.UserLogin.UserID);
@@ -409,6 +412,76 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                         return;
                     }
                 }
+
+                //db:20260406 - validasi asset u/ item product non medis
+                //if (cboSRItemType.SelectedValue == ItemType.NonMedical && !chkIsNonMasterOrder.Checked)
+                //{
+                //    var isAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets);
+                //    if (isAssetsJournaled)
+                //    {
+                //        var assetValidationMsg = string.Empty;
+                //        var inventoryValidationMsg = string.Empty;
+
+                //        var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.acc_JournalAssetsAmount));
+
+                //        foreach (var p in ItemTransactionItems)
+                //        {
+                //            if (!(p.IsBonusItem ?? false))
+                //            {
+                //                var amount = (p.PriceInCurrency.Value - p.DiscountInCurrency.Value) * (1 + (Convert.ToDecimal(txtTaxPercentage.Value) / 100));
+                //                if (chkIsAssets.Checked || p.IsAsset)
+                //                {
+                //                    if ((amount < assetLimitAmount))
+                //                    {
+
+                //                        if (assetValidationMsg == string.Empty)
+                //                            assetValidationMsg = "[" + p.ItemID + "] " + p.Description;
+                //                        else
+                //                            assetValidationMsg += ", [" + p.ItemID + "] " + p.Description;
+                //                    }
+                //                }
+                //                else
+                //                {
+                //                    if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount))
+                //                    {
+
+                //                        if (inventoryValidationMsg == string.Empty)
+                //                            inventoryValidationMsg = "[" + p.ItemID + "] " + p.Description;
+                //                        else
+                //                            inventoryValidationMsg += ", [" + p.ItemID + "] " + p.Description;
+                //                    }
+                //                }
+                //            }
+                //        }
+
+                //        if (assetValidationMsg.Length > 0 && inventoryValidationMsg.Length == 0)
+                //        {
+                //            args.MessageText = string.Format("The following items do not fit the asset classification (price less than Rp. {0}) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+                //            args.IsCancel = true;
+                //            return;
+                //        }
+
+                //        if (assetValidationMsg.Length == 0 && inventoryValidationMsg.Length > 0)
+                //        {
+                //            args.MessageText = string.Format("The following items do not fit the inventory classification (price more than Rp. {0}) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+                //            args.IsCancel = true;
+                //            return;
+                //        }
+
+                //        if (assetValidationMsg.Length > 0 && inventoryValidationMsg.Length > 0)
+                //        {
+                //            var msgContent = new StringBuilder();
+                //            msgContent.AppendFormat("The following items do not fit the asset classification (price less than Rp. {0}) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+                //            msgContent.Append("<br />");
+                //            msgContent.AppendFormat("The following items do not fit the inventory classification (price more than Rp. {0}) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount));
+
+                //            args.MessageText = msgContent.ToString();
+                //            args.IsCancel = true;
+                //            return;
+                //        }
+
+                //    }
+                //}
 
                 var str = (new ItemTransaction()).Approve(txtTransactionNo.Text, ItemTransactionItems, AppSession.UserLogin.UserID, AppSession.Parameter.RoundingTransaction);
                 if (!string.IsNullOrEmpty(str))
@@ -507,6 +580,9 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             btnGetItem.Enabled = true;
             btnResetItem.Enabled = true;
             chkIsInventoryItem.Checked = IsGrantsReceiving || IsDirectPurchase;
+            if (IsGrantsReceiving || IsDirectPurchase)
+                chkIsNewTaxCalculation.Checked = true;
+
             if (IsDirectPurchase)
             {
                 txtInvoiceNo.Text = "-";
@@ -784,7 +860,8 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             {
                 cboBusinessPartnerID.SelectedValue = cboi.Value;
             }
-            else {
+            else
+            {
                 //cboBusinessPartnerID.SelectedIndex = 0;
             }
 
@@ -864,6 +941,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
 
             if (itemTransaction.IsTaxable != null)
                 rblTypesOfTaxes.SelectedIndex = itemTransaction.IsTaxable == 2 ? 2 : (itemTransaction.IsTaxable == 1 ? 0 : 1);
+            chkIsNewTaxCalculation.Checked = itemTransaction.IsNewTaxCalculation ?? false;
 
             CalculateTotal();
         }
@@ -886,7 +964,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             entity.ReferenceNo = txtReferenceNo.Text;
             entity.ToServiceUnitID = cboToServiceUnitID.SelectedItem.Value;
             entity.ToLocationID = cboToLocationID.SelectedValue;
-            
+
             entity.SRItemType = cboSRItemType.SelectedValue;
             //-db (6/6/2023): ditambah default value u/ kasus di rsi dimana por consignment jd terisi "020" (belum nemu sumber masalahnya)
             entity.SRPurchaseOrderType = (cboSRPurchaseOrderType.SelectedValue == "CS" || cboSRPurchaseOrderType.SelectedValue == "CR") ? cboSRPurchaseOrderType.SelectedValue : (IsDirectPurchase ? "CS" : "CR");
@@ -928,7 +1006,8 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                 entity.ServiceUnitCostID = cboFromServiceUnitID.SelectedValue;
             else
                 entity.ServiceUnitCostID = refs.ServiceUnitCostID;
-                
+            entity.IsNewTaxCalculation = chkIsNewTaxCalculation.Checked;
+
             //Last Update Status
             if (entity.es.IsAdded || entity.es.IsModified)
             {
@@ -1026,7 +1105,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             var supp = new Supplier();
             supp.LoadByPrimaryKey(cboBusinessPartnerID.SelectedValue);
 
-            if (rblTypesOfTaxes.SelectedIndex == 0)
+            if (rblTypesOfTaxes.SelectedIndex != 2)
                 txtTaxPercentage.Value = Convert.ToDouble(supp.TaxPercentage ?? 0);
             else
                 txtTaxPercentage.Value = 0;
@@ -1079,7 +1158,8 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             chkIsConsignmentAlreadyReceived.Checked = header.IsConsignmentAlreadyReceived ?? false;
             chkIsAssets.Enabled = !(chkIsConsignment.Checked); //&& !AppSession.Application.IsModuleAssetActive;
             rblTypesOfTaxes.SelectedIndex = header.IsTaxable == 2 ? 2 : (header.IsTaxable == 1 ? 0 : 1);
-                
+            chkIsNewTaxCalculation.Checked = header.IsNewTaxCalculation ?? false;
+
             if (chkIsConsignment.Checked)
             {
                 ComboBox.PopulateWithSupplierForLocation(cboFromLocationID, cboBusinessPartnerID.SelectedValue);
@@ -1197,11 +1277,13 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                     entity.Discount2Percentage = (decimal)row["Discount2Percentage"];
                     entity.Discount = (decimal)row["Discount"];
 
-                    if (header.IsTaxable == 0)
+                    //db:20260129 - include tax
+                    //if (header.IsTaxable == 0)
+                    if (header.IsTaxable == 0 && !(chkIsNewTaxCalculation.Checked))
                     {
                         //var prices = Helper.GetReversePriceValueV2((decimal)row["Price"], entity.Discount1Percentage ?? 0, entity.Discount ?? 0);
                         var prices = Helper.GetReversePriceValueV2((decimal)row["Price"], entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
-
+                        
                         entity.Price = prices[0];
                         entity.Discount = prices[1];
                         //tax += prices[3];
@@ -1398,7 +1480,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
                 query.Select(iq.Barcode.As("refToItem_Barcode"),
                     @"<CASE WHEN a.Quantity * a.ConversionFactor > ISNULL((SELECT SUM(itie.Quantity * itie.ConversionFactor)
                         FROM ItemTransactionItemEd AS itie 
-                        WHERE itie.TransactionNo = a.TransactionNo AND itie.SequenceNo = a.SequenceNo), 0) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS 'refToItemProduct_IsNotCompleteED'>", 
+                        WHERE itie.TransactionNo = a.TransactionNo AND itie.SequenceNo = a.SequenceNo), 0) THEN CAST(1 AS BIT) ELSE CAST(0 AS BIT) END AS 'refToItemProduct_IsNotCompleteED'>",
                     fq.FabricName.As("refToFabric_FabricName"));
                 coll.Load(query);
 

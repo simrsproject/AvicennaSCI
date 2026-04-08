@@ -285,6 +285,24 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
         protected global::Telerik.Web.UI.RadTextBox txtInitialDiagnosis;
 
         /// <summary>
+        /// tsSuggestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tsSuggestion;
+
+        /// <summary>
+        /// txtSuggestion control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtSuggestion;
+
+        /// <summary>
         /// txtBpjsCoverageFormula control.
         /// </summary>
         /// <remarks>

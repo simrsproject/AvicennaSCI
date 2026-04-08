@@ -136,6 +136,9 @@ namespace Temiang.Avicenna.Module.RADT
                 qr.InnerJoin(guar).On(qr.GuarantorID == guar.GuarantorID);
                 qr.LeftJoin(sal).On(sal.StandardReferenceID == "Salutation" & qp.SRSalutation == sal.ItemID);
 
+                if (!string.IsNullOrEmpty(cboGuarantorID.SelectedValue))
+                    qr.Where(qr.GuarantorID == cboGuarantorID.SelectedValue);
+
                 switch (RegistrationType)
                 {
                     case AppConstant.RegistrationType.InPatient:
@@ -279,6 +282,29 @@ namespace Temiang.Avicenna.Module.RADT
 
                 grdRegisteredList.Rebind();
             }
+        }
+
+        protected void cboGuarantorID_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        {
+            e.Item.Text = ((DataRowView)e.Item.DataItem)["GuarantorName"].ToString();
+            e.Item.Value = ((DataRowView)e.Item.DataItem)["GuarantorID"].ToString();
+        }
+
+        protected void cboGuarantorID_ItemsRequested(object o, RadComboBoxItemsRequestedEventArgs e)
+        {
+            string searchTextContain = string.Format("%{0}%", e.Text);
+            var query = new GuarantorQuery();
+            query.es.Top = 30;
+            query.Where
+                (
+                    query.GuarantorName.Like(searchTextContain),
+                    query.SRGuarantorType != AppSession.Parameter.GuarantorTypeMemberID,
+                    query.IsActive == true
+                );
+            query.OrderBy(query.GuarantorName.Ascending);
+
+            cboGuarantorID.DataSource = query.LoadDataTable();
+            cboGuarantorID.DataBind();
         }
     }
 }

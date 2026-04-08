@@ -1,9 +1,92 @@
-﻿---[08-04-2026 - Handono]---
+﻿---[02-01-2026 - Apip]---
+1.	- Modif Perhitungan dAmt jadi taxamount di simpan dibawah, jurnal Return POR 
+
+---[07-01-2026 - Luthfi]---
+1.	- Bugfix isi Exam Order tab Other, replace </br>
+
+--[12-01-2026 - APip]---
+1. allow paging nya di false di history fluid balance - titipan rama
+
+--[12-01-2026 - Naufal]---
+1. CR RSI Validasi MDS dari Casemix Center untuk menjadi MDS akhir di EMR Pasien //https://www.sciptaintegrasi.com/mantis/view.php?id=3585
+	script 12/01/26
+
+---[13-01-2026 - Deby]---
+1. optimalisasi proses saat save location jika ada perubahan stockgroup
+   --> insert document 20260113 - 01
+
+---[28-01-2026 - Luthfi]---
+1. Bugfix session ItemBridging di master lab
+
+---[29-01-2026 - Deby]---
+1. odoo task: 6980 - saat pembuatan PO include tax, nilai pembagiannya tidak dapat terhitung otomatis seolah2 tanpa PPN
+   --> modif form po & por sehubungan dg status include tax hanya sebagai alat bantu perhitungan price (perhitungan price sudah dihitung pada saat po)
+   --> insert document 20260129 - 01
+
+---[30-01-2026 - Naufal]---
+1. Bugfix PO, POR, AP. nilai bertambah saat edit POR di AP
+2. Bugfix bisa ambil antrian ketika parameter ValueForTakingQueueBeforeStartTime terisi. (isi dengan menit)
+
+---[03-02-2026 - Luthfi]---
+	Titipan Daniel
+1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
+
+---[05-02-2026 - Dewi]---
+1. Bugfix VerificationList2, ketika transaksi AP yang sudah di verifikasi dan di batalkan tetap muncul di payment process
+1. Menambahkan penanganan null pada perhitungan jtdCcD.Debit dengan nilai default 0
+
+---[05-02-2026 - Danang]---
+1. Rewrite Feature Satusehat Inpatient
+	- Script Ada Pada Folder SatuSehat Inpatient
+
+---[10-02-2026 - Luthfi]---
+Titipan Daniel
+1. Mengubah grid grdLocationException menjadi grdLocationExceptionDistConfirm pada method PopulateLocationExceptionDistributionConfirmGrid
+
+---[11-02-2026 - Luthfi]---
+Titipan Daniel
+1.  Replace telerik sama sp dan nambah excel di rl 3.5 v2025
+
+---[23-02-2026 - Apip]---
+1. Modif RL 4.1 2025 titipan rama
+
+---[25-02-2026 - Apip]---
+1.	Modif ketika get template di itempackage price dan totalnya akan terikut juga
+
+---[06-03-2026 - Naufal]---
+1.	Bugfix AppointmentQueFormattedNo tidak terupdate saat update appointment via endpoint AppointmentUpdate
+
+---[16-03-2026 - Danang]---
+1.	Re Write Pengiriman ServiceRequest Radiology (Bridging Sarusehat)
+2.	Odoo Otomatis IB & Lock RSI
+3.	Re Write Pengiriman SatuSehat Inpatient (Mapping Class)
+
+---[26-03-2026 - Danang]---
+1.	Piloting Feature BPJS Rujukan SatuSehat (Create Nomor Rujukan Nasional / Rujukan Berbasis Kompetensi)
+	Note: Endpoint Delete, Update, View Masih Belum Ada Info Lanjutan dari Kemenkes
+
+---[01-04-2026 - Danang]---
+1.	Mapping Item Radiology SatuSehat
+
+---[06-04-2026 - BT]---
+1.	Penambahan durasi timeout pada modul verifikasi jasa medis
+
+---[06-04-2026 - Deby]---
+1. modif form PO, ++ validasi saat pembuatan PO item non medical jika item yg diplih harganya (satuan+ppn) tidak sesuai dg klasifikasi asset atau inventory
+   >> parameter acc_JournalAssetsAmount, jika :
+      price >= paramaterValue --> asset
+      price <  paramaterValue --> inventory
+
+---[06-04-2026 - Wiliam]---
+1. Modif Detail EMR (EmrDetail.aspx & EmrIpDetial.aspx) untuk menampilkan info Tanggal Ranap Terakhir di Patient Section.
+   Perlu eksekusi script sp_GetLatestIPRRegistration.sql di Document/2026/04/06
+
+---[08-04-2026 - Handono]---
 - Satusehat Immunization Process
 - Master Item Product Medical: Add Vaccine entry
 - Master Item Service: Add Vaccine entry
 - Service Unit Transaction: : Add Vaccine entry
 - Standard Reference: Add Mapping Satusehat
 - Upgrade Restsharp Package
-
+	  
 

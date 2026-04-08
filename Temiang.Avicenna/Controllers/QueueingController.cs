@@ -1410,7 +1410,8 @@ namespace Temiang.Avicenna.Controllers
         {
             InitConstanta();
             ViewData["qLocation"] = qLocation;
-            ViewData["addjustStartTime"] = AppSession.Parameter.ValueForTakingQueueBeforeStartTime;
+            //ViewData["addjustStartTime"] = AppSession.Parameter.ValueForTakingQueueBeforeStartTime;
+            ViewData["IsDirectButtonBetweenKioskVersion"] = AppParameter.IsYes(AppParameter.ParameterItem.IsDirectButtonBetweenKioskVersion);
             return View();
         }
         #endregion

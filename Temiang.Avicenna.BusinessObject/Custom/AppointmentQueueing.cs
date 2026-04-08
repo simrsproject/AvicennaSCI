@@ -179,6 +179,67 @@ namespace Temiang.Avicenna.BusinessObject
                 return false;
             }
         }
+        public bool UpdateQueForReg(Appointment apt, AppointmentQueueing apQue, string SRQueueingType, ServiceUnit su, string UserID, bool IsFromApiAntrianV2)
+        {
+            // validasi 
+            if (string.IsNullOrEmpty(su.SrqueueinglocationReg))
+            {
+                if (IsFromApiAntrianV2)
+                {
+                    throw new Exception(string.Format("Invalid registration queueing location in service unit {0}", su.ServiceUnitName));
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            if (string.IsNullOrEmpty(su.QueueCode))
+            {
+                if (IsFromApiAntrianV2)
+                {
+                    throw new Exception(string.Format("Invalid queueing code in service unit {0}", su.QueueCode));
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            var asri = new AppStandardReferenceItem();
+            asri.LoadByPrimaryKey("QueueingType", SRQueueingType);
+
+            var par = new Paramedic();
+            par.LoadByPrimaryKey(apt.ParamedicID);
+
+            //this.AppointmentNo = apt.AppointmentNo;
+            apQue.SRQueueingLocation = su.SrqueueinglocationReg;
+            apQue.SRQueueingGroup = "01";
+            apQue.SRQueueingType = SRQueueingType;
+
+            if (_isGuarantorPrefix)
+                if (_isQueueByPhysician)
+                    apQue.FormattedNo = string.Format("{0}{1}{2}-{3}", asri.CustomField, su.QueueCode, par.ParamedicQueueCode, apt.AppointmentQue.Value.ToString().PadLeft(3, '0'));
+                else
+                    apQue.FormattedNo = string.Format("{0}{1}-{2}", asri.CustomField, su.QueueCode, apt.AppointmentQue.Value.ToString().PadLeft(3, '0'));
+            else if (_isQueueByPhysician)
+                apQue.FormattedNo = string.Format("{0}{1}-{2}", su.QueueCode, par.ParamedicQueueCode, apt.AppointmentQue.Value.ToString().PadLeft(3, '0'));
+            else
+                apQue.FormattedNo = string.Format("{0}-{1}", su.QueueCode, apt.AppointmentQue.Value.ToString().PadLeft(3, '0'));
+
+            apQue.QueueingDate = apt.AppointmentDate;
+            apQue.SRKioskQueueStatus = "01";
+            apQue.ServiceUnitID = su.ServiceUnitID;
+
+            var cDate = (new DateTime()).NowAtSqlServer();
+
+            apQue.CreateDateTime = cDate;
+            apQue.CreateByUserID = UserID;
+            apQue.LastUpdateDateTime = cDate;
+            apQue.LastUpdateByUserID = UserID;
+            apQue.ParamedicID = apt.ParamedicID;
+
+            return true;
+        }
     }
 
     public partial class AppointmentQueueingCollection {

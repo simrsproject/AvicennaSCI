@@ -1327,6 +1327,15 @@
                                         <asp:HiddenField runat="server" ID="hdnGuarantorCardNo" />
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td style="vertical-align: top;">Tgl Ranap Terakhir
+                                    </td>
+                                    <td style="vertical-align: top;">:
+                                    </td>
+                                    <td style="vertical-align: top;">
+                                        <asp:Label runat="server" ID="lblTglRanap" Font-Bold="true"/>
+                                    </td>
+                                </tr>
                                 <tr runat="server" id="trTglRujukan">
                                     <td style="vertical-align: top;">Tgl Akhir Rujukan
                                     </td>
@@ -1392,6 +1401,16 @@
                         <div style="height: 10px">
                         </div>
                     </cc:CollapsePanel>
+                    <cc:CollapsePanel ID="cpnDiagnosis" runat="server" Width="100%" Title="">
+                        <asp:Literal runat="server" ID="litDiagnosis"></asp:Literal>
+
+                        <div style="height: 10px">
+                        </div>
+                        <fieldset runat="server" id="fsSuggestion" style="background-color: #FFFF00;">
+                            <legend><strong>Suggestion</strong></legend>
+                            <asp:Literal runat="server" ID="litSuggestion"></asp:Literal>
+                        </fieldset>
+                    </cc:CollapsePanel>
                     <cc:CollapsePanel ID="cpnAllergies" runat="server" Width="100%" Title="Allergies<div id='divEditAlg' style='float: right;padding:4px'><a  href='#' onclick='javascript:entryPatientAllergy(); event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();'> <img src='../../../Images/Toolbar/edit16.png'  alt='edit' /></a></div>">
                         <asp:Literal runat="server" ID="litPatientAllergy"></asp:Literal>
 
@@ -1427,13 +1446,7 @@
                         </fieldset>
                         <div style="height: 10px">
                         </div>
-                    </cc:CollapsePanel>
-                    <cc:CollapsePanel ID="cpnDiagnosis" runat="server" Width="100%" Title="">
-                        <asp:Literal runat="server" ID="litDiagnosis"></asp:Literal>
-
-                        <div style="height: 10px">
-                        </div>
-                    </cc:CollapsePanel>
+                    </cc:CollapsePanel>                    
 
                     <cc:CollapsePanel ID="cpnVitalSign" runat="server" Width="100%" Title="Vital Sign">
                         <%--                        <telerik:RadGrid ID="grdVitalSign" runat="server" OnNeedDataSource="grdVitalSign_NeedDataSource"
