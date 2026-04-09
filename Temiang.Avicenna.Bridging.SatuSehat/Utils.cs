@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -523,6 +524,40 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             else
             {
                 satuSehatLog.ErrorResponse = string.Format("{0}. {1}", response.ErrorMessage, response.Content);
+
+                // Error Found duplicate resource: Encounter RuleNumber: 20002
+                if (satuSehatLog.ErrorResponse.Contains("RuleNumber: 20002"))
+                {
+                    // Ambil EncounterID
+                    //var sampleUrl = "Encounter?subject=P08638876323&identifier=REG/EM/260409-0004";
+                    var url = string.Format("{0}/Encounter?subject={1}&identifier={2}", BaseUrl, patSs.BridgingID, reg.RegistrationNo);
+
+                    var getEncounter = RestClientExecute(string.Empty, url, ref accessToken, Method.Get);
+                    if (getEncounter.StatusCode == System.Net.HttpStatusCode.Created || getEncounter.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        try
+                        {
+                            // Parse into JObject
+                            var jo = JObject.Parse(getEncounter.Content);
+
+                            // Get first entry resource id
+                            string firstEncounterId = (string)jo.SelectToken("entry[0].resource.id");
+                            if (!string.IsNullOrEmpty(firstEncounterId))
+                            {
+                                satuSehatLog.EncounterID = new Guid(firstEncounterId);
+                                satuSehatLog.str.ErrorResponse = string.Empty;
+                            }
+                        }
+                        catch (Exception)
+                        {
+
+                            // throw;
+                        }
+
+                    }
+                }
+                
+
             }
 
             satuSehatLog.Save();
@@ -17256,7 +17291,6 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 else
                 {
                     itemIds = itemIds.Remove(itemIds.Length - 1);
-                    seqNos = seqNos.Remove(itemIds.Length - 1);
                     itemNames = itemNames.Remove(itemNames.Length - 1);
 
                     if (!string.IsNullOrEmpty(loincIds))
@@ -17271,7 +17305,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                     if (!string.IsNullOrEmpty(specimens))
                         specimens = specimens.Remove(specimens.Length - 1);
 
-                    AddToSatusehatOrderedItems(lisConnectionName, satuSehatLog, patSs, parSs, itemIds, itemNames, loincIds, loincNames, servReqs, specimens, orderNumber, seqNos);
+                    AddToSatusehatOrderedItems(lisConnectionName, satuSehatLog, patSs, parSs, itemIds, itemNames, loincIds, loincNames, servReqs, specimens, orderNumber, string.Empty);
                 }
             }
         }
@@ -17281,23 +17315,11 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             var ssItem = new Temiang.Avicenna.BusinessObject.Interop.SatusehatOrderedItems(); // Saat ini menggunakan table yang sama untuk beberapa macam LIS
             ssItem.es.Connection.Name = lisConnectionName;
 
-            if (AppParameter.IsYes(AppParameter.ParameterItem.IsSatusehatLisDataSharePerItemLab))
+            if (!ssItem.LoadByPrimaryKey(orderNumber, seqNos))
             {
-                if (!ssItem.LoadByPrimaryKey(orderNumber, seqNos))
-                {
-                    ssItem = new Temiang.Avicenna.BusinessObject.Interop.SatusehatOrderedItems();
-                    ssItem.es.Connection.Name = lisConnectionName;
-                    ssItem.OrderSequenceNo = seqNos;
-                }
-            }
-            else
-            {
-                if (!ssItem.LoadByPrimaryKey(orderNumber, ""))
-                {
-                    ssItem = new Temiang.Avicenna.BusinessObject.Interop.SatusehatOrderedItems();
-                    ssItem.es.Connection.Name = lisConnectionName;
-                    ssItem.OrderSequenceNo = string.Empty;
-                }
+                ssItem = new Temiang.Avicenna.BusinessObject.Interop.SatusehatOrderedItems();
+                ssItem.es.Connection.Name = lisConnectionName;
+                ssItem.OrderSequenceNo = seqNos;
             }
 
             ssItem.OrderNumber = orderNumber;

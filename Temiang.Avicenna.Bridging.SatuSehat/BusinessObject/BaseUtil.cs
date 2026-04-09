@@ -68,8 +68,14 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
         }
 
         #region Common Method
+        private static Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.TokenResponse _tokenRespose = null;
+        private static DateTime _tokenExpireDate = DateTime.MinValue;
         private Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.TokenResponse GetToken()
         {
+            if (_tokenRespose != null && _tokenExpireDate > DateTime.Now.AddMinutes(10)) // Token anggap expired jika 10 menit lagi
+                return _tokenRespose;
+
+            _tokenRespose = null;
             var url = string.Format("{0}/accesstoken?grant_type=client_credentials", _authUrl);
             var client = new RestClient(url);
             //client.Timeout = -1;
@@ -91,16 +97,18 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
                         JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.TokenResponse>(
                             response.Content);
 
-                    return tokenResponse;
+                    _tokenRespose = tokenResponse;
+                    _tokenExpireDate = DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt());
                 }
                 else
-                    //throw new Exception(response.Content);
-                    return null;
+                    throw new Exception("Token not valid json format");
             }
             catch (Exception ex)
             {
                 throw new Exception(string.Concat(ex.Message, Environment.NewLine, response.Content), ex);
             }
+
+            return _tokenRespose;
         }
         public RestResponse RestClientPost(string requestBody, string resourceType, ref string accessToken)
         {
@@ -147,19 +155,22 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
             var request = new RestRequest();
             request.Method = method;
 
-            if (string.IsNullOrWhiteSpace(accessToken) && HttpContext.Current.Cache["ssAccessToken"] != null)
-                accessToken = HttpContext.Current.Cache["ssAccessToken"].ToString();
+            //if (string.IsNullOrWhiteSpace(accessToken) && HttpContext.Current.Cache["ssAccessToken"] != null)
+            //    accessToken = HttpContext.Current.Cache["ssAccessToken"].ToString();
+
+            //if (string.IsNullOrWhiteSpace(accessToken))
+            //{
+            //    var tokenResponse = GetToken();
+            //    if (tokenResponse != null)
+            //    {
+            //        accessToken = tokenResponse.AccessToken;
+            //        HttpContext.Current.Cache.Insert("ssAccessToken", accessToken, null,
+            //            DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt()), TimeSpan.Zero);
+            //    }
+            //}
 
             if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                var tokenResponse = GetToken();
-                if (tokenResponse != null)
-                {
-                    accessToken = tokenResponse.AccessToken;
-                    HttpContext.Current.Cache.Insert("ssAccessToken", accessToken, null,
-                        DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt()), TimeSpan.Zero);
-                }
-            }
+                accessToken = GetToken().AccessToken;
 
             request.AddHeader("Authorization", String.Format("Bearer {0}", accessToken));
 

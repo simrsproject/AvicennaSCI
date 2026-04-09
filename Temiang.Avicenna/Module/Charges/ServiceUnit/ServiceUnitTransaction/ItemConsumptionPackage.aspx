@@ -61,7 +61,7 @@
                     HeaderText="Item ID" HeaderStyle-Width="100" HeaderStyle-HorizontalAlign="Left"
                     ItemStyle-HorizontalAlign="Left" />
                 <telerik:GridBoundColumn DataField="ItemName" UniqueName="ItemName" SortExpression="ItemName"
-                    HeaderText="Item Name" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                    HeaderText="Item Name" HeaderStyle-Width="150" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                 <telerik:GridNumericColumn DataField="Qty" UniqueName="Qty" SortExpression="Qty"
                     HeaderText="Qty" HeaderStyle-Width="50" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                 <telerik:GridTemplateColumn HeaderText="Realization" UniqueName="QtyRealizationText"
@@ -82,9 +82,9 @@
                     ItemStyle-HorizontalAlign="Left" ColumnGroupName="Dosage" />
                 <telerik:GridTemplateColumn HeaderText="Paramedic" UniqueName="ParamedicID"
                     HeaderStyle-HorizontalAlign="center" ColumnGroupName="Immunization">
-                    <HeaderStyle Width="200px" />
+                    <HeaderStyle Width="150px" />
                     <ItemTemplate>
-                        <telerik:RadComboBox runat="server" ID="cboParamedicID" Width="200px" EmptyMessage="Select a Paramedic"
+                        <telerik:RadComboBox runat="server" ID="cboParamedicID" Width="150px" EmptyMessage="Select a Paramedic"
                             EnableLoadOnDemand="true" ShowMoreResultsBox="true" EnableVirtualScrolling="true">
                             <WebServiceSettings Method="Paramedics" Path="~/WebService/ComboBoxDataService.asmx" />
                             <ClientItemTemplate>
@@ -111,7 +111,7 @@
                 </telerik:GridTemplateColumn>
                 <telerik:GridTemplateColumn HeaderText="Routine Timing" UniqueName="ImmTiming"
                     HeaderStyle-HorizontalAlign="center" ColumnGroupName="Immunization">
-                    <HeaderStyle Width="200px" />
+                    <HeaderStyle Width="150px" />
                     <ItemTemplate>
                         <telerik:RadComboBox runat="server" ID="cboSRImmTiming" Width="100%"></telerik:RadComboBox>
                     </ItemTemplate>
@@ -134,7 +134,7 @@
                     Visible="false" />
                 <telerik:GridTemplateColumn HeaderText="Location" UniqueName="location"
                     HeaderStyle-HorizontalAlign="center">
-                    <HeaderStyle Width="200px" />
+                    <HeaderStyle Width="150px" />
                     <ItemTemplate>
                         <telerik:RadComboBox runat="server" ID="cboLocationID" Width="100%"></telerik:RadComboBox>
                     </ItemTemplate>
