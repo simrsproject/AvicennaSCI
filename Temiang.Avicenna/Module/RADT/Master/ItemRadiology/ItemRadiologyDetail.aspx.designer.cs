@@ -411,6 +411,24 @@ namespace Temiang.Avicenna.Module.RADT.Master
         protected global::Telerik.Web.UI.RadNumericTextBox txtIntervalOrderWarning;
 
         /// <summary>
+        /// trDCMCode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow trDCMCode;
+
+        /// <summary>
+        /// cboDicomCode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboDicomCode;
+
+        /// <summary>
         /// tabStrip control.
         /// </summary>
         /// <remarks>

@@ -287,6 +287,21 @@
                         <td width="20" />
                         <td />
                     </tr>
+                    <tr runat="server" id="trDCMCode">
+                        <td class="label">Modality Dicom Code
+                        </td>
+                        <td class="entry">
+                            <telerik:RadComboBox runat="server" ID="cboDicomCode" Width="200px" EnableLoadOnDemand="true"
+                                HighlightTemplatedItems="true" OnItemDataBound="cboDicomCode_ItemDataBound"
+                                MarkFirstMatch="True" OnItemsRequested="cboDicomCode_ItemsRequested">
+                                <FooterTemplate>
+                                    Note : Show max 20 items
+                                </FooterTemplate>
+                            </telerik:RadComboBox>
+                        </td>
+                        <td width="20" />
+                        <td />
+                    </tr>
                 </table>
             </td>
         </tr>

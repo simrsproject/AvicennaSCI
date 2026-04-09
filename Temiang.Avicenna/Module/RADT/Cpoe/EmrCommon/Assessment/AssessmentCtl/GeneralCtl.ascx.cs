@@ -115,7 +115,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
         {
             base.OnLoad(e);
             ajxPnlFdolm.Visible = IsShowPnlFdolm;
-            rowSCTChiefComplaint.Visible = !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]);
+            rowSCTChiefComplaint.Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatOrganizationID")));
+            rowSCTHpi.Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatOrganizationID")));
 
             rfvComplaint.Visible = false;
             if (AppParameter.IsYes(AppParameter.ParameterItem.IsEmrChiefComplaintTextRequired))
@@ -198,7 +199,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
 
             if (rowSCTChiefComplaint.Visible)
                 ComboBox.PopulateWithOneRow(cboSCTChiefComplaint, assessment.SCTChiefComplaint, Temiang.Avicenna.BusinessObject.Common.Enums.EntityClassName.Snomedct, "Code", "Display");
-
+            if (rowSCTHpi.Visible)
+                ComboBox.PopulateWithOneRow(cboSCTHpi, assessment.SCTHpi, Temiang.Avicenna.BusinessObject.Common.Enums.EntityClassName.Snomedct, "Code", "Display");
 
             txtHpi.Text = assessment.Hpi;
             cboAnamnesisType.SelectedIndex = assessment.IsAutoAnamnesis == true ? 0 : 1;
@@ -278,6 +280,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
                 asses.SCTChiefComplaint = cboSCTChiefComplaint.SelectedValue;
             else
                 asses.str.SCTChiefComplaint = string.Empty;
+
+            if (rowSCTHpi.Visible)
+                asses.SCTHpi = cboSCTHpi.SelectedValue;
+            else
+                asses.str.SCTHpi = string.Empty;
 
             asses.Hpi = txtHpi.Text;
             asses.IsAutoAnamnesis = (cboAnamnesisType.SelectedIndex == 0);

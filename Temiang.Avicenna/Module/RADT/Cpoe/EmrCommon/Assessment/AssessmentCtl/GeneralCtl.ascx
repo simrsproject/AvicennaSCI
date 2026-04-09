@@ -43,7 +43,7 @@
                     </td>
                     <td>
                         <telerik:RadComboBox runat="server" ID="cboSCTChiefComplaint" Width="300px" EmptyMessage="Select a Snomed CT Code"
-                            EnableLoadOnDemand="true" ShowMoreResultsBox="true" EnableVirtualScrolling="true">
+                            EnableLoadOnDemand="true" ShowMoreResultsBox="true" EnableVirtualScrolling="true" OnClientItemsRequesting="function(sender, args){ args.get_context()['SRSnomedCT']='ChiefComplaint'; }">
                             <WebServiceSettings Method="SnomedctChiefComplaint" Path="~/WebService/ComboBoxDataService.asmx" />
                         </telerik:RadComboBox>
                     </td>
@@ -61,6 +61,18 @@
                         <telerik:RadTextBox ID="txtHpi" runat="server" Width="100%" Height="60px" Resize="Vertical"
                             TextMode="MultiLine" ClientEvents-OnBlur="fixDangText" />
                     </td>
+                </tr>
+                <tr runat="server" id="rowSCTHpi">
+                    <td class="label">
+                        <asp:Label ID="Label7" runat="server" Text="History of Present Illness Snomed CT"></asp:Label>
+                    </td>
+                    <td>
+                        <telerik:RadComboBox runat="server" ID="cboSCTHpi" Width="300px" EmptyMessage="Select a Snomed CT Code"
+                            EnableLoadOnDemand="true" ShowMoreResultsBox="true" EnableVirtualScrolling="true" OnClientItemsRequesting="function(sender, args){ args.get_context()['SRSnomedCT']='MedicalHist'; }">
+                            <WebServiceSettings Method="SnomedctChiefComplaint" Path="~/WebService/ComboBoxDataService.asmx" />
+                        </telerik:RadComboBox>
+                    </td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td class="label">

@@ -176,6 +176,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "LastUpdateByUserID": this.str.LastUpdateByUserID = (string)value; break;
                         case "RlMasterReportItemID": this.str.RlMasterReportItemID = (string)value; break;
                         case "IsCitoFromStandardReference": this.str.IsCitoFromStandardReference = (string)value; break;
+                        case "DicomCode": this.str.DicomCode = (string)value; break;
                     }
                 }
                 else
@@ -423,6 +424,21 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(ItemRadiologyMetadata.ColumnNames.IsCitoFromStandardReference, value);
             }
         }
+        /// <summary>
+        /// Maps to ItemRadiology.DicomCode
+        /// </summary>
+        virtual public System.String DicomCode
+        {
+            get
+            {
+                return base.GetSystemString(ItemRadiologyMetadata.ColumnNames.DicomCode);
+            }
+
+            set
+            {
+                base.SetSystemString(ItemRadiologyMetadata.ColumnNames.DicomCode, value);
+            }
+        }
 
         #endregion
 
@@ -640,6 +656,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsCitoFromStandardReference = Convert.ToBoolean(value);
                 }
             }
+            public System.String DicomCode
+            {
+                get
+                {
+                    System.String data = entity.DicomCode;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.DicomCode = null;
+                    else entity.DicomCode = Convert.ToString(value);
+                }
+            }
             private esItemRadiology entity;
         }
         #endregion
@@ -781,7 +811,13 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ItemRadiologyMetadata.ColumnNames.IsCitoFromStandardReference, esSystemType.Boolean);
             }
         }
-
+        public esQueryItem DicomCode
+        {
+            get
+            {
+                return new esQueryItem(this, ItemRadiologyMetadata.ColumnNames.DicomCode, esSystemType.String);
+            }
+        }
     }
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
@@ -1236,6 +1272,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
+            c = new esColumnMetadata(ItemRadiologyMetadata.ColumnNames.DicomCode, 12, typeof(System.String), esSystemType.String);
+            c.PropertyName = ItemRadiologyMetadata.PropertyNames.DicomCode;
+            c.CharacterMaxLength = 20;
+            c.IsNullable = true;
+            _columns.Add(c);
 
         }
         #endregion
@@ -1275,6 +1316,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string LastUpdateByUserID = "LastUpdateByUserID";
             public const string RlMasterReportItemID = "RlMasterReportItemID";
             public const string IsCitoFromStandardReference = "IsCitoFromStandardReference";
+            public const string DicomCode = "DicomCode";
         }
         #endregion
 
@@ -1293,6 +1335,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string LastUpdateByUserID = "LastUpdateByUserID";
             public const string RlMasterReportItemID = "RlMasterReportItemID";
             public const string IsCitoFromStandardReference = "IsCitoFromStandardReference";
+            public const string DicomCode = "DicomCode";
         }
         #endregion
 
@@ -1348,7 +1391,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("LastUpdateByUserID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("RlMasterReportItemID", new esTypeMap("int", "System.Int32"));
                 meta.AddTypeMap("IsCitoFromStandardReference", new esTypeMap("bit", "System.Boolean"));
-
+                meta.AddTypeMap("DicomCode", new esTypeMap("varchar", "System.String"));
 
                 meta.Source = "ItemRadiology";
                 meta.Destination = "ItemRadiology";
