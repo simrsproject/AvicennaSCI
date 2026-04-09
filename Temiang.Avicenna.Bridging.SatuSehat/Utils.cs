@@ -4178,11 +4178,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
 
             string accessionValue;
 
-            if (!string.IsNullOrWhiteSpace(resultValue))
-            {
-                accessionValue = resultValue;
-            }
-            else if (Temiang.Avicenna.Common.AppSession.Parameter.HealthcareInitialAppsVersion == "RSIMT")
+            if (Temiang.Avicenna.Common.AppSession.Parameter.HealthcareInitialAppsVersion == "RSIMT")
             {
                 accessionValue =
                     $"{new string(transactionNo.Where(char.IsDigit).ToArray())}" +
@@ -4218,7 +4214,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 identifier = new List<object>() {
                     new {
                         system= string.Format( "http://sys-ids.kemkes.go.id/servicerequest/{0}",OrganizationID),
-                        value = string.IsNullOrWhiteSpace(resultValue) ? $"{transactionNo}-{sequenceNo}" : resultValue //accession number
+                        value = $"{transactionNo}-{sequenceNo}"//accession number
                 },
                 new {
                     use = "usual",
