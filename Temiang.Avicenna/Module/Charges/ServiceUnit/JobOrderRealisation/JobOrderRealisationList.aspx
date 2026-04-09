@@ -440,16 +440,6 @@
                         <telerik:GridBoundColumn HeaderStyle-Width="120px" DataField="PaymentNo" HeaderText="Payment No"
                             UniqueName="PaymentNo" SortExpression="PaymentNo" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
-                                                <telerik:GridTemplateColumn UniqueName="resendServiceRequestSS" HeaderText="SatuSehat" Visible="False">
-                            <ItemTemplate>
-                                <%# (new string[] {AppSession.Parameter.ServiceUnitRadiologyID, AppSession.Parameter.ServiceUnitRadiologyID2}.Contains(DataBinder.Eval(Container.DataItem, "ServiceUnitID").ToString()) &&
-                                        !string.IsNullOrWhiteSpace(Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatOrganizationID))) ? 
-                                        string.Format("<a href=\"#\" onclick=\"resendServiceRequestSS('{0}'); return false;\"><img src=\"../../../../Images/SatuSehatSmall.png\" border=\"0\" title=\"Send Service Request Radiology To SatuSehat\" /></a>", DataBinder.Eval(Container.DataItem, "TransactionNo")) :
-                                        string.Empty %>
-                            </ItemTemplate>                           
-                            <HeaderStyle HorizontalAlign="Center" Width="40px" />
-                            <ItemStyle HorizontalAlign="Center" />
-                        </telerik:GridTemplateColumn>
 
                          <telerik:GridTemplateColumn UniqueName="viewSpecimenCRDetail" HeaderText="">
                             <ItemTemplate>
@@ -576,6 +566,16 @@
                         <telerik:GridBoundColumn HeaderStyle-Width="120px" DataField="PaymentNo" HeaderText="Payment No"
                             UniqueName="PaymentNo" SortExpression="PaymentNo" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
+                        <telerik:GridTemplateColumn UniqueName="resendServiceRequestSS" HeaderText="SatuSehat" Visible="False">
+                            <ItemTemplate>
+                                <%# (new string[] {AppSession.Parameter.ServiceUnitRadiologyID, AppSession.Parameter.ServiceUnitRadiologyID2}.Contains(DataBinder.Eval(Container.DataItem, "ServiceUnitID").ToString()) &&
+                                        !string.IsNullOrWhiteSpace(Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatOrganizationID))) ? 
+                                        string.Format("<a href=\"#\" onclick=\"resendServiceRequestSS('{0}'); return false;\"><img src=\"../../../../Images/SatuSehatSmall.png\" border=\"0\" title=\"Send Service Request Radiology To SatuSehat\" /></a>", DataBinder.Eval(Container.DataItem, "TransactionNo")) :
+                                        string.Empty %>
+                            </ItemTemplate>                           
+                            <HeaderStyle HorizontalAlign="Center" Width="40px" />
+                            <ItemStyle HorizontalAlign="Center" />
+                        </telerik:GridTemplateColumn>
                         <telerik:GridTemplateColumn UniqueName="PrintTransactionReceipt" HeaderStyle-Width="30px"
                             ItemStyle-HorizontalAlign="center">
                             <ItemTemplate>

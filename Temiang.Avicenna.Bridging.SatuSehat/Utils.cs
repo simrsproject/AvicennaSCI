@@ -4194,11 +4194,22 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                     $"{transactionNo}" +
                     $"{sequenceNo.Substring(sequenceNo.Length - 2)}";
             }
+            else if (Temiang.Avicenna.Common.AppSession.Parameter.RisPacsInteropVendor == "INTIWID")
+            {
+                var orderno = string.Empty;
+
+                foreach (var c in transactionNo.ToCharArray())
+                {
+                    if (!int.TryParse(c.ToString(), out int number)) continue;
+                    if (number == 0) continue;
+                    orderno += number.ToString();
+                }
+
+                accessionValue = orderno;
+            }
             else
             {
-                accessionValue =
-                    $"{transactionNo.Replace("-", "")}" +
-                    $"{sequenceNo.Substring(sequenceNo.Length - 2)}";
+                accessionValue = $"{transactionNo}-{sequenceNo}";
             }
 
             var postData = new
