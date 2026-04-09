@@ -8,6 +8,7 @@
             <th style="width: 300px" rowspan="2">Service Unit</th>
             <th style="width: 300px" rowspan="2">Physician Name</th>
             <th style="width: 230px" rowspan="2">Specialty</th>
+            <th style="width: 230px" rowspan="2">Notes</th>
             <th style="width: 170px" colspan="3">Appointment</th>
             <th></th>
         </tr>
@@ -45,6 +46,8 @@
             <td>
                 <telerik:RadTextBox runat="server" ID="txtSpecialtyName01" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
             <td>
+                <telerik:RadTextBox runat="server" ID="txtNotes01" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
+            <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentNo01" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentTime01" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
@@ -80,6 +83,8 @@
             </td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtSpecialtyName02" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
+            <td>
+                <telerik:RadTextBox runat="server" ID="txtNotes02" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentNo02" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
             <td>
@@ -117,6 +122,8 @@
             <td>
                 <telerik:RadTextBox runat="server" ID="txtSpecialtyName03" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
             <td>
+                <telerik:RadTextBox runat="server" ID="txtNotes03" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
+            <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentNo03" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentTime03" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
@@ -153,6 +160,8 @@
             <td>
                 <telerik:RadTextBox runat="server" ID="txtSpecialtyName04" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
             <td>
+                <telerik:RadTextBox runat="server" ID="txtNotes04" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
+            <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentNo04" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentTime04" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
@@ -188,6 +197,8 @@
             </td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtSpecialtyName05" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
+            <td>
+                <telerik:RadTextBox runat="server" ID="txtNotes05" ClientIDMode="Static" Width="100%"></telerik:RadTextBox></td>
             <td>
                 <telerik:RadTextBox runat="server" ID="txtAppointmentNo05" Width="100%" ReadOnly="true"></telerik:RadTextBox></td>
             <td>

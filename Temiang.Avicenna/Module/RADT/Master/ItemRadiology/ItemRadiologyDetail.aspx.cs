@@ -441,7 +441,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 StandardReference.InitializeIncludeSpace(cboSREklaimGroup, AppEnum.StandardReference.EklaimTariffGroup);
                 StandardReference.InitializeIncludeSpace(cboSREklaimFactorGroup, AppEnum.StandardReference.EklaimFactorGroup);
 
-                trDCMCode.Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatOrganizationID")));
+                trDCMCode.Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.BaseUtil.SatuSehatKey("SatuSehatOrganizationID")));
 
 
                 var ApRl = new AppProgramCollection();
