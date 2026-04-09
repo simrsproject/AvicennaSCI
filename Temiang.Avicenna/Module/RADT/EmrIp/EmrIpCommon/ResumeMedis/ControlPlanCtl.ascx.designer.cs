@@ -51,6 +51,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         protected global::Telerik.Web.UI.RadTextBox txtSpecialtyName01;
 
         /// <summary>
+        /// txtNotes01 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNotes01;
+
+        /// <summary>
         /// txtAppointmentNo01 control.
         /// </summary>
         /// <remarks>
@@ -112,6 +121,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtSpecialtyName02;
+
+        /// <summary>
+        /// txtNotes02 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNotes02;
 
         /// <summary>
         /// txtAppointmentNo02 control.
@@ -177,6 +195,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         protected global::Telerik.Web.UI.RadTextBox txtSpecialtyName03;
 
         /// <summary>
+        /// txtNotes03 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNotes03;
+
+        /// <summary>
         /// txtAppointmentNo03 control.
         /// </summary>
         /// <remarks>
@@ -240,6 +267,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         protected global::Telerik.Web.UI.RadTextBox txtSpecialtyName04;
 
         /// <summary>
+        /// txtNotes04 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNotes04;
+
+        /// <summary>
         /// txtAppointmentNo04 control.
         /// </summary>
         /// <remarks>
@@ -301,6 +337,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtSpecialtyName05;
+
+        /// <summary>
+        /// txtNotes05 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNotes05;
 
         /// <summary>
         /// txtAppointmentNo05 control.

@@ -16,6 +16,7 @@ namespace Temiang.Avicenna.BusinessObject.JsonField
         public string ParamedicID { get; set; }
         public string ServiceUnitID { get; set; }
         public string SpecialtyName { get; set; }
+        public string Notes { get; set; }
         public string AppointmentNo { get; set; }
         public int? AppointmentQue { get; set; }
         public string AppointmentTime { get; set; }
