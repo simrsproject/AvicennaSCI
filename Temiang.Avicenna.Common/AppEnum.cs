@@ -815,7 +815,7 @@ namespace Temiang.Avicenna.Common
             AllergySatuSehat,
 
             SatuSehatClassType,
-
+            DicomCode
         }
 
         public enum AutoNumber

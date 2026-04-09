@@ -4529,5 +4529,36 @@ namespace Temiang.Avicenna.Module.Charges
             if (!satuSehatLog.EncounterID.HasValue) return;
         }
 
+
+        protected void btnRisSatusehat_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var charges = new TransCharges();
+                charges.LoadByPrimaryKey(Request.QueryString["joNo"]);
+
+                var reg = new Registration();
+                reg.LoadByPrimaryKey(charges.RegistrationNo);
+
+                var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
+                var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
+
+                if (!string.IsNullOrWhiteSpace(serviceUnitRadiologyIdArray) &&
+                    !string.IsNullOrWhiteSpace(serviceUnitRadiologyID))
+                {
+                    SatusehatServiceRequestPostAndLogToRis(reg, charges.TransactionNo);
+                    ShowInformationHeader($"Success Send Service Request To SatuSehat (TRX: {charges.TransactionNo})");
+                }
+                else
+                {
+                    ShowInformationHeader("Failed To Send Service Request, Check For Post Data");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowInformationHeader("Error: " + ex.Message);
+            }
+        }
+
     }
 }

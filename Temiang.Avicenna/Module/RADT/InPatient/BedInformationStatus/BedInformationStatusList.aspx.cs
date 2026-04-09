@@ -44,6 +44,8 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                 txtReady.BackColor = System.Drawing.Color.Green;
                 txtOccupied.ReadOnly = true;
                 txtOccupied.BackColor = System.Drawing.Color.Red;
+                txtSip.ReadOnly = true;
+                txtSip.BackColor = System.Drawing.Color.Cyan;
                 txtBooked.ReadOnly = true;
                 txtBooked.BackColor = System.Drawing.Color.Brown;
                 txtPending.ReadOnly = true;
@@ -650,6 +652,9 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                 case "BedStatus-07":
                     color = System.Drawing.Color.Purple;
                     break;
+                case "BedStatus-08":
+                    color = System.Drawing.Color.Cyan;
+                    break;
             }
 
             return color;
@@ -696,7 +701,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
             query.GroupBy(query.SRBedStatus);
             DataTable dtb = query.LoadDataTable();
 
-            int allBed = 0, ready = 0, occupied = 0, booked = 0, pending = 0, cleaning = 0, reserved = 0, repaired = 0;
+            int allBed = 0, ready = 0, occupied = 0, booked = 0, pending = 0, cleaning = 0, reserved = 0, repaired = 0, sip = 0;
             foreach (DataRow row in dtb.Rows)
             {
                 allBed += row["NumberOfBeds"].ToInt();
@@ -723,11 +728,15 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                     case "BedStatus-07":
                         repaired += row["NumberOfBeds"].ToInt();
                         break;
+                    case "BedStatus-08":
+                        sip += row["NumberOfBeds"].ToInt();
+                        break;
                 }
             }
             lblNumberOfBeds.Text = "Number of Beds : " + allBed.ToString();
             txtReady.Value = Convert.ToDouble(ready);
             txtOccupied.Value = Convert.ToDouble(occupied);
+            txtSip.Value = Convert.ToDouble(sip);
             txtBooked.Value = Convert.ToDouble(booked);
             txtPending.Value = Convert.ToDouble(pending);
             txtCleaning.Value = Convert.ToDouble(cleaning);

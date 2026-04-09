@@ -7,6 +7,7 @@ using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.BusinessObject.Reference;
 using System.Linq;
+using System.Configuration;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
@@ -144,6 +145,9 @@ namespace Temiang.Avicenna.Module.RADT.Master
             entity.SREklaimTariffGroup = cboSREklaimGroup.SelectedValue;
             entity.SREklaimFactorGroup = cboSREklaimFactorGroup.SelectedValue;
             entity.IntervalOrderWarning = Convert.ToInt16(txtIntervalOrderWarning.Value);
+
+            if (trDCMCode.Visible)
+                itemRadiology.DicomCode = cboDicomCode.SelectedValue;
 
             //Last Update Status
             if (entity.es.IsAdded || entity.es.IsModified)
@@ -330,6 +334,15 @@ namespace Temiang.Avicenna.Module.RADT.Master
             chkIsCitoFromStandardReference.Checked = itemRadiology.IsCitoFromStandardReference ?? false;
             txtItemIDExternal.Text = item.ItemIDExternal;
 
+            if (trDCMCode.Visible && !string.IsNullOrEmpty(itemRadiology.DicomCode))
+            {
+                var asri = new AppStandardReferenceItemQuery();
+                asri.Where(asri.ItemID == itemRadiology.DicomCode, asri.StandardReferenceID == AppEnum.StandardReference.DicomCode, asri.IsActive == true);
+                cboDicomCode.DataSource = asri.LoadDataTable();
+                cboDicomCode.DataBind();
+                cboDicomCode.SelectedValue = itemRadiology.DicomCode;
+            }
+
             cboSREklaimGroup.SelectedValue = item.SREklaimTariffGroup;
             cboSREklaimFactorGroup.SelectedValue = item.SREklaimFactorGroup;
 
@@ -370,6 +383,8 @@ namespace Temiang.Avicenna.Module.RADT.Master
             chkIsHasTestResults.Checked = true;
 
             cboSREklaimGroup.SelectedValue = "07";
+            cboDicomCode.Text = string.Empty;
+            cboDicomCode.Items.Clear();
         }
 
         protected override void OnMenuMoveNextClick(ValidateArgs args)
@@ -425,6 +440,9 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 StandardReference.InitializeIncludeSpace(cboSRBpjsItemGroup, AppEnum.StandardReference.BpjsItemGroup);
                 StandardReference.InitializeIncludeSpace(cboSREklaimGroup, AppEnum.StandardReference.EklaimTariffGroup);
                 StandardReference.InitializeIncludeSpace(cboSREklaimFactorGroup, AppEnum.StandardReference.EklaimFactorGroup);
+
+                trDCMCode.Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.BaseUtil.SatuSehatKey("SatuSehatOrganizationID")));
+
 
                 var ApRl = new AppProgramCollection();
                 ApRl.Query.Where(ApRl.Query.ProgramID == AppConstant.Program.RlReportV2025, ApRl.Query.IsVisible == true);
@@ -966,7 +984,36 @@ namespace Temiang.Avicenna.Module.RADT.Master
             chkIsCitoFromStandardReference.Enabled = chkIsAllowCito.Checked;
             chkIsCitoFromStandardReference.Checked = false;
         }
+        protected void cboDicomCode_ItemsRequested(object o, RadComboBoxItemsRequestedEventArgs e)
+        {
+            string searchTextContain = string.Format("%{0}%", e.Text);
+            var query = new AppStandardReferenceItemQuery();
+            query.es.Top = 20;
+            query.Select
+                (
+                    query.ItemID,
+                    query.ItemName
+                );
+            query.Where
+                (
+                    query.Or
+                        (
+                            query.ItemID.Like(searchTextContain),
+                            query.ItemName.Like(searchTextContain)
+                        ),
+                    query.StandardReferenceID == AppEnum.StandardReference.DicomCode.ToString(),
+                    query.IsActive == true
+                );
+            query.OrderBy(query.ItemName.Ascending);
+            cboDicomCode.DataSource = query.LoadDataTable();
+            cboDicomCode.DataBind();
+        }
 
+        protected void cboDicomCode_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        {
+            e.Item.Text = ((DataRowView)e.Item.DataItem)["ItemID"].ToString();
+            e.Item.Value = ((DataRowView)e.Item.DataItem)["ItemName"].ToString();
+        }
         private bool IsBarcodeUsedByOtherItem(ValidateArgs args, string itemID, string bc)
         {
             args.IsCancel = false;

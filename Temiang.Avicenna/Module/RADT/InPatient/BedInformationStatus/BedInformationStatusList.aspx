@@ -53,6 +53,7 @@
                     <telerik:AjaxUpdatedControl ControlID="lblNumberOfBeds" />
                     <telerik:AjaxUpdatedControl ControlID="txtReady" />
                     <telerik:AjaxUpdatedControl ControlID="txtOccupied" />
+                    <telerik:AjaxUpdatedControl ControlID="txtSip" />
                     <telerik:AjaxUpdatedControl ControlID="txtBooked" />
                     <telerik:AjaxUpdatedControl ControlID="txtPending" />
                     <telerik:AjaxUpdatedControl ControlID="txtCleaning" />
@@ -73,6 +74,7 @@
                     <telerik:AjaxUpdatedControl ControlID="lblNumberOfBeds" />
                     <telerik:AjaxUpdatedControl ControlID="txtReady" />
                     <telerik:AjaxUpdatedControl ControlID="txtOccupied" />
+                    <telerik:AjaxUpdatedControl ControlID="txtSip" />
                     <telerik:AjaxUpdatedControl ControlID="txtBooked" />
                     <telerik:AjaxUpdatedControl ControlID="txtPending" />
                     <telerik:AjaxUpdatedControl ControlID="txtCleaning" />
@@ -92,6 +94,7 @@
                     <telerik:AjaxUpdatedControl ControlID="lblNumberOfBeds" />
                     <telerik:AjaxUpdatedControl ControlID="txtReady" />
                     <telerik:AjaxUpdatedControl ControlID="txtOccupied" />
+                    <telerik:AjaxUpdatedControl ControlID="txtSip" />
                     <telerik:AjaxUpdatedControl ControlID="txtBooked" />
                     <telerik:AjaxUpdatedControl ControlID="txtPending" />
                     <telerik:AjaxUpdatedControl ControlID="txtCleaning" />
@@ -229,6 +232,10 @@
                                             <telerik:RadNumericTextBox ID="txtOccupied" runat="server" Width="30px" NumberFormat-DecimalDigits="0" ForeColor="White" Font-Bold="true" />
                                         </td>
                                         <td>&nbsp;Occupied&nbsp;</td>
+                                        <td>
+                                            <telerik:RadNumericTextBox ID="txtSip" runat="server" Width="30px" NumberFormat-DecimalDigits="0" ForeColor="White" Font-Bold="true" />
+                                        </td>
+                                        <td>&nbsp;SIP&nbsp;</td>
                                         <td>
                                             <telerik:RadNumericTextBox ID="txtBooked" runat="server" Width="30px" NumberFormat-DecimalDigits="0" ForeColor="White" Font-Bold="true" />
                                         </td>

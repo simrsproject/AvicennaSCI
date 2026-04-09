@@ -3,6 +3,7 @@
 
 <%@ Register TagPrefix="cc" Namespace="Temiang.Avicenna.CustomControl" Assembly="Temiang.Avicenna" %>
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
+<%@ Import Namespace="Temiang.Avicenna.Common" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
     <telerik:RadCodeBlock ID="RadCodeBlock1" runat="server">
 
@@ -74,6 +75,12 @@
                 oWnd.setSize(1000, 600);
                 oWnd.show();   
             }
+
+            function resendServiceRequestSS(transNo) {
+                if (confirm('Send This Service Request To SatuSehat?')) {
+                    __doPostBack("<%= grdList2.UniqueID %>", 'resendSRSS|' + transNo);
+                            }
+                        }
         </script>
 
     </telerik:RadCodeBlock>
@@ -433,6 +440,7 @@
                         <telerik:GridBoundColumn HeaderStyle-Width="120px" DataField="PaymentNo" HeaderText="Payment No"
                             UniqueName="PaymentNo" SortExpression="PaymentNo" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
+
                          <telerik:GridTemplateColumn UniqueName="viewSpecimenCRDetail" HeaderText="">
                             <ItemTemplate>
                                 <%# DataBinder.Eval(Container.DataItem, "ServiceUnitName").ToString().ToLower().Contains("lab") ?
@@ -558,6 +566,16 @@
                         <telerik:GridBoundColumn HeaderStyle-Width="120px" DataField="PaymentNo" HeaderText="Payment No"
                             UniqueName="PaymentNo" SortExpression="PaymentNo" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
+                        <telerik:GridTemplateColumn UniqueName="resendServiceRequestSS" HeaderText="SatuSehat" Visible="False">
+                            <ItemTemplate>
+                                <%# (new string[] {AppSession.Parameter.ServiceUnitRadiologyID, AppSession.Parameter.ServiceUnitRadiologyID2}.Contains(DataBinder.Eval(Container.DataItem, "ServiceUnitID").ToString()) &&
+                                        !string.IsNullOrWhiteSpace(Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatOrganizationID))) ? 
+                                        string.Format("<a href=\"#\" onclick=\"resendServiceRequestSS('{0}'); return false;\"><img src=\"../../../../Images/SatuSehatSmall.png\" border=\"0\" title=\"Send Service Request Radiology To SatuSehat\" /></a>", DataBinder.Eval(Container.DataItem, "TransactionNo")) :
+                                        string.Empty %>
+                            </ItemTemplate>                           
+                            <HeaderStyle HorizontalAlign="Center" Width="40px" />
+                            <ItemStyle HorizontalAlign="Center" />
+                        </telerik:GridTemplateColumn>
                         <telerik:GridTemplateColumn UniqueName="PrintTransactionReceipt" HeaderStyle-Width="30px"
                             ItemStyle-HorizontalAlign="center">
                             <ItemTemplate>

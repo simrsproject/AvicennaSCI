@@ -195,6 +195,15 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
         protected global::Telerik.Web.UI.RadNumericTextBox txtOccupied;
 
         /// <summary>
+        /// txtSip control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadNumericTextBox txtSip;
+
+        /// <summary>
         /// txtBooked control.
         /// </summary>
         /// <remarks>

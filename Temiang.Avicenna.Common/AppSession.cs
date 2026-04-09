@@ -1259,6 +1259,11 @@ namespace Temiang.Avicenna.Common
                 get { return IsYes(AppParameter.ParameterItem.IsAutoClosedRegOnDischargePermit); }
             }
 
+            public static bool IsAutoSIPRegOnDischargePermit
+            {
+                get { return IsYes(AppParameter.ParameterItem.IsAutoSIPRegOnDischargePermit); }
+            }
+
             public static bool IsAutoClosedRegOpOnPayment
             {
                 get { return IsYes(AppParameter.ParameterItem.IsAutoClosedRegOpOnPayment); }

@@ -2655,9 +2655,14 @@ namespace Temiang.Avicenna.WebService
         {
             var qr = new SnomedctQuery("p");
             qr.Select(qr.Code.As("ValueField"), qr.DisplayNative.As("TextField"));
-            qr.Where(qr.SRSnomedct == "ChiefComplaint", qr.IsActive == true);
+            qr.Where(qr.IsActive == true);
             if (context.Text != "[showall]")
                 qr.Where(qr.Display.Like(string.Format("%{0}%", context.Text)));
+
+            var srSnomedCT = context["SRSnomedCT"]?.ToString();
+            if (!string.IsNullOrEmpty(srSnomedCT))
+                qr.Where(qr.SRSnomedct == srSnomedCT);
+
             qr.OrderBy(qr.Display.Ascending);
             qr.es.Top = MaxQueryRecord;
 

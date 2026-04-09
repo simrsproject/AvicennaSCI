@@ -619,5 +619,8 @@
     <asp:Button ID="btnLisSatusehat" runat="server" Text="Update LIS Table Satusehat" OnClick="btnLisSatusehat_Click" Visible="true" />
     <br />
     <br />
+    <asp:Button ID="btnRisSatusehat" runat="server" Text="Send Radiology Service Request To Satusehat" OnClick="btnRisSatusehat_Click" />
+    <br />
+    <br />
     <br />
 </asp:Content>

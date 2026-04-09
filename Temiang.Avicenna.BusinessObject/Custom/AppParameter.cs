@@ -296,6 +296,7 @@ namespace Temiang.Avicenna.BusinessObject
             IsSelfCheckinPrintingSEP,
             SepProgramIdRpt,
             IsAutoClosedRegOnDischargePermit,
+            IsAutoSIPRegOnDischargePermit,
             IsAutoClosedRegOpOnPayment,
             IsAutoClosedRegIpOnPayment,
             TariffComponentPriceVisible,
@@ -1564,6 +1565,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsAutoClosedRegIpOnPayment = "Is Auto Closed Reg-IP On Payment ? (Yes or No)|No| |False";
             public const string IsAutoClosedRegOnPaymentWithHoldTx = "Is Auto Closed Registration On Payment With Hold Transaction? (Yes or No)|No| |False";
             public const string IsAutoClosedRegOnDischargePermit = "Is Auto Closed Registration On Discharge Permit ? (Yes/No)|No;RSI:Yes| |False";
+            public const string IsAutoSIPRegOnDischargePermit = "Is Auto SIP Registration On Discharge Permit ? (Yes/No)|No;RSI:Yes| |False";
             public const string IsAutoClosedRegOpOnPayment = "Is Auto Closed Reg-OP On Payment ? (Yes or No)|No| |False";
             public const string IsCashPurchaseOrderUpdatePrice = "Is Cash Purchase Order Update Price (Yes/No)|No||False";
             public const string IsCreateAssetIdAutomatic = "Is Create Asset Id Automatic (Yes/No)|No| |True";
