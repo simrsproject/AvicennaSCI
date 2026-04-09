@@ -684,6 +684,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                             {
                                 satuSehatLog.EncounterID = new Guid(firstEncounterId);
                                 satuSehatLog.str.ErrorResponse = string.Empty;
+
+                                encounterId = firstEncounterId;
                             }
                         }
                         catch (Exception)
@@ -694,8 +696,6 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
 
                     }
                 }
-                
-
             }
 
             satuSehatLog.Save();

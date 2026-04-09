@@ -98,3 +98,11 @@ Titipan Daniel
 ---[08-04-2026 - Apip]---
 1. Add Status bed biru muda, jika klik di menu billing discharge permit ODO #HT09761 
 	- Untuk aktifkannya parameter ini IsAutoSIPRegOnDischargePermit = Yes
+
+---[09-04-2026 - Handono]---
+- Bugsfix satusehat Lab data sharing
+- Bugsfix Item Name tidak muncul di Item Consumption Service Unit Tx
+- Satusehat: handle error "Found duplicate resource" for resource:
+	- Encounter
+	- ServiceRequest
+	- Condition

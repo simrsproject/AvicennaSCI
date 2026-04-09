@@ -163,6 +163,8 @@
     <Compile Include="BusinessObject\ConditionResponse.cs" />
     <Compile Include="BusinessObject\ConsentResponse.cs" />
     <Compile Include="BusinessObject\ProcedureResponse.cs" />
+    <Compile Include="BusinessObject\ConditionGet.cs" />
+    <Compile Include="BusinessObject\ServiceRequestGet.cs" />
     <Compile Include="BusinessObject\SubClass\Meta.cs" />
     <Compile Include="BusinessObject\SubClass\Interpretation.cs" />
     <Compile Include="BusinessObject\SubClass\Period.cs" />

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -268,16 +269,16 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
         protected BaseResponse RestClientPostAndSaveLog(string resourceType, string requestBody, SatuSehatResult ssResult, ref string accessToken)
         {
-            BaseResponse conditionResponse = null;
+            BaseResponse baseResponse = null;
 
             var response = RestClientPost(requestBody, resourceType, ref accessToken);
 
             if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                conditionResponse = JsonConvert.DeserializeObject<BaseResponse>(response.Content);
-                if (!string.IsNullOrEmpty(conditionResponse.Id))
+                baseResponse = JsonConvert.DeserializeObject<BaseResponse>(response.Content);
+                if (!string.IsNullOrEmpty(baseResponse.Id))
                 {
-                    ssResult.ResultID = new Guid(conditionResponse.Id);
+                    ssResult.ResultID = new Guid(baseResponse.Id);
                     ssResult.ErrorResponse = string.Empty;
                 }
             }
@@ -293,8 +294,95 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
             ssResult.Save();
 
-            return conditionResponse;
+
+            // Error Found duplicate resource: xxx RuleNumber: 20002
+            if (ssResult.ErrorResponse.Contains("RuleNumber: 20002"))
+            {
+                // Pull resource
+                switch (resourceType)
+                {
+                    case "ServiceRequest":
+                        ServiceRequestPull(ssResult.EncounterID.ToString(), ref accessToken);
+                        break;
+                    case "Condition":
+                        ConditionPull(ssResult.EncounterID.ToString(), ref accessToken);
+                        break;
+                }
+
+            }
+
+            return baseResponse;
         }
+
+        private void ServiceRequestPull(string encounterID, ref string accessToken)
+        {
+            // Ambil ServiceRequest
+            var url = string.Format("{0}/ServiceRequest?encounter={1}", BaseUrl, encounterID);
+
+            var response = RestClientExecute(string.Empty, url, ref accessToken, Method.Get);
+            if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var serviceRequest = JsonConvert.DeserializeObject<ServiceRequestGet.Root>(response.Content);
+                foreach (var entry in serviceRequest.Entry)
+                {
+                    var ssResult = new SatuSehatResult();
+                    var gEncounterID = new Guid(encounterID);
+                    var identifier = entry.Resource.Identifier[0].Value;
+                    var orderIds = identifier.Split('-');
+                    var seqNo = orderIds[orderIds.Length - 1];
+                    var jobOrderNo = identifier.Substring(0, identifier.Length - (seqNo.Length + 1));
+                    ssResult.Query.Where(ssResult.Query.EncounterID == gEncounterID, ssResult.Query.ResourceType == "ServiceRequest", ssResult.Query.Category == jobOrderNo, ssResult.Query.Code == seqNo);
+                    if (!ssResult.Query.Load())
+                        ssResult = new SatuSehatResult();
+
+                    ssResult.EncounterID = gEncounterID;
+                    ssResult.ResourceType = "ServiceRequest";
+                    ssResult.Category = jobOrderNo;
+                    ssResult.Code = seqNo;
+                    ssResult.PostData = JsonConvert.SerializeObject(entry.Resource);
+                    ssResult.ResultID = new Guid(entry.Resource.Id);
+                    ssResult.str.ErrorResponse = string.Empty;
+                    SetResultIndexNo(ssResult);
+
+                    ssResult.Save();
+                }
+
+            }
+        }
+
+        private void ConditionPull(string encounterID, ref string accessToken)
+        {
+            // Ambil Condition
+            var url = string.Format("{0}/Condition?encounter={1}", BaseUrl, encounterID);
+
+            var response = RestClientExecute(string.Empty, url, ref accessToken, Method.Get);
+            if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                var Condition = JsonConvert.DeserializeObject<ConditionGet.Root>(response.Content);
+                foreach (var entry in Condition.Entry)
+                {
+                    var ssResult = new SatuSehatResult();
+                    var gEncounterID = new Guid(encounterID);
+                    var diagnoseID = entry.Resource.Code.Coding[0].Code;
+                    ssResult.Query.Where(ssResult.Query.EncounterID == gEncounterID, ssResult.Query.ResourceType== "Condition", ssResult.Query.Category == "Diagnosis", ssResult.Query.Code == diagnoseID);
+                    if (!ssResult.Query.Load())
+                        ssResult = new SatuSehatResult();
+
+                    ssResult.EncounterID = gEncounterID;
+                    ssResult.ResourceType = "Condition";
+                    ssResult.Category = "Diagnosis";
+                    ssResult.Code = diagnoseID;
+                    ssResult.PostData = JsonConvert.SerializeObject(entry.Resource);
+                    ssResult.ResultID = new Guid(entry.Resource.Id);
+                    ssResult.str.ErrorResponse = string.Empty;
+                    SetResultIndexNo(ssResult);
+
+                    ssResult.Save();
+                }
+
+            }
+        }
+
         protected void SetResultIndexNo(SatuSehatResult ssResult)
         {
             if (ssResult.IndexNo == null || ssResult.IndexNo == 0)
