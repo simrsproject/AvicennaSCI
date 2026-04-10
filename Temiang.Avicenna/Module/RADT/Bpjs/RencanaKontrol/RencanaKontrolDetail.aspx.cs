@@ -85,18 +85,18 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     {
                         foreach (var item in responsePoli.Response.List)
                         {
-                            if (AppSession.Parameter.HealthcareInitial == "RSI")
-                            {
-                                var poliAwal = response.Response.Poli.Split('-')[0].Trim();
-                                if (poliAwal == "HDL")
-                                {
-                                    if  (item.KodePoli == "007") continue;
-                                }
-                                else if (poliAwal == "007")
-                                {
-                                    if (item.KodePoli == "HDL") continue;
-                                }
-                            }
+                            //if (AppSession.Parameter.HealthcareInitial == "RSI")
+                            //{
+                            //    var poliAwal = response.Response.Poli.Split('-')[0].Trim();
+                            //    if (poliAwal == "HDL")
+                            //    {
+                            //        if  (item.KodePoli == "007") continue;
+                            //    }
+                            //    else if (poliAwal == "007")
+                            //    {
+                            //        if (item.KodePoli == "HDL") continue;
+                            //    }
+                            //}
                             cboPoliDirujuk.Items.Add(new RadComboBoxItem($"{item.NamaPoli} - Kapasitas : {item.Kapasitas} - Jml Rencana Kontrol dan Rujukan : {item.JmlRencanaKontroldanRujukan}", item.KodePoli));
                         }
                     }

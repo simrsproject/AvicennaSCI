@@ -111,3 +111,6 @@ Titipan Daniel
 - Modifikasi function LatestInpatientRegistrationDate() di EmrDetail.aspx.cs dan EmrIpDetail.aspx.cs 
  untuk mengembalikan last ranap InPatient berdasarkan DischargeDate
 - modifikasi SP sp_GetLatestIPRRegistration. script ada di Document/2026/04/10/alter_sp_GetLatestIPRRegistration.sql
+
+---[10-04-2026 - Apip]---
+1.	bugfix rencana kontrol pasien HD poli kontrol ginjal hipertensi tidak muncul
