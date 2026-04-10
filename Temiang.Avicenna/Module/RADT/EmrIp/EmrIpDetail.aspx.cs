@@ -824,8 +824,19 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             if (dtLatestRanap.Rows.Count > 0)
             {
                 DataRow row = dtLatestRanap.Rows[0];
-                DateTime latestRegistration = DateTime.Parse(row["RegistrationDate"].ToString());
-                return latestRegistration;
+
+                if (row["DischargeDate"] == DBNull.Value)
+                    return null;
+
+                var strDate = row["DischargeDate"].ToString();
+
+                if (string.IsNullOrWhiteSpace(strDate))
+                    return null;
+
+                if (DateTime.TryParse(strDate, out DateTime result))
+                    return result;
+
+                return null;
             }
             return null;
         }

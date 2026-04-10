@@ -106,3 +106,8 @@ Titipan Daniel
 	- Encounter
 	- ServiceRequest
 	- Condition
+
+---[10-04-2026 - Wiliam]---]
+- Modifikasi function LatestInpatientRegistrationDate() di EmrDetail.aspx.cs dan EmrIpDetail.aspx.cs 
+ untuk mengembalikan last ranap InPatient berdasarkan DischargeDate
+- modifikasi SP sp_GetLatestIPRRegistration. script ada di Document/2026/04/10/alter_sp_GetLatestIPRRegistration.sql
