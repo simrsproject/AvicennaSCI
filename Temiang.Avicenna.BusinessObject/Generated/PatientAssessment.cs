@@ -221,6 +221,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "ToInpatient": this.str.ToInpatient = (string)value; break;
                         case "ChiefComplaint": this.str.ChiefComplaint = (string)value; break;
                         case "SCTChiefComplaint": this.str.SCTChiefComplaint = (string)value; break;
+                        case "SCTHpi": this.str.SCTHpi = (string)value; break;
                     }
                 }
                 else
@@ -1248,7 +1249,21 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(PatientAssessmentMetadata.ColumnNames.SCTChiefComplaint, value);
             }
         }
+        /// <summary>
+        /// Maps to PatientAssessment.SCTHpi
+        /// </summary>
+        virtual public System.String SCTHpi
+        {
+            get
+            {
+                return base.GetSystemString(PatientAssessmentMetadata.ColumnNames.SCTHpi);
+            }
 
+            set
+            {
+                base.SetSystemString(PatientAssessmentMetadata.ColumnNames.SCTHpi, value);
+            }
+        }
         #endregion
 
         #region String Properties
@@ -2095,6 +2110,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.SCTChiefComplaint = Convert.ToString(value);
                 }
             }
+            public System.String SCTHpi
+            {
+                get
+                {
+                    System.String data = entity.SCTHpi;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.SCTHpi = null;
+                    else entity.SCTHpi = Convert.ToString(value);
+                }
+            }
             private esPatientAssessment entity;
         }
         #endregion
@@ -2629,6 +2658,13 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        public esQueryItem SCTHpi
+        {
+            get
+            {
+                return new esQueryItem(this, PatientAssessmentMetadata.ColumnNames.SCTHpi, esSystemType.String);
+            }
+        }
     }
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
@@ -3358,7 +3394,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-
+            c = new esColumnMetadata(PatientAssessmentMetadata.ColumnNames.SCTHpi, 61, typeof(System.String), esSystemType.String);
+            c.PropertyName = PatientAssessmentMetadata.PropertyNames.SCTHpi;
+            c.CharacterMaxLength = 20;
+            c.IsNullable = true;
+            _columns.Add(c);
         }
         #endregion
 
@@ -3446,6 +3486,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string ToInpatient = "ToInpatient";
             public const string ChiefComplaint = "ChiefComplaint";
             public const string SCTChiefComplaint = "SCTChiefComplaint";
+            public const string SCTHpi = "SCTHpi";
         }
         #endregion
 
@@ -3513,6 +3554,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string ToInpatient = "ToInpatient";
             public const string ChiefComplaint = "ChiefComplaint";
             public const string SCTChiefComplaint = "SCTChiefComplaint";
+            public const string SCTHpi = "SCTHpi";
         }
         #endregion
 
@@ -3617,6 +3659,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("ToInpatient", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("ChiefComplaint", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SCTChiefComplaint", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("SCTHpi", new esTypeMap("varchar", "System.String"));
 
 
                 meta.Source = "PatientAssessment";

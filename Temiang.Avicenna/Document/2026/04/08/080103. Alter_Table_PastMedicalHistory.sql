@@ -1,0 +1,2 @@
+ALTER TABLE dbo.PastMedicalHistory ADD
+EffectiveDateTime datetime NULL

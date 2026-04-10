@@ -159,6 +159,24 @@ namespace Temiang.Avicenna.Module.RADT.Master
         protected global::System.Web.UI.WebControls.Image Image2;
 
         /// <summary>
+        /// LblSsbID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label LblSsbID;
+
+        /// <summary>
+        /// txtSsbID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtSsbID;
+
+        /// <summary>
         /// chkIsTemporary control.
         /// </summary>
         /// <remarks>

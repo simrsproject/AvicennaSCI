@@ -80,5 +80,29 @@ Titipan Daniel
 ---[06-04-2026 - Wiliam]---
 1. Modif Detail EMR (EmrDetail.aspx & EmrIpDetial.aspx) untuk menampilkan info Tanggal Ranap Terakhir di Patient Section.
    Perlu eksekusi script sp_GetLatestIPRRegistration.sql di Document/2026/04/06
-	  
 
+---[08-04-2026 - Handono]---
+- Satusehat Immunization Process
+- Master Item Product Medical: Add Vaccine entry
+- Master Item Service: Add Vaccine entry
+- Service Unit Transaction: : Add Vaccine entry
+- Standard Reference: Add Mapping Satusehat
+- Upgrade Restsharp Package
+
+---[08-04-2026 - Danang]---
+1. Satusehat Radiology
+	-> Post Service Request Radiology ke Satusehat (add button di realisasi detail & button di realisasi list)
+	-> Post Observation & Diagnostic Report SatuSehat (value dari test result atau ekspertise)
+2. Progress Rujukan Kompetensi BPJS
+
+---[08-04-2026 - Apip]---
+1. Add Status bed biru muda, jika klik di menu billing discharge permit ODO #HT09761 
+	- Untuk aktifkannya parameter ini IsAutoSIPRegOnDischargePermit = Yes
+
+---[09-04-2026 - Handono]---
+- Bugsfix satusehat Lab data sharing
+- Bugsfix Item Name tidak muncul di Item Consumption Service Unit Tx
+- Satusehat: handle error "Found duplicate resource" for resource:
+	- Encounter
+	- ServiceRequest
+	- Condition

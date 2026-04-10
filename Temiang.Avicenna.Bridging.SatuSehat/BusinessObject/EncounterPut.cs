@@ -79,22 +79,22 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
         [JsonProperty("coding")]
         public List<Coding> Coding;
     }
-    
+
     public class DischargeDisposition
     {
         [JsonProperty("coding")]
         public List<Coding> Coding;
 
-        [JsonProperty("text")]
+        [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
         public string Text { get; set; }
     }
 
     public class Hospitalization
     {
-        [JsonProperty("dischargedisposition")]
+        [JsonProperty("dischargeDisposition", NullValueHandling = NullValueHandling.Ignore)]
         public List<DischargeDisposition> DischargeDisposition;
 
-        [JsonProperty("admitsource")]
+        [JsonProperty("admitSource")]
         public AdmitSource AdmitSource;
     }
 }

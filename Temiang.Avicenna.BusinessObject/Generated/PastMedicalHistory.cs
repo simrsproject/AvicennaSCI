@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects  
 ===============================================================================
-                       Date Generated       : 6/1/2016 2:54:26 PM
+                       Date Generated       : 10/30/2024 1:48:54 PM
 ===============================================================================
 */
 
@@ -170,6 +170,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "Notes": this.str.Notes = (string)value; break;
                         case "LastUpdateDateTime": this.str.LastUpdateDateTime = (string)value; break;
                         case "LastUpdateByUserID": this.str.LastUpdateByUserID = (string)value; break;
+                        case "EffectiveDateTime": this.str.EffectiveDateTime = (string)value; break;
                     }
                 }
                 else
@@ -180,6 +181,11 @@ namespace Temiang.Avicenna.BusinessObject
 
                             if (value == null || value is System.DateTime)
                                 this.LastUpdateDateTime = (System.DateTime?)value;
+                            break;
+                        case "EffectiveDateTime":
+
+                            if (value == null || value is System.DateTime)
+                                this.EffectiveDateTime = (System.DateTime?)value;
                             break;
 
                         default:
@@ -270,6 +276,21 @@ namespace Temiang.Avicenna.BusinessObject
             set
             {
                 base.SetSystemString(PastMedicalHistoryMetadata.ColumnNames.LastUpdateByUserID, value);
+            }
+        }
+        /// <summary>
+        /// Maps to PastMedicalHistory.EffectiveDateTime
+        /// </summary>
+        virtual public System.DateTime? EffectiveDateTime
+        {
+            get
+            {
+                return base.GetSystemDateTime(PastMedicalHistoryMetadata.ColumnNames.EffectiveDateTime);
+            }
+
+            set
+            {
+                base.SetSystemDateTime(PastMedicalHistoryMetadata.ColumnNames.EffectiveDateTime, value);
             }
         }
 
@@ -391,6 +412,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.LastUpdateByUserID = Convert.ToString(value);
                 }
             }
+            public System.String EffectiveDateTime
+            {
+                get
+                {
+                    System.DateTime? data = entity.EffectiveDateTime;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.EffectiveDateTime = null;
+                    else entity.EffectiveDateTime = Convert.ToDateTime(value);
+                }
+            }
             private esPastMedicalHistory entity;
         }
         #endregion
@@ -474,6 +509,14 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, PastMedicalHistoryMetadata.ColumnNames.LastUpdateByUserID, esSystemType.String);
+            }
+        }
+
+        public esQueryItem EffectiveDateTime
+        {
+            get
+            {
+                return new esQueryItem(this, PastMedicalHistoryMetadata.ColumnNames.EffectiveDateTime, esSystemType.DateTime);
             }
         }
 
@@ -887,6 +930,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
+            c = new esColumnMetadata(PastMedicalHistoryMetadata.ColumnNames.EffectiveDateTime, 5, typeof(System.DateTime), esSystemType.DateTime);
+            c.PropertyName = PastMedicalHistoryMetadata.PropertyNames.EffectiveDateTime;
+            c.IsNullable = true;
+            _columns.Add(c);
+
 
         }
         #endregion
@@ -919,6 +967,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string Notes = "Notes";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
+            public const string EffectiveDateTime = "EffectiveDateTime";
         }
         #endregion
 
@@ -930,6 +979,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string Notes = "Notes";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
+            public const string EffectiveDateTime = "EffectiveDateTime";
         }
         #endregion
 
@@ -978,6 +1028,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("Notes", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("LastUpdateDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("LastUpdateByUserID", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("EffectiveDateTime", new esTypeMap("datetime", "System.DateTime"));
 
 
                 meta.Source = "PastMedicalHistory";

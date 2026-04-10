@@ -327,6 +327,8 @@
                                         ItemStyle-HorizontalAlign="Left" />
                                     <telerik:GridBoundColumn DataField="Notes" HeaderText="Notes" UniqueName="Notes"
                                         SortExpression="Notes" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                                    <telerik:GridBoundColumn DataField="SatuSehatBridgingID" HeaderText="SS Bridging ID" UniqueName="SatuSehatBridgingID"
+                                        SortExpression="SatuSehatBridgingID" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                                     <telerik:GridCheckBoxColumn HeaderStyle-Width="80px" DataField="IsTemporary" HeaderText="Temporary"
                                         UniqueName="IsTemporary" SortExpression="IsTemporary" HeaderStyle-HorizontalAlign="Center"
                                         ItemStyle-HorizontalAlign="Center" />

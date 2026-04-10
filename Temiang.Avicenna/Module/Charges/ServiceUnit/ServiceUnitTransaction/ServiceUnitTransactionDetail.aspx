@@ -1069,7 +1069,7 @@
                 </telerik:GridTemplateColumn>
                 <telerik:GridTemplateColumn UniqueName="cons" HeaderText="" Groupable="false">
                     <ItemTemplate>
-                        <%# (DataBinder.Eval(Container.DataItem, "IsItemTypeService").Equals(true) && DataBinder.Eval(Container.DataItem, "IsApprove").Equals(false) && DataBinder.Eval(Container.DataItem, "IsVoid").Equals(false) ? string.Format("<a href=\"#\" onclick=\"openWinCons('{0}','{1}','{2}'); return false;\"><img src=\"../../../../Images/Toolbar/consumption.png\" border=\"0\" title=\"Item Consumption\" /></a>",
+                        <%# ((DataBinder.Eval(Container.DataItem, "IsItemTypeService").Equals(true) || DataBinder.Eval(Container.DataItem, "IsVaccine").Equals(true)) && DataBinder.Eval(Container.DataItem, "IsApprove").Equals(false) && DataBinder.Eval(Container.DataItem, "IsVoid").Equals(false) ? string.Format("<a href=\"#\" onclick=\"openWinCons('{0}','{1}','{2}'); return false;\"><img src=\"../../../../Images/Toolbar/consumption.png\" border=\"0\" title=\"Item Consumption\" /></a>",
                                     DataBinder.Eval(Container.DataItem, "TransactionNo"), DataBinder.Eval(Container.DataItem, "SequenceNo"), 
                                         DataBinder.Eval(Container.DataItem, "ItemID")) : string.Empty
                                 )%>

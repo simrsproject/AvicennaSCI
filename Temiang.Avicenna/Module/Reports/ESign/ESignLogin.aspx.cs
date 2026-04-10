@@ -55,15 +55,20 @@ namespace Temiang.Avicenna.Module.Reports.ESign
             var userId = AppParameter.GetParameterValue(AppParameter.ParameterItem.ESignUserId);
             var pwd = AppParameter.GetParameterValue(AppParameter.ParameterItem.ESignPassword);
 
-            var client = new RestClient(url);
-            client.Authenticator = new RestSharp.Authenticators.HttpBasicAuthenticator(userId, pwd);
+            //var client = new RestClient(url);
+            //client.Authenticator = new RestSharp.Authenticators.HttpBasicAuthenticator(userId, pwd);
 
+            var options = new RestClientOptions(url)
+            {
+                Authenticator = new RestSharp.Authenticators.HttpBasicAuthenticator(userId, pwd)
+            };
+            var client = new RestClient(options);
             var request = new RestSharp.RestRequest();
             request.Method = Method.Get;
 
-            var timeOutPar = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
-            var timeOut = Convert.ToInt16(timeOutPar) * 1000;
-            request.Timeout = timeOut;
+            var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
+            //var timeOut = Convert.ToInt16(timeOutPar) * 1000;
+            request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
 
             var response = client.Execute(request);
             if (response != null)

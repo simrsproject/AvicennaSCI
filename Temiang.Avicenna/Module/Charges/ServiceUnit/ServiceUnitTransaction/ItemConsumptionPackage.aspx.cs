@@ -6,17 +6,19 @@ using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.BusinessObject.Reference;
-using DevExpress.DataProcessing;
 
 namespace Temiang.Avicenna.Module.Charges
 {
     public partial class ItemConsumptionPackage : BasePageDialog
     {
-        private LocationCollection locs {
-            get {
+        private LocationCollection locs
+        {
+            get
+            {
                 return (LocationCollection)Session["icp_LocColl"];
             }
-            set {
+            set
+            {
                 Session["icp_LocColl"] = value;
             }
         }
@@ -48,8 +50,7 @@ namespace Temiang.Avicenna.Module.Charges
                 }
             }
         }
-
-        public override bool OnButtonOkClicked()
+        protected override void OnButtonOkClicked(ValidateArgs args)
         {
             foreach (GridDataItem dataItem in grdList.MasterTableView.Items)
             {
@@ -59,10 +60,66 @@ namespace Temiang.Avicenna.Module.Charges
                 {
                     entity.QtyRealization = Convert.ToDecimal((dataItem.FindControl("txtQtyRealization") as RadNumericTextBox).Value ?? 0);
                     entity.LocationID = (dataItem.FindControl("cboLocationID") as RadComboBox).SelectedValue;
+
+                    // Vaccine Info
+                    entity.str.SRImmReason = string.Empty;
+                    entity.str.BatchNumber = string.Empty;
+                    entity.str.SRImmTiming = string.Empty;
+                    entity.str.ExpirationDate = string.Empty;
+
+                    var item = new ItemProductMedic();
+                    if (item.LoadByPrimaryKey(entity.DetailItemID) && (item.IsVaccine ?? false))
+                    {
+
+                        //var tariffComponentPrimaryPhysician = tciCompColl.FirstOrDefault(e => e.SequenceNo == tciCon.SequenceNo && e.TariffComponentID == AppParameter.GetParameterValue(AppParameter.ParameterItem.TariffComponentPrimaryPhysicianID));
+                        //if (tariffComponentPrimaryPhysician != null && !string.IsNullOrEmpty(tariffComponentPrimaryPhysician.ParamedicID))
+                        //    pim.ParamedicID = tariffComponentPrimaryPhysician.ParamedicID;
+                        //else
+                        //{
+                        //    //Todo: Diskusikan bagaimana cara ambil ParamedicID dari tx Item Package
+                        //}
+
+                        var parId = (dataItem.FindControl("cboParamedicID") as RadComboBox).SelectedValue;
+                        var imReason = (dataItem.FindControl("cboSRImmReason") as RadComboBox).SelectedValue;
+                        var batchNumber = (dataItem.FindControl("txtBatchNumber") as RadTextBox).Text;
+                        var imTiming = (dataItem.FindControl("cboSRImmTiming") as RadComboBox).SelectedValue;
+                        var txtExpirationDate = (dataItem.FindControl("txtExpirationDate") as RadDatePicker);
+
+                        var confirm = string.Empty;
+                        if (string.IsNullOrEmpty(parId))
+                            confirm = string.Concat(confirm, " Paramedic,");
+                        else
+                            entity.ParamedicID = parId;
+
+                        if (string.IsNullOrEmpty(imReason))
+                            confirm = string.Concat(confirm, " Immunization Reason,");
+                        else
+                            entity.SRImmReason = imReason;
+
+                        if (string.IsNullOrEmpty(batchNumber))
+                            confirm = string.Concat(confirm, " Drug Batch Number,");
+                        else
+                            entity.BatchNumber = batchNumber;
+
+                        if (string.IsNullOrEmpty(imTiming))
+                            confirm = string.Concat(confirm, " Routine Timing,");
+                        else
+                            entity.SRImmTiming = imTiming;
+
+                        if (txtExpirationDate.IsEmpty)
+                            confirm = string.Concat(confirm, " ExpirationDate");
+                        else
+                            entity.ExpirationDate = txtExpirationDate.SelectedDate;
+
+                        if (!string.IsNullOrEmpty(confirm))
+                        {
+                            args.IsCancel = true;
+                            args.MessageText = string.Concat("The item is a vaccine drug that requires ", confirm, " information.");
+                            return;
+                        }
+                    }
                 }
             }
-
-            return true;
         }
 
         protected void grdList_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
@@ -83,22 +140,81 @@ namespace Temiang.Avicenna.Module.Charges
             {
                 var dataItem = e.Item as GridDataItem;
                 var tcc = ((TransChargesItemConsumption)dataItem.DataItem);
+
+
+                // Hide delete buttom for Item from Item Consumption, identity by Qty>0 (info from Deby) (by Handono 251027)
+                if (Convert.ToDecimal(dataItem["Qty"].Text) > 0)
+                {
+                    // Find the delete button (assuming it's a GridButtonColumn)
+                    ImageButton deleteButton = (ImageButton)dataItem["DeleteColumn"].Controls[0];
+                    deleteButton.Visible = false;
+                }
+
+                // Location
                 var cbo = dataItem.FindControl("cboLocationID") as RadComboBox;
-                if (cbo != null) {
+                if (cbo != null)
+                {
                     cbo.Items.Add(string.Empty);
-                    foreach (var loc in locs) {
+                    foreach (var loc in locs)
+                    {
                         cbo.Items.Add(new RadComboBoxItem(loc.LocationName, loc.LocationID));
                     }
-                    if (!string.IsNullOrEmpty(tcc.LocationID)) {
+                    if (!string.IsNullOrEmpty(tcc.LocationID))
+                    {
                         var ci = cbo.Items.FindItemByValue(tcc.LocationID);
-                        if (ci != null) {
+                        if (ci != null)
+                        {
                             cbo.SelectedValue = tcc.LocationID;
                         }
                     }
-                    if (string.IsNullOrEmpty(cbo.SelectedValue)) {
+                    if (string.IsNullOrEmpty(cbo.SelectedValue))
+                    {
                         if (cbo.Items.Count == 2) cbo.Items[1].Selected = true;
                     }
                 }
+
+                // Immunization Entry
+                var cboSRImmReason = dataItem.FindControl("cboSRImmReason") as RadComboBox;
+                var cboSRImmTiming = dataItem.FindControl("cboSRImmTiming") as RadComboBox;
+                var cboParamedicID = dataItem.FindControl("cboParamedicID") as RadComboBox;
+
+                var item = new ItemProductMedic();
+                if (item.LoadByPrimaryKey(tcc.DetailItemID) && (item.IsVaccine ?? false))
+                {
+                    // Reason
+                    StandardReference.InitializeIncludeSpace(cboSRImmReason, AppEnum.StandardReference.ImmReason);
+                    if (!string.IsNullOrEmpty(tcc.SRImmReason))
+                    {
+                        ComboBox.SelectedValue(cboSRImmReason, tcc.SRImmReason);
+                    }
+
+                    // Routine Timing
+                    StandardReference.InitializeIncludeSpace(cboSRImmTiming, AppEnum.StandardReference.ImmTiming);
+                    if (!string.IsNullOrEmpty(tcc.SRImmTiming))
+                    {
+                        ComboBox.SelectedValue(cboSRImmTiming, tcc.SRImmTiming);
+                    }
+
+                    // Paramedic
+                    var objSess = Session["collTransChargesItemComp" + Request.UserHostName + Request.QueryString["pageId"]];
+                    if (objSess != null)
+                    {
+                        var tciCompColl = (TransChargesItemCompCollection)objSess;
+
+                        var tariffComponentPrimaryPhysician = tciCompColl.FirstOrDefault(comp => comp.SequenceNo == Request.QueryString["seq"] && comp.TariffComponentID == AppParameter.GetParameterValue(AppParameter.ParameterItem.TariffComponentPrimaryPhysicianID));
+                        if (tariffComponentPrimaryPhysician != null && !string.IsNullOrEmpty(tariffComponentPrimaryPhysician.ParamedicID))
+                        {
+                            ComboBox.PopulateWithOneParamedic(cboParamedicID, tariffComponentPrimaryPhysician.ParamedicID);
+                        }
+                    }
+                }
+
+                var isVaccine = item.IsVaccine ?? false;
+                cboSRImmReason.Visible = isVaccine;
+                cboSRImmTiming.Visible = isVaccine;
+                cboParamedicID.Visible = isVaccine;
+                (dataItem.FindControl("txtBatchNumber") as RadTextBox).Visible = isVaccine;
+                (dataItem.FindControl("txtExpirationDate") as RadDatePicker).Visible = isVaccine;
             }
         }
 
@@ -228,6 +344,18 @@ namespace Temiang.Avicenna.Module.Charges
                         im.LoadByPrimaryKey(i.ItemID);
                         entity.AveragePrice = im.CostPrice;
                         entity.FifoPrice = im.PriceInBaseUnit;
+
+                        // Vaccine Inf
+                        if (userControl.IsVaccine)
+                        {
+                            entity.QtyDosage = userControl.QtyDosage;
+                            entity.SRDosageUnit = userControl.SRDosageUnit;
+                            entity.SRImmReason = userControl.SRImmReason;
+                            entity.BatchNumber = userControl.BatchNumber;
+                            entity.SRImmTiming = userControl.SRImmTiming;
+                            entity.ExpirationDate = userControl.ExpirationDate;
+                        }
+
                         break;
                     case ItemType.NonMedical:
                         var inm = new ItemProductNonMedic();
@@ -275,7 +403,7 @@ namespace Temiang.Avicenna.Module.Charges
 
             if (eventArgument.Equals("rebind"))
                 grdList.Rebind();
-            
+
         }
     }
 }

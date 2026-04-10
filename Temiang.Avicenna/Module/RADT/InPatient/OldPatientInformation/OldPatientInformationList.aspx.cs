@@ -287,7 +287,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
             query.LeftJoin(srQ).On(srQ.RoomID == query.RoomID);
 
 
-            query.es.Top = 30;
+            ///query.es.Top = 30; Dimunculkan semua dan gunkan paging untuk mencegah masalah loading (Handono 2026-11-11)
             query.Select
             (
                 query.PatientID,

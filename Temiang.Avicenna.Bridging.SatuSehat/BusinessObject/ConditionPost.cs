@@ -33,6 +33,9 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
         [JsonProperty("recordedDate")]
         public string RecordedDate { get; set; }
+
+        [JsonProperty("note", NullValueHandling = NullValueHandling.Ignore)]
+        public List<Note> Note { get; set; }
     }
 
 }

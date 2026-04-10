@@ -68,9 +68,9 @@ namespace Temiang.Avicenna.WebService
             var url = $"{_authUrl}/accesstoken?grant_type=client_credentials";
             var client = new RestClient(url);
             var request = new RestRequest { Method = Method.Post };
-            var timeOutPar = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
-            int timeOut = Convert.ToInt16(timeOutPar) * 1000;
-            request.Timeout = timeOut;
+            var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
+            //var timeOut = Convert.ToInt16(timeOutPar) * 1000;
+            request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
             request.AddParameter("client_id", _clientID);
             request.AddParameter("client_secret", _secretKey);
@@ -2300,45 +2300,69 @@ namespace Temiang.Avicenna.WebService
             return comboData;
 
         }
+        //[WebMethod]
+        //public RadComboBoxData SatuSehatItemX(RadComboBoxContext context)
+        //{
+        //    IDictionary<string, object> contextDictionary = (IDictionary<string, object>)context;
+        //    var itemType = (string)contextDictionary["tp"];
+        //    switch (itemType)
+        //    {
+        //        case "kfa":
+        //            {
+        //                //var qr = new SatuSehatKfaQuery("p");
+        //                //qr.Select(qr.SsUuid.As("Code"), qr.SsNama.As("ItemName"));
+        //                //qr.Where(qr.Or(qr.SsUuid == context.Text, qr.SsNama.Like(string.Format("%{0}%", context.Text))));
+        //                //qr.OrderBy(qr.SsNama.Ascending);
+        //                //qr.es.Top = MaxQueryRecord;
+        //                //var dtb = qr.LoadDataTable();
+        //                //var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+        //                //return comboData;
 
-        [WebMethod]
-        public RadComboBoxData PatientRegistrationByServiceUnitUsers(RadComboBoxContext context)
-        {
-            var contextDictionary = (IDictionary<string, object>)context;
-            var filter = ((string)contextDictionary["EmployeeNumber"]);
+        //                try
+        //                {
+        //                    var tokenResponse = GetToken();
+        //                    if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
+        //                        throw new Exception("Unable to retrieve access token.");
 
-            var qr = new RegistrationQuery("a");
-            var pat = new PatientQuery("b");
-            var ausu = new AppUserServiceUnitQuery("c");
-            var au = new AppUserQuery("d");
+        //                    string keyword = context.Text;
+        //                    string apiUrl = $"{_KFAbaseUrl}/kfa-v2/products/all?page=1&size=100&product_type=farmasi&keyword={HttpUtility.UrlEncode(keyword)}";
 
-            qr.InnerJoin(pat).On(qr.PatientID == pat.PatientID)
-                .InnerJoin(ausu).On(qr.ServiceUnitID == qr.ServiceUnitID)
-                .InnerJoin(au).On(ausu.UserID == au.UserID);
-            qr.Select(qr.RegistrationNo.As("ValueField"), @"<'(' + b.MedicalNo + ') ' + RTRIM(LTRIM(RTRIM(LTRIM(b.FirstName + ' ' + b.MiddleName)) + ' ' + b.LastName)) AS 'TextField'>");
-            qr.Where(au.PersonID == filter && qr.IsVoid == 0 && qr.SRRegistrationType == AppConstant.RegistrationType.InPatient);
+        //                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiUrl);
+        //                    request.Method = "GET";
+        //                    request.Headers.Add("Authorization", "Bearer " + tokenResponse.AccessToken);
+        //                    request.Accept = "application/json";
 
-            if (context.Text != "[showall]")
-            {
-                if (context.Text.ToLower().Contains("reg"))
-                    qr.Where(qr.RegistrationNo == context.Text);
-                else
-                {
-                    string sNumber = context.Text.Replace("-", "").Replace("/", "").Replace(".", "");
-                    bool containsInt = sNumber.Any(char.IsDigit); //Will return true if the string contains a digit
-                    if (!containsInt)
-                        qr.Where(string.Format("<RTRIM(LTRIM(RTRIM(LTRIM(b.FirstName + ' ' + b.MiddleName)) + ' ' + b.LastName)) LIKE '%{0}%'>", context.Text));
-                    else
-                        qr.Where(qr.Or(pat.MedicalNo == context.Text, string.Format("< OR b.MedicalNo LIKE '%{0}%'>", context.Text)));
-                }
-            }
+        //                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+        //                    using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+        //                    {
+        //                        string responseJson = reader.ReadToEnd();
+        //                        JObject json = JObject.Parse(responseJson);
+        //                        var items = json["items"]?["data"]?.ToList();
 
-            qr.es.Distinct = true;
-            qr.es.Top = MaxQueryRecord;
+        //                        if (items == null || items.Count == 0)
+        //                            return null;
 
-            var comboData = PopulateComboBoxDataItems(context, qr);
-            return comboData;
-        }
+        //                        // Prepare DataTable
+        //                        DataTable dt = new DataTable();
+        //                        dt.Columns.Add("Code");
+        //                        dt.Columns.Add("ItemName");
+
+        //                        foreach (var item in items)
+        //                        {
+        //                            string code = item["kfa_code"]?.ToString();
+        //                            string name = item["name"]?.ToString();
+        //                            if (!string.IsNullOrWhiteSpace(code) && !string.IsNullOrWhiteSpace(name))
+        //                            {
+        //                                dt.Rows.Add(code, name);
+        //                            }
+        //                        }
+
+        //    qr.es.Distinct = true;
+        //    qr.es.Top = MaxQueryRecord;
+
+        //    var comboData = PopulateComboBoxDataItems(context, qr);
+        //    return comboData;
+        //}
 
         [WebMethod]
         public RadComboBoxData SatuSehatItem(RadComboBoxContext context)
@@ -2448,17 +2472,15 @@ namespace Temiang.Avicenna.WebService
                         return comboData;
                     }
                 case "alg": // Obsolete diganti zat aktif (Handono 2025-08)
-                    //{
-                    //    var qr = new SatuSehatKfaQuery("p");
-                    //    qr.Select(qr.SsNama.As("ItemName"), qr.SsUuid.As("Code"));
-                    //    qr.Where(qr.SsNama.Like(string.Format("%{0}%", context.Text)));
-                    //    qr.OrderBy(qr.SsNama.Ascending);
-                    //    qr.es.Top = MaxQueryRecord;
-                    //    var dtb = qr.LoadDataTable();
-                    //    var comboData = PopulateComboBoxDataItems(context, dtb, "ItemName", "Code", "ItemName");
-                    //    return comboData;
-                    //}
                     {
+                        //var qr = new SatuSehatKfaQuery("p");
+                        //qr.Select(qr.SsNama.As("ItemName"), qr.SsUuid.As("Code"));
+                        //qr.Where(qr.SsNama.Like(string.Format("%{0}%", context.Text)));
+                        //qr.OrderBy(qr.SsNama.Ascending);
+                        //qr.es.Top = MaxQueryRecord;
+                        //var dtb = qr.LoadDataTable();
+                        //var comboData = PopulateComboBoxDataItems(context, dtb, "ItemName", "Code", "ItemName");
+                        //return comboData;
                         try
                         {
                             var tokenResponse = GetToken();
@@ -2526,9 +2548,88 @@ namespace Temiang.Avicenna.WebService
                             throw new Exception("Error fetching KFA items: " + ex.Message, ex);
                         }
                     }
+                case "diet":
+                    {
+                        var qr = new SnomedctQuery("p");
+                        qr.Select(qr.Code, qr.Display.As("ItemName"));
+                        qr.Where(qr.SRSnomedct == "DietPatient", qr.Or(qr.Code == context.Text, qr.Display.Like(string.Format("%{0}%", context.Text))));
+                        qr.OrderBy(qr.Display.Ascending);
+                        qr.es.Top = MaxQueryRecord;
+                        var dtb = qr.LoadDataTable();
+                        var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+                        return comboData;
+                    }
+                case "cvxgroup":
+                    {
+                        var qr = new SatuSehatKfaQuery("p");
+                        qr.Select(qr.SsUuid.As("Code"), qr.SsNama.As("ItemName"));
+                        qr.Where(qr.SsType == "cvxgroup", qr.Or(qr.SsUuid == context.Text, qr.SsNama.Like(string.Format("%{0}%", context.Text))));
+                        qr.OrderBy(qr.SsNama.Ascending);
+                        qr.es.Top = MaxQueryRecord;
+                        var dtb = qr.LoadDataTable();
+                        var comboData = PopulateComboBoxDataItems(context, dtb, "Code", "Code", "ItemName");
+                        return comboData;
+                    }
 
             }
             return null;
+        }
+
+        [WebMethod]
+        public RadComboBoxData GetObat(RadComboBoxContext context)
+        {
+            string filterText = context["filter"] as string ?? context.Text;
+
+            var qr = new ItemBridgingQuery("p");
+            qr.Select(qr.BridgingID, qr.BridgingName);
+            qr.Where(
+                qr.SRBridgingType == AppEnum.BridgingType.APOTEKONLINE.ToString(),
+                qr.BridgingName.Like($"%{filterText}%")
+            );
+            qr.OrderBy(qr.BridgingName.Ascending);
+            qr.es.Top = MaxQueryRecord;
+
+            var comboData = PopulateComboBoxDataItems(context, qr, "BridgingID", "BridgingName");
+            return comboData;
+        }
+
+        [WebMethod]
+        public RadComboBoxData PatientRegistrationByServiceUnitUsers(RadComboBoxContext context)
+        {
+            var contextDictionary = (IDictionary<string, object>)context;
+            var filter = ((string)contextDictionary["EmployeeNumber"]);
+
+            var qr = new RegistrationQuery("a");
+            var pat = new PatientQuery("b");
+            var ausu = new AppUserServiceUnitQuery("c");
+            var au = new AppUserQuery("d");
+
+            qr.InnerJoin(pat).On(qr.PatientID == pat.PatientID)
+                .InnerJoin(ausu).On(qr.ServiceUnitID == qr.ServiceUnitID)
+                .InnerJoin(au).On(ausu.UserID == au.UserID);
+            qr.Select(qr.RegistrationNo.As("ValueField"), @"<'(' + b.MedicalNo + ') ' + RTRIM(LTRIM(RTRIM(LTRIM(b.FirstName + ' ' + b.MiddleName)) + ' ' + b.LastName)) AS 'TextField'>");
+            qr.Where(au.PersonID == filter && qr.IsVoid == 0 && qr.SRRegistrationType == AppConstant.RegistrationType.InPatient);
+
+            if (context.Text != "[showall]")
+            {
+                if (context.Text.ToLower().Contains("reg"))
+                    qr.Where(qr.RegistrationNo == context.Text);
+                else
+                {
+                    string sNumber = context.Text.Replace("-", "").Replace("/", "").Replace(".", "");
+                    bool containsInt = sNumber.Any(char.IsDigit); //Will return true if the string contains a digit
+                    if (!containsInt)
+                        qr.Where(string.Format("<RTRIM(LTRIM(RTRIM(LTRIM(b.FirstName + ' ' + b.MiddleName)) + ' ' + b.LastName)) LIKE '%{0}%'>", context.Text));
+                    else
+                        qr.Where(qr.Or(pat.MedicalNo == context.Text, string.Format("< OR b.MedicalNo LIKE '%{0}%'>", context.Text)));
+                }
+            }
+
+            qr.es.Distinct = true;
+            qr.es.Top = MaxQueryRecord;
+
+            var comboData = PopulateComboBoxDataItems(context, qr);
+            return comboData;
         }
 
         [WebMethod]
@@ -2554,9 +2655,34 @@ namespace Temiang.Avicenna.WebService
         {
             var qr = new SnomedctQuery("p");
             qr.Select(qr.Code.As("ValueField"), qr.DisplayNative.As("TextField"));
-            qr.Where(qr.SRSnomedct == "ChiefComplaint", qr.IsActive == true);
+            qr.Where(qr.IsActive == true);
             if (context.Text != "[showall]")
                 qr.Where(qr.Display.Like(string.Format("%{0}%", context.Text)));
+
+            var srSnomedCT = context["SRSnomedCT"]?.ToString();
+            if (!string.IsNullOrEmpty(srSnomedCT))
+                qr.Where(qr.SRSnomedct == srSnomedCT);
+
+            qr.OrderBy(qr.Display.Ascending);
+            qr.es.Top = MaxQueryRecord;
+
+            var comboData = PopulateComboBoxDataItems(context, qr);
+            return comboData;
+        }
+
+        [WebMethod]
+        public RadComboBoxData Snomedct(RadComboBoxContext context)
+        {
+            var qr = new SnomedctQuery("p");
+            qr.Select(qr.Code.As("ValueField"), qr.DisplayNative.As("TextField"));
+            qr.Where(qr.IsActive == true);
+            if (context.Text != "[showall]")
+                qr.Where(qr.Display.Like(string.Format("%{0}%", context.Text)));
+
+            var srSnomedCT = context["SRSnomedCT"]?.ToString();
+            if (!string.IsNullOrEmpty(srSnomedCT))
+                qr.Where(qr.SRSnomedct == srSnomedCT);
+
             qr.OrderBy(qr.Display.Ascending);
             qr.es.Top = MaxQueryRecord;
 

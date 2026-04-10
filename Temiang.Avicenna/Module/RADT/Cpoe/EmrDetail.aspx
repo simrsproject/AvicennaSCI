@@ -327,6 +327,10 @@
                         break;
                     case "ClinicalPathway":
                         openClinicalPathway();
+                        break;
+                     case "ImmHist":
+                        openImmunizationHist();
+                        break;
                     default:
                         if (value.includes('rpt_')) {
                             var vals = value.split('_');
@@ -404,6 +408,10 @@
                         break;
                     case "ReferToSpecialist":
                         entryReferToSpecialist();
+                        break;
+                    case "IntNoteHist":
+                        var url = '<%= Helper.UrlRoot() %>/Module/RADT/EmrIp/EmrIpCommon/IntegratedNote/IntegratedNoteHist.aspx?regno=<%= RegistrationNo %>&patid=<%= PatientID %>';
+                        openWinEntryMaxWindow(url);
                         break;
                     case "add_IntNotes":
                         {
@@ -956,6 +964,10 @@
                 var url = '<%= Helper.UrlRoot() %>/Module/RADT/Cpoe/Common/GrowthChart.aspx?patid=<%= PatientID %>';
                 openWinEntryMaximize(url);
             }
+            function openImmunizationHist() {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Cpoe/EmrCommon/Immunization/ImmunizationHist.aspx?patid=<%= PatientID %>';
+                openWinEntryMaximize(url);
+            }
             function showPRMRJ() {
                 var url = '<%= Helper.UrlRoot() %>/Module/RADT/Cpoe/EmrCommon/PRMRJ/Prmrj.aspx?&patid=<%= PatientID %>';
                 openWinEntryMaxWindow(url);
@@ -1499,18 +1511,9 @@
                             ImageUrl="~/Images/Toolbar/ordering16.png" />
                         <telerik:RadToolBarDropDown runat="server" Text="UDD" ImageUrl="~/Images/Toolbar/drugs16.png">
                         </telerik:RadToolBarDropDown>
-                        <telerik:RadToolBarDropDown runat="server" Text="HAIs Monitoring" ImageUrl="~/Images/Toolbar/ordering16.png">
-                        </telerik:RadToolBarDropDown>
-                        <telerik:RadToolBarDropDown runat="server" Text="HAIs Monitoring" ImageUrl="~/Images/Toolbar/ordering16.png" Visible="false">
-                            <Buttons>
-                                <telerik:RadToolBarButton runat="server" Text="Vena Verifier" Value="Nosocomial_Infus" />
-                                <telerik:RadToolBarButton runat="server" Text="Central (Infus)" Value="Nosocomial_InfusCentral" />
-                                <telerik:RadToolBarButton runat="server" Text="Dower Catheter" Value="Nosocomial_Catheter" />
-                                <telerik:RadToolBarButton runat="server" Text="NGT (Naso Gastric Tube)" Value="Nosocomial_Ngt" />
-                                <telerik:RadToolBarButton runat="server" Text="Surgery" Value="Nosocomial_Surgery" />
-                                <telerik:RadToolBarButton runat="server" Text="Mechanic Ventilation" Value="Nosocomial_Ett" />
-                                <telerik:RadToolBarButton runat="server" Text="Bed Rest" Value="Nosocomial_BedRest" />
-                            </Buttons>
+                        <telerik:RadToolBarButton runat="server" Text="Immunization" Value="ImmHist" ImageUrl="~/Images/Toolbar/views16.png">
+                        </telerik:RadToolBarButton>
+                        <telerik:RadToolBarDropDown runat="server" Text="HAIs Mon" CustomValue="hais" ImageUrl="~/Images/Toolbar/ordering16.png">
                         </telerik:RadToolBarDropDown>
                         <telerik:RadToolBarDropDown runat="server" Text="Graph" ImageUrl="~/Images/Toolbar/barchart.bmp">
                             <Buttons>
@@ -1575,6 +1578,8 @@
                                     ImageUrl="~/Images/Toolbar/ordering16.png" />
                                 <telerik:RadToolBarButton ID="RadToolBarButton1" runat="server" Text="Education" Value="Education"
                                     ImageUrl="~/Images/Toolbar/ordering16.png" />
+                                <telerik:RadToolBarButton runat="server" Text="Hist" Value="IntNoteHist" Visible="false"
+                                    ImageUrl="~/Images/Toolbar/history16.png" />
                                 <telerik:RadToolBarButton runat="server" Text="Refresh" Value="refresh"
                                     ImageUrl="~/Images/Toolbar/refresh16.png" />
                             </Items>

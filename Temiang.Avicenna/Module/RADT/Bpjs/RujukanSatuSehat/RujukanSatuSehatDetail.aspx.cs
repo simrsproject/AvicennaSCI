@@ -2,7 +2,9 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -645,7 +647,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             {
                 try
                 {
-                    LoadKriteriaRujukan();
+                    LoadKriteriaRujukan(true);
 
                     var list = JsonConvert.DeserializeObject<List<KriteriaAnswerItem>>(br.KriteriaRujukanJson);
 
@@ -666,13 +668,28 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
                 if (hf == null || cbo == null) continue;
 
-                var data = list.FirstOrDefault(x => x.LinkId == hf.Value);
+                //var data = list.FirstOrDefault(x => x.LinkId == hf.Value);
+                var data = list.FirstOrDefault(x =>
+                    !string.IsNullOrEmpty(x.LinkId) &&
+                    x.LinkId.Split(',').Contains(hf.Value)
+                );
                 if (data == null) continue;
 
                 var val = data.Answer?.FirstOrDefault()?.ValueString;
 
+                //if (!string.IsNullOrEmpty(val))
+                //{
+                //    cbo.SelectedValue = val;
+                //    cbo.Text = val;
+                //}
+
                 if (!string.IsNullOrEmpty(val))
                 {
+                    if (cbo.FindItemByValue(val) == null)
+                    {
+                        cbo.Items.Add(new RadComboBoxItem(val, val));
+                    }
+
                     cbo.SelectedValue = val;
                     cbo.Text = val;
                 }
@@ -685,7 +702,11 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
                 if (hf == null || chk == null) continue;
 
-                var data = list.FirstOrDefault(x => x.LinkId == hf.Value);
+                //var data = list.FirstOrDefault(x => x.LinkId == hf.Value);
+                var data = list.FirstOrDefault(x =>
+                    !string.IsNullOrEmpty(x.LinkId) &&
+                    x.LinkId.Split(',').Contains(hf.Value)
+                );
                 if (data == null) continue;
 
                 var val = data.Answer?.FirstOrDefault()?.ValueBoolean;
@@ -703,9 +724,44 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             printJobParameters.AddNew("p_NoRujukan", txtNoRujukan.Text);
         }
 
+        //protected void cboDiagnosa_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
+        //{
+        //    cboFaskesRujukan.Items.Clear();
+        //    LoadKriteriaRujukan();
+        //}
+
         protected void cboDiagnosa_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
         {
+            // 🔥 CLEAR KRITERIA
+            rptKriteria.DataSource = null;
+            rptKriteria.DataBind();
+
+            rptBoolean.DataSource = null;
+            rptBoolean.DataBind();
+
+            // 🔥 CLEAR WILAYAH
+            cboProvinsi.ClearSelection();
+            cboProvinsi.Items.Clear();
+            cboProvinsi.Text = "";
+
+            cboKabupaten.ClearSelection();
+            cboKabupaten.Items.Clear();
+            cboKabupaten.Text = "";
+
+            // 🔥 CLEAR SPESIALISTIK
+            cboSpesialistik.ClearSelection();
+            cboSpesialistik.Text = "";
+
+            // 🔥 CLEAR FASKES
+            cboFaskesRujukan.ClearSelection();
             cboFaskesRujukan.Items.Clear();
+            cboFaskesRujukan.Text = "";
+
+            // 🔥 CLEAR SESSION (biar gak nyampah)
+            Session["wilayah"] = null;
+            Session["faskesList"] = null;
+
+            // 🔥 LOAD ULANG berdasarkan diagnosa baru
             LoadKriteriaRujukan();
         }
 
@@ -843,7 +899,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             var data = (FaskesItem)e.Item.DataItem;
             if (data == null) return;
 
-            e.Item.Text = $"{data.Nmppk} - {data.Nmkc} - Jumlah Rujuk: {data.JmlRujuk:0} - Kapasitas: {data.Kapasitas:0}";
+            e.Item.Text = $"{data.Nmppk} - {data.Nmkc} - Kelas: {data.Kelas} - Jumlah Rujuk: {data.JmlRujuk:0} - Kapasitas: {data.Kapasitas:0}";
         }
 
         private void Alert(string msg)
@@ -852,10 +908,17 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 "alert", $"alert('{msg}');", true);
         }
 
-        private void LoadKriteriaRujukan()
+        private void LoadKriteriaRujukan(bool force = false)
         {
-            if (rptKriteria.Items.Count > 0 && ViewState[VS_LAST_DIAG]?.ToString() == cboDiagnosa.SelectedValue)
-                return;
+            //if (rptKriteria.Items.Count > 0 && ViewState[VS_LAST_DIAG]?.ToString() == cboDiagnosa.SelectedValue)
+            //    return;
+
+            //ViewState[VS_LAST_DIAG] = cboDiagnosa.SelectedValue;
+
+            if (!force &&
+                rptKriteria.Items.Count > 0 &&
+                ViewState[VS_LAST_DIAG]?.ToString() == cboDiagnosa.SelectedValue)
+                            return;
 
             ViewState[VS_LAST_DIAG] = cboDiagnosa.SelectedValue;
 
@@ -897,31 +960,95 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 }
             };
 
-            var response = svc.GetKriteriaRujukan(request);
-
-            if (response.MetaData.Code == "200" && response.Response != null)
+            try
             {
-                var all = response.Response.KriteriaRujukan;
+                var response = svc.GetKriteriaRujukan(request);
 
-                var textItems = all.Where(x => x.Type == "text").ToList();
-                var booleanItems = all.Where(x => x.Type == "boolean").ToList();
+                if (response != null && response.MetaData != null && response.MetaData.Code == "200" && response.Response != null)
+                {
+                    var all = response.Response.KriteriaRujukan;
 
-                rptKriteria.DataSource = textItems;
-                rptKriteria.DataBind();
+                    var textItems = all.Where(x => x.Type == "text").ToList();
+                    var booleanItems = all.Where(x => x.Type == "boolean").ToList();
 
-                rptBoolean.DataSource = booleanItems;
-                rptBoolean.DataBind();
+                    rptKriteria.DataSource = textItems;
+                    rptKriteria.DataBind();
 
-                Wilayah = response.Response.JejaringWilayahRujukan;
-                BindProvinsi(Wilayah);
+                    rptBoolean.DataSource = booleanItems;
+                    rptBoolean.DataBind();
 
-                cboKabupaten.Items.Clear();
-                cboKabupaten.Items.Insert(0,
-                    new RadComboBoxItem("-- pilih kabupaten --", ""));
+                    Wilayah = response.Response.JejaringWilayahRujukan;
+                    BindProvinsi(Wilayah);
+
+                    cboKabupaten.Items.Clear();
+                    cboKabupaten.Items.Insert(0,
+                        new RadComboBoxItem("-- pilih kabupaten --", ""));
+                }
+                else
+                {
+                    string code = response?.MetaData?.Code ?? "NULL";
+                    string message = response?.MetaData?.Message ?? "Response kosong";
+
+                    ShowAlert($"Gagal load Kriteria Rujukan. Code: {code} - {message}");
+                }
             }
+            catch (WebException wex)
+            {
+                string errorMessage = "";
+
+                if (wex.Response != null)
+                {
+                    using (var reader = new StreamReader(wex.Response.GetResponseStream()))
+                    {
+                        string responseText = reader.ReadToEnd();
+
+                        try
+                        {
+                            // parse JSON error dari BPJS
+                            var errObj = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(responseText);
+                            errorMessage = errObj?.metaData?.message;
+                        }
+                        catch
+                        {
+                            errorMessage = responseText;
+                        }
+                    }
+                }
+
+                ShowAlert("Error API BPJS: " + errorMessage);
+            }
+
+            //if (response.MetaData.Code == "200" && response.Response != null)
+            //{
+            //    var all = response.Response.KriteriaRujukan;
+
+            //    var textItems = all.Where(x => x.Type == "text").ToList();
+            //    var booleanItems = all.Where(x => x.Type == "boolean").ToList();
+
+            //    rptKriteria.DataSource = textItems;
+            //    rptKriteria.DataBind();
+
+            //    rptBoolean.DataSource = booleanItems;
+            //    rptBoolean.DataBind();
+
+            //    Wilayah = response.Response.JejaringWilayahRujukan;
+            //    BindProvinsi(Wilayah);
+
+            //    cboKabupaten.Items.Clear();
+            //    cboKabupaten.Items.Insert(0,
+            //        new RadComboBoxItem("-- pilih kabupaten --", ""));
+            //}
 
             cboProvinsi.ClearSelection();
             cboKabupaten.ClearSelection();
+        }
+
+        private void ShowAlert(string message)
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(),
+                Guid.NewGuid().ToString(),
+                $"alert('{message.Replace("'", "\\'")}');",
+                true);
         }
 
         private List<KriteriaAnswerItem> GetKriteriaAnswer()

@@ -68,17 +68,29 @@ namespace Temiang.Avicenna.ControlPanel.Setting
             txtLineNumber.Value = System.Convert.ToDouble(DataBinder.Eval(DataItem, AppStandardReferenceItemMetadata.ColumnNames.LineNumber));
             txtCustomField.Text = (String)DataBinder.Eval(DataItem, AppStandardReferenceItemMetadata.ColumnNames.CustomField);
             txtCustomField2.Text = (String)DataBinder.Eval(DataItem, AppStandardReferenceItemMetadata.ColumnNames.CustomField2);
+
+            // Snomed CT
+            var bg = new AppStandardReferenceItemBridging();
+            bg.Query.Where(bg.Query.StandardReferenceID == (String)DataBinder.Eval(DataItem, AppStandardReferenceItemMetadata.ColumnNames.StandardReferenceID),
+                bg.Query.ItemID == (String)DataBinder.Eval(DataItem, AppStandardReferenceItemMetadata.ColumnNames.ItemID));
+            bg.Query.es.Top = 1;
+            if (bg.Query.Load())
+                ComboBox.PopulateWithOneRow(cboSnomedCt, bg.BridgingID, BusinessObject.Common.Enums.EntityClassName.Snomedct, "Code", "Display");
         }
 
         private void InitInput()
         {
             // numeric value
             var txtID = ((RadTextBox)Helper.FindControlRecursive(Page, "txtStandardReferenceID"));
-            if (txtID != null) {
-                if (!string.IsNullOrEmpty(txtID.Text)) {
+            if (txtID != null)
+            {
+                if (!string.IsNullOrEmpty(txtID.Text))
+                {
                     var std = new AppStandardReference();
-                    if(std.LoadByPrimaryKey(txtID.Text)){
-                        if (std.IsNumericValue ?? false) {
+                    if (std.LoadByPrimaryKey(txtID.Text))
+                    {
+                        if (std.IsNumericValue ?? false)
+                        {
                             txtNumericValue.ReadOnly = false;
                         }
                     }
@@ -220,7 +232,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting
 
         public String ReferenceID
         {
-            get 
+            get
             {
                 if (trReferenceID.Visible)
                     return txtReferenceID.Text;
@@ -267,6 +279,14 @@ namespace Temiang.Avicenna.ControlPanel.Setting
             get { return txtCustomField2.Text; }
         }
 
+        public string SSBridgingID
+        {
+            get
+            {
+                return cboSnomedCt.SelectedValue;
+            }
+        }
         #endregion
+
     }
 }

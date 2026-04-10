@@ -18,7 +18,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         }
 
         private void AddControlPlanItem(List<ControlPlanItem> itemPlans, RadDateTimePicker txtControlPlanDateTime, RadComboBox cboServiceUnitID
-            , RadComboBox cboParamedicName, RadTextBox txtSpecialtyName, RadTextBox txtAppointmentNo, RadTextBox txtAppointmentQue, RadTextBox txtAppointmentTime)
+            , RadComboBox cboParamedicName, RadTextBox txtSpecialtyName, RadTextBox txtNotes, RadTextBox txtAppointmentNo, RadTextBox txtAppointmentQue, RadTextBox txtAppointmentTime)
         {
 
             if (!txtControlPlanDateTime.IsEmpty && !string.IsNullOrWhiteSpace(cboServiceUnitID.SelectedValue) && !string.IsNullOrWhiteSpace(cboParamedicName.SelectedValue))
@@ -45,6 +45,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                         ParamedicID = cboParamedicName.SelectedValue,
                         ParamedicName = cboParamedicName.Text,
                         SpecialtyName = txtSpecialtyName.Text,
+                        Notes = txtNotes.Text,
                         AppointmentNo = txtAppointmentNo.Text,
                         AppointmentQue = txtAppointmentQue.Text.ToInt(),
                         AppointmentTime = txtAppointmentTime.Text
@@ -121,11 +122,11 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             //        AppointmentTime = txtAppointmentTime05.Text
             //    });
 
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtNotes01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtNotes02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtNotes03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtNotes04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
 
 
             var controlPlan = new ControlPlan();
@@ -136,11 +137,11 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
         public void Populate(string controlPlan)
         {
             // Reset
-            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
-            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
-            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
-            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
-            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
+            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtNotes01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
+            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtNotes02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
+            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtNotes03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
+            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtNotes04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
+            PopulatePlanItem(new ControlPlanItem(), txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
 
             if (!string.IsNullOrEmpty(controlPlan))
             {
@@ -152,7 +153,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                 //ControlPlanItem cpi;
                 if (planCount > 0)
                 {
-                    PopulatePlanItem(oplan.Items[0], txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
+                    PopulatePlanItem(oplan.Items[0], txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtNotes01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
                 }
 
                 if (planCount > 1)
@@ -168,7 +169,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                     //txtAppointmentNo02.Text = cpi.AppointmentNo;
                     //txtAppointmentQue02.Text = cpi.AppointmentQue.ToString();
                     //txtAppointmentTime02.Text = cpi.AppointmentTime;
-                    PopulatePlanItem(oplan.Items[1], txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
+                    PopulatePlanItem(oplan.Items[1], txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtNotes02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
 
                 }
 
@@ -186,7 +187,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                     //txtAppointmentQue03.Text = cpi.AppointmentQue.ToString();
                     //txtAppointmentTime03.Text = cpi.AppointmentTime;
 
-                    PopulatePlanItem(oplan.Items[2], txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
+                    PopulatePlanItem(oplan.Items[2], txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtNotes03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
                 }
 
                 if (planCount > 3)
@@ -203,7 +204,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                     //txtAppointmentQue04.Text = cpi.AppointmentQue.ToString();
                     //txtAppointmentTime04.Text = cpi.AppointmentTime;
 
-                    PopulatePlanItem(oplan.Items[3], txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
+                    PopulatePlanItem(oplan.Items[3], txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtNotes04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
 
                 }
 
@@ -220,18 +221,18 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                     //txtAppointmentNo05.Text = cpi.AppointmentNo;
                     //txtAppointmentQue05.Text = cpi.AppointmentQue.ToString();
                     //txtAppointmentTime05.Text = cpi.AppointmentTime;
-                    PopulatePlanItem(oplan.Items[2], txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
+                    PopulatePlanItem(oplan.Items[2], txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
                 }
             }
         }
 
         public void PopulatePlanItem(ControlPlan cp)
         {
-            PopulatePlanItem(cp.Items[0], txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
+            PopulatePlanItem(cp.Items[0], txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtNotes01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
         }
 
         private void PopulatePlanItem(ControlPlanItem cpi, RadDateTimePicker txtControlPlanDateTime, RadComboBox cboServiceUnitID
-            , RadComboBox cboParamedicName, RadTextBox txtSpecialtyName, RadTextBox txtAppointmentNo, RadTextBox txtAppointmentQue, RadTextBox txtAppointmentTime)
+            , RadComboBox cboParamedicName, RadTextBox txtSpecialtyName, RadTextBox txtNotes, RadTextBox txtAppointmentNo, RadTextBox txtAppointmentQue, RadTextBox txtAppointmentTime)
         {
 
             if (cpi.ControlPlanDateTime.Equals(Convert.ToDateTime("1/1/0001 12:00:00 AM")))
@@ -263,6 +264,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
 
             //cboParamedicName.Text = cpi.ParamedicName;
             txtSpecialtyName.Text = cpi.SpecialtyName;
+            txtNotes.Text = cpi.Notes;
             txtAppointmentNo.Text = cpi.AppointmentNo;
             if (cpi.AppointmentQue > 0)
                 txtAppointmentQue.Text = cpi.AppointmentQue.ToString();

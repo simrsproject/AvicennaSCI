@@ -1,10 +1,8 @@
-/*
+﻿/*
 ===============================================================================
                  Persistence Layer and Business Objects
 ===============================================================================
-Version         : 2009.2.1214.0
-Driver          : SQL
-Date Generated  : 2/24/2026 11:52:55 AM
+                       Date Generated       : 7/28/2025 11:53:12 AM
 ===============================================================================
 */
 
@@ -33,6 +31,7 @@ namespace Temiang.Avicenna.BusinessObject
 		{
 
 		}
+
 
 		protected override string GetCollectionName()
 		{
@@ -111,34 +110,46 @@ namespace Temiang.Avicenna.BusinessObject
 
 		}
 		
+
 		#region LoadByPrimaryKey
-		public virtual bool LoadByPrimaryKey(System.String bridgingID, System.String roomID, System.String sRBridgingType)
+        public virtual bool LoadByPrimaryKey(String roomID, String sRBridgingType, String bridgingID)
 		{
-			if(this.es.Connection.SqlAccessType == esSqlAccessType.DynamicSQL)
-				return LoadByPrimaryKeyDynamic(bridgingID, roomID, sRBridgingType);
+            if (this.es.Connection.SqlAccessType == esSqlAccessType.DynamicSQL)
+                return LoadByPrimaryKeyDynamic(roomID, sRBridgingType, bridgingID);
 			else
-				return LoadByPrimaryKeyStoredProcedure(bridgingID, roomID, sRBridgingType);
+                return LoadByPrimaryKeyStoredProcedure(roomID, sRBridgingType, bridgingID);
 		}
 
-		public virtual bool LoadByPrimaryKey(esSqlAccessType sqlAccessType, System.String bridgingID, System.String roomID, System.String sRBridgingType)
+        /// <summary>
+        /// Loads an entity by primary key
+        /// </summary>
+        /// <remarks>
+        /// Requires primary keys be defined on all tables.
+        /// If a table does not have a primary key set,
+        /// this method will not compile.
+        /// </remarks>
+        /// <param name="sqlAccessType">Either esSqlAccessType StoredProcedure or DynamicSQL</param>
+        public virtual bool LoadByPrimaryKey(esSqlAccessType sqlAccessType, String roomID, String sRBridgingType, String bridgingID)
 		{
 			if (sqlAccessType == esSqlAccessType.DynamicSQL)
-				return LoadByPrimaryKeyDynamic(bridgingID, roomID, sRBridgingType);
+                return LoadByPrimaryKeyDynamic(roomID, sRBridgingType, bridgingID);
 			else
-				return LoadByPrimaryKeyStoredProcedure(bridgingID, roomID, sRBridgingType);
+                return LoadByPrimaryKeyStoredProcedure(roomID, sRBridgingType, bridgingID);
 		}
 
-		private bool LoadByPrimaryKeyDynamic(System.String bridgingID, System.String roomID, System.String sRBridgingType)
+        private bool LoadByPrimaryKeyDynamic(String roomID, String sRBridgingType, String bridgingID)
 		{
 			esServiceRoomBridgingQuery query = this.GetDynamicQuery();
-			query.Where(query.BridgingID == bridgingID, query.RoomID == roomID, query.SRBridgingType == sRBridgingType);
+            query.Where(query.RoomID == roomID, query.SRBridgingType == sRBridgingType, query.BridgingID == bridgingID);
 			return query.Load();
 		}
 
-		private bool LoadByPrimaryKeyStoredProcedure(System.String bridgingID, System.String roomID, System.String sRBridgingType)
+        private bool LoadByPrimaryKeyStoredProcedure(String roomID, String sRBridgingType, String bridgingID)
 		{
 			esParameters parms = new esParameters();
-			parms.Add("BridgingID",bridgingID);			parms.Add("RoomID",roomID);			parms.Add("SRBridgingType",sRBridgingType);
+            parms.Add("RoomID", roomID);
+            parms.Add("SRBridgingType", sRBridgingType);
+            parms.Add("BridgingID", bridgingID);
 			return this.Load(esQueryType.StoredProcedure, this.es.spLoadByPrimaryKey, parms);
 		}
 		#endregion
@@ -158,12 +169,12 @@ namespace Temiang.Avicenna.BusinessObject
 
 		public override void SetProperty(string name, object value)
 		{
-			if(this.Row == null) this.AddNew();
+            if (this.Row == null) this.AddNew();
 			
 			esColumnMetadata col = this.Meta.Columns.FindByPropertyName(name);
 			if (col != null)
 			{
-				if(value == null || value is System.String)
+                if (value == null || value is System.String)
 				{				
 					// Use the strongly typed property
 					switch (name)
@@ -199,7 +210,7 @@ namespace Temiang.Avicenna.BusinessObject
 					}
 				}
 			}
-			else if(this.Row.Table.Columns.Contains(name))
+            else if (this.Row.Table.Columns.Contains(name))
 			{
 				this.Row[name] = value;
 			}
@@ -326,8 +337,31 @@ namespace Temiang.Avicenna.BusinessObject
 
 		#region String Properties
 
-
-		[BrowsableAttribute( false )]
+        /// <summary>
+        /// Converts an entity's properties to
+        /// and from strings.
+        /// </summary>
+        /// <remarks>
+        /// The str properties Get and Set provide easy conversion
+        /// between a string and a property's data type. Not all
+        /// data types will get a str property.
+        /// </remarks>
+        /// <example>
+        /// Set a datetime from a string.
+        /// <code>
+        /// Employees entity = new Employees();
+        /// entity.LoadByPrimaryKey(10);
+        /// entity.str.HireDate = "2007-01-01 00:00:00";
+        /// entity.Save();
+        /// </code>
+        /// Get a datetime as a string.
+        /// <code>
+        /// Employees entity = new Employees();
+        /// entity.LoadByPrimaryKey(10);
+        /// string theDate = entity.str.HireDate;
+        /// </code>
+        /// </example>
+        [BrowsableAttribute(false)]
 		public esStrings str
 		{
 			get
@@ -533,6 +567,7 @@ namespace Temiang.Avicenna.BusinessObject
 	[Serializable]
 	abstract public class esServiceRoomBridgingQuery : esDynamicQuery
 	{
+
 		override protected IMetadata Meta
 		{
 			get
@@ -629,7 +664,7 @@ namespace Temiang.Avicenna.BusinessObject
 		{
 			get
 			{
-				return  ServiceRoomBridgingMetadata.Meta();
+                return ServiceRoomBridgingMetadata.Meta();
 			}
 		}
 		
@@ -658,8 +693,7 @@ namespace Temiang.Avicenna.BusinessObject
 		
 		#endregion
 
-
-		[BrowsableAttribute( false )]
+        [BrowsableAttribute(false)]
 		public ServiceRoomBridgingQuery Query
 		{
 			get
@@ -674,11 +708,95 @@ namespace Temiang.Avicenna.BusinessObject
 			}
 		}
 
+        /// <summary>
+        /// Useful for building up conditional queries.
+        /// In most cases, before loading an entity or collection,
+        /// you should instantiate a new one. This method was added
+        /// to handle specialized circumstances, and should not be
+        /// used as a substitute for that.
+        /// </summary>
+        /// <remarks>
+        /// This just sets obj.Query to null/Nothing.
+        /// In most cases, you will 'new' your object before
+        /// loading it, rather than calling this method.
+        /// It only affects obj.Query.Load(), so is not useful
+        /// when Joins are involved, or for many other situations.
+        /// Because it clears out any obj.Query.Where clauses,
+        /// it can be useful for building conditional queries on the fly.
+        /// <code>
+        /// public bool ReQuery(string lastName, string firstName)
+        /// {
+        ///     this.QueryReset();
+        ///     
+        ///     if(!String.IsNullOrEmpty(lastName))
+        ///     {
+        ///         this.Query.Where(
+        ///             this.Query.LastName == lastName);
+        ///     }
+        ///     if(!String.IsNullOrEmpty(firstName))
+        ///     {
+        ///         this.Query.Where(
+        ///             this.Query.FirstName == firstName);
+        ///     }
+        ///     
+        ///     return this.Query.Load();
+        /// }
+        /// </code>
+        /// <code lang="vbnet">
+        /// Public Function ReQuery(ByVal lastName As String, _
+        ///     ByVal firstName As String) As Boolean
+        /// 
+        ///     Me.QueryReset()
+        /// 
+        ///     If Not [String].IsNullOrEmpty(lastName) Then
+        ///         Me.Query.Where(Me.Query.LastName = lastName)
+        ///     End If
+        ///     If Not [String].IsNullOrEmpty(firstName) Then
+        ///         Me.Query.Where(Me.Query.FirstName = firstName)
+        ///     End If
+        /// 
+        ///     Return Me.Query.Load()
+        /// End Function
+        /// </code>
+        /// </remarks>
 		public void QueryReset()
 		{
 			this.query = null;
 		}
 
+        /// <summary>
+        /// Used to custom load a Join query.
+        /// Returns true if at least one record was loaded.
+        /// </summary>
+        /// <remarks>
+        /// Provides support for InnerJoin, LeftJoin,
+        /// RightJoin, and FullJoin. You must provide an alias
+        /// for each query when instantiating them.
+        /// <code>
+        /// EmployeeCollection collection = new EmployeeCollection();
+        /// 
+        /// EmployeeQuery emp = new EmployeeQuery("eq");
+        /// CustomerQuery cust = new CustomerQuery("cq");
+        /// 
+        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName);
+        /// emp.LeftJoin(cust).On(emp.EmployeeID == cust.StaffAssigned);
+        /// 
+        /// collection.Load(emp);
+        /// </code>
+        /// <code lang="vbnet">
+        /// Dim collection As New EmployeeCollection()
+        /// 
+        /// Dim emp As New EmployeeQuery("eq")
+        /// Dim cust As New CustomerQuery("cq")
+        /// 
+        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName)
+        /// emp.LeftJoin(cust).On(emp.EmployeeID = cust.StaffAssigned)
+        /// 
+        /// collection.Load(emp)
+        /// </code>
+        /// </remarks>
+        /// <param name="query">The query object instance name.</param>
+        /// <returns>True if at least one record was loaded.</returns>
 		public bool Load(ServiceRoomBridgingQuery query)
 		{
 			this.query = query;
@@ -686,27 +804,29 @@ namespace Temiang.Avicenna.BusinessObject
 			return this.Query.Load();
 		}
 		
+        /// <summary>
+        /// Adds a new entity to the collection.
+        /// Always calls AddNew() on the entity, in case it is overridden.
+        /// </summary>
 		public ServiceRoomBridging AddNew()
 		{
 			ServiceRoomBridging entity = base.AddNewEntity() as ServiceRoomBridging;
 			
 			return entity;
 		}
-
-		public ServiceRoomBridging FindByPrimaryKey(System.String bridgingID, System.String roomID, System.String sRBridgingType)
+        public ServiceRoomBridging FindByPrimaryKey(String roomID, String sRBridgingType, String bridgingID)
 		{
-			return base.FindByPrimaryKey(bridgingID, roomID, sRBridgingType) as ServiceRoomBridging;
+            return base.FindByPrimaryKey(roomID, sRBridgingType, bridgingID) as ServiceRoomBridging;
 		}
 
-
-		#region IEnumerable<ServiceRoomBridging> Members
+        #region IEnumerable< ServiceRoomBridging> Members
 
 		IEnumerator<ServiceRoomBridging> IEnumerable<ServiceRoomBridging>.GetEnumerator()
 		{
 			System.Collections.IEnumerable enumer = this as System.Collections.IEnumerable;
 			System.Collections.IEnumerator iterator = enumer.GetEnumerator();
 
-			while(iterator.MoveNext())
+            while (iterator.MoveNext())
 			{
 				yield return iterator.Current as ServiceRoomBridging;
 			}
@@ -721,8 +841,7 @@ namespace Temiang.Avicenna.BusinessObject
 	/// <summary>
 	/// Encapsulates the 'ServiceRoomBridging' table
 	/// </summary>
-
-    [System.Diagnostics.DebuggerDisplay("ServiceRoomBridging ({RoomID},{SRBridgingType},{BridgingID})")]
+    [System.Diagnostics.DebuggerDisplay("ServiceRoomBridging ({RoomID, SRBridgingType, BridgingID})")]
 	[Serializable]
 	public partial class ServiceRoomBridging : esServiceRoomBridging
 	{
@@ -759,10 +878,7 @@ namespace Temiang.Avicenna.BusinessObject
 		}
 		#endregion
 		
-
-
-
-		[BrowsableAttribute( false )]
+        [BrowsableAttribute(false)]
 		public ServiceRoomBridgingQuery Query
 		{
 			get
@@ -777,12 +893,97 @@ namespace Temiang.Avicenna.BusinessObject
 			}
 		}
 
+        /// <summary>
+        /// Useful for building up conditional queries.
+        /// In most cases, before loading an entity or collection,
+        /// you should instantiate a new one. This method was added
+        /// to handle specialized circumstances, and should not be
+        /// used as a substitute for that.
+        /// </summary>
+        /// <remarks>
+        /// This just sets obj.Query to null/Nothing.
+        /// In most cases, you will 'new' your object before
+        /// loading it, rather than calling this method.
+        /// It only affects obj.Query.Load(), so is not useful
+        /// when Joins are involved, or for many other situations.
+        /// Because it clears out any obj.Query.Where clauses,
+        /// it can be useful for building conditional queries on the fly.
+        /// <code>
+        /// public bool ReQuery(string lastName, string firstName)
+        /// {
+        ///     this.QueryReset();
+        ///     
+        ///     if(!String.IsNullOrEmpty(lastName))
+        ///     {
+        ///         this.Query.Where(
+        ///             this.Query.LastName == lastName);
+        ///     }
+        ///     if(!String.IsNullOrEmpty(firstName))
+        ///     {
+        ///         this.Query.Where(
+        ///             this.Query.FirstName == firstName);
+        ///     }
+        ///     
+        ///     return this.Query.Load();
+        /// }
+        /// </code>
+        /// <code lang="vbnet">
+        /// Public Function ReQuery(ByVal lastName As String, _
+        ///     ByVal firstName As String) As Boolean
+        /// 
+        ///     Me.QueryReset()
+        /// 
+        ///     If Not [String].IsNullOrEmpty(lastName) Then
+        ///         Me.Query.Where(Me.Query.LastName = lastName)
+        ///     End If
+        ///     If Not [String].IsNullOrEmpty(firstName) Then
+        ///         Me.Query.Where(Me.Query.FirstName = firstName)
+        ///     End If
+        /// 
+        ///     Return Me.Query.Load()
+        /// End Function
+        /// </code>
+        /// </remarks>
 		public void QueryReset()
 		{
 			this.query = null;
 		}
 		
-
+        /// <summary>
+        /// Used to custom load a Join query.
+        /// Returns true if at least one row is loaded.
+        /// For an entity, an exception will be thrown
+        /// if more than one row is loaded.
+        /// </summary>
+        /// <remarks>
+        /// Provides support for InnerJoin, LeftJoin,
+        /// RightJoin, and FullJoin. You must provide an alias
+        /// for each query when instantiating them.
+        /// <code>
+        /// EmployeeCollection collection = new EmployeeCollection();
+        /// 
+        /// EmployeeQuery emp = new EmployeeQuery("eq");
+        /// CustomerQuery cust = new CustomerQuery("cq");
+        /// 
+        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName);
+        /// emp.LeftJoin(cust).On(emp.EmployeeID == cust.StaffAssigned);
+        /// 
+        /// collection.Load(emp);
+        /// </code>
+        /// <code lang="vbnet">
+        /// Dim collection As New EmployeeCollection()
+        /// 
+        /// Dim emp As New EmployeeQuery("eq")
+        /// Dim cust As New CustomerQuery("cq")
+        /// 
+        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName)
+        /// emp.LeftJoin(cust).On(emp.EmployeeID = cust.StaffAssigned)
+        /// 
+        /// collection.Load(emp)
+        /// </code>
+        /// </remarks>
+        /// <param name="query">The query object instance name.</param>
+        /// <returns>True if at least one record was loaded.</returns>
 		public bool Load(ServiceRoomBridgingQuery query)
 		{
 			this.query = query;
@@ -866,6 +1067,7 @@ namespace Temiang.Avicenna.BusinessObject
 			c.IsNullable = true;
 			_columns.Add(c);
 				
+
 		}
 		#endregion	
 	
@@ -886,7 +1088,7 @@ namespace Temiang.Avicenna.BusinessObject
 
 		public esColumnMetadataCollection Columns
 		{
-			get	{ return base._columns; }
+            get { return base._columns; }
 		}
 		
 		#region ColumnNames
@@ -932,9 +1134,9 @@ namespace Temiang.Avicenna.BusinessObject
 			// This is only executed once per the life of the application
 			lock (typeof(ServiceRoomBridgingMetadata))
 			{
-				if(ServiceRoomBridgingMetadata.mapDelegates == null)
+                if (ServiceRoomBridgingMetadata.mapDelegates == null)
 				{
-					ServiceRoomBridgingMetadata.mapDelegates = new Dictionary<string,MapToMeta>();
+                    ServiceRoomBridgingMetadata.mapDelegates = new Dictionary<string, MapToMeta>();
 				}
 				
 				if (ServiceRoomBridgingMetadata.meta == null)
@@ -951,7 +1153,7 @@ namespace Temiang.Avicenna.BusinessObject
 
 		private esProviderSpecificMetadata esDefault(string mapName)
 		{
-			if(!_providerMetadataMaps.ContainsKey(mapName))
+            if (!_providerMetadataMaps.ContainsKey(mapName))
 			{
 				esProviderSpecificMetadata meta = new esProviderSpecificMetadata();
 				
@@ -987,4 +1189,5 @@ namespace Temiang.Avicenna.BusinessObject
 		static protected Dictionary<string, MapToMeta> mapDelegates;
 		static private int _esDefault = RegisterDelegateesDefault();
 	}
+
 }

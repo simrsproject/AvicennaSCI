@@ -40,6 +40,18 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 ViewState["IsNewRecord"] = true;
 
                 chkIsActive.Checked = true;
+
+                // Check ItemIdExternal exist
+                try
+                {
+                    rowItemIdExternal.Visible = true;
+                    txtItemIdExternal.Text = (String)DataBinder.Eval(DataItem, ItemBridgingMetadata.ColumnNames.ItemIdExternal);
+                }
+                catch (Exception ex)
+                {
+                    rowItemIdExternal.Visible = false;
+                }
+
                 return;
             }
             ViewState["IsNewRecord"] = false;
@@ -58,7 +70,16 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 cboServiceUnitAliasID.Text = (String)DataBinder.Eval(DataItem, ItemBridgingMetadata.ColumnNames.BridgingID);
 
             txtServiceUnitAliasName.Text = (String)DataBinder.Eval(DataItem, ItemBridgingMetadata.ColumnNames.BridgingName);
-            txtItemIdExternal.Text = (String)DataBinder.Eval(DataItem, ItemBridgingMetadata.ColumnNames.ItemIdExternal);
+            try
+            {
+                rowItemIdExternal.Visible = true;
+                txtItemIdExternal.Text = (String)DataBinder.Eval(DataItem, ItemBridgingMetadata.ColumnNames.ItemIdExternal);
+            }
+            catch (Exception ex)
+            {
+                rowItemIdExternal.Visible = false;
+            }
+
             chkIsActive.Checked = Convert.ToBoolean(DataBinder.Eval(DataItem, ItemBridgingMetadata.ColumnNames.IsActive));
         }
 

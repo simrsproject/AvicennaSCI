@@ -18,5 +18,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
         [JsonProperty("code")]
         public string Code { get; set; }
+
+        [JsonProperty("display", NullValueHandling = NullValueHandling.Ignore)]
+        public string Display { get; set; }
     }
 }

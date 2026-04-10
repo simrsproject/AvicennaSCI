@@ -321,6 +321,24 @@ namespace Temiang.Avicenna.ControlPanel.Setting
         protected global::Telerik.Web.UI.RadComboBox cboSubledger;
 
         /// <summary>
+        /// Label9 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label9;
+
+        /// <summary>
+        /// cboSnomedCt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboSnomedCt;
+
+        /// <summary>
         /// Label7 control.
         /// </summary>
         /// <remarks>

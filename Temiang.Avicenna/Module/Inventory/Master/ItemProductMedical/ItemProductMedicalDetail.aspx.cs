@@ -154,6 +154,13 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             detail.BpjsMaxQtyOrderIpr = Convert.ToInt32(txtBpjsMaxQtyOrderIpr.Value);
             detail.BpjsMaxQtyOrderOpr = Convert.ToInt32(txtBpjsMaxQtyOrderOpr.Value);
             detail.BpjsMaxQtyOrderEmr = Convert.ToInt32(txtBpjsMaxQtyOrderEmr.Value);
+            detail.IsVaccine = ItemImmunizations.Count > 0 ? true : chkIsVaccine.Checked;
+
+            if (string.IsNullOrEmpty(cboSRCvxName.SelectedValue))
+                detail.str.SRCvxName = string.Empty;
+            else
+                detail.SRCvxName = cboSRCvxName.SelectedValue;
+
 
             //Last Update Status
             if (detail.es.IsAdded || detail.es.IsModified)
@@ -168,6 +175,14 @@ namespace Temiang.Avicenna.Module.Inventory.Master
                 dosageDetail.LastUpdateByUserID = AppSession.UserLogin.UserID;
                 dosageDetail.LastUpdateDateTime = DateTime.Now;
             }
+
+            foreach (var immDetail in ItemImmunizations)
+            {
+                immDetail.ItemID = txtItemID.Text;
+                immDetail.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                immDetail.LastUpdateDateTime = DateTime.Now;
+            }
+
             //matrix label
             foreach (ItemProductMedicLabel l in ItemProductMedicLabels)
             {
@@ -543,6 +558,7 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             chkIsMedication.Checked = itemProductMedDt.IsMedication ?? false;
             chkIsNoPrescriptionFee.Checked = itemProductMedDt.IsNoPrescriptionFee ?? false;
             chkIsPethidine.Checked = itemProductMedDt.IsPethidine ?? false;
+            chkIsVaccine.Checked = itemProductMedDt.IsVaccine ?? false;
             cboSRAntibioticLine.SelectedValue = itemProductMedDt.SRAntibioticLine;
             chkIsNonGenericLimited.Checked = itemProductMedDt.IsNonGenericLimited ?? false;
             chkIsChronic.Checked = itemProductMedDt.IsChronic ?? false;
@@ -592,6 +608,19 @@ namespace Temiang.Avicenna.Module.Inventory.Master
                 cboAssetGroupID.Text = string.Empty;
             }
 
+            if (cboSRCvxName.Items.Count < 2) // Cegah hasil pengisian cboSRCvxName pada DataModeChange tereset
+            {
+                if (!string.IsNullOrEmpty(itemProductMedDt.SRCvxName))
+                {
+                    StandardReference.InitializeWithOneRow(cboSRCvxName, AppEnum.StandardReference.CvxName, itemProductMedDt.SRCvxName);
+                }
+                else
+                {
+                    cboSRCvxName.Items.Clear();
+                    cboSRCvxName.Text = string.Empty;
+                }
+            }
+
             grdPriceHistory.Rebind();
 
             ItemProductMedicMargins = null;
@@ -599,6 +628,7 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             grdMarginDetail.DataBind();
 
             PopulateItemProductDosageDetailGrid();
+            PopulateItemImmunizationGrid();
             PopulateItemLabelGrid();
             PopulateItemZatActiveGrid();
             PopulateSupplierItemGrid();
@@ -643,6 +673,7 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             cboSRBpjsItemGroup.Text = string.Empty;
             cboSRItemCategory.Text = string.Empty;
             cboProductAccount.Text = string.Empty;
+            cboSRCvxName.Text = string.Empty;
 
             var mrg = new ItemProductMarginQuery();
             mrg.es.Top = 1;
@@ -722,6 +753,11 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             RefreshCommandItemProductConsumeUnitMatrix(newVal);
             RefreshCommandItemProductFabric(newVal);
             RefreshCommandItemItemBridging(newVal);
+            RefreshCommandItemImmunization(newVal);
+
+            if (newVal != AppEnum.DataMode.Read) // Isi untuk keperluan edit
+                StandardReference.InitializeIncludeSpace(cboSRCvxName, AppEnum.StandardReference.CvxName, true);
+
         }
 
         protected override void OnInit(EventArgs e)
@@ -815,6 +851,27 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             else
             {
                 args.MessageText = AppConstant.Message.RecordNotExist;
+                args.IsCancel = true;
+                return;
+            }
+        }
+        protected override void OnMenuSaveValidation(AppEnum.DataMode dataMode, ValidateArgs args)
+        {
+            if (chkIsVaccine.Checked && ItemImmunizations.Count == 0)
+            {
+                args.MessageText = "The Vaccine Drugs being checked must have an Immunization List.";
+                args.IsCancel = true;
+                return;
+            }
+            if (chkIsVaccine.Checked && string.IsNullOrEmpty(cboSRCvxName.SelectedValue))
+            {
+                args.MessageText = "The Vaccine Drugs being checked must define CVX Name.";
+                args.IsCancel = true;
+                return;
+            }
+            if (ItemImmunizations.Count > 0 && string.IsNullOrEmpty(cboSRCvxName.SelectedValue))
+            {
+                args.MessageText = "Drugs containing Immunization must define the CVX Name.";
                 args.IsCancel = true;
                 return;
             }
@@ -1077,6 +1134,7 @@ namespace Temiang.Avicenna.Module.Inventory.Master
                 }
 
                 ItemProductMedicMargins.Save();
+                ItemImmunizations.Save();
 
                 ItemProductDosageDetails.Save();
 
@@ -1872,6 +1930,121 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             }
         }
 
+        #endregion
+
+        #region ItemImmunization
+        private ItemImmunizationCollection ItemImmunizations
+        {
+            get
+            {
+                if (IsPostBack)
+                {
+                    object obj = Session["collItemImmunization"];
+                    if (obj != null)
+                    {
+                        return ((ItemImmunizationCollection)(obj));
+                    }
+                }
+
+                var coll = new ItemImmunizationCollection();
+
+                var query = new ItemImmunizationQuery("a");
+                var imm = new ImmunizationQuery("b");
+
+                query.InnerJoin(imm).On(
+                    query.ImmunizationID == imm.ImmunizationID
+                    );
+                query.Where(query.ItemID == txtItemID.Text);
+                query.Select(
+                    query,
+                    imm.ImmunizationName.As("refToImmunization_ImmunizationName")
+                    );
+
+                coll.Load(query);
+
+                Session["collItemImmunization"] = coll;
+                return coll;
+            }
+            set { Session["collItemImmunization"] = value; }
+        }
+
+        private void RefreshCommandItemImmunization(AppEnum.DataMode newVal)
+        {
+            //Toogle grid command
+            bool isVisible = (newVal != AppEnum.DataMode.Read);
+            grdItemImmunization.Columns[0].Visible = isVisible;
+            grdItemImmunization.Columns[grdItemImmunization.Columns.Count - 1].Visible = isVisible;
+
+            grdItemImmunization.MasterTableView.CommandItemDisplay = isVisible
+                                                                              ? GridCommandItemDisplay.Top
+                                                                              : GridCommandItemDisplay.None;
+            //Perbaharui tampilan dan data
+            grdItemImmunization.Rebind();
+        }
+
+
+        private void PopulateItemImmunizationGrid()
+        {
+            //Display Data Detail
+            ItemImmunizations = null; //Reset Record Detail
+            grdItemImmunization.DataSource = ItemImmunizations; //Requery
+            grdItemImmunization.MasterTableView.IsItemInserted = false;
+            grdItemImmunization.MasterTableView.ClearEditItems();
+            grdItemImmunization.DataBind();
+        }
+
+        protected void grdItemImmunization_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
+        {
+            grdItemImmunization.DataSource = ItemImmunizations;
+        }
+
+        protected void grdItemImmunization_UpdateCommand(object source, GridCommandEventArgs e)
+        {
+            var editedItem = e.Item as GridEditableItem;
+            if (editedItem == null) return;
+
+            var itemID = Convert.ToString(editedItem.OwnerTableView.DataKeyValues[editedItem.ItemIndex][ItemImmunizationMetadata.ColumnNames.ImmunizationID]);
+            var entity = FindItemImmunization(itemID);
+            if (entity != null)
+                SetEntityValueItemImmunization(entity, e);
+        }
+
+        protected void grdItemImmunization_DeleteCommand(object source, GridCommandEventArgs e)
+        {
+            var item = e.Item as GridDataItem;
+            if (item == null) return;
+
+            var itemID = Convert.ToString(item.OwnerTableView.DataKeyValues[item.ItemIndex][ItemImmunizationMetadata.ColumnNames.ImmunizationID]);
+            var entity = FindItemImmunization(itemID);
+            if (entity != null)
+                entity.MarkAsDeleted();
+        }
+
+        protected void grdItemImmunization_InsertCommand(object source, GridCommandEventArgs e)
+        {
+            var entity = ItemImmunizations.AddNew();
+            SetEntityValueItemImmunization(entity, e);
+
+            //Stay in insert mode
+            e.Canceled = true;
+            grdItemImmunization.Rebind();
+        }
+
+        private BusinessObject.ItemImmunization FindItemImmunization(String itemID)
+        {
+            var coll = ItemImmunizations;
+            return coll.FirstOrDefault(rec => rec.ImmunizationID.Equals(itemID));
+        }
+
+        private void SetEntityValueItemImmunization(BusinessObject.ItemImmunization entity, GridCommandEventArgs e)
+        {
+            var userControl = (ItemImmunizationDetail)e.Item.FindControl(GridEditFormItem.EditFormUserControlID);
+            if (userControl != null)
+            {
+                entity.ImmunizationID = userControl.ImmunizationID;
+                entity.ImmunizationName = userControl.Immunizationame;
+            }
+        }
         #endregion
 
         #region ItemLabel

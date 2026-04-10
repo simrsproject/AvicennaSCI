@@ -186,8 +186,11 @@ namespace Temiang.Avicenna.BusinessObject
 						case "SRIntervalTime": this.str.SRIntervalTime = (string)value; break;
 						case "SRSpecimenType": this.str.SRSpecimenType = (string)value; break;
 						case "IsCulture": this.str.IsCulture = (string)value; break;
-					}
-				}
+						case "IsFasting": this.str.IsFasting = (string)value; break;
+                        case "SRResultValueType": this.str.SRResultValueType = (string)value; break;
+
+                    }
+                }
 				else
 				{
 					switch (name)
@@ -266,6 +269,11 @@ namespace Temiang.Avicenna.BusinessObject
 						
 							if (value == null || value is System.Boolean)
 								this.IsCulture = (System.Boolean?)value;
+							break;
+						case "IsFasting":
+						
+							if (value == null || value is System.Boolean)
+								this.IsFasting = (System.Boolean?)value;
 							break;
 					
 						default:
@@ -613,36 +621,66 @@ namespace Temiang.Avicenna.BusinessObject
 				base.SetSystemBoolean(ItemLaboratoryMetadata.ColumnNames.IsCulture, value);
 			}
 		}
-		
-		#endregion	
+        /// <summary>
+        /// Maps to ItemLaboratory.IsFasting
+        /// </summary>
+        virtual public System.Boolean? IsFasting
+        {
+			get
+			{
+				return base.GetSystemBoolean(ItemLaboratoryMetadata.ColumnNames.IsFasting);
+			}
+			
+			set
+			{
+				base.SetSystemBoolean(ItemLaboratoryMetadata.ColumnNames.IsFasting, value);
+			}
+		}
+        /// <summary>
+        /// Maps to ItemLaboratory.SRResultValueType
+        /// </summary>
+        virtual public System.String SRResultValueType
+        {
+            get
+            {
+                return base.GetSystemString(ItemLaboratoryMetadata.ColumnNames.SRResultValueType);
+            }
 
-		#region String Properties
-		
-		/// <summary>
-		/// Converts an entity's properties to
-		/// and from strings.
-		/// </summary>
-		/// <remarks>
-		/// The str properties Get and Set provide easy conversion
-		/// between a string and a property's data type. Not all
-		/// data types will get a str property.
-		/// </remarks>
-		/// <example>
-		/// Set a datetime from a string.
-		/// <code>
-		/// Employees entity = new Employees();
-		/// entity.LoadByPrimaryKey(10);
-		/// entity.str.HireDate = "2007-01-01 00:00:00";
-		/// entity.Save();
-		/// </code>
-		/// Get a datetime as a string.
-		/// <code>
-		/// Employees entity = new Employees();
-		/// entity.LoadByPrimaryKey(10);
-		/// string theDate = entity.str.HireDate;
-		/// </code>
-		/// </example>
-		[BrowsableAttribute( false )]		
+            set
+            {
+                base.SetSystemString(ItemLaboratoryMetadata.ColumnNames.SRResultValueType, value);
+            }
+        }
+
+        #endregion
+
+        #region String Properties
+
+        /// <summary>
+        /// Converts an entity's properties to
+        /// and from strings.
+        /// </summary>
+        /// <remarks>
+        /// The str properties Get and Set provide easy conversion
+        /// between a string and a property's data type. Not all
+        /// data types will get a str property.
+        /// </remarks>
+        /// <example>
+        /// Set a datetime from a string.
+        /// <code>
+        /// Employees entity = new Employees();
+        /// entity.LoadByPrimaryKey(10);
+        /// entity.str.HireDate = "2007-01-01 00:00:00";
+        /// entity.Save();
+        /// </code>
+        /// Get a datetime as a string.
+        /// <code>
+        /// Employees entity = new Employees();
+        /// entity.LoadByPrimaryKey(10);
+        /// string theDate = entity.str.HireDate;
+        /// </code>
+        /// </example>
+        [BrowsableAttribute( false )]		
 		public esStrings str
 		{
 			get
@@ -970,7 +1008,35 @@ namespace Temiang.Avicenna.BusinessObject
 					else entity.IsCulture = Convert.ToBoolean(value);
 				}
 			}
-			private esItemLaboratory entity;
+			public System.String IsFasting
+            {
+				get
+				{
+					System.Boolean? data = entity.IsFasting;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.IsFasting = null;
+					else entity.IsFasting = Convert.ToBoolean(value);
+				}
+			}
+            public System.String SRResultValueType
+            {
+                get
+                {
+                    System.String data = entity.SRResultValueType;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.SRResultValueType = null;
+                    else entity.SRResultValueType = Convert.ToString(value);
+                }
+            }
+            private esItemLaboratory entity;
 		}
 		#endregion
 
@@ -1191,8 +1257,24 @@ namespace Temiang.Avicenna.BusinessObject
 				return new esQueryItem(this, ItemLaboratoryMetadata.ColumnNames.IsCulture, esSystemType.Boolean);
 			}
 		} 
-	
-	}
+
+		public esQueryItem IsFasting
+        {
+			get
+			{
+				return new esQueryItem(this, ItemLaboratoryMetadata.ColumnNames.IsFasting, esSystemType.Boolean);
+			}
+		}
+
+        public esQueryItem SRResultValueType
+        {
+            get
+            {
+                return new esQueryItem(this, ItemLaboratoryMetadata.ColumnNames.SRResultValueType, esSystemType.String);
+            }
+        }
+
+    }
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
 	[Serializable]
@@ -1701,9 +1783,20 @@ namespace Temiang.Avicenna.BusinessObject
 			c.PropertyName = ItemLaboratoryMetadata.PropertyNames.IsCulture;
 			c.IsNullable = true;
 			_columns.Add(c); 
-				
 
-		}
+			c = new esColumnMetadata(ItemLaboratoryMetadata.ColumnNames.IsFasting, 22, typeof(System.Boolean), esSystemType.Boolean);
+			c.PropertyName = ItemLaboratoryMetadata.PropertyNames.IsFasting;
+			c.IsNullable = true;
+			_columns.Add(c);
+
+            c = new esColumnMetadata(ItemLaboratoryMetadata.ColumnNames.SRResultValueType, 23, typeof(System.String), esSystemType.String);
+            c.PropertyName = ItemLaboratoryMetadata.PropertyNames.SRResultValueType;
+            c.CharacterMaxLength = 20;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+
+        }
 		#endregion
 	
 		static public ItemLaboratoryMetadata Meta()
@@ -1751,11 +1844,13 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string SRIntervalTime = "SRIntervalTime";
 			public const string SRSpecimenType = "SRSpecimenType";
 			public const string IsCulture = "IsCulture";
-		}
-		#endregion	
-		
-		#region PropertyNames
-		public class PropertyNames
+			public const string IsFasting = "IsFasting";
+            public const string SRResultValueType = "SRResultValueType";
+        }
+        #endregion
+
+        #region PropertyNames
+        public class PropertyNames
 		{ 
 			public const string ItemID = "ItemID";
 			public const string ReportRLID = "ReportRLID";
@@ -1779,10 +1874,12 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string SRIntervalTime = "SRIntervalTime";
 			public const string SRSpecimenType = "SRSpecimenType";
 			public const string IsCulture = "IsCulture";
-		}
-		#endregion	
+			public const string IsFasting = "IsFasting";
+            public const string SRResultValueType = "SRResultValueType";
+        }
+        #endregion
 
-		public esProviderSpecificMetadata GetProviderMetadata(string mapName)
+        public esProviderSpecificMetadata GetProviderMetadata(string mapName)
 		{
 			MapToMeta mapMethod = mapDelegates[mapName];
 
@@ -1844,9 +1941,11 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("SRIntervalTime", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("SRSpecimenType", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("IsCulture", new esTypeMap("bit", "System.Boolean"));
-		
+				meta.AddTypeMap("IsFasting", new esTypeMap("bit", "System.Boolean"));
+                meta.AddTypeMap("SRResultValueType", new esTypeMap("varchar", "System.String"));
 
-				meta.Source = "ItemLaboratory";
+
+                meta.Source = "ItemLaboratory";
 				meta.Destination = "ItemLaboratory";
 				meta.spInsert = "proc_ItemLaboratoryInsert";				
 				meta.spUpdate = "proc_ItemLaboratoryUpdate";		

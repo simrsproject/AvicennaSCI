@@ -250,7 +250,6 @@ namespace Temiang.Avicenna.Common
                 get { return IsYes(AppParameter.ParameterItem.IsEmrPhysicianAssessmentMandatory); }
             }
 
-
             public static bool IsShowSearchMenu => IsYes(AppParameter.ParameterItem.IsShowSearchMenu);
 
             public static bool IsPrescriptionOnlyInStock
@@ -1258,6 +1257,11 @@ namespace Temiang.Avicenna.Common
             public static bool IsAutoClosedRegOnDischargePermit
             {
                 get { return IsYes(AppParameter.ParameterItem.IsAutoClosedRegOnDischargePermit); }
+            }
+
+            public static bool IsAutoSIPRegOnDischargePermit
+            {
+                get { return IsYes(AppParameter.ParameterItem.IsAutoSIPRegOnDischargePermit); }
             }
 
             public static bool IsAutoClosedRegOpOnPayment

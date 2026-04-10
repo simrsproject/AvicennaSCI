@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Telerik.Web.UI;
@@ -34,7 +35,41 @@ namespace Temiang.Avicenna.Module.RADT.Master
             txtSRItemUnit.Text = (String)DataBinder.Eval(DataItem, ItemConsumptionMetadata.ColumnNames.SRItemUnit);
 
             PopulateDetailItemName(false);
+            try
+            {
+                txtQtyDosage.Value = Convert.ToDouble(DataBinder.Eval(DataItem, ItemConsumptionMetadata.ColumnNames.QtyDosage));
+            }
+            catch
+            {
+                txtQtyDosage.Value = 0;
+            }
+            try
+            {
+                var dosageUnit = (String)DataBinder.Eval(DataItem, ItemConsumptionMetadata.ColumnNames.SRDosageUnit);
+                if (!string.IsNullOrEmpty(dosageUnit))
+                {
+                    var dosageq = new AppStandardReferenceItemQuery();
+                    dosageq.Where(dosageq.StandardReferenceID == AppEnum.StandardReference.DosageUnit.ToString(), dosageq.ItemID == dosageUnit);
+                    dosageq.Select(dosageq.ItemID, dosageq.ItemName);
+                    cboSRDosageUnit.DataSource = dosageq.LoadDataTable();
+                    cboSRDosageUnit.DataBind();
+                    cboSRDosageUnit.SelectedValue = dosageUnit;
+                }
+                else
+                {
+                    cboSRDosageUnit.Items.Clear();
+                    cboSRDosageUnit.SelectedValue = string.Empty;
+                    cboSRDosageUnit.Text = string.Empty;
+                }
+            }
+            catch
+            {
+                cboSRDosageUnit.Items.Clear();
+                cboSRDosageUnit.SelectedValue = string.Empty;
+                cboSRDosageUnit.Text = string.Empty;
+            }
         }
+
         protected void customValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
             //Check duplicate key
@@ -78,7 +113,16 @@ namespace Temiang.Avicenna.Module.RADT.Master
         {
             get { return txtSRItemUnit.Text; }
         }
+        public Decimal? QtyDosage
+        {
+            get { return Convert.ToDecimal(txtQtyDosage.Value); }
+        }
+        public String SRDosageUnit
+        {
+            get { return cboSRDosageUnit.SelectedValue; }
+        }
         #endregion
+
         #region Method & Event TextChanged
         protected void txtDetailItemID_TextChanged(object sender, EventArgs e)
         {
@@ -98,8 +142,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 txtDetailItemID.Text = entity.ItemID;
                 lblDetailItemName.Text = entity.ItemName;
 
-                PopulateItemUnit(entity.ItemID,entity.SRItemType);
-
+                PopulateItemUnit(entity.ItemID, entity.SRItemType, isResetIdIfNotExist);
             }
             else
             {
@@ -110,20 +153,87 @@ namespace Temiang.Avicenna.Module.RADT.Master
             }
         }
 
-        private void PopulateItemUnit(string itemID, string itemType)
+        private void PopulateItemUnit(string itemID, string itemType, bool isResetIdIfNotExist)
         {
             if (BusinessObject.Reference.ItemType.Medical.Equals(itemType))
             {
                 ItemProductMedic item = new ItemProductMedic();
                 if (item.LoadByPrimaryKey(itemID))
+                {
                     txtSRItemUnit.Text = item.SRItemUnit;
+
+                    if (isResetIdIfNotExist)
+                    {
+                        if (!string.IsNullOrEmpty(item.SRDosageUnit))
+                        {
+                            txtQtyDosage.Value = Convert.ToDouble(item.Dosage);
+                            var dosageq = new AppStandardReferenceItemQuery();
+                            dosageq.Where(dosageq.StandardReferenceID == AppEnum.StandardReference.DosageUnit.ToString(), dosageq.ItemID == item.SRDosageUnit);
+                            dosageq.Select(dosageq.ItemID, dosageq.ItemName);
+                            cboSRDosageUnit.DataSource = dosageq.LoadDataTable();
+                            cboSRDosageUnit.DataBind();
+                            cboSRDosageUnit.SelectedValue = item.SRDosageUnit;
+                        }
+                        else
+                        {
+                            txtQtyDosage.Value = 0;
+                            cboSRDosageUnit.Items.Clear();
+                            cboSRDosageUnit.SelectedValue = string.Empty;
+                            cboSRDosageUnit.Text = string.Empty;
+                        }
+                    }
+                }
+                else
+                {
+                    txtSRItemUnit.Text = string.Empty;
+                    txtQtyDosage.Value = 0;
+                    cboSRDosageUnit.Items.Clear();
+                    cboSRDosageUnit.SelectedValue = string.Empty;
+                    cboSRDosageUnit.Text = string.Empty;
+                }
             }
             else
             {
                 ItemProductNonMedic item = new ItemProductNonMedic();
                 if (item.LoadByPrimaryKey(itemID))
                     txtSRItemUnit.Text = item.SRItemUnit;
+
+                txtQtyDosage.Value = 0;
+                cboSRDosageUnit.Items.Clear();
+                cboSRDosageUnit.SelectedValue = string.Empty;
+                cboSRDosageUnit.Text = string.Empty;
             }
+        }
+
+        protected void cboSRDosageUnit_ItemsRequested(object o, RadComboBoxItemsRequestedEventArgs e)
+        {
+            string searchTextContain = string.Format("%{0}%", e.Text);
+            var query = new AppStandardReferenceItemQuery();
+            query.es.Top = 10;
+            query.Select
+                (
+                    query.ItemID,
+                    query.ItemName
+                );
+            query.Where
+                (
+                    query.Or
+                        (
+                            query.ItemID.Like(searchTextContain),
+                            query.ItemName.Like(searchTextContain)
+                        ),
+                        query.StandardReferenceID == AppEnum.StandardReference.DosageUnit.ToString(),
+                        query.IsActive == true
+                );
+
+            cboSRDosageUnit.DataSource = query.LoadDataTable();
+            cboSRDosageUnit.DataBind();
+        }
+
+        protected void cboStandardReferenceItem_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        {
+            e.Item.Text = ((DataRowView)e.Item.DataItem)["ItemName"].ToString();
+            e.Item.Value = ((DataRowView)e.Item.DataItem)["ItemID"].ToString();
         }
         #endregion
     }

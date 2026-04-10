@@ -261,7 +261,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
 
         private void PopulateToolbarHaisMonitoring()
         {
-            var tbarHais = (RadToolBarDropDown)tbMenu.Items[8];
+            var tbarHais = (RadToolBarDropDown)tbMenu.Items.FindItemByAttribute("CustomValue", "hais");
 
             var std = new AppStandardReferenceItemQuery();
             std.Where(std.StandardReferenceID == "HaisMonitoring");
@@ -1193,7 +1193,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
 
         }
 
-        public static DataTable RegistrationInfoMedicDataTable(string registrationType, string registrationNo, List<string> registrationNoList, string patientID, string filterEntry)
+        public static DataTable RegistrationInfoMedicDataTable(string registrationType, string registrationNo, List<string> registrationNoList, string patientID, string filterEntry, bool isHistCurrentPatient=false)
         {
             // RegistrationInfoMedic
             var que = new RegistrationInfoMedicQuery("a");
@@ -1206,36 +1206,42 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             var reg = new RegistrationQuery("x");
             que.InnerJoin(reg).On(que.RegistrationNo == reg.RegistrationNo);
 
-            if (registrationType == AppConstant.RegistrationType.InPatient)
+            if (isHistCurrentPatient)
             {
-                // Filter dari table Registration dan juga dari RegistrationInfoMedic akan lebih efisien query nya langsung terfilter jumlah recordnya masing2 (Handono 2024-11-19)
-                if (registrationNoList.Count > 1)
-                    que.Where(reg.RegistrationNo.In(registrationNoList), que.RegistrationNo.In(registrationNoList));
-                else
-                    que.Where(reg.RegistrationNo == registrationNoList[0], que.RegistrationNo == registrationNoList[0]);
+                que.Where(reg.PatientID == patientID);
             }
             else
             {
-
-                //List<string> patientRelateds = Patient.PatientRelateds(patientID);
-                //if (patientRelateds.Count == 1)
-                //    que.Where(reg.PatientID == patientID);
-                //else
-                //    que.Where(reg.PatientID.In(patientRelateds));
-
-                // Non Inpatient ambil 5 registrasi terakhir (Handono 2022-09)
-                var regCount = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.EmrHistoryRegistrationCount).ToInt();
-                var lastRegNos = Patient.Last.RegistrationNos(patientID, regCount, registrationNo);
-
-                // Filter dari table Registration dan juga dari RegistrationInfoMedic akan lebih efisien query nya langsung terfilter jumlah recordnya masing2 (Handono 2024-11-19)
-                if (lastRegNos.Count == 1)
-                    que.Where(reg.RegistrationNo == lastRegNos[0], que.RegistrationNo == lastRegNos[0]);
+                if (registrationType == AppConstant.RegistrationType.InPatient)
+                {
+                    // Filter dari table Registration dan juga dari RegistrationInfoMedic akan lebih efisien query nya langsung terfilter jumlah recordnya masing2 (Handono 2024-11-19)
+                    if (registrationNoList.Count > 1)
+                        que.Where(reg.RegistrationNo.In(registrationNoList), que.RegistrationNo.In(registrationNoList));
+                    else
+                        que.Where(reg.RegistrationNo == registrationNoList[0], que.RegistrationNo == registrationNoList[0]);
+                }
                 else
-                    que.Where(reg.RegistrationNo.In(lastRegNos), que.RegistrationNo.In(lastRegNos));
+                {
+
+                    //List<string> patientRelateds = Patient.PatientRelateds(patientID);
+                    //if (patientRelateds.Count == 1)
+                    //    que.Where(reg.PatientID == patientID);
+                    //else
+                    //    que.Where(reg.PatientID.In(patientRelateds));
+
+                    // Non Inpatient ambil 5 registrasi terakhir (Handono 2022-09)
+                    var regCount = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.EmrHistoryRegistrationCount).ToInt();
+                    var lastRegNos = Patient.Last.RegistrationNos(patientID, regCount, registrationNo);
+
+                    // Filter dari table Registration dan juga dari RegistrationInfoMedic akan lebih efisien query nya langsung terfilter jumlah recordnya masing2 (Handono 2024-11-19)
+                    if (lastRegNos.Count == 1)
+                        que.Where(reg.RegistrationNo == lastRegNos[0], que.RegistrationNo == lastRegNos[0]);
+                    else
+                        que.Where(reg.RegistrationNo.In(lastRegNos), que.RegistrationNo.In(lastRegNos));
 
 
+                }
             }
-
             if (!string.IsNullOrWhiteSpace(filterEntry))
                 que.Where(que.SRUserType == filterEntry);
 
@@ -1266,31 +1272,37 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             //patTransHist.Where(patTransHist.RegistrationNo == nshd.RegistrationNo, patTransHist.DateOfEntry <= nsdt.CreateDateTime, patTransHist.TimeOfEntry <= nsdt.CreateDateTime);
             //patTransHist.Select(patTransHist.ServiceUnitID);
 
-
-            if (registrationType == AppConstant.RegistrationType.InPatient)
+            if (isHistCurrentPatient)
             {
-                if (registrationNoList.Count > 1)
-                    nsdt.Where(nshd.RegistrationNo.In(registrationNoList));
-                else
-                    nsdt.Where(nshd.RegistrationNo == registrationNoList[0]);
-
+                nsdt.Where(reg.PatientID == patientID);
             }
             else
             {
-                //List<string> patientRelateds = Patient.PatientRelateds(patientID);
+                if (registrationType == AppConstant.RegistrationType.InPatient)
+                {
+                    if (registrationNoList.Count > 1)
+                        nsdt.Where(nshd.RegistrationNo.In(registrationNoList));
+                    else
+                        nsdt.Where(nshd.RegistrationNo == registrationNoList[0]);
 
-                //if (patientRelateds.Count == 1)
-                //    nsdt.Where(regqr.PatientID == patientID);
-                //else
-                //    nsdt.Where(regqr.PatientID.In(patientRelateds));
-
-                // Non Inpatient ambil 5 registrasi terakhir (Handono 2022-09)
-                var regCount = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.EmrHistoryRegistrationCount).ToInt();
-                var lastRegNos = Patient.Last.RegistrationNos(patientID, regCount, registrationNo);
-                if (lastRegNos.Count == 1)
-                    nsdt.Where(regqr.RegistrationNo == lastRegNos[0]);
+                }
                 else
-                    nsdt.Where(regqr.RegistrationNo.In(lastRegNos));
+                {
+                    //List<string> patientRelateds = Patient.PatientRelateds(patientID);
+
+                    //if (patientRelateds.Count == 1)
+                    //    nsdt.Where(regqr.PatientID == patientID);
+                    //else
+                    //    nsdt.Where(regqr.PatientID.In(patientRelateds));
+
+                    // Non Inpatient ambil 5 registrasi terakhir (Handono 2022-09)
+                    var regCount = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.EmrHistoryRegistrationCount).ToInt();
+                    var lastRegNos = Patient.Last.RegistrationNos(patientID, regCount, registrationNo);
+                    if (lastRegNos.Count == 1)
+                        nsdt.Where(regqr.RegistrationNo == lastRegNos[0]);
+                    else
+                        nsdt.Where(regqr.RegistrationNo.In(lastRegNos));
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(filterEntry))

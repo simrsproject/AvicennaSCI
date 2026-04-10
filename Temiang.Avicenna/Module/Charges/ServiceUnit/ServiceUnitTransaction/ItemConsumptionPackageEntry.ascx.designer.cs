@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Temiang.Avicenna.Module.Charges {
-    
-    
-    public partial class ItemConsumptionPackageEntry {
-        
+namespace Temiang.Avicenna.Module.Charges
+{
+
+
+    public partial class ItemConsumptionPackageEntry
+    {
+
         /// <summary>
         /// vsumTransChargesItemConsumption control.
         /// </summary>
@@ -20,7 +22,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ValidationSummary vsumTransChargesItemConsumption;
-        
+
         /// <summary>
         /// customValidator control.
         /// </summary>
@@ -29,7 +31,16 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CustomValidator customValidator;
-        
+
+        /// <summary>
+        /// hdnIsVaccine control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnIsVaccine;
+
         /// <summary>
         /// lblDetailItemID control.
         /// </summary>
@@ -38,7 +49,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblDetailItemID;
-        
+
         /// <summary>
         /// cboDetailItemID control.
         /// </summary>
@@ -47,7 +58,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadComboBox cboDetailItemID;
-        
+
         /// <summary>
         /// rfvDetailItemID control.
         /// </summary>
@@ -56,7 +67,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvDetailItemID;
-        
+
         /// <summary>
         /// Image1 control.
         /// </summary>
@@ -65,7 +76,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Image1;
-        
+
         /// <summary>
         /// lblQuantity control.
         /// </summary>
@@ -74,7 +85,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblQuantity;
-        
+
         /// <summary>
         /// txtQty control.
         /// </summary>
@@ -83,7 +94,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadNumericTextBox txtQty;
-        
+
         /// <summary>
         /// txtSRItemUnit control.
         /// </summary>
@@ -92,7 +103,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtSRItemUnit;
-        
+
         /// <summary>
         /// rfvQuantity control.
         /// </summary>
@@ -101,7 +112,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvQuantity;
-        
+
         /// <summary>
         /// Image2 control.
         /// </summary>
@@ -110,7 +121,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Image Image2;
-        
+
         /// <summary>
         /// btnUpdate control.
         /// </summary>
@@ -119,7 +130,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnUpdate;
-        
+
         /// <summary>
         /// btnInsert control.
         /// </summary>
@@ -128,7 +139,7 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnInsert;
-        
+
         /// <summary>
         /// btnCancel control.
         /// </summary>
@@ -137,5 +148,113 @@ namespace Temiang.Avicenna.Module.Charges {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnCancel;
+
+        /// <summary>
+        /// divVaccineInf control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divVaccineInf;
+
+        /// <summary>
+        /// lblDosage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblDosage;
+
+        /// <summary>
+        /// txtQtyDosage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadNumericTextBox txtQtyDosage;
+
+        /// <summary>
+        /// cboSRDosageUnit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboSRDosageUnit;
+
+        /// <summary>
+        /// Label1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label1;
+
+        /// <summary>
+        /// txtBatchNumber control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtBatchNumber;
+
+        /// <summary>
+        /// Label4 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label4;
+
+        /// <summary>
+        /// txtExpirationDate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadDatePicker txtExpirationDate;
+
+        /// <summary>
+        /// Label2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label2;
+
+        /// <summary>
+        /// cboSRImmReason control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboSRImmReason;
+
+        /// <summary>
+        /// Label3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label3;
+
+        /// <summary>
+        /// cboSRImmTiming control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboSRImmTiming;
     }
 }

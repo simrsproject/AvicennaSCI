@@ -47,6 +47,9 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
         [JsonProperty("id", NullValueHandling = NullValueHandling.Ignore)]
         public string ID { get; set; }
+
+        [JsonProperty("basedOn", NullValueHandling = NullValueHandling.Ignore)]
+        public ServiceProvider BasedOn { get; set; }
     }
 
 

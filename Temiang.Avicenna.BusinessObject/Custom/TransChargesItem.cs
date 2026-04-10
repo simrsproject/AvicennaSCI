@@ -135,6 +135,41 @@ namespace Temiang.Avicenna.BusinessObject
             set { SetColumn("refToItemConditionRule_ItemConditionRuleName", value); }
         }
 
+        public bool? IsPreparation
+        {
+            get
+            {
+                object val = this.GetColumn("refTo_IsPreparation");
+                if (val == null || val == DBNull.Value)
+                    return null;
+
+                if (val is bool)
+                    return (bool)val;
+
+                if (val is int)
+                    return ((int)val) == 1;
+
+                if (val is string)
+                    return val.ToString() == "1" || val.ToString().ToLower() == "true";
+
+                return null;
+            }
+            set
+            {
+                this.SetColumn("refTo_IsPreparation", value);
+            }
+        }
+
+        public bool? IsVaccine
+        {
+            get
+            {
+                var val = GetColumn("refToIpm_IsVaccine");
+                return val == null || val == DBNull.Value ? false : (bool?)val;
+            }
+            set { SetColumn("refToIpm_IsVaccine", value); }
+        }
+
         public void SetPrevOrder(string RegistrationNo, int iHourInterval)
         {
             if (iHourInterval == 0) return;

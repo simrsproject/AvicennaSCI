@@ -163,7 +163,9 @@
     <Compile Include="Custom\Finance\CashTransactionTemplateDetail.cs" />
     <Compile Include="Custom\GuarantorAutoBillItem.cs" />
     <Compile Include="Custom\GuarantorServiceUnitPlafond.cs" />
+    <Compile Include="Custom\ImmunizationBridging.cs" />
     <Compile Include="Custom\ItemBalanceDetailEd.cs" />
+    <Compile Include="Custom\ItemImmunization.cs" />
     <Compile Include="Custom\ItemProductFabric.cs" />
     <Compile Include="Custom\ItemServiceProcedure.cs" />
     <Compile Include="Custom\MedicalDischargeSummaryDiagnoseCmx.cs" />
@@ -775,7 +777,10 @@
     <Compile Include="Generated\BridgingTemplate.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
     <Compile Include="Generated\DietBridging.cs" />
+    <Compile Include="Generated\ImmunizationBridging.cs" />
+    <Compile Include="Generated\Interop\SatusehatOrderedItems.cs" />
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />
+    <Compile Include="Generated\ItemImmunization.cs" />
     <Compile Include="Generated\JsonBridgingRujukBalikValueTemp.cs" />
     <Compile Include="Generated\LoincItem.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryBodyDiagramCmx.cs" />
@@ -894,6 +899,10 @@
     <Compile Include="Generated\RlTxReportV2025.cs" />
     <Compile Include="Generated\RlTxReport37v2025.cs" />
     <Compile Include="Generated\SatuSehatILPPreparation.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplateDetail.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplateDetailKeyWord.cs" />
+    <Compile Include="Generated\SatuSehatILPPreparation.cs" />
+    <Compile Include="Generated\SatuSehatILPTemplate.cs" />
     <Compile Include="Generated\SatuSehatILPTemplateDetail.cs" />
     <Compile Include="Generated\SatuSehatILPTemplateDetailKeyWord.cs" />
     <Compile Include="Generated\SatuSehatKfa.cs" />

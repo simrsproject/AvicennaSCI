@@ -395,7 +395,6 @@
                     case "dicom":
                         openDicom("");
                         break;
-
                     case "pc_visit":
                         openVisit("<%=PatientID%>", "<%=RegistrationNo%>");
                         break;
@@ -414,7 +413,9 @@
                     case "pc_homepresc":
                         openHomePrescription("<%=PatientID%>", "<%=RegistrationNo%>", "<%=ReferFromRegistrationNo%>")
                         break;
-
+                    case "ImmHist":
+                        openImmunizationHist();
+                        break;
                     default:
                         if (value.includes('rpt_')) {
                             var vals = value.split('_');
@@ -548,6 +549,10 @@
                         }
                         else
                             alert(abortAdd);
+                        break;
+                    case "IntNoteHist":
+                        var url = '<%= Helper.UrlRoot() %>/Module/RADT/EmrIp/EmrIpCommon/IntegratedNote/IntegratedNoteHist.aspx?regno=<%= RegistrationNo %>&patid=<%= PatientID %>';
+                        openWinEntryMaxWindow(url);
                         break;
                     default:
                         if (val.includes("filter_")) {
@@ -1110,6 +1115,10 @@
             }
             function openGrowthChart() {
                 var url = '<%= Helper.UrlRoot() %>/Module/RADT/Cpoe/Common/GrowthChart.aspx?patid=<%= PatientID %>';
+                openWinEntryMaximize(url);
+            }
+            function openImmunizationHist() {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Cpoe/EmrCommon/Immunization/ImmunizationHist.aspx?patid=<%= PatientID %>';
                 openWinEntryMaximize(url);
             }
             function openVitalSignChartAnesthesia(bookingno) {
@@ -1823,23 +1832,14 @@
                             ImageUrl="~/Images/Toolbar/views16.png" />
                         <telerik:RadToolBarButton runat="server" Text="Billing" Value="Billing"
                             ImageUrl="~/Images/Toolbar/ordering16.png" />
-                        <telerik:RadToolBarButton runat="server" Text="Fluid Balance" Value="FluidBalance"
+                        <telerik:RadToolBarButton runat="server" Text="Fluid Bal" Value="FluidBalance"
                             ImageUrl="~/Images/Toolbar/ordering16.png" />
                         <telerik:RadToolBarDropDown runat="server" Text="UDD" ImageUrl="~/Images/Toolbar/drugs16.png"></telerik:RadToolBarDropDown>
-                        <telerik:RadToolBarDropDown runat="server" Text="HAIs Monitoring" ImageUrl="~/Images/Toolbar/ordering16.png">
+                        <telerik:RadToolBarButton runat="server" Text="Immunization" Value="ImmHist" ImageUrl="~/Images/Toolbar/views16.png">
+                        </telerik:RadToolBarButton>
+                        <telerik:RadToolBarDropDown runat="server" Text="HAIs Mon" CustomValue="hais" ImageUrl="~/Images/Toolbar/ordering16.png">
                         </telerik:RadToolBarDropDown>
-                        <telerik:RadToolBarDropDown runat="server" Text="HAIs Monitoring" ImageUrl="~/Images/Toolbar/ordering16.png" Visible="false">
-                            <Buttons>
-                                <telerik:RadToolBarButton runat="server" Text="Vena Verifier" Value="Nosocomial_Infus" />
-                                <telerik:RadToolBarButton runat="server" Text="Central (Infus)" Value="Nosocomial_InfusCentral" />
-                                <telerik:RadToolBarButton runat="server" Text="Dower Catheter" Value="Nosocomial_Catheter" />
-                                <telerik:RadToolBarButton runat="server" Text="NGT (Naso Gastric Tube)" Value="Nosocomial_Ngt" />
-                                <telerik:RadToolBarButton runat="server" Text="Surgery" Value="Nosocomial_Surgery" />
-                                <telerik:RadToolBarButton runat="server" Text="Mechanic Ventilation" Value="Nosocomial_Ett" />
-                                <telerik:RadToolBarButton runat="server" Text="Bed Rest" Value="Nosocomial_BedRest" />
-                                <telerik:RadToolBarButton runat="server" Text="Length of Stay" Value="Nosocomial_Hap" />
-                            </Buttons>
-                        </telerik:RadToolBarDropDown>
+
                         <telerik:RadToolBarDropDown runat="server" Text="Phar Care" ImageUrl="~/Images/Toolbar/drugs16.png">
                             <Buttons>
                                 <telerik:RadToolBarButton runat="server" Text="Visit Notes" Value="pc_visit" />
@@ -1933,6 +1933,8 @@
                                 <telerik:RadToolBarButton runat="server" Text="]" Enabled="False" />
                                 <telerik:RadToolBarButton runat="server" Text="Print" Value="print"
                                     ImageUrl="~/Images/Toolbar/print16.png" />
+                                <telerik:RadToolBarButton runat="server" Text="Hist" Value="IntNoteHist" Visible="false"
+                                    ImageUrl="~/Images/Toolbar/history16.png" />
                                 <telerik:RadToolBarButton runat="server" Text="Refresh" Value="refresh"
                                     ImageUrl="~/Images/Toolbar/refresh16.png" />
 

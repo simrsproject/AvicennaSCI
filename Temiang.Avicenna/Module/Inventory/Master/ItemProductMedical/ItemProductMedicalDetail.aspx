@@ -46,6 +46,14 @@
             oWnd.set_width(document.body.offsetWidth);
             oWnd.show();
         }
+                function cboConsumeUnit_ClientItemsRequesting(sender, eventArgs) {
+            var context = eventArgs.get_context();
+            context["ItemID"] = $find("<%=txtItemID.ClientID %>").get_value();
+        }
+        function showDropDown(sender, eventArgs) {
+            sender.showDropDown();
+            sender.requestItems("[showall]", false);
+        }
     </script>
 
     <telerik:RadWindowManager ID="RadWindowManager1" runat="server" Modal="true" VisibleStatusbar="false"
@@ -792,7 +800,7 @@
                                     <td>
                                         <asp:CheckBox ID="chkIsMedication" runat="server" Text="Medication" />
                                     </td>
-                                    <td></td>
+                                    <td><asp:CheckBox ID="chkIsVaccine" runat="server" Text="Vaccine Drugs" /></td>
                                     <td></td>
                                 </tr>
                             </table>
@@ -1081,6 +1089,7 @@
             </telerik:RadTab>
             <telerik:RadTab runat="server" Text="Bridging & Integration" PageViewID="pgvAliasName" />
             <telerik:RadTab runat="server" Text="BPJS Additional Setting" PageViewID="pgvBpjsAddSetting" />
+            <telerik:RadTab runat="server" Text="Immunization List" PageViewID="pgvItemImmunization" />
         </Tabs>
     </telerik:RadTabStrip>
     <telerik:RadMultiPage ID="multiPage" runat="server" SelectedIndex="0" BorderStyle="Solid"
@@ -1597,5 +1606,53 @@
                 </tr>
             </table>
         </telerik:RadPageView>
+            <telerik:RadPageView ID="pgvItemImmunization" runat="server">
+        <table width="500px">
+            <tr>
+                <td class="label">
+                    <asp:Label ID="Label3" runat="server" Text="Cvx Name"></asp:Label>
+                </td>
+                <td class="entry">
+                    <telerik:RadComboBox ID="cboSRCvxName" runat="server" Width="300px" DataTextField="ItemName" DataValueField="ItemID">
+                    </telerik:RadComboBox>
+                </td>
+                <td width="20px">
+                </td>
+                <td></td>
+            </tr>
+
+        </table>
+        <telerik:RadGrid ID="grdItemImmunization" runat="server" OnNeedDataSource="grdItemImmunization_NeedDataSource"
+            AutoGenerateColumns="False" GridLines="None" OnUpdateCommand="grdItemImmunization_UpdateCommand"
+            OnDeleteCommand="grdItemImmunization_DeleteCommand" OnInsertCommand="grdItemImmunization_InsertCommand">
+            <MasterTableView CommandItemDisplay="None" DataKeyNames="ImmunizationID" ClientDataKeyNames="ImmunizationID"
+                AllowPaging="true" PageSize="20">
+                <Columns>
+                    <telerik:GridEditCommandColumn ButtonType="ImageButton" Visible="false">
+                        <HeaderStyle Width="30px" />
+                        <ItemStyle CssClass="MyImageButton" />
+                    </telerik:GridEditCommandColumn>
+                    <telerik:GridBoundColumn DataField="ImmunizationID" HeaderText="ID" UniqueName="ImmunizationID" HeaderStyle-Width="100px"
+                        SortExpression="ImmunizationID" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                    <telerik:GridBoundColumn DataField="ImmunizationName" HeaderText="Immunization Name" UniqueName="ImmunizationName"
+                        SortExpression="ImmunizationName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                    <telerik:GridButtonColumn UniqueName="DeleteColumn" Text="Delete" CommandName="Delete"
+                        ButtonType="ImageButton" ConfirmText="Delete this row?">
+                        <HeaderStyle Width="30px" />
+                        <ItemStyle HorizontalAlign="Center" CssClass="MyImageButton" />
+                    </telerik:GridButtonColumn>
+                </Columns>
+                <EditFormSettings UserControlName="ItemImmunizationDetail.ascx" EditFormType="WebUserControl">
+                    <EditColumn UniqueName="ItemImmunizationEditCommand">
+                    </EditColumn>
+                </EditFormSettings>
+            </MasterTableView>
+            <ClientSettings EnableRowHoverStyle="true">
+                <Resizing AllowColumnResize="True" />
+            </ClientSettings>
+        </telerik:RadGrid>
+    </telerik:RadPageView>
     </telerik:RadMultiPage>
+        <br />
+    <br />
 </asp:Content>

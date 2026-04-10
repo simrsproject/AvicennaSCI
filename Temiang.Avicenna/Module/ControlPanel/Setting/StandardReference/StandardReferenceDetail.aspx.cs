@@ -1,10 +1,11 @@
 using System;
-using Temiang.Dal.Core;
-using Temiang.Dal.Interfaces;
+using System.Web.UI;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using Temiang.Dal.Core;
 using Temiang.Dal.DynamicQuery;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.ControlPanel.Setting
 {
@@ -171,7 +172,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting
                 args.IsCancel = true;
                 return;
             }
-            
+
             entity.AddNew();
             SetEntityValue(entity);
             SaveEntity(entity);
@@ -184,6 +185,49 @@ namespace Temiang.Avicenna.ControlPanel.Setting
                 entity.Save();
 
                 AppStandardReferenceItems.Save();
+
+                // Brdging Satusehat
+                var ssbtype = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+                if (!string.IsNullOrEmpty(ssbtype))
+                {
+                    foreach (var item in AppStandardReferenceItems)
+                    {
+                        var bg = new AppStandardReferenceItemBridging();
+                        if (bg.LoadByPrimaryKey(item.StandardReferenceID, item.ItemID, ssbtype))
+                        {
+                            if (string.IsNullOrEmpty(item.SSBridgingID))
+                            {
+                                bg.MarkAsDeleted();
+                            }
+                            else
+                            {
+
+                                bg.BridgingID = item.SSBridgingID;
+
+                                var sct = new Snomedct();
+                                if (sct.LoadByPrimaryKey(item.StandardReferenceID, item.SSBridgingID))
+                                    bg.BridgingName = sct.Display;
+
+                            }
+                            bg.Save();
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(item.SSBridgingID))
+                            {
+                                bg = new AppStandardReferenceItemBridging();
+                                bg.StandardReferenceID = item.StandardReferenceID;
+                                bg.ItemID = item.ItemID;
+                                bg.BridgingID = item.SSBridgingID;
+                                var sct = new Snomedct();
+                                if (sct.LoadByPrimaryKey(item.StandardReferenceID, item.SSBridgingID))
+                                    bg.BridgingName = sct.Display;
+
+                                bg.Save();
+                            }
+                        }
+                    }
+                }
 
                 //Commit if success, Rollback if failed
                 trans.Complete();
@@ -213,14 +257,28 @@ namespace Temiang.Avicenna.ControlPanel.Setting
                 }
                 else
                 {
-                    entity.MarkAsDeleted();
-                    AppStandardReferenceItemCollection itemDetail = new AppStandardReferenceItemCollection();
-                    itemDetail.LoadByStandardReferenceID(txtStandardReferenceID.Text);
-                    itemDetail.MarkAllAsDeleted();
                     using (esTransactionScope trans = new esTransactionScope())
                     {
-                        AppStandardReferenceItems.Save();
+                        var items = new AppStandardReferenceItemCollection();
+                        var itemQr = new AppStandardReferenceItemQuery("stdi");
+                        itemQr.Where(itemQr.StandardReferenceID == txtStandardReferenceID.Text);
+                        items.Load(itemQr);
+                        items.MarkAllAsDeleted();
+                        items.Save();
 
+                        // Bridging Satusehat
+                        var ssbtype = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+                        if (!string.IsNullOrEmpty(ssbtype))
+                        {
+                            var bgs = new AppStandardReferenceItemBridgingCollection();
+                            var bgQr = new AppStandardReferenceItemBridgingQuery();
+                            bgQr.Where(bgQr.StandardReferenceID == txtStandardReferenceID.Text, bgQr.SRBridgingType == ssbtype);
+                            bgs.Load(bgQr);
+                            bgs.MarkAllAsDeleted();
+                            bgs.Save();
+                        }
+
+                        entity.MarkAsDeleted();
                         entity.Save();
 
                         //Commit if success, Rollback if failed
@@ -251,10 +309,16 @@ namespace Temiang.Avicenna.ControlPanel.Setting
                 itemQuery.LeftJoin(coa).On(itemQuery.coaID == coa.ChartOfAccountId)
                     .Where(itemQuery.StandardReferenceID == txtStandardReferenceID.Text)
                     .Select(
-                        itemQuery, 
+                        itemQuery,
                         coa.ChartOfAccountCode.As("refTo_CoaCode"),
                         coa.ChartOfAccountName.As("refTo_CoaName")
                     );
+
+                var ssbtype = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+                var bgss = new AppStandardReferenceItemBridgingQuery("bgss");
+                itemQuery.LeftJoin(bgss).On(itemQuery.ItemID == bgss.ItemID & bgss.SRBridgingType == ssbtype);
+                itemQuery.Select(bgss.BridgingID.As("refTo_StdiSSBridging"));
+
                 itemQuery.OrderBy(itemQuery.ItemID.Ascending);
                 coll.Load(itemQuery);
 
@@ -263,9 +327,9 @@ namespace Temiang.Avicenna.ControlPanel.Setting
                 Session["collAppStandardReferenceItem"] = coll;
                 return coll;
             }
-            set 
-            { 
-                Session["collAppStandardReferenceItem"] = value; 
+            set
+            {
+                Session["collAppStandardReferenceItem"] = value;
             }
         }
 
@@ -286,7 +350,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting
         private void PopulateGridDetail(AppStandardReference appStandardReference)
         {
             //Reset Record Detail
-            AppStandardReferenceItems = null; 
+            AppStandardReferenceItems = null;
 
             //Requery Record Detail
             grdStandardReferenceItem.DataSource = AppStandardReferenceItems;
@@ -329,6 +393,7 @@ namespace Temiang.Avicenna.ControlPanel.Setting
                 item.IsActive = ctl.IsActive;
                 item.CustomField = ctl.CustomField;
                 item.CustomField2 = ctl.CustomField2;
+                item.SSBridgingID = ctl.SSBridgingID;
 
                 int Coa = 0;
                 int SubLedger = 0;

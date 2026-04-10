@@ -117,6 +117,10 @@ namespace Temiang.Avicenna.Common
 
         public enum StandardReference
         {
+            LabResultType,
+            ImmTiming,
+            ImmReason,
+            CvxName,
             Flacc,
             KelurahanKemenkes,
             KecamatanKemenkes,
@@ -811,7 +815,7 @@ namespace Temiang.Avicenna.Common
             AllergySatuSehat,
 
             SatuSehatClassType,
-
+            DicomCode
         }
 
         public enum AutoNumber

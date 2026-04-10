@@ -7,6 +7,7 @@ using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.BusinessObject.Reference;
 using System.Linq;
+using System.Web.UI;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
@@ -22,7 +23,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             entity.SRItemType = BusinessObject.Reference.ItemType.Laboratory;
             entity.SRBillingGroup = cboBillingGroup.SelectedValue;
             entity.SRBpjsItemGroup = cboSRBpjsItemGroup.SelectedValue;
-            entity.ItemName = txtItemName.Text;
+            entity.ItemName = txtItemName.Text.Trim();
             entity.IsActive = chkIsActive.Checked;
             entity.IsDelegationToNurse = chkIsDelegationToNurse.Checked;
             entity.Notes = txtNotes.Text;
@@ -65,6 +66,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             itemLaboratory.WaitingTimeForResults = Convert.ToInt16(txtWaitingTimeForResults.Value);
             itemLaboratory.SRIntervalTime = cboSRIntervalTime.SelectedValue;
             itemLaboratory.SRSpecimenType = cboSRSpecimenType.SelectedValue;
+            itemLaboratory.SRResultValueType = cboSRResultValueType.SelectedValue;
             itemLaboratory.IsCulture = chkIsCulture.Checked;
 
             //Last Update Status
@@ -250,6 +252,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             chkIsDisplayInOrderList.Checked = itemLaboratory.IsDisplayInOrderList ?? false;
             cboSRExaminationClass.SelectedValue = itemLaboratory.SRExaminationClass;
             cboSRSpecimenType.SelectedValue = itemLaboratory.SRSpecimenType;
+            cboSRResultValueType.SelectedValue = itemLaboratory.SRResultValueType;
             cboSRLabUnit.SelectedValue = itemLaboratory.SRLaboratoryUnit;
             chkIsConfidential.Checked = itemLaboratory.IsConfidential ?? false;
             chkIsCulture.Checked = itemLaboratory.IsCulture ?? false;
@@ -389,18 +392,48 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 StandardReference.InitializeIncludeSpace(cboSREklaimGroup, AppEnum.StandardReference.EklaimTariffGroup);
                 StandardReference.InitializeIncludeSpace(cboSREklaimFactorGroup, AppEnum.StandardReference.EklaimFactorGroup);
 
-                var rl = new RlMasterReportCollection();
-                rl.Query.Where(rl.Query.IsActive == true, rl.Query.RlMasterReportID == 11);
-                rl.LoadAll();
-                cboReportRLID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
-                foreach (RlMasterReport entity in rl)
+                var aprl = new AppProgramCollection();
+                aprl.Query.Where(aprl.Query.ProgramID == AppConstant.Program.RlReportV2025, aprl.Query.IsVisible == true);
+                aprl.LoadAll();
+
+                if (aprl.Count > 0)
                 {
-                    cboReportRLID.Items.Add(new RadComboBoxItem(entity.RlMasterReportNo + " - " + entity.RlMasterReportName, entity.RlMasterReportID.ToString()));
+                    var rl = new RlMasterReportV2025Collection();
+                    rl.Query.Where(rl.Query.IsActive == true, rl.Query.RlMasterReportID == 8);
+                    rl.LoadAll();
+                    cboReportRLID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                    foreach (RlMasterReportV2025 entity in rl)
+                    {
+                        cboReportRLID.Items.Add(new RadComboBoxItem(entity.RlMasterReportNo + " - " + entity.RlMasterReportName, entity.RlMasterReportID.ToString()));
+                    }
                 }
+                else
+                {
+                    var rl = new RlMasterReportCollection();
+                    rl.Query.Where(rl.Query.IsActive == true, rl.Query.RlMasterReportID == 11);
+                    rl.LoadAll();
+                    cboReportRLID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                    foreach (RlMasterReport entity in rl)
+                    {
+                        cboReportRLID.Items.Add(new RadComboBoxItem(entity.RlMasterReportNo + " - " + entity.RlMasterReportName, entity.RlMasterReportID.ToString()));
+                    }
+                }
+
+                //var rl = new RlMasterReportCollection();
+                //rl.Query.Where(rl.Query.IsActive == true, rl.Query.RlMasterReportID == 11);
+                //rl.LoadAll();
+
+
+                //cboReportRLID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                //foreach (RlMasterReport entity in rl)
+                //{
+                //    cboReportRLID.Items.Add(new RadComboBoxItem(entity.RlMasterReportNo + " - " + entity.RlMasterReportName, entity.RlMasterReportID.ToString()));
+                //}
 
                 StandardReference.InitializeIncludeSpace(cboSRExaminationClass, AppEnum.StandardReference.ExaminationClass);
                 StandardReference.InitializeIncludeSpace(cboSRLabUnit, AppEnum.StandardReference.LaboratoryUnit);
                 StandardReference.InitializeIncludeSpace(cboSRSpecimenType, AppEnum.StandardReference.SpecimenType);
+                StandardReference.InitializeIncludeSpace(cboSRResultValueType, AppEnum.StandardReference.LabResultType);
 
                 trBpjsItemGroup.Visible = AppSession.Parameter.HealthcareInitialAppsVersion == "RSSMCB";
                 trSRItemSubGroup.Visible = AppSession.Parameter.IsUsingItemSubGroup;
@@ -752,6 +785,8 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 entity.DetailItemID = userControl.DetailItemID;
                 entity.Qty = userControl.Qty ?? 0;
                 entity.SRItemUnit = userControl.SRItemUnit;
+                entity.QtyDosage = userControl.QtyDosage ?? 0;
+                entity.SRDosageUnit = userControl.SRDosageUnit;
             }
         }
         #endregion
@@ -1016,7 +1051,6 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
             DataTable dtb = (new ItemTariff()).GetItemTariffComponent(tariffType, itemID, classID, startingDate);
             e.DetailTableView.DataSource = dtb;
-
         }
 
         #endregion
@@ -1029,13 +1063,36 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
             if (!string.IsNullOrEmpty(e.Value))
             {
-                var coll = new RlMasterReportItemCollection();
-                coll.Query.Where(coll.Query.RlMasterReportID == Convert.ToInt32(e.Value), coll.Query.IsActive == true);
-                coll.LoadAll();
+                //foreach (RlMasterReportItem entity in coll)
+                //{
+                //    cboRlMasterReportItemID.Items.Add(new RadComboBoxItem(entity.RlMasterReportItemCode + " - " + entity.RlMasterReportItemName, entity.RlMasterReportItemID.ToString()));
+                //}
 
-                foreach (RlMasterReportItem entity in coll)
+                var aprl = new AppProgramCollection();
+                aprl.Query.Where(aprl.Query.ProgramID == AppConstant.Program.RlReportV2025, aprl.Query.IsVisible == true);
+                aprl.LoadAll();
+
+                if (aprl.Count > 0)
                 {
-                    cboRlMasterReportItemID.Items.Add(new RadComboBoxItem(entity.RlMasterReportItemCode + " - " + entity.RlMasterReportItemName, entity.RlMasterReportItemID.ToString()));
+                    var coll = new RlMasterReportItemV2025Collection();
+                    coll.Query.Where(coll.Query.RlMasterReportID == Convert.ToInt32(e.Value), coll.Query.IsActive == true);
+                    coll.LoadAll();
+
+                    foreach (RlMasterReportItemV2025 entity in coll)
+                    {
+                        cboRlMasterReportItemID.Items.Add(new RadComboBoxItem(entity.RlMasterReportItemCode + " - " + entity.RlMasterReportItemName, entity.RlMasterReportItemID.ToString()));
+                    }
+                }
+                else
+                {
+                    var coll = new RlMasterReportItemCollection();
+                    coll.Query.Where(coll.Query.RlMasterReportID == Convert.ToInt32(e.Value), coll.Query.IsActive == true);
+                    coll.LoadAll();
+
+                    foreach (RlMasterReportItem entity in coll)
+                    {
+                        cboRlMasterReportItemID.Items.Add(new RadComboBoxItem(entity.RlMasterReportItemCode + " - " + entity.RlMasterReportItemName, entity.RlMasterReportItemID.ToString()));
+                    }
                 }
             }
         }
@@ -1408,6 +1465,12 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 return item;
             }
             return null;
+        }
+
+        protected void btnFilterPriceHistory_Click(object sender, ImageClickEventArgs e)
+        {
+            grdPriceHistory.CurrentPageIndex = 0;
+            grdPriceHistory.Rebind();
         }
     }
 }

@@ -1,5 +1,6 @@
 using DocumentFormat.OpenXml.VariantTypes;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Web.UI;
@@ -38,6 +39,11 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
                 chkIsBpjs.Visible = AppSession.Parameter.HealthcareInitialAppsVersion == "RSCH";
                 trItemBooked.Visible = AppSession.Parameter.IsBookingBedCharged;
+            }
+            if (!IsPostBack)
+            {
+                grdBed.Columns.FindByUniqueName("SatuSehatBridgingID").Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatOrganizationID")));
+
             }
         }
 
@@ -98,7 +104,28 @@ namespace Temiang.Avicenna.Module.RADT.Master
             entity = new ServiceRoom();
             entity.AddNew();
             SetEntityValue(entity);
+            var qr = new ServiceUnitBridgingQuery("q");
+            qr.Where(qr.ServiceUnitID == txtServiceUnitID.Text, qr.SRBridgingType == Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
+            qr.es.Top = 1;
+            var dtbCheck = qr.LoadDataTable();
+            if (dtbCheck.Rows.Count < 1)
+            {
+                args.MessageText = "Service unit mapping to SATUSEHAT is required.";
+                return;
+            }
+            // Check SatuSehat status create new flag
+            var ssbType = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+            var sb = ServiceRoomBridgings.Where(s => s.SRBridgingType == ssbType && s.BridgingID == "CREATE").FirstOrDefault();
+            var isCreateSsb = false;
+            if (sb != null)
+            {
+                isCreateSsb = true;
+                sb.MarkAsDeleted();
+            }
             SaveEntity(entity);
+            // Post to SatuSehat
+            if (grdBed.Columns.FindByUniqueName("SatuSehatBridgingID").Visible)
+                SaveRoomToSatuSehat(isCreateSsb);
         }
 
         protected override void OnMenuSaveEditClick(ValidateArgs args)
@@ -107,7 +134,19 @@ namespace Temiang.Avicenna.Module.RADT.Master
             if (entity.LoadByPrimaryKey(txtRoomID.Text))
             {
                 SetEntityValue(entity);
+                var ssbType = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+                var sb = ServiceRoomBridgings.Where(s => s.SRBridgingType == ssbType && s.BridgingID == "CREATE").FirstOrDefault();
+                var isCreateSsrb = false;
+                if (sb != null)
+                {
+                    isCreateSsrb = true;
+                    sb.MarkAsDeleted();
+                }
                 SaveEntity(entity);
+
+                // Post to SatuSehat
+                if (grdBed.Columns.FindByUniqueName("SatuSehatBridgingID").Visible)
+                    SaveRoomToSatuSehat(isCreateSsrb);
             }
             else
             {
@@ -435,6 +474,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 chkIsResetPrice.Enabled = false;
             }
 
+            grdBed.Columns.FindByUniqueName("SatuSehatBridgingID").Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatClientID")));
             grdImages.Columns[0].Visible = false;
             grdImages.Columns[grdImages.Columns.Count - 1].Visible = isVisible;
 
@@ -914,6 +954,14 @@ namespace Temiang.Avicenna.Module.RADT.Master
         {
             var coll = ServiceRoomBridgings;
             return coll.FirstOrDefault(rec => rec.SRBridgingType.Equals(type) && rec.BridgingID.Equals(id));
+        }
+        private void SaveRoomToSatuSehat(bool isCreateSsrb)
+        {
+            // Post to SatuSehat
+            var satuSehat = new Bridging.SatuSehat.Utils();
+            if (isCreateSsrb)
+                satuSehat.PostRoom(txtServiceUnitID.Text, txtRoomID.Text);
+            satuSehat.PostBed(txtServiceUnitID.Text, txtRoomID.Text);
         }
 
         private void SetEntityValue(ServiceRoomBridging entity, GridCommandEventArgs e)
