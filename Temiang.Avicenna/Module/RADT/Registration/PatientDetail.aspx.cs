@@ -702,9 +702,11 @@ namespace Temiang.Avicenna.Module.RADT
             entity.ParentSpouseOccupationDesc = txtParentSpouseOccupationDesc.Text;
             entity.ParentSpouseAge = Convert.ToInt16(txtParentSpouseAge.Value);
             entity.MotherAge = Convert.ToInt16(txtMotherAge.Value);
+            entity.MotherSsn = txtMotherSsn.Text;
             entity.SRMotherOccupation = cboSRMotherOccupation.SelectedValue;
             entity.MotherOccupationDesc = txtMotherOccupationDesc.Text;
             entity.FatherAge = Convert.ToInt16(txtFatherAge.Value);
+            entity.FatherSsn = txtFatherSsn.Text;
             entity.SRFatherOccupation = cboSRFatherOccupation.SelectedValue;
             entity.FatherOccupationDesc = txtFatherOccupationDesc.Text;
 
@@ -925,10 +927,12 @@ namespace Temiang.Avicenna.Module.RADT
             txtParentSpouseOccupationDesc.Text = patient.ParentSpouseOccupationDesc;
             txtParentSpouseAge.Value = Convert.ToDouble(patient.ParentSpouseAge);
             txtMotherAge.Value = Convert.ToDouble(patient.MotherAge);
+            txtMotherSsn.Text = patient.MotherSsn;
             cboSRMotherOccupation.SelectedValue = patient.SRMotherOccupation;
             txtMotherOccupationDesc.Text = patient.MotherOccupationDesc;
             txtFatherName.Text = patient.FatherName;
             txtFatherAge.Value = Convert.ToDouble(patient.FatherAge);
+            txtFatherSsn.Text = patient.FatherSsn;
             cboSRFatherOccupation.SelectedValue = patient.SRFatherOccupation;
             txtFatherOccupationDesc.Text = patient.FatherOccupationDesc;
 
@@ -1350,7 +1354,7 @@ namespace Temiang.Avicenna.Module.RADT
                     }
                 }
             }
-            
+
 
 
             return dtb;
@@ -2181,6 +2185,6 @@ namespace Temiang.Avicenna.Module.RADT
             }
         }
 
-    
+
     }
 }

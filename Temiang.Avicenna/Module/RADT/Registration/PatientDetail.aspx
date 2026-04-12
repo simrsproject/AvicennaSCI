@@ -238,6 +238,34 @@
                     </tr>
                     <tr>
                         <td class="label">
+                            <asp:Label ID="lblSSN" runat="server" Text="SSN"></asp:Label>
+                        </td>
+                        <td class="entry300">
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <telerik:RadTextBox ID="txtSSN" runat="server" Width="300px" MaxLength="16">
+                                        </telerik:RadTextBox>
+                                    </td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <asp:ImageButton runat="server" ID="btnInfoDukcapil" ImageUrl="~/Images/infoblue16.png" ToolTip="Info Dukcapil" OnClientClick="openWinDukcapil();return false;" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="10px">
+                            <asp:RequiredFieldValidator ID="rfvSSN" runat="server" ErrorMessage="SSN required."
+                                ValidationGroup="entry" ControlToValidate="txtSSN" SetFocusOnError="True" Width="20px"
+                                Visible="False">
+                                <asp:Image ID="Image9" runat="server" SkinID="rfvImage" />
+                            </asp:RequiredFieldValidator>
+                        </td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td class="label">
                             <asp:Label ID="lblSRSalutation" runat="server" Text="Salutation"></asp:Label>
                         </td>
                         <td class="entry300">
@@ -494,8 +522,7 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td class="label">
-                                <asp:Label ID="Label9" runat="server" Text="Father MRN"></asp:Label>
+                            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:Label ID="Label9" runat="server" Text="MRN"></asp:Label>
                             </td>
                             <td class="entry300">
                                 <table cellpadding="0" cellspacing="0">
@@ -513,6 +540,15 @@
                                         </td>
                                     </tr>
                                 </table>
+                            </td>
+                            <td width="10px"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:Label ID="lblFatherSsn" runat="server" Text="SSN"></asp:Label>
+                            </td>
+                            <td class="entry300">
+                                <telerik:RadTextBox ID="txtFatherSsn" runat="server" Width="300px" MaxLength="16" />
                             </td>
                             <td width="10px"></td>
                             <td></td>
@@ -537,8 +573,7 @@
                             <td></td>
                         </tr>
                         <tr>
-                            <td class="label">
-                                <asp:Label ID="lblMotherMedicalNo" runat="server" Text="Mother MRN"></asp:Label>
+                            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:Label ID="lblMotherMedicalNo" runat="server" Text="MRN"></asp:Label>
                             </td>
                             <td class="entry300">
                                 <table cellpadding="0" cellspacing="0">
@@ -560,34 +595,16 @@
                             <td width="10px"></td>
                             <td></td>
                         </tr>
+                        <tr>
+                            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<asp:Label ID="lblMotherSsn" runat="server" Text="SSN"></asp:Label>
+                            </td>
+                            <td class="entry300">
+                                <telerik:RadTextBox ID="txtMotherSsn" runat="server" Width="300px" MaxLength="16" />
+                            </td>
+                            <td width="10px"></td>
+                            <td></td>
+                        </tr>
                     </asp:Panel>
-                    <tr>
-                        <td class="label">
-                            <asp:Label ID="lblSSN" runat="server" Text="SSN"></asp:Label>
-                        </td>
-                        <td class="entry300">
-                            <table cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td>
-                                        <telerik:RadTextBox ID="txtSSN" runat="server" Width="300px" MaxLength="16">
-                                        </telerik:RadTextBox>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <asp:ImageButton runat="server" ID="btnInfoDukcapil" ImageUrl="~/Images/infoblue16.png" ToolTip="Info Dukcapil" OnClientClick="openWinDukcapil();return false;" />
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td width="10px">
-                            <asp:RequiredFieldValidator ID="rfvSSN" runat="server" ErrorMessage="SSN required."
-                                ValidationGroup="entry" ControlToValidate="txtSSN" SetFocusOnError="True" Width="20px"
-                                Visible="False">
-                                <asp:Image ID="Image9" runat="server" SkinID="rfvImage" />
-                            </asp:RequiredFieldValidator>
-                        </td>
-                        <td></td>
-                    </tr>
                     <tr>
                         <td class="label">
                             <asp:Label ID="lblPassportNo" runat="server" Text="Passport No"></asp:Label>

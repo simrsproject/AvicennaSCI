@@ -3197,6 +3197,7 @@
     <Content Include="Module\RADT\SatuSehat\SatuSehatILPDetail.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatKYC.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx" />
+    <Content Include="Module\RADT\SatuSehat\PostDataInfo.aspx" />
     <Content Include="Module\RADT\SatuSehat\SatuSehatResultInfo.aspx" />
     <Content Include="Module\RADT\SatuSehat\ProcessDataToSatuSehat.aspx" />
     <Content Include="Module\RADT\UpdateReferral\UpdateReferralDetail.aspx" />
@@ -21758,6 +21759,13 @@
     </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatRawatInap.aspx.designer.cs">
       <DependentUpon>SatuSehatRawatInap.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\PostDataInfo.aspx.cs">
+      <DependentUpon>PostDataInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\SatuSehat\PostDataInfo.aspx.designer.cs">
+      <DependentUpon>PostDataInfo.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\SatuSehat\SatuSehatResultInfo.aspx.cs">
       <DependentUpon>SatuSehatResultInfo.aspx</DependentUpon>
