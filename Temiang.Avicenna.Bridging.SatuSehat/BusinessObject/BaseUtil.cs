@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -71,7 +72,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
         #region Common Method
         private static Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.TokenResponse _tokenRespose = null;
         private static DateTime _tokenExpireDate = DateTime.MinValue;
-        private Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.TokenResponse GetToken()
+        public Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.TokenResponse GetToken()
         {
             if (_tokenRespose != null && _tokenExpireDate > DateTime.Now.AddMinutes(10)) // Token anggap expired jika 10 menit lagi
                 return _tokenRespose;
@@ -102,7 +103,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
                     _tokenExpireDate = DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt());
                 }
                 else
-                    throw new Exception("Token not valid json format");
+                    throw new Exception("Failed to get Satusehat Token");
             }
             catch (Exception ex)
             {
@@ -138,7 +139,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
             }
             else
             {
-                ssResult.ErrorResponse = response.Content;
+                ssResult.ErrorResponse = response.Content ?? response.ErrorMessage;
             }
 
             ssResult.ResourceType = resourceType + "/Patch";
@@ -156,27 +157,12 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
             var request = new RestRequest();
             request.Method = method;
 
-            //if (string.IsNullOrWhiteSpace(accessToken) && HttpContext.Current.Cache["ssAccessToken"] != null)
-            //    accessToken = HttpContext.Current.Cache["ssAccessToken"].ToString();
-
-            //if (string.IsNullOrWhiteSpace(accessToken))
-            //{
-            //    var tokenResponse = GetToken();
-            //    if (tokenResponse != null)
-            //    {
-            //        accessToken = tokenResponse.AccessToken;
-            //        HttpContext.Current.Cache.Insert("ssAccessToken", accessToken, null,
-            //            DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt()), TimeSpan.Zero);
-            //    }
-            //}
-
             if (string.IsNullOrWhiteSpace(accessToken))
                 accessToken = GetToken().AccessToken;
 
             request.AddHeader("Authorization", String.Format("Bearer {0}", accessToken));
 
             var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
-            //var timeOut = Convert.ToInt16(timeOutPar) * 1000;
             request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
 
             if (!string.IsNullOrWhiteSpace(requestBody))
@@ -198,61 +184,11 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
         public RestResponse RestClientPut(string requestBody, string resourceType, ref string accessToken)
         {
-            var baseUrl = string.IsNullOrEmpty(resourceType) ? BaseUrl : string.Concat(BaseUrl, "/", resourceType);
-            var client = new RestClient(baseUrl);
-            var request = new RestRequest();
-            request.Method = Method.Put;
-
-            if (string.IsNullOrWhiteSpace(accessToken) && HttpContext.Current.Cache["ssAccessToken"] != null)
-                accessToken = HttpContext.Current.Cache["ssAccessToken"].ToString();
-
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                var tokenResponse = GetToken();
-                if (tokenResponse != null)
-                {
-                    accessToken = tokenResponse.AccessToken;
-                    HttpContext.Current.Cache.Insert("ssAccessToken", accessToken, null,
-                        DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt()), TimeSpan.Zero);
-                }
-            }
-
-            request.AddHeader("Authorization", String.Format("Bearer {0}", accessToken));
-            request.AddHeader("Content-Type", "application/json");
-
-            var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
-            //var timeOut = Convert.ToInt16(timeOutPar) * 1000;
-            request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
-
-            request.AddParameter("application/json", requestBody, ParameterType.RequestBody);
-            return client.Execute(request);
+            var url = string.IsNullOrEmpty(resourceType) ? BaseUrl : string.Concat(BaseUrl, "/", resourceType);
+            return RestClientExecute(requestBody, url, ref accessToken, RestSharp.Method.Put);
         }
         public RestResponse RestClientGet(string url, ref string accessToken)
         {
-            if (string.IsNullOrWhiteSpace(accessToken) && HttpContext.Current.Cache["ssAccessToken"] != null)
-                accessToken = HttpContext.Current.Cache["ssAccessToken"].ToString();
-
-            if (string.IsNullOrWhiteSpace(accessToken))
-            {
-                var tokenResponse = GetToken();
-                if (tokenResponse != null)
-                {
-                    accessToken = tokenResponse.AccessToken;
-                    HttpContext.Current.Cache.Insert("ssAccessToken", accessToken, null,
-                        DateTime.Now.AddSeconds(tokenResponse.ExpiresIn.ToInt()), TimeSpan.Zero);
-                }
-            }
-            var client = new RestClient(url);
-
-            var request = new RestRequest();
-            request.Method = Method.Get;
-            request.AddHeader("Authorization", String.Format("Bearer {0}", accessToken));
-
-            //var body = @"";
-            //request.AddParameter("text/plain", body, ParameterType.RequestBody);
-            var response = client.Execute(request);
-            return response;
-
             return RestClientExecute(string.Empty, url, ref accessToken, RestSharp.Method.Get);
         }
 
@@ -284,7 +220,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
             }
             else
             {
-                ssResult.ErrorResponse = response.Content;
+                ssResult.ErrorResponse = response.Content ?? response.ErrorMessage;
             }
 
             ssResult.ResourceType = resourceType;
@@ -296,7 +232,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
 
 
             // Error Found duplicate resource: xxx RuleNumber: 20002
-            if (ssResult.ErrorResponse.Contains("RuleNumber: 20002"))
+            if (!string.IsNullOrEmpty(ssResult.ErrorResponse) && ssResult.ErrorResponse.Contains("RuleNumber: 20002"))
             {
                 // Pull resource
                 switch (resourceType)
@@ -364,7 +300,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
                     var ssResult = new SatuSehatResult();
                     var gEncounterID = new Guid(encounterID);
                     var diagnoseID = entry.Resource.Code.Coding[0].Code;
-                    ssResult.Query.Where(ssResult.Query.EncounterID == gEncounterID, ssResult.Query.ResourceType== "Condition", ssResult.Query.Category == "Diagnosis", ssResult.Query.Code == diagnoseID);
+                    ssResult.Query.Where(ssResult.Query.EncounterID == gEncounterID, ssResult.Query.ResourceType == "Condition", ssResult.Query.Category == "Diagnosis", ssResult.Query.Code == diagnoseID);
                     if (!ssResult.Query.Load())
                         ssResult = new SatuSehatResult();
 

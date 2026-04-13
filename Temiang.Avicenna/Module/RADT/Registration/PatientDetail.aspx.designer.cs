@@ -132,6 +132,51 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::System.Web.UI.WebControls.ImageButton btnImpBpjsMember;
 
         /// <summary>
+        /// lblSSN control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblSSN;
+
+        /// <summary>
+        /// txtSSN control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtSSN;
+
+        /// <summary>
+        /// btnInfoDukcapil control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnInfoDukcapil;
+
+        /// <summary>
+        /// rfvSSN control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvSSN;
+
+        /// <summary>
+        /// Image9 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image Image9;
+
+        /// <summary>
         /// lblSRSalutation control.
         /// </summary>
         /// <remarks>
@@ -609,6 +654,24 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::Telerik.Web.UI.RadNumericTextBox txtFatherAge;
 
         /// <summary>
+        /// lblFatherSsn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblFatherSsn;
+
+        /// <summary>
+        /// txtFatherSsn control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtFatherSsn;
+
+        /// <summary>
         /// pnlParentInformationMother control.
         /// </summary>
         /// <remarks>
@@ -690,49 +753,22 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::Telerik.Web.UI.RadNumericTextBox txtMotherAge;
 
         /// <summary>
-        /// lblSSN control.
+        /// lblMotherSsn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblSSN;
+        protected global::System.Web.UI.WebControls.Label lblMotherSsn;
 
         /// <summary>
-        /// txtSSN control.
+        /// txtMotherSsn control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Telerik.Web.UI.RadTextBox txtSSN;
-
-        /// <summary>
-        /// btnInfoDukcapil control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.ImageButton btnInfoDukcapil;
-
-        /// <summary>
-        /// rfvSSN control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator rfvSSN;
-
-        /// <summary>
-        /// Image9 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Image Image9;
+        protected global::Telerik.Web.UI.RadTextBox txtMotherSsn;
 
         /// <summary>
         /// lblPassportNo control.

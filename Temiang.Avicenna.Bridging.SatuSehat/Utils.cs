@@ -30,6 +30,14 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
 
     public class Utils : Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.BaseUtil
     {
+        public Utils()
+        {
+            // Handle error The request was aborted: Could not create SSL/TLS secure channel (Handono 20260411)
+            System.Net.ServicePointManager.SecurityProtocol =
+                System.Net.SecurityProtocolType.Tls12 |
+                System.Net.SecurityProtocolType.Tls11 |
+                System.Net.SecurityProtocolType.Tls;
+        }
 
         #region Consent
         public Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.ConsentResponse.Root GetConsent(string patientID)
@@ -125,9 +133,9 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             }
 
 
-            if (string.IsNullOrWhiteSpace(pat.Ssn))
+            if (string.IsNullOrWhiteSpace(pat.Ssn) && string.IsNullOrWhiteSpace(pat.MotherSsn))
             {
-                satuSehatLog.ErrorResponse = "SSN can not empty, please complete the SSN on the master patient";
+                satuSehatLog.ErrorResponse = "SSN can not empty, please complete the SSN / Mother SSN on the master patient";
                 satuSehatLog.Save();
                 return string.Empty;
             }
@@ -136,7 +144,13 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             if (string.IsNullOrWhiteSpace(patSs.BridgingID))
             {
                 // Retrieve SS Patient ID
-                var response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id", string.Concat("nik|", pat.Ssn), ref accessToken);
+                var response = new RestResponse();
+
+                if (!string.IsNullOrEmpty(pat.Ssn))
+                    response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id/", string.Concat("nik|", pat.Ssn), ref accessToken);
+                else if (!string.IsNullOrEmpty(pat.MotherSsn))
+                    response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id/", string.Concat("nik-ibu|", pat.MotherSsn, "&birthdate=", pat.DateOfBirth.Value.ToString("yyyy-MM-dd")), ref accessToken);
+
                 if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var patientSearchResponse = JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.PatientSearch.PatientSearchResponse>(response.Content);
@@ -165,7 +179,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 }
                 else
                 {
-                    satuSehatLog.ErrorResponse = string.Format("{0}. {1}", response.ErrorMessage, response.Content);
+                    satuSehatLog.ErrorResponse = string.Format("Please check SSN. {0}. {1}", response.ErrorMessage, response.Content);
                     satuSehatLog.Save();
                     return string.Empty;
                 }
@@ -17341,6 +17355,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             var servReqs = string.Empty;
             var specimens = string.Empty;
             var itemCount = 0;
+            var isSpecimenExist = false;
+
             foreach (var ssResult in ssServiceReqs)
             {
                 var tci = new TransChargesItem();
@@ -17390,9 +17406,12 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 ssSpecimen.Query.Where(ssSpecimen.Query.EncounterID == satuSehatLog.EncounterID, ssSpecimen.Query.ResourceType == "Specimen", ssSpecimen.Query.Category == transactionNo, ssSpecimen.Query.Code == tci.SequenceNo);
                 ssSpecimen.Query.es.Top = 1;
                 if (ssSpecimen.Query.Load())
+                {
+                    isSpecimenExist = true;
                     specimens = string.Concat(specimens, ssSpecimen.ResultID.ToString(), "~");
+                }
                 else
-                    specimens = string.Concat(specimens, "-", "~");
+                    specimens = string.Concat(specimens, "~");
             }
 
             if (!string.IsNullOrWhiteSpace(itemIds))
@@ -17436,6 +17455,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 else
                 {
                     itemIds = itemIds.Remove(itemIds.Length - 1);
+                    seqNos = string.Empty; // Untuk order yg digabung jadi 1 record, info seqno nya diisi kosong
                     itemNames = itemNames.Remove(itemNames.Length - 1);
 
                     if (!string.IsNullOrEmpty(loincIds))
@@ -17447,10 +17467,12 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                     if (!string.IsNullOrEmpty(servReqs))
                         servReqs = servReqs.Remove(servReqs.Length - 1);
 
-                    if (!string.IsNullOrEmpty(specimens))
+                    if (isSpecimenExist && !string.IsNullOrEmpty(specimens))
                         specimens = specimens.Remove(specimens.Length - 1);
+                    else
+                        specimens = string.Empty;
 
-                    AddToSatusehatOrderedItems(lisConnectionName, satuSehatLog, patSs, parSs, itemIds, itemNames, loincIds, loincNames, servReqs, specimens, orderNumber, string.Empty);
+                    AddToSatusehatOrderedItems(lisConnectionName, satuSehatLog, patSs, parSs, itemIds, itemNames, loincIds, loincNames, servReqs, specimens, orderNumber, seqNos);
                 }
             }
         }
@@ -17485,10 +17507,14 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             if (!string.IsNullOrEmpty(loinscName))
                 ssItem.SSLoincName = loinscName;
 
-            if (!string.IsNullOrEmpty(servReq))
+            if (string.IsNullOrEmpty(servReq))
+                ssItem.str.SSServiceRequestID = string.Empty;
+            else
                 ssItem.SSServiceRequestID = servReq;
 
-            if (!string.IsNullOrEmpty(specimen) && !specimen.Equals("-"))
+            if (string.IsNullOrEmpty(specimen))
+                ssItem.str.SSSpecimenID = string.Empty;
+            else
                 ssItem.SSSpecimenID = specimen;
 
             ssItem.Save();

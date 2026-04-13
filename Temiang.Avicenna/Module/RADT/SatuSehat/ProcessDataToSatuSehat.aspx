@@ -26,7 +26,23 @@
                 oWnd.center();
                 oWnd.show();
             }
+            function openPostDataInfo(regno,eid, rtype, idxno) {
+                var oWnd = $find("<%= winInfo.ClientID %>");
+                var url = 'PostDataInfo.aspx?regno=' + regno + '&eid=' + eid + '&rtype=' + rtype + '&idxno=' + idxno;
+                oWnd.setUrl(url);
+                oWnd.setSize(1040, 600);
+                oWnd.center();
+                oWnd.show();
+            }
 
+            function openWinPatient(mode, pid) {
+                var oWnd = $find("<%= winInfo.ClientID %>");
+                var url = "<%= Temiang.Avicenna.Common.Helper.UrlRoot() %>/Module/RADT/Registration/PatientDetail.aspx?md=" + mode + "&md2=" + mode + "&pid=" + pid + "&pt=patient&rt=OPR"
+                oWnd.setUrl(url);
+                oWnd.setSize(1300, 800);
+                oWnd.center();
+                oWnd.show();
+            }
             function CloseStatus(registrationNo) {
                 if (confirm("Close this pending SatuSehat data?"))
                     __doPostBack("<%= grdRegisteredList.UniqueID %>", "closestatus|" + registrationNo);
@@ -245,8 +261,14 @@
                 <telerik:GridBoundColumn HeaderStyle-Width="80px" DataField="PatientBridgingID" HeaderText="Satu Sehat PID"
                     UniqueName="PatientBridgingID" SortExpression="PatientBridgingID" HeaderStyle-HorizontalAlign="Center"
                     ItemStyle-HorizontalAlign="Left" />
-                <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name" UniqueName="PatientName"
-                    SortExpression="PatientName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" HeaderStyle-Width="200px" />
+                <telerik:GridTemplateColumn HeaderText="Patient Name" UniqueName="PatientName">
+                    <HeaderStyle HorizontalAlign="Left" Width="200px" />
+                    <ItemStyle HorizontalAlign="Left" />
+                    <ItemTemplate>
+                        <%# string.Format("<a style=\"cursor: pointer;\" onclick=\"openWinPatient('edit','{0}')\"><img src=\"../../../Images/Toolbar/views16.png\" border=\"0\" alt=\"Patient View\" title=\"Patient View\" />&nbsp;{1}</a>", DataBinder.Eval(Container.DataItem, "PatientID"), DataBinder.Eval(Container.DataItem, "PatientName"))%>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
+
                 <telerik:GridBoundColumn HeaderStyle-Width="50px" DataField="Sex" HeaderText="Gender"
                     UniqueName="Sex" SortExpression="Sex" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridBoundColumn DataField="ServiceUnitName" HeaderText="Service Unit" UniqueName="ServiceUnitName"
@@ -287,7 +309,7 @@
                     <HeaderStyle HorizontalAlign="Left" Width="300px" />
                     <ItemStyle HorizontalAlign="Left" />
                     <ItemTemplate>
-                        <%# string.Format("<a style=\"cursor: pointer;\" onclick=\"openSatuSehatResultInfo('Encounter','{0}')\"><img src=\"../../../Images/Toolbar/views16.png\" border=\"0\" alt=\"Result View\" title=\"Result View\" />&nbsp;{0}</a>", DataBinder.Eval(Container.DataItem, "EncounterID"))%>
+                        <%# string.IsNullOrWhiteSpace(DataBinder.Eval(Container.DataItem, "EncounterID").ToString()) ? string.Empty : string.Format("<a style=\"cursor: pointer;\" onclick=\"openSatuSehatResultInfo('Encounter','{0}')\"><img src=\"../../../Images/Toolbar/views16.png\" border=\"0\" alt=\"Result View\" title=\"Result View\" />&nbsp;{0}</a>", DataBinder.Eval(Container.DataItem, "EncounterID"))%>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
                 <telerik:GridDateTimeColumn DataField="LastUpdateDateTime" HeaderText="Proccess Date" UniqueName="LastUpdateDateTime">
@@ -298,6 +320,7 @@
                     HeaderText="Last Error Process" ItemStyle-HorizontalAlign="Left">
                     <ItemTemplate>
                         <%# DataBinder.Eval(Container.DataItem, "ErrorResponse")%>
+                        <%# string.IsNullOrWhiteSpace(DataBinder.Eval(Container.DataItem, "ErrorResponse").ToString()) ? string.Empty : string.Format("<a style=\"cursor: pointer;\" onclick=\"openPostDataInfo('{0}','','','')\"><img src=\"../../../Images/Toolbar/views16.png\" border=\"0\" alt=\"Post Data View\" title=\"Post Data View\" /></a>", DataBinder.Eval(Container.DataItem, "RegistrationNo"))%>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
 
@@ -330,7 +353,7 @@
                                     <HeaderStyle HorizontalAlign="Left" Width="300px" />
                                     <ItemStyle HorizontalAlign="Left" />
                                     <ItemTemplate>
-<%--                                        <asp:LinkButton ID="lbtnResend" runat="server" CommandName="Resend" Visible='<%# DataBinder.Eval(Container.DataItem, "ResultID") == DBNull.Value%>'
+                                        <%--                                        <asp:LinkButton ID="lbtnResend" runat="server" CommandName="Resend" Visible='<%# DataBinder.Eval(Container.DataItem, "ResultID") == DBNull.Value%>'
                                             ToolTip='Resend' CommandArgument='<%# string.Format("{0}|{1}|{2}|{3}|{4}", DataBinder.Eval(Container.DataItem, "RegistrationNo"), DataBinder.Eval(Container.DataItem, "HeaderEncounterID"),DataBinder.Eval(Container.DataItem, "ResourceType"),DataBinder.Eval(Container.DataItem, "Category"),DataBinder.Eval(Container.DataItem, "Code")) %>'>
                                     <img src="../../../Images/Toolbar/refresh16.png" border="0" />
                                         </asp:LinkButton>--%>
@@ -348,6 +371,7 @@
                                     HeaderText="Last Error Process" ItemStyle-HorizontalAlign="Left">
                                     <ItemTemplate>
                                         <%# DataBinder.Eval(Container.DataItem, "ErrorResponse")%>
+                                        <%# string.IsNullOrWhiteSpace(DataBinder.Eval(Container.DataItem, "ErrorResponse").ToString()) ? string.Empty : string.Format("<a style=\"cursor: pointer;\" onclick=\"openPostDataInfo('','{0}','{1}','{2}')\"><img src=\"../../../Images/Toolbar/views16.png\" border=\"0\" alt=\"Post Data View\" title=\"Post Data View\" /></a>", DataBinder.Eval(Container.DataItem, "EncounterID"), DataBinder.Eval(Container.DataItem, "ResourceType"), DataBinder.Eval(Container.DataItem, "IndexNo"))%>
                                     </ItemTemplate>
                                 </telerik:GridTemplateColumn>
                             </Columns>

@@ -114,3 +114,9 @@ Titipan Daniel
 
 ---[10-04-2026 - Apip]---
 1.	bugfix rencana kontrol pasien HD poli kontrol ginjal hipertensi tidak muncul
+
+---[12-04-2026 - Handono]---
+- Satusehat: Handle error The request was aborted: Could not create SSL/TLS secure channel
+- Satusehat: Add Link Patient Detail, diperlukan untuk update SSN menggunakan hak akses Registration OutPatient
+- Satusehat: Pencarian PatientID menggunakan SSN ibu
+- Patient Detail: Add Entry Mother & Father SSN 
