@@ -3581,8 +3581,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 regDateTime = reg.RegistrationDate.Value;
             }
 
-            var startTime = regDateTime.AddHours(GmtDif).ToString(DateFormatSort) + "+00:00";
-            var endTime = regDateTime.AddHours(GmtDif).AddMinutes(1).ToString(DateFormatSort) + "+00:00";
+            var startTime = regDateTime.AddHours(GmtDif).ToString(DateFormatLong) + "+00:00";
+            var endTime = regDateTime.AddHours(GmtDif).AddMinutes(30).ToString(DateFormatLong) + "+00:00";
 
 
             var postData = new
