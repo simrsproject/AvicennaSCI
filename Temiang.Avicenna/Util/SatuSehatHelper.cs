@@ -1323,7 +1323,7 @@ namespace Temiang.Avicenna.Util
                 var sb = new BedQuery("sb");
                 var bs = new BedStatusHistoryQuery("bs");
                 sb.InnerJoin(bs).On(sb.BedID == bs.BedID);
-                sb.Where(bs.RegistrationNo == "REG/IP/251014-0002");
+                sb.Where(bs.RegistrationNo == registrationNo);
                 sb.OrderBy(bs.LastUpdateDateTime.Descending);
                 sb.es.Top = 1;
                 var dtb = sb.LoadDataTable();
