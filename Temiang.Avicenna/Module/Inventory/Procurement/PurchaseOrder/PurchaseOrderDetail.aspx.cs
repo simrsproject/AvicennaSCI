@@ -13,6 +13,7 @@ using Temiang.Avicenna.BusinessObject.Reference;
 using DevExpress.Web.Internal.XmlProcessor;
 using static DevExpress.XtraEditors.ViewInfo.BaseListBoxViewInfo;
 using System.Text;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
@@ -620,12 +621,13 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             ajax.AddAjaxSetting(chkIsConsignment, chkIsAssets);
             ajax.AddAjaxSetting(chkIsAssets, chkIsConsignmentAlreadyReceived);
 
-            ajax.AddAjaxSetting(chkIsTaxable, txtTaxPercentage);
-            ajax.AddAjaxSetting(chkIsTaxable, txtTaxAmount);
-            ajax.AddAjaxSetting(chkIsTaxable, txtTotal);
+            //ajax.AddAjaxSetting(chkIsTaxable, txtTaxPercentage);
+            //ajax.AddAjaxSetting(chkIsTaxable, txtTaxAmount);
+            //ajax.AddAjaxSetting(chkIsTaxable, txtTotal);
             //ajax.AddAjaxSetting(chkIsTaxable, txtPph22);
             //ajax.AddAjaxSetting(chkIsTaxable, txtPph23);
 
+            ajax.AddAjaxSetting(rblTypesOfTaxes, grdItemTransactionItem);
             ajax.AddAjaxSetting(rblTypesOfTaxes, txtTaxPercentage);
             ajax.AddAjaxSetting(rblTypesOfTaxes, txtTaxAmount);
             ajax.AddAjaxSetting(rblTypesOfTaxes, txtTotal);
@@ -1847,11 +1849,21 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                                             ((entity.Price - (entity.Price * entity.Discount1Percentage / 100)) *
                                              entity.Discount2Percentage / 100);
 
+                        //db:tax 20260129 - ppn dikeluarkan dari price
+                        if (rblTypesOfTaxes.SelectedIndex == 1 && (entity.IsTaxable ?? false) && chkIsNewTaxCalculation.Checked)
+                        {
+                            var prices = Helper.GetReversePriceValueV3((entity.Price ?? 0), entity.Discount1Percentage ?? 0, entity.Discount2Percentage ?? 0, entity.Discount ?? 0, Convert.ToDecimal(txtTaxPercentage.Value) / 100);
+
+                            entity.Price = prices[0];
+                            entity.Discount = prices[1];
+                        }
+
                         totaltransaction += (entity.Price * entity.Quantity);
                         totaldiscitem += (entity.Discount * entity.Quantity);
 
                         if (entity.IsTaxable ?? false)
                             totaltax += ((entity.Price - entity.Discount) * entity.Quantity);
+
                     }
                 }
 
@@ -1913,8 +1925,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
         protected void cboBusinessPartnerID_SelectedIndexChanged(object o, RadComboBoxSelectedIndexChangedEventArgs e)
         {
             //GetContractNo();
-            UpdateItemPrice();
             GetTax(e.Value);
+            UpdateItemPrice();
             CalculateTax();
         }
 
@@ -1928,6 +1940,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             else
                 txtTaxPercentage.Value = 0;
 
+            UpdateItemPrice();
             CalculateTax();
         }
 
@@ -2442,6 +2455,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             else
                 txtTaxPercentage.Value = 0;
 
+            UpdateItemPrice();
             CalculateTax();
         }
 

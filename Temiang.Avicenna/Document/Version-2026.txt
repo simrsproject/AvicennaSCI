@@ -120,3 +120,6 @@ Titipan Daniel
 - Satusehat: Add Link Patient Detail, diperlukan untuk update SSN menggunakan hak akses Registration OutPatient
 - Satusehat: Pencarian PatientID menggunakan SSN ibu
 - Patient Detail: Add Entry Mother & Father SSN 
+
+---[15-04-2026 - Deby]---
+1. bugfix form po (odoo task: 6980) --> u/ kasus pada saat perubahn status tax, price  di item detail tidak berubah.
