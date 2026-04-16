@@ -1150,6 +1150,7 @@ namespace Temiang.Avicenna.BusinessObject
             acc_IsJournalAssets,
             AntibioticMaxConsumeDay,
             acc_JournalAssetsAmount,
+            AssetLimitAmount,
             acc_AssetInventoryAmountLimit,
             acc_EconomicLifeInYearLimit,
             IsVoucherListShowVoid,
@@ -2416,6 +2417,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string AntibioticMaxConsumeDay = "Standard maximal day consume Antibiotic (default 7)|7| |False";
             public const string acc_IsJournalAssets = "Is Journal Assets (POR)? (Yes/No)|No| |False";
             public const string acc_JournalAssetsAmount = "Journal Assets Amount|10000000| |False";
+            public const string AssetLimitAmount = "Asset Limit Amount|500000| |False";
             public const string acc_AssetInventoryAmountLimit = "Asset Inventory Amount Limit (as Cost for PO asset validation)|500000| |False";
             public const string acc_EconomicLifeInYearLimit = "Economic Life In Year Limit (for PO asset validation)|1| |False";
             public const string acc_AssetDepreciationAmountLimit = "Asset Depreciation Amount Limit|10000000| |False";

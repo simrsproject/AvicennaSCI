@@ -123,3 +123,6 @@ Titipan Daniel
 
 ---[15-04-2026 - Deby]---
 1. bugfix form po (odoo task: 6980) --> u/ kasus pada saat perubahn status tax, price  di item detail tidak berubah.
+
+---[16-04-2026 - Danang]---
+1. CR Ubah XML RSI film no jadi MRN

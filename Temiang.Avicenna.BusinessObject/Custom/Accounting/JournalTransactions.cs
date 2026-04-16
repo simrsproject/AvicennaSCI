@@ -28079,7 +28079,7 @@ namespace Temiang.Avicenna.BusinessObject
                     var isInventory = true;
                     var isAsset = itemInv.IsAsset ?? (e.IsAssets ?? false);
 
-                    IsAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets) && isAsset;
+                    IsAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets) && isAsset; 
 
                     switch (itemInv.SRItemType)
                     {
