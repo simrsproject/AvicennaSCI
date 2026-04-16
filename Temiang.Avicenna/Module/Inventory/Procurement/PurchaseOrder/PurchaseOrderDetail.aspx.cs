@@ -842,7 +842,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     var assetValidationMsg = string.Empty;
                     var inventoryValidationMsg = string.Empty;
 
-                    var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.acc_JournalAssetsAmount));
+                    var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.AssetLimitAmount));
 
                     foreach (var p in ItemTransactionItems)
                     {

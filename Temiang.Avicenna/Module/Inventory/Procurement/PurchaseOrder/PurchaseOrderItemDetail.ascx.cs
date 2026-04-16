@@ -521,7 +521,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     var isAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets);
                     if (isAssetsJournaled)
                     {
-                        var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.acc_JournalAssetsAmount));
+                        var assetLimitAmount = Convert.ToDecimal(AppParameter.GetParameterValue(AppParameter.ParameterItem.AssetLimitAmount));
                         if (!(chkIsBonusItem.Checked))
                         {
                             var amount = (Convert.ToDecimal(txtPrice.Value) - Convert.ToDecimal(txtDiscountAmount.Value)) * (1 + (Convert.ToDecimal(TxtTaxPercentage.Value) / 100));
