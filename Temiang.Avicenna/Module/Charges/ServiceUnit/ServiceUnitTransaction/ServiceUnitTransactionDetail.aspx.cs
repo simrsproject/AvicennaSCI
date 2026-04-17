@@ -5410,7 +5410,7 @@ namespace Temiang.Avicenna.Module.Charges
                                                                 //}
                                                                 //else 
                                                                 root.patientid = patient.MedicalNo;
-                                                                root.mrn = patient.MedicalNo;
+                                                                root.mrn = detail.FilmNo;
                                                                 root.name = patient.PatientName;
                                                                 root.address = patient.Address;
                                                                 root.sex = patient.Sex;
