@@ -1162,20 +1162,24 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         protected override void RaisePostBackEvent(IPostBackEventHandler source, string eventArgument)
         {
-            base.RaisePostBackEvent(source, eventArgument);
-            if (string.IsNullOrEmpty(eventArgument)) return;
-            var argsCust = eventArgument.Split('|')[0];
+            if (string.IsNullOrEmpty(eventArgument))
+            {
+                base.RaisePostBackEvent(source, eventArgument);
+                return;
+            }
+
+            var parts = eventArgument.Split('|');
+            var argsCust = parts.Length > 0 ? parts[0] : "";
 
             if (argsCust == "sendvalidate")
             {
-                var mode = eventArgument.Contains("|")
-                    ? eventArgument.Split('|')[1]
-                    : "send";
-
+                var mode = parts.Length > 1 ? parts[1] : "send";
                 HandleSendValidate(mode);
                 return;
             }
-           
+
+            base.RaisePostBackEvent(source, eventArgument);
+
             RegistrationPathwayCollection rpc;
 
             var args = eventArgument.Split('|').Count() > 0 ? eventArgument.Split('|')[0] : eventArgument;
@@ -2798,6 +2802,19 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             var btn = RadToolBar2.FindItemByValue("sendvalidate") as RadToolBarButton;
 
             bool isSend = mode == "send";
+            var reg = new Registration();
+            reg.LoadByPrimaryKey(Request.QueryString["regno"]);
+            if(reg.IsClosed == true)
+            {
+                ScriptManager.RegisterStartupScript(
+                                this,
+                                GetType(),
+                                "regclosed",
+                                "alert('Registration Is Closed.');",
+                                true
+                            );
+                return;
+            }
 
             SendToDpjpValidation(isSend);
             InitSendValidateButton();
