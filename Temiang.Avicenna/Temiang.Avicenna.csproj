@@ -1824,6 +1824,9 @@
     <Content Include="Document\2025\09\iDRG\04. Master ICD9\4. Script Insert Procedure.sql" />
     <Content Include="Document\2025\09\iDRG\04. Master ICD9\5. Script Update Procedure.sql" />
     <Content Include="Document\2025\09\iDRG\index.php" />
+    <None Include="Document\Bpjs Face Scan\Readme.md" />
+    <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
+    <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
     <None Include="Document\dll\NCalc.dll" />
     <Content Include="Document\2023\09\01\01. DocumentFiles - Alter.sql" />
