@@ -2069,6 +2069,7 @@
     <Content Include="Document\2026\04\08\080101. ServiceRoomBridging-Create.sql" />
     <Content Include="Document\2026\04\08\080102. Alter Table Bed.sql" />
     <Content Include="Document\2026\04\08\080103. Alter_Table_PastMedicalHistory.sql" />
+    <Content Include="Document\2026\04\10\alter_sp_GetLatestIPRRegistration.sql" />
     <Content Include="Document\Dokumentasi API\Dokumentasi Setting Antrian V2.txt" />
     <Content Include="Document\Dokumentasi API\Dokumentasi API Queuing.txt" />
     <Content Include="Document\Ews Pews Meows Setting\00. Readme.txt" />

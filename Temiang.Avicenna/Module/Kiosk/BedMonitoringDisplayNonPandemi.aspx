@@ -22,7 +22,7 @@
         }
 
         .myTh {
-            font-size: 18px;
+            font-size: 35px;
         }
 
         .myThNum {
@@ -97,7 +97,7 @@
                     "createdCell": function (td, cellData, rowData, row, col) {
                         $(td).css('padding-top', '0px');
                         $(td).css('padding-bottom', '0px');
-                        $(td).css('font-size', '20px');
+                        $(td).css('font-size', '35px');
                     }
                 }],
                 "createdRow": function (row, data, dataIndex) {
