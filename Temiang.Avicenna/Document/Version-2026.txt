@@ -126,3 +126,9 @@ Titipan Daniel
 
 ---[16-04-2026 - Danang]---
 1. CR Ubah XML RSI film no jadi MRN
+
+---[21-04-2026 - Nuno]---
+1. Pindahin resource App Frista dari avicenna-emr ke source ybrs
+
+---[22-04-2026 - Apip]---
+1.	modif PatientAssessment di mds ambil jadi descending

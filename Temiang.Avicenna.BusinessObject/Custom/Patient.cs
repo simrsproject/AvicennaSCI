@@ -423,7 +423,7 @@ namespace Temiang.Avicenna.BusinessObject
                     qra.Where(qra.RegistrationNo == registrationNo);
                 //qra.Where(qra.RegistrationNo.In(mergeRegistrations));
 
-                qra.OrderBy(qra.RegistrationInfoMedicID.Ascending);
+                qra.OrderBy(qra.RegistrationInfoMedicID.Descending);
                 qra.es.Top = 1;
                 var assesment = new PatientAssessment();
                 if (assesment.Load(qra))
