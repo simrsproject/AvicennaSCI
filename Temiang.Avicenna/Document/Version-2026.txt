@@ -132,3 +132,6 @@ Titipan Daniel
 
 ---[22-04-2026 - Apip]---
 1.	modif PatientAssessment di mds ambil jadi descending
+
+---[22-04-2026 - Wiliam]---
+1. Menambahkan Badge Count untuk Patient Info pada EmrList.aspx.cs method RegistrationNoteCount()

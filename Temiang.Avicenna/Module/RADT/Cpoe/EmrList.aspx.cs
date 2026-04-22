@@ -2915,6 +2915,12 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             var si = new RegistrationInfoSumary();
             if (si.LoadByPrimaryKey(regNo))
                 noteCount = si.NoteCount;
+            
+            var patientID = DataBinder.Eval(container.DataItem, "PatientID").ToString();
+            var pi = new PatientInfoSumary();
+            if (pi.LoadByPrimaryKey(patientID))
+                noteCount += pi.NoteCount;
+
             return (string.Format("<a href=\"#\" title=\"Note\" class=\"noti_Container\" onclick=\"openWinRegistrationInfo('{0}'); return false;\"><span id=\"noti_{0}\" class=\"noti_bubble\">{1}</span></a>",
                                                                     regNo, noteCount > 0 ? noteCount.ToString() : string.Empty));
         }
