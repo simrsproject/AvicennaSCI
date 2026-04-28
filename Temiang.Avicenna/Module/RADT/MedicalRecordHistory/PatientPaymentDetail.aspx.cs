@@ -428,8 +428,9 @@ namespace Temiang.Avicenna.Module.RADT
 
         private string[] MergeRegistrationList(string regNo)
         {
-            if (ViewState["MergeRegistration"] == null)
-                ViewState["MergeRegistration"] = Helper.MergeBilling.GetMergeRegistration(regNo);
+            //if (ViewState["MergeRegistration"] == null)
+            //    ViewState["MergeRegistration"] = Helper.MergeBilling.GetMergeRegistration(regNo);
+            ViewState["MergeRegistration"] = Helper.MergeBilling.GetMergeRegistration(regNo);
 
             return (string[])ViewState["MergeRegistration"];
         }
