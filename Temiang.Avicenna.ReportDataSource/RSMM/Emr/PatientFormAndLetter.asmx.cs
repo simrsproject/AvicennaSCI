@@ -978,8 +978,9 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     education = ConvertDataTabletoObject(PatientEducation(registrationNo)),
                     UnitIntended = StandardReference.GetItemName(AppEnum.StandardReference.UnitIntended, medsum.SRUnitIntended),
                     Dpjp = par.ParamedicName,
-                    DpjpSign = Convert.ToBase64String(imgDpjp)
-
+                    DpjpSign = Convert.ToBase64String(imgDpjp),
+                    DpjpSignByte = imgDpjp,
+                    SignatureImageByte = signimg.SignatureImage
                 };
 
                 var retField = MergeJsonData(HeaderField(pat, reg, null), additionalField);
