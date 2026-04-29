@@ -139,8 +139,10 @@ Titipan Daniel
 ---[28-05-2026 - Dewi]---
 1. Bugfix PatientPaymentDetail, print jadi bermasalah karena parameter RegistrationNoList tidak berganti karena function MergeRegistrationList
 
----[29-05-2026 - Danang]---
+---[29-05-2026 - Wiliam]---
 1. Menambahkan response field pada Temiang.Avicenna.ReportDataSource\RSMM\Emr\PatientFormAndLetter.asmx.cs
+   method MedicalDischargeSummaryOutPatient()
+
    var additionalField = new {
 		.
 		.
