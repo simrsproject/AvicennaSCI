@@ -11865,6 +11865,7 @@ namespace Temiang.Avicenna.BusinessObject
                 decimal price = 0;
                 decimal lastPrice = 0;
                 decimal discPctg = 0;
+                bool isControlExpired = false;
                 switch (item.SRItemType)
                 {
                     case Reference.ItemType.Medical:
@@ -11874,6 +11875,7 @@ namespace Temiang.Avicenna.BusinessObject
                         price = med.PriceInBaseUnit ?? 0;
                         lastPrice = med.LastPriceInBaseUnit ?? 0;
                         discPctg = med.PurchaseDiscount1 ?? 0;
+                        isControlExpired = med.IsControlExpired ?? false;
                         if (!med.IsInventoryItem ?? false)
                             continue;
 
@@ -11885,6 +11887,7 @@ namespace Temiang.Avicenna.BusinessObject
                         price = nmed.PriceInBaseUnit ?? 0;
                         lastPrice = nmed.LastPriceInBaseUnit ?? 0;
                         discPctg = nmed.PurchaseDiscount1 ?? 0;
+                        isControlExpired = nmed.IsControlExpired ?? false;
                         if (!nmed.IsInventoryItem ?? false)
                             continue;
                         break;
@@ -11895,6 +11898,7 @@ namespace Temiang.Avicenna.BusinessObject
                         price = kitc.PriceInBaseUnit ?? 0;
                         lastPrice = kitc.LastPriceInBaseUnit ?? 0;
                         discPctg = kitc.PurchaseDiscount1 ?? 0;
+                        isControlExpired = kitc.IsControlExpired ?? false;
                         if (!kitc.IsInventoryItem ?? false)
                             continue;
                         break;
@@ -12370,8 +12374,37 @@ namespace Temiang.Avicenna.BusinessObject
                                         }
                                         catch (Exception)
                                         {
-                                            itemNoStock = item.ItemName + " [Item Balance Detail Expired]";
-                                            return;
+                                            if (!isControlExpired)
+                                            {
+                                                #region movement
+                                                movement = itemMovements.AddNew();
+                                                movement.MovementDate = Utils.NowAtSqlServer().AddMilliseconds(10 * i);
+                                                movement.ServiceUnitID = serviceUnitID;
+                                                movement.LocationID = locationID;
+                                                movement.TransactionCode = it.TransactionCode;
+                                                movement.TransactionNo = entity.TransactionNo;
+                                                movement.SequenceNo = entity.SequenceNo;
+                                                movement.ItemID = entity.ItemID;
+                                                movement.ExpiredDate = null;
+                                                movement.BatchNumber = null;
+                                                movement.InitialStock = initialStock;
+                                                movement.QuantityOut = qty;
+                                                movement.QuantityIn = 0;
+                                                movement.SRItemUnit = entity.SRItemUnit;
+                                                movement.CostPrice = entity.CostPrice;
+                                                movement.SalesPrice = entity.Price;
+                                                movement.PurchasePrice = entity.Price;
+                                                movement.LastPriceInBaseUnit = lastPrice;
+                                                movement.LastUpdateDateTime = Utils.NowAtSqlServer();
+                                                movement.LastUpdateByUserID = userID;
+                                                #endregion
+                                            }
+                                            else
+                                            {
+                                                itemNoStock = item.ItemName + " [Item Balance Detail Expired]";
+                                                return;
+                                            }
+                                            
                                         }
                                     }
                                 }
@@ -12450,8 +12483,37 @@ namespace Temiang.Avicenna.BusinessObject
                         }
                         catch (Exception)
                         {
-                            itemNoStock = item.ItemName + " [Item Balance Detail Expired]";
-                            return;
+                            if (!isControlExpired)
+                            {
+                                #region movement
+                                var movement = itemMovements.AddNew();
+                                movement.MovementDate = Utils.NowAtSqlServer();
+                                movement.ServiceUnitID = serviceUnitID;
+                                movement.LocationID = locationID;
+                                movement.TransactionCode = it.TransactionCode;
+                                movement.TransactionNo = entity.TransactionNo;
+                                movement.SequenceNo = entity.SequenceNo;
+                                movement.ItemID = entity.ItemID;
+                                movement.ExpiredDate = null;
+                                movement.BatchNumber = null;
+                                movement.InitialStock = balance.Balance + resultQty;
+                                movement.QuantityOut = resultQty;
+                                movement.QuantityIn = 0;
+                                movement.SRItemUnit = entity.SRItemUnit;
+                                movement.CostPrice = entity.CostPrice;
+                                movement.SalesPrice = entity.Price;
+                                movement.PurchasePrice = entity.Price;
+                                movement.LastPriceInBaseUnit = lastPrice;
+                                movement.LastUpdateDateTime = Utils.NowAtSqlServer();
+                                movement.LastUpdateByUserID = userID;
+                                #endregion
+                            }
+                            else
+                            {
+                                itemNoStock = item.ItemName + " [Item Balance Detail Expired]";
+                                return;
+                            }
+                            
                         }
                     }
                 }
