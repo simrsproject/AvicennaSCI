@@ -108,7 +108,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
             qr.Where(qr.ServiceUnitID == txtServiceUnitID.Text, qr.SRBridgingType == Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
             qr.es.Top = 1;
             var dtbCheck = qr.LoadDataTable();
-            if (dtbCheck.Rows.Count < 1)
+            if (dtbCheck.Rows.Count < 1 && grdAliasName.Items.Count > 0)
             {
                 args.MessageText = "Service unit mapping to SATUSEHAT is required.";
                 return;
@@ -134,6 +134,15 @@ namespace Temiang.Avicenna.Module.RADT.Master
             if (entity.LoadByPrimaryKey(txtRoomID.Text))
             {
                 SetEntityValue(entity);
+                var qr = new ServiceUnitBridgingQuery("q");
+                qr.Where(qr.ServiceUnitID == txtServiceUnitID.Text, qr.SRBridgingType == Temiang.Avicenna.BusinessObject.AppParameter.GetParameterValue(Temiang.Avicenna.BusinessObject.AppParameter.ParameterItem.SatuSehatBridgingTypeID));
+                qr.es.Top = 1;
+                var dtbCheck = qr.LoadDataTable();
+                if (dtbCheck.Rows.Count < 1 && grdAliasName.Items.Count > 0)
+                {
+                    args.MessageText = "Service unit mapping to SATUSEHAT is required.";
+                    return;
+                }
                 var ssbType = AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
                 var sb = ServiceRoomBridgings.Where(s => s.SRBridgingType == ssbType && s.BridgingID == "CREATE").FirstOrDefault();
                 var isCreateSsrb = false;
