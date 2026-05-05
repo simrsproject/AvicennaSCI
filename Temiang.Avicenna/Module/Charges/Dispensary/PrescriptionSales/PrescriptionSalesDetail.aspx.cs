@@ -3522,24 +3522,59 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     {
                         if (isEtiketDalam)
                         {
-                            // obat dalam / putih
-                            var parWhiteEtiquette = new PrintJobParameterCollection();
-                            parWhiteEtiquette.AddNew("p_PrescriptionNo", entity.PrescriptionNo, null, null);
-                            parWhiteEtiquette.AddNew("p_SequenceNo", string.Empty, null, null);
-                            parWhiteEtiquette.AddNew("p_Label", "1", null, null);
-                            PrintManager.CreatePrintJob(AppConstant.Report.PrescriptionEtiket, parWhiteEtiquette);
+                            //modified by wiliam 2026-05-05
+                            //cek apakah HealthCareID == RSI && GuarantorID == B2294 (OBAT KRONIS BPJS KESEHATAN)
+                            //jika iya tidak usah direct print
+                            var isDirectPrint = true;
+                            if(AppSession.Parameter.HealthcareID == "RSI")
+                            {
+                                var b2294 = AppSession.Parameter.GetParameterValueString(AppParameter.ParameterItem.Is23DaysPrescriptionUseChronicGuarantor);
+                                if (reg.GuarantorID == b2294)
+                                {
+                                    isDirectPrint = false;
+                                }
+                            }
+
+                            if(isDirectPrint)
+                            {
+                                // obat dalam / putih
+                                var parWhiteEtiquette = new PrintJobParameterCollection();
+                                parWhiteEtiquette.AddNew("p_PrescriptionNo", entity.PrescriptionNo, null, null);
+                                parWhiteEtiquette.AddNew("p_SequenceNo", string.Empty, null, null);
+                                parWhiteEtiquette.AddNew("p_Label", "1", null, null);
+                                PrintManager.CreatePrintJob(AppConstant.Report.PrescriptionEtiket, parWhiteEtiquette);
+                            }
+                            
                         }
                         if (isEtiketLuar)
                         {
-                            // obat luar / biru
-                            var parBlueEtiquette = new PrintJobParameterCollection();
-                            parBlueEtiquette.AddNew("p_PrescriptionNo", entity.PrescriptionNo, null, null);
-                            parBlueEtiquette.AddNew("p_SequenceNo", string.Empty, null, null);
-                            parBlueEtiquette.AddNew("p_Label", "2", null, null);
-                            PrintManager.CreatePrintJob(AppConstant.Report.PrescriptionEtiketLr, parBlueEtiquette);
+
+                            //modified by wiliam 2026-05-05
+                            //cek apakah HealthCareID == RSI && GuarantorID == B2294 (OBAT KRONIS BPJS KESEHATAN)
+                            //jika iya tidak usah direct print
+                            var isDirectPrint = true;
+                            if (AppSession.Parameter.HealthcareID == "RSI")
+                            {
+                                var b2294 = AppSession.Parameter.GetParameterValueString(AppParameter.ParameterItem.Is23DaysPrescriptionUseChronicGuarantor);
+                                if (reg.GuarantorID == b2294)
+                                {
+                                    isDirectPrint = false;
+                                }
+                            }
+
+                            if (isDirectPrint)
+                            {
+                                // obat luar / biru
+                                var parBlueEtiquette = new PrintJobParameterCollection();
+                                parBlueEtiquette.AddNew("p_PrescriptionNo", entity.PrescriptionNo, null, null);
+                                parBlueEtiquette.AddNew("p_SequenceNo", string.Empty, null, null);
+                                parBlueEtiquette.AddNew("p_Label", "2", null, null);
+                                PrintManager.CreatePrintJob(AppConstant.Report.PrescriptionEtiketLr, parBlueEtiquette);
+                            }
                         }
                     }
                 }
+
                 if (AppSession.Parameter.IsAutoPrintPrescriptionReceipt)
                 {
                     var parPrescription = new PrintJobParameterCollection();
