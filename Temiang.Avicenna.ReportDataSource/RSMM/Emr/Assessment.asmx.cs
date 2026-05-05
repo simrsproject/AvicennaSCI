@@ -1076,6 +1076,9 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 PemeriksaanPenunjang = asses.OtherExam,
                 //SignImgUrl = asses.SignImg,
                 SignImgUrl = !string.IsNullOrEmpty(Convert.ToString(au.SignatureImage)) ? Encoding.UTF8.GetBytes(Convert.ToString(au.SignatureImage)) : asses.SignImg,
+                SignImgByte = au.SignatureImage != null
+                            ? ((byte[])au.SignatureImage)
+                            : ((byte[])asses.SignImg),
                 PatientSignImg = asses.PatientSignImg
             };
 
