@@ -150,6 +150,9 @@ Titipan Daniel
         SignatureImageByte = signimg.SignatureImage
    }
 
+---[29-04-2026 - Apip]---
+1.	Perbaikan Bug: saat klik SIP, status pada bed booking ikut berubah menjadi SIP.
+
 ---[05-05-2026 - Wiliam]---
 1. Menambahkan response field pada Assessment.asmx.cs method KidClinic
    var additionalField = new {
@@ -157,3 +160,4 @@ Titipan Daniel
 		.
 		SignImgByte
    }	
+

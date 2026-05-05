@@ -4165,7 +4165,7 @@ namespace Temiang.Avicenna.Module.Charges
                     if (AppSession.Parameter.IsAutoSIPRegOnDischargePermit)
                     {
                         var bedColl = new BedCollection();
-                        bedColl.Query.Where(bedColl.Query.RegistrationNo == reg.RegistrationNo);
+                        bedColl.Query.Where(bedColl.Query.RegistrationNo == reg.RegistrationNo, bedColl.Query.SRBedStatus == AppSession.Parameter.BedStatusOccupied.ToString());
                         bedColl.LoadAll();
                         foreach (var bed in bedColl)
                         {
