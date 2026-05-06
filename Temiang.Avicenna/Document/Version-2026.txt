@@ -153,7 +153,7 @@ Titipan Daniel
 ---[29-04-2026 - Apip]---
 1.	Perbaikan Bug: saat klik SIP, status pada bed booking ikut berubah menjadi SIP.
 
----[05-05-2026 - Wiliam]---
+---[05-05-2026 - Wiliam] ---
 1. Menambahkan response field pada Assessment.asmx.cs method KidClinic
    var additionalField = new {
 		.
@@ -163,3 +163,5 @@ Titipan Daniel
 
 2. Modifikasi PrescriptionSalesDetail.aspx.cs. khusus RSI & Guarantor B2294 tidak usah direct print ketika approve.
 
+--- [06-05-2026 - Wiliam] ---
+1. Modifikasi order by RealizationDateTimeFrom DESC pada method ServiceUnitBookings()

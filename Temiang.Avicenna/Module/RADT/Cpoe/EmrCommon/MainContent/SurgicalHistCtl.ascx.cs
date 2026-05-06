@@ -104,7 +104,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
             query.Where(reg.PatientID == PatientID, query.Or(reg.IsVoid.IsNull(), reg.IsVoid == false), query.Or(query.IsVoid.IsNull(), query.IsVoid == false));
             //query.Where(reg.RegistrationNo.In(RelatedRegistrations)); //TODO: Mungkinkah dimunculkan semua tidak per episode
             query.Where(reg.PatientID.In(PatientRelateds));
-            query.OrderBy(query.BookingNo.Descending);
+            query.OrderBy(query.RealizationDateTimeFrom.Descending);
 
             DataTable dtb = query.LoadDataTable();
             foreach (DataRow row in dtb.Rows)
