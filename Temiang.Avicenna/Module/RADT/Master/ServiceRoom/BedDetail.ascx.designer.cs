@@ -256,5 +256,32 @@ namespace Temiang.Avicenna.Module.RADT.Master
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtNotes;
+
+        /// <summary>
+        /// cboBridgingType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboBridgingType;
+
+        /// <summary>
+        /// cboServiceUnitAliasID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboServiceUnitAliasID;
+
+        /// <summary>
+        /// txtServiceUnitAliasName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtServiceUnitAliasName;
     }
 }

@@ -311,7 +311,7 @@ namespace Temiang.Avicenna.WebService
         {
             var delete = DeleteTempatTidur();
 
-            var sum = JsonConvert.DeserializeObject<List<Json.Request.Insert>>(InsertTempatTidurDataOnly(string.Empty));
+            var sum = JsonConvert.DeserializeObject<List<Json.Request.Insert>>(InsertTempatTidurByRoomDataOnly(string.Empty));
 
             foreach (var data in sum)
             {
@@ -323,7 +323,23 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod]
-        public string InsertTempatTidurDataOnly(string serviceUnitID)
+        public string InsertTempatTidurByBed()
+        {
+            var delete = DeleteTempatTidur();
+
+            var sum = JsonConvert.DeserializeObject<List<Json.Request.Insert>>(InsertTempatTidurByBedDataOnly(string.Empty));
+
+            foreach (var data in sum)
+            {
+                var svc = new Service();
+                var insert = svc.Insert(data);
+            }
+
+            return JsonConvert.SerializeObject(sum);
+        }
+
+        [WebMethod]
+        public string InsertTempatTidurByRoomDataOnly(string serviceUnitID)
         {
             var bed = new BedQuery("a");
             var room = new ServiceRoomQuery("d");
@@ -376,6 +392,87 @@ namespace Temiang.Avicenna.WebService
                         .GroupBy(ss => new { RoomID = ss.Field<string>("RoomID"), BedID = ss.Field<string>("BedID") }).Count().ToString(),
                     Antrian = src.AsEnumerable().Where(ss => ss.Field<string>("RoomID") == s.Key.RoomID && ss.Field<string>("SRBedStatus") == "BedStatus-03")
                         .GroupBy(ss => new { RoomID = ss.Field<string>("RoomID"), BedID = ss.Field<string>("BedID") }).Count().ToString()
+                });
+
+            var sum = list.GroupBy(l => new
+            {
+                l.IdTt,
+                l.RoomID,
+                l.Ruang
+            }).Select(l => new Common.RsOnline.Json.Request.Insert()
+            {
+                IdTt = l.Key.IdTt,
+                Ruang = l.Key.Ruang,
+                JumlahRuang = l.Sum(x => x.JumlahRuang.ToInt()).ToString(),
+                Jumlah = l.Sum(x => x.Jumlah.ToInt()).ToString(),
+                Terpakai = srd.AsEnumerable().Count(ss => ss.Field<string>("RoomID") == l.Key.RoomID && ss.Field<string>("BridgingID") == l.Key.IdTt).ToString(),
+                TerpakaiSuspek = "0",
+                TerpakaiKonfirmasi = "0",
+                Antrian = l.Sum(x => x.Antrian.ToInt()).ToString(),
+                Prepare = "0",
+                PreparePlan = "0",
+                Covid = "0"
+            }).OrderBy(l => l.Ruang);
+
+            return JsonConvert.SerializeObject(sum);
+        }
+
+        [WebMethod]
+        public string InsertTempatTidurByBedDataOnly(string serviceUnitID)
+        {
+            var bed = new BedQuery("a");
+            var room = new ServiceRoomQuery("d");
+            bed.Select(
+                    bed.BridgingID,
+                    room.RoomID,
+                    room.RoomName,
+                    bed.BedID,
+                    bed.SRBedStatus
+                );
+            bed.InnerJoin(room).On(bed.RoomID == room.RoomID && room.IsActive == true);
+            bed.Where(bed.SRBridgingType == AppEnum.BridgingType.RS_ONLINE.ToString(),
+                bed.SRBedStatus.NotIn("BedStatus-07"),
+                bed.IsVisibleTo3rdParty == true,
+                bed.IsActive == true);
+            if (!string.IsNullOrWhiteSpace(serviceUnitID)) bed.Where(room.ServiceUnitID == serviceUnitID);
+            var src = bed.LoadDataTable();
+
+            var regis = new RegistrationQuery("a");
+            bed = new BedQuery("b");
+            regis.Select(
+                    regis.RegistrationNo,
+                    regis.RoomID,
+                    bed.BridgingID,
+                    regis.BedID
+                );
+            regis.InnerJoin(bed).On(regis.BedID == bed.BedID && 
+                bed.SRBridgingType == AppEnum.BridgingType.RS_ONLINE.ToString() && 
+                bed.IsVisibleTo3rdParty == true && 
+                bed.IsActive == true);
+            regis.Where(regis.SRRegistrationType == AppConstant.RegistrationType.InPatient,
+                regis.DischargeDate.IsNull(),
+                regis.IsClosed == false,
+                regis.IsVoid == false);
+            if (!string.IsNullOrWhiteSpace(serviceUnitID)) regis.Where(regis.ServiceUnitID == serviceUnitID);
+            var srd = regis.LoadDataTable();
+
+            var list = src.AsEnumerable()
+                .GroupBy(s => new
+                {
+                    IdTt = s.Field<string>("BridgingID"),
+                    RoomID = s.Field<string>("RoomID"),
+                    Ruang = s.Field<string>("RoomName")
+                }).Select(s => new Common.RsOnline.Json.Request.Insert()
+                {
+                    IdTt = s.Key.IdTt,
+                    RoomID = s.Key.RoomID,
+                    Ruang = s.Key.Ruang,
+                    JumlahRuang = src.AsEnumerable().Where(ss => ss.Field<string>("BridgingID") == s.Key.IdTt && ss.Field<string>("RoomID") == s.Key.RoomID)
+                        .GroupBy(ss => new { IdTt = ss.Field<string>("BridgingID"), RoomID = ss.Field<string>("RoomID"), Ruang = ss.Field<string>("RoomName") }).Count().ToString(),
+                    Jumlah = src.AsEnumerable().Where(ss => ss.Field<string>("BridgingID") == s.Key.IdTt && ss.Field<string>("RoomID") == s.Key.RoomID)
+                        .GroupBy(ss => new { IdTt = ss.Field<string>("BridgingID"), RoomID = ss.Field<string>("RoomID"), Ruang = ss.Field<string>("RoomName"), BedID = ss.Field<string>("BedID") }).Count().ToString(),
+                    Antrian = src.AsEnumerable().Where(ss => ss.Field<string>("BridgingID") == s.Key.IdTt && ss.Field<string>("RoomID") == s.Key.RoomID && ss.Field<string>("SRBedStatus") == "BedStatus-03")
+                        .GroupBy(ss => new { IdTt = ss.Field<string>("BridgingID"), RoomID = ss.Field<string>("RoomID"), Ruang = ss.Field<string>("RoomName"), BedID = ss.Field<string>("BedID") }).Count().ToString(),
                 });
 
             var sum = list.GroupBy(l => new

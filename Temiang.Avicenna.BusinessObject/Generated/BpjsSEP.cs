@@ -229,7 +229,8 @@ namespace Temiang.Avicenna.BusinessObject
 						case "AssesmentPel": this.str.AssesmentPel = (string)value; break;							
 						case "KodeDpjpKontrol": this.str.KodeDpjpKontrol = (string)value; break;							
 						case "NoLP": this.str.NoLP = (string)value; break;							
-						case "KlsHak": this.str.KlsHak = (string)value; break;
+						case "KlsHak": this.str.KlsHak = (string)value; break;							
+						case "PoliRujukan": this.str.PoliRujukan = (string)value; break;
 					}
 				}
 				else
@@ -1317,6 +1318,22 @@ namespace Temiang.Avicenna.BusinessObject
 			}
 		}
 		
+		/// <summary>
+		/// Maps to BpjsSEP.PoliRujukan
+		/// </summary>
+		virtual public System.String PoliRujukan
+		{
+			get
+			{
+				return base.GetSystemString(BpjsSEPMetadata.ColumnNames.PoliRujukan);
+			}
+			
+			set
+			{
+				base.SetSystemString(BpjsSEPMetadata.ColumnNames.PoliRujukan, value);
+			}
+		}
+		
 		#endregion	
 
 		#region String Properties
@@ -2274,6 +2291,21 @@ namespace Temiang.Avicenna.BusinessObject
 					else entity.KlsHak = Convert.ToString(value);
 				}
 			}
+				
+			public System.String PoliRujukan
+			{
+				get
+				{
+					System.String data = entity.PoliRujukan;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.PoliRujukan = null;
+					else entity.PoliRujukan = Convert.ToString(value);
+				}
+			}
 			
 
 			private esBpjsSEP entity;
@@ -2812,6 +2844,14 @@ namespace Temiang.Avicenna.BusinessObject
 			get
 			{
 				return new esQueryItem(this, BpjsSEPMetadata.ColumnNames.KlsHak, esSystemType.String);
+			}
+		} 
+		
+		public esQueryItem PoliRujukan
+		{
+			get
+			{
+				return new esQueryItem(this, BpjsSEPMetadata.ColumnNames.PoliRujukan, esSystemType.String);
 			}
 		} 
 		
@@ -3409,6 +3449,12 @@ namespace Temiang.Avicenna.BusinessObject
 			c.IsNullable = true;
 			_columns.Add(c);
 				
+			c = new esColumnMetadata(BpjsSEPMetadata.ColumnNames.PoliRujukan, 62, typeof(System.String), esSystemType.String);
+			c.PropertyName = BpjsSEPMetadata.PropertyNames.PoliRujukan;
+			c.CharacterMaxLength = 10;
+			c.IsNullable = true;
+			_columns.Add(c);
+				
 		}
 		#endregion	
 	
@@ -3497,6 +3543,7 @@ namespace Temiang.Avicenna.BusinessObject
 			 public const string KodeDpjpKontrol = "KodeDpjpKontrol";
 			 public const string NoLP = "NoLP";
 			 public const string KlsHak = "KlsHak";
+			 public const string PoliRujukan = "PoliRujukan";
 		}
 		#endregion	
 		
@@ -3565,6 +3612,7 @@ namespace Temiang.Avicenna.BusinessObject
 			 public const string KodeDpjpKontrol = "KodeDpjpKontrol";
 			 public const string NoLP = "NoLP";
 			 public const string KlsHak = "KlsHak";
+			 public const string PoliRujukan = "PoliRujukan";
 		}
 		#endregion	
 
@@ -3670,7 +3718,8 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("AssesmentPel", new esTypeMap("char", "System.String"));
 				meta.AddTypeMap("KodeDpjpKontrol", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("NoLP", new esTypeMap("varchar", "System.String"));
-				meta.AddTypeMap("KlsHak", new esTypeMap("varchar", "System.String"));			
+				meta.AddTypeMap("KlsHak", new esTypeMap("varchar", "System.String"));
+				meta.AddTypeMap("PoliRujukan", new esTypeMap("varchar", "System.String"));			
 				
 				
 				

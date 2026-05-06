@@ -257,6 +257,25 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblTglRanap;
 
+
+        /// <summary>
+        /// trHakKelasBpjs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow trHakKelasBpjs;
+
+        /// <summary>
+        /// lblBpjsHakKelas control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblBpjsHakKelas;
+
         /// <summary>
         /// trCovClass control.
         /// </summary>
@@ -283,6 +302,33 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblServiceUnit;
+
+        /// <summary>
+        /// trRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel trRujukan;
+
+        /// <summary>
+        /// lblTglRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTglRujukan;
+
+        /// <summary>
+        /// lblPoliRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPoliRujukan;
 
         /// <summary>
         /// divChronicDisease control.

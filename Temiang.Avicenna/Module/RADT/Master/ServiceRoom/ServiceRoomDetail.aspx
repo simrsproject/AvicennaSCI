@@ -329,6 +329,10 @@
                                         SortExpression="Notes" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                                     <telerik:GridBoundColumn DataField="SatuSehatBridgingID" HeaderText="SS Bridging ID" UniqueName="SatuSehatBridgingID"
                                         SortExpression="SatuSehatBridgingID" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                                    <telerik:GridBoundColumn DataField="BridingTypeName" HeaderText="Bridging Type" UniqueName="BridingTypeName"
+                                        SortExpression="BridingTypeName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                                    <telerik:GridBoundColumn DataField="BridgingID" HeaderText="Bridging ID" UniqueName="BridgingID"
+                                        SortExpression="BridgingID" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                                     <telerik:GridCheckBoxColumn HeaderStyle-Width="80px" DataField="IsTemporary" HeaderText="Temporary"
                                         UniqueName="IsTemporary" SortExpression="IsTemporary" HeaderStyle-HorizontalAlign="Center"
                                         ItemStyle-HorizontalAlign="Center" />

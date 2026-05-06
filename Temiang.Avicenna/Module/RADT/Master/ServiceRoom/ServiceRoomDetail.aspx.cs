@@ -531,15 +531,19 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 var query = new BedQuery("a");
                 var classQuery = new ClassQuery("b");
                 var chargeclassQuery = new ClassQuery("c");
+                var asri = new AppStandardReferenceItemQuery("f");
 
                 query.Select
                     (
                         query,
                         classQuery.ClassName.As("refToClass_ClassName"),
-                        chargeclassQuery.ClassName.As("refToClass_DefaultChargeClassName")
+                        chargeclassQuery.ClassName.As("refToClass_DefaultChargeClassName"),
+                        asri.ItemName.As("refToAppStandardReferenceItem_ItemName")
                     );
                 query.InnerJoin(classQuery).On(query.ClassID == classQuery.ClassID);
                 query.InnerJoin(chargeclassQuery).On(query.DefaultChargeClassID == chargeclassQuery.ClassID);
+                query.LeftJoin(asri).On(query.SRBridgingType == asri.ItemID &&
+                                        asri.StandardReferenceID == AppEnum.StandardReference.BridgingType.ToString());
                 query.Where(query.RoomID == txtRoomID.Text);
                 query.OrderBy
                     (
@@ -643,6 +647,10 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 entity.IsNeedConfirmation = userControl.IsNeedConfirmation;
                 entity.IsVisibleTo3rdParty = userControl.IsSharedTo3rdParty;
                 entity.Notes = userControl.Notes;
+                entity.SRBridgingType = userControl.SRBridgingType;
+                entity.BridingTypeName = userControl.BridgingTypeName;
+                entity.BridgingID = userControl.BridgingID;
+                entity.BridgingName = userControl.BridgingName;
             }
         }
 

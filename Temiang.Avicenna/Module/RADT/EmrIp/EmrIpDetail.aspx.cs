@@ -794,6 +794,16 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             if (trBpjsSepNo.Visible)
                 lblBpjsSepNo.Text = reg.BpjsSepNo;
 
+            trHakKelasBpjs.Visible = grr.SRGuarantorType == AppSession.Parameter.GuarantorTypeBPJS;
+            if (trHakKelasBpjs.Visible)
+            {
+                var sep = new BpjsSEP();
+                if (sep.LoadByPrimaryKey(reg.BpjsSepNo) && !string.IsNullOrWhiteSpace(sep.KlsHak))
+                {
+                    lblBpjsHakKelas.Text = sep.KlsHak;
+                }
+            }
+
             trCovClass.Visible = !string.IsNullOrWhiteSpace(reg.CoverageClassID);
             if (trCovClass.Visible)
             {
@@ -805,6 +815,28 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             var unit = new ServiceUnit();
             unit.LoadByPrimaryKey(ServiceUnitID);
             lblServiceUnit.Text = unit.ServiceUnitName;
+
+            if (AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
+                !string.IsNullOrWhiteSpace(reg.BpjsSepNo) && reg.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
+            {
+                var sep = new BpjsSEP();
+                if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
+                {
+                    lblTglRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
+
+                    if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
+                    {
+                        var svc = new Common.BPJS.VClaim.v11.Service();
+                        var rujukan = svc.GetRujukan(sep.NoRujukan);
+                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        {
+                            lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
+                        }
+                    }
+
+                    trRujukan.Visible = true;
+                }
+            }
 
             PopulatePatientAllergy();
             PopulateEpisodeDiagnose();

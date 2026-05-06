@@ -12,6 +12,8 @@ using Temiang.Dal.Interfaces;
 using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Avicenna.Module.RADT.EmrIp;
 using System.Configuration;
+using Temiang.Avicenna.Common.BPJS.VClaim.v11;
+using Enum = Temiang.Avicenna.Common.BPJS.VClaim.Enum;
 
 namespace Temiang.Avicenna.Module.RADT
 {
@@ -635,12 +637,7 @@ namespace Temiang.Avicenna.Module.RADT
                 var bs = new BpjsSEP();
                 bs.Query.Select(bs.Query.TanggalRujukan);
                 bs.Load(bsq);
-                trTglRujukan.Visible = !string.IsNullOrWhiteSpace(bs.TanggalRujukan.ToString());
-                if (trTglRujukan.Visible)
-                    lblTglRujukan.Text = bs.TanggalRujukan.Value.AddDays(90).ToString("yyyy-MM-dd");
             }
-            else
-                trTglRujukan.Visible = false;
 
 
             trCovClass.Visible = !string.IsNullOrWhiteSpace(reg.CoverageClassID);
@@ -654,6 +651,53 @@ namespace Temiang.Avicenna.Module.RADT
             var unit = new ServiceUnit();
             unit.LoadByPrimaryKey(ServiceUnitID);
             lblServiceUnit.Text = unit.ServiceUnitName;
+
+            if (AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
+                !string.IsNullOrWhiteSpace(reg.BpjsSepNo) && reg.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
+            {
+                var sep = new BpjsSEP();
+                if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
+                {
+                    if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
+                    {
+                        var svc = new Common.BPJS.VClaim.v11.Service();
+                        var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
+                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        {
+                            if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                            {
+                                lblNoRujukan.Text =
+                                    rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                        ?.NoKunjungan ?? string.Empty;
+                                lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                    .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                            }
+                        }
+
+                        svc = new Service();
+                        rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
+                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        {
+                            if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                            {
+                                lblNoRujukan.Text =
+                                    rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                        ?.NoKunjungan ?? string.Empty;
+                                lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                    .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        lblNoRujukan.Text = sep.NoRujukan;
+                    }
+                    if (!string.IsNullOrWhiteSpace(lblNoRujukan.Text))
+                        lblTglBerlakuRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
+
+                    trRujukan.Visible = true;
+                }
+            }
 
             lblChronicDisease.Text = Patient.ChronicDisease(PatientID);
             if (string.IsNullOrEmpty(lblChronicDisease.Text))

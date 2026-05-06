@@ -1336,15 +1336,6 @@
                                         <asp:Label runat="server" ID="lblTglRanap" Font-Bold="true"/>
                                     </td>
                                 </tr>
-                                <tr runat="server" id="trTglRujukan">
-                                    <td style="vertical-align: top;">Tgl Akhir Rujukan
-                                    </td>
-                                    <td style="vertical-align: top;">:
-                                    </td>
-                                    <td>
-                                        <asp:Label runat="server" ID="lblTglRujukan" Font-Bold="true" />
-                                    </td>
-                                </tr>
                                 <tr runat="server" id="trCovClass">
                                     <td style="vertical-align: top;">Cov. Class
                                     </td>
@@ -1373,6 +1364,35 @@
                                         <asp:HiddenField runat="server" ID="hdnPhysicianID" />
                                     </td>
                                 </tr>
+                               <asp:Panel runat="server" ID="trRujukan" Visible="False">
+                                    <tr>
+                                        <td style="vertical-align: top;">No Rujukan
+                                        </td>
+                                        <td style="vertical-align: top;">:
+                                        </td>
+                                        <td>
+                                            <asp:Label runat="server" ID="lblNoRujukan" Font-Bold="true" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top;">Tgl. Berlaku Rujukan
+                                        </td>
+                                        <td style="vertical-align: top;">:
+                                        </td>
+                                        <td>
+                                            <asp:Label runat="server" ID="lblTglBerlakuRujukan" Font-Bold="true" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top;">Poli Rujukan
+                                        </td>
+                                        <td style="vertical-align: top;">:
+                                        </td>
+                                        <td>
+                                            <asp:Label runat="server" ID="lblPoliRujukan" Font-Bold="true" />
+                                        </td>
+                                    </tr>
+                                </asp:Panel>
                             </table>
                         </td>
                     </tr>

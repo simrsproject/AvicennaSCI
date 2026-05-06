@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Telerik.Web.UI;
@@ -21,13 +22,14 @@ namespace Temiang.Avicenna.Module.RADT.Master
         protected override void OnDataBinding(EventArgs e)
         {
             //PopUpSearch.InitializeOnButtonClick(AppEnum.PopUpSearch.Class, txtClassID);
+            StandardReference.InitializeIncludeSpace(cboBridgingType, AppEnum.StandardReference.BridgingType);
 
             var coll = new ClassCollection();
             coll.Query.Where
-                (
-                    coll.Query.IsActive == true,
-                    coll.Query.IsInPatientClass == true
-                );
+            (
+                coll.Query.IsActive == true,
+                coll.Query.IsInPatientClass == true
+            );
             coll.Query.OrderBy(coll.Query.ClassID.Ascending);
             coll.LoadAll();
 
@@ -54,21 +56,36 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
                 return;
             }
+
             ViewState["IsNewRecord"] = false;
 
             txtBedID.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BedID);
             cboClassID.SelectedValue = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.ClassID);
-            cboDefaultChargeClassID.SelectedValue = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.DefaultChargeClassID);
+            cboDefaultChargeClassID.SelectedValue =
+                (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.DefaultChargeClassID);
             chkIsTemporary.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsTemporary);
             chkIsNeedConfirmation.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsNeedConfirmation);
             chkIsActive.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsActive);
-            chkIsSharedTo3rdParty.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsVisibleTo3rdParty);
+            chkIsSharedTo3rdParty.Checked =
+                (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsVisibleTo3rdParty);
             txtNotes.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.Notes);
             if (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["SatuSehatOrganizationID"]) || !string.IsNullOrWhiteSpace(Temiang.Avicenna.Bridging.SatuSehat.Utils.SatuSehatKey("SatuSehatClientID")))
                 txtSsbID.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SatuSehatBridgingID);
 
             hdnRegistrationNo.Value = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.RegistrationNo);
-            hdnSRBedStatus.Value= (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBedStatus);
+            hdnSRBedStatus.Value = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBedStatus);
+
+            if (!string.IsNullOrWhiteSpace((String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBridgingType)))
+            {
+                cboBridgingType.SelectedValue =
+                    (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBridgingType);
+                cboBridgingType_SelectedIndexChanged(null,
+                    new RadComboBoxSelectedIndexChangedEventArgs(string.Empty, string.Empty, cboBridgingType.SelectedValue,
+                        string.Empty));
+                cboServiceUnitAliasID.SelectedValue = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BridgingID);
+            }
+
+            txtServiceUnitAliasName.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BridgingName);
 
             if (!string.IsNullOrEmpty((String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.RegistrationNo)))
             {
@@ -164,10 +181,87 @@ namespace Temiang.Avicenna.Module.RADT.Master
         {
             get { return txtNotes.Text; }
         }
+
+        public String SRBridgingType
+        {
+            get { return cboBridgingType.SelectedValue; }
+        }
+        public String BridgingTypeName
+        {
+            get { return cboBridgingType.Text; }
+        }
+        public String BridgingID
+        {
+            get { return cboServiceUnitAliasID.SelectedValue; }
+        }
+        public String BridgingName
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(txtServiceUnitAliasName.Text) ? (Helper.FindControlRecursive(this.Page, "txtRoomName") as RadTextBox).Text : txtServiceUnitAliasName.Text;
+            }
+        }
+
         #endregion
 
         #region Method & Event TextChanged
 
         #endregion
+
+        protected void cboBridgingType_SelectedIndexChanged(object o, RadComboBoxSelectedIndexChangedEventArgs e)
+        {
+            cboServiceUnitAliasID.Items.Clear();
+            cboServiceUnitAliasID.SelectedValue = string.Empty;
+            cboServiceUnitAliasID.Text = string.Empty;
+
+            if (e.Value == AppEnum.BridgingType.BPJS.ToString() && Common.Helper.IsBpjsIntegration)
+            {
+            }
+            else if (e.Value == AppEnum.BridgingType.RS_ONLINE.ToString() && Common.Helper.IsRsOnlineIntegration)
+            {
+                var svc = new Common.RsOnline.Service();
+                var response = svc.ReferensiTempatTidur();
+                if (response?.TempatTidur != null && response.TempatTidur.Any())
+                {
+                    cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                    foreach (var item in response.TempatTidur)
+                    {
+                        cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.NamaTt, item.KodeTt));
+                    }
+                }
+            }
+            else if (e.Value == AppEnum.BridgingType.Inhealth.ToString() && Common.Helper.IsInhealthIntegration)
+            {
+                var collTitle = new AppStandardReferenceItemCollection();
+                collTitle.Query.Where(
+                    collTitle.Query.StandardReferenceID == AppEnum.StandardReference.InhealthClassType,
+                    collTitle.Query.IsActive == true
+                    );
+                collTitle.Query.OrderBy(collTitle.Query.ItemID.Ascending);
+                collTitle.LoadAll();
+                cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
+                foreach (var item in collTitle)
+                {
+                    cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(item.ItemID + " - " + item.ItemName, item.ItemID));
+                }
+            }
+        }
+
+        protected void cboServiceUnitAliasID_SelectedIndexChanged(object o, RadComboBoxSelectedIndexChangedEventArgs e)
+        {
+            if (cboBridgingType.SelectedValue == AppEnum.BridgingType.BPJS.ToString() && Common.Helper.IsBpjsIntegration)
+            {
+            }
+            else if (cboBridgingType.SelectedValue == AppEnum.BridgingType.Inhealth.ToString() && Common.Helper.IsInhealthIntegration)
+            {
+                var collTitle = new AppStandardReferenceItem();
+                collTitle.Query.es.Top = 1;
+                collTitle.Query.Where(
+                    collTitle.Query.StandardReferenceID == AppEnum.StandardReference.InhealthClassType,
+                    collTitle.Query.ItemID == cboServiceUnitAliasID.SelectedValue
+                    );
+                if (collTitle.Query.Load()) txtServiceUnitAliasName.Text = collTitle.ItemName;
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Linq;
+using System.Text;
 using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -56,6 +57,17 @@ namespace Temiang.Avicenna.WebService
             }
 
             return "ok";
+        }
+
+        [WebMethod]
+        public string Decrypt(string param)
+        {
+            //param = @"eyJub21vckthcnR1IjoiMDAwMTUyMDkwMTIzNSIsIm5hbWEiOiJCSURVTkkgRUxJWkEgU1lFQkFUIE1VUllBVEkgUFVUUkkiLCJhbGFtYXQiOiJKTC4gTUVMVVIgSUkgTk8uIDgxIDEyLzE1IFJBTkNBRUtFSyBLRU5DQU5BLCBSQU5DQUVLRUssIEtBQlVQQVRFTiBCQU5EVU5HIiwidGdsTGhyIjoiMDYtMTEtMTk5MiIsIm5payI6IjMyMDQyODQ2MTE5MjAwMDIiLCJma3RwIjoiS2xpbmlrIFByYXRhbWEgWXVzdWYgSSIsImZrdHBHaWdpIjoiLSIsInN0YXR1c1Blc2VydGEiOiIwIn0=";
+
+            param = @"eyJub2thcHN0IjoiMDAwMTUxOTIzMjIxOCIsImtvZGVCb29raW5nIjoiQVBULTI2MDQxNy0wNTI2Iiwibm9SdWp1a2FuIjoiMTAwMVIwMDcwNDI2SzAwNjcyNCIsIm5vcm0iOiIwMDA5ODA3MSIsImtldEt1bmp1bmdhbiI6IktvbnRyb2wiLCJuYW1hRmFza2VzQXNhbFJ1anVrIjpudWxsLCJuYW1hUG9saSI6IkdJTkpBTC1ISVBFUlRFTlNJICIsIm5hbWFEb2t0ZXIiOiJEUi4gQUdVTkcgTlVHUk9ITywgU1AuUEQiLCJub21vckFudHJlYW4iOiJUQ1FCIC0gNiJ9";
+
+            var str = Encoding.UTF8.GetString(Convert.FromBase64String(param));
+            return str;
         }
     }
 }

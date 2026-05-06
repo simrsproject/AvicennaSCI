@@ -33,16 +33,17 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
         {
             base.OnLoad(e);
 
-            if (!IsPostBack)
-            {
-                if (AppSession.Parameter.HealthcareInitialAppsVersion == "YBRSGKP")
-                {
-                    if (AppSession.Parameter.HealthcareInitial == "RSI")
-                    {
-                        //cboAssesmentPelayanan.Items.Remove(4);
-                    }
-                }
-            }
+            //if (!IsPostBack)
+            //{
+            //    if (AppSession.Parameter.HealthcareInitialAppsVersion == "YBRSGKP")
+            //    {
+            //        if (AppSession.Parameter.HealthcareInitial == "RSI")
+            //        {
+            //            cboAssesmentPelayanan.Items.Remove(3);
+            //            cboAssesmentPelayanan.Items.Remove(4);
+            //        }
+            //    }
+            //}
         }
 
         protected override void OnLoadComplete(EventArgs e)
@@ -1060,14 +1061,34 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
                 //}
                 if (kontrolResponse.Response.List.Any(l => l.JnsKontrol == cboPelayanan.SelectedValue && l.TerbitSEP.ToLower().Trim() == "belum"))
                 {
-                    cboNoSkdp.DataSource = kontrolResponse.Response.List.Where(l => l.JnsKontrol == cboPelayanan.SelectedValue && l.TerbitSEP.ToLower().Trim() == "belum").Select(l => new SkdpSource()
+                    if (cboPoliSep.SelectedValue.Split('#')[0].ToLower() == "hdl")
                     {
-                        NoSuratKontrol = l.NoSuratKontrol,
-                        TglRencanaKontrol = l.TglRencanaKontrol,
-                        NamaPoliTujuan = l.NamaPoliTujuan,
-                        NamaDokter = l.NamaDokter,
-                        JenisSuratKontrol = l.JnsKontrol == "1" ? "Rawat Inap" : "Rawat Jalan"
-                    }).ToList();
+                        cboNoSkdp.DataSource = kontrolResponse.Response.List.Where(l =>
+                                l.PoliAsal == "HDL" &&
+                                l.JnsKontrol == cboPelayanan.SelectedValue && l.TerbitSEP.ToLower().Trim() == "belum")
+                            .Select(l => new SkdpSource()
+                            {
+                                NoSuratKontrol = l.NoSuratKontrol,
+                                TglRencanaKontrol = l.TglRencanaKontrol,
+                                NamaPoliTujuan = l.NamaPoliTujuan,
+                                NamaDokter = l.NamaDokter,
+                                JenisSuratKontrol = l.JnsKontrol == "1" ? "Rawat Inap" : "Rawat Jalan"
+                            }).ToList();
+                    }
+                    else
+                    {
+                        cboNoSkdp.DataSource = kontrolResponse.Response.List.Where(l =>
+                                l.JnsKontrol == cboPelayanan.SelectedValue && l.TerbitSEP.ToLower().Trim() == "belum")
+                            .Select(l => new SkdpSource()
+                            {
+                                NoSuratKontrol = l.NoSuratKontrol,
+                                TglRencanaKontrol = l.TglRencanaKontrol,
+                                NamaPoliTujuan = l.NamaPoliTujuan,
+                                NamaDokter = l.NamaDokter,
+                                JenisSuratKontrol = l.JnsKontrol == "1" ? "Rawat Inap" : "Rawat Jalan"
+                            }).ToList();
+                    }
+
                     cboNoSkdp.DataBind();
 
                     Temiang.Avicenna.Common.BPJS.VClaim.v11.RencanaKontrol.Select.ResponseSuratKontrolList.List kontrol;
@@ -1129,6 +1150,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
 
                     if (reffer.PoliRujukan != null)
                     {
+                        ViewState["PoliRujukan"] = reffer.PoliRujukan.Kode;
+
                         cboPoliSep_ItemsRequested(null, new Telerik.Web.UI.RadComboBoxItemsRequestedEventArgs() { Text = reffer.PoliRujukan.Kode });
                         foreach (RadComboBoxItem item in cboPoliSep.Items)
                         {
@@ -1176,6 +1199,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
 
                 if (reffer.PoliRujukan != null)
                 {
+                    ViewState["PoliRujukan"] = reffer.PoliRujukan.Kode;
+
                     cboPoliSep_ItemsRequested(null,
                         new Telerik.Web.UI.RadComboBoxItemsRequestedEventArgs() { Text = reffer.PoliRujukan.Kode });
                     cboPoliSep.SelectedValue = reffer.PoliRujukan.Kode;
@@ -1584,6 +1609,27 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
             var entity = new BpjsSEP();
             entity.AddNew();
             SetEntityValue(entity);
+
+            if (!string.IsNullOrWhiteSpace(entity.NoMR))
+            {
+                var patient = new Patient();
+                if (patient.LoadByMedicalNo(entity.NoMR))
+                {
+                    if (!(patient.IsActive ?? false))
+                    {
+                        args.MessageText = $"Data pasien dengan No MR : {entity.NoMR} tidak aktif";
+                        args.IsCancel = true;
+                        return;
+                    }
+                }
+                else
+                {
+                    args.MessageText = $"Data pasien dengan No MR : {entity.NoMR} tidak ditemukan";
+                    args.IsCancel = true;
+                    return;
+                }
+            }
+
             SaveEntity(entity, args);
         }
 
@@ -2008,6 +2054,11 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
             bs.KodeDpjpKontrol = cboDpjpKontrol.SelectedValue;
             bs.NoSkdp = cboNoSkdp.Text;
             bs.KlsHak = txtHakKelasPeserta.Text;
+            if (ViewState["PoliRujukan"] != null)
+            {
+                if (bs.PoliTujuan.ToLower() == "igd") bs.PoliRujukan = string.Empty;
+                else bs.PoliRujukan = ViewState["PoliRujukan"].ToString();
+            }
         }
 
         private void SaveEntity(BpjsSEP entity, ValidateArgs args)

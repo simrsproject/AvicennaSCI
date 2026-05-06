@@ -821,5 +821,11 @@ namespace Temiang.Avicenna.Common.BPJS.Antrian
                 }
             }
         }
+
+        public QrCode.Param.Root DecryptQrCode(string param)
+        {
+            return JsonConvert.DeserializeObject<QrCode.Param.Root>(
+                Encoding.UTF8.GetString(Convert.FromBase64String(param)));
+        }
     }
 }

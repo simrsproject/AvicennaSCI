@@ -18,6 +18,12 @@ namespace Temiang.Avicenna.BusinessObject
             get { return GetColumn("refToClass_DefaultChargeClassName").ToString(); }
             set { SetColumn("refToClass_DefaultChargeClassName", value); }
         }
+
+        public string BridingTypeName
+        {
+            get { return GetColumn("refToAppStandardReferenceItem_ItemName").ToString(); }
+            set { SetColumn("refToAppStandardReferenceItem_ItemName", value); }
+        }
     }
 
     public partial class BedCollection

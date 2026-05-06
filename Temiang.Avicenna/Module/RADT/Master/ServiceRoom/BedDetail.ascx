@@ -8,7 +8,7 @@
 <table width="100%" cellpadding="0" cellspacing="0">
     <tr>
         <td style="width: 50%; vertical-align: top;">
-            <table style="width:100%">
+            <table style="width: 100%">
                 <tr>
                     <td class="label">
                         <asp:Label ID="lblBedID" runat="server" Text="Bed No"></asp:Label>
@@ -120,9 +120,38 @@
                     <td class="entry">
                         <telerik:RadTextBox ID="txtNotes" runat="server" Width="300px" MaxLength="500" TextMode="MultiLine" Height="100px" />
                     </td>
+                    <td width="20px"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="label">Bridging Type
+                    </td>
+                    <td class="entry">
+                        <telerik:RadComboBox ID="cboBridgingType" runat="server" Width="300px" AutoPostBack="true"
+                            OnSelectedIndexChanged="cboBridgingType_SelectedIndexChanged" />
+                    </td>
                     <td width="20px">
                     </td>
-                    <td></td>
+                    <td />
+                </tr>
+                <tr>
+                    <td class="label">Bridging ID
+                    </td>
+                    <td class="entry">
+                        <telerik:RadComboBox ID="cboServiceUnitAliasID" runat="server" Width="300px" AllowCustomText="true"
+                            Filter="Contains" AutoPostBack="true" OnSelectedIndexChanged="cboServiceUnitAliasID_SelectedIndexChanged" />
+                    </td>
+                    <td width="20px"></td>
+                    <td />
+                </tr>
+                <tr>
+                    <td class="label">Bridging Name
+                    </td>
+                    <td class="entry">
+                        <telerik:RadTextBox ID="txtServiceUnitAliasName" runat="server" Width="300px" />
+                    </td>
+                    <td width="20px" />
+                    <td />
                 </tr>
             </table>
         </td>

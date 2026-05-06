@@ -267,24 +267,6 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::System.Web.UI.WebControls.Label lblTglRanap;
 
         /// <summary>
-        /// trTglRujukan control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTableRow trTglRujukan;
-
-        /// <summary>
-        /// lblTglRujukan control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTglRujukan;
-
-        /// <summary>
         /// trCovClass control.
         /// </summary>
         /// <remarks>
@@ -328,6 +310,42 @@ namespace Temiang.Avicenna.Module.RADT
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hdnPhysicianID;
+
+        /// <summary>
+        /// trRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel trRujukan;
+
+        /// <summary>
+        /// lblNoRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNoRujukan;
+
+        /// <summary>
+        /// lblTglBerlakuRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTglBerlakuRujukan;
+
+        /// <summary>
+        /// lblPoliRujukan control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPoliRujukan;
 
         /// <summary>
         /// divChronicDisease control.

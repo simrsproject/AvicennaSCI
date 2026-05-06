@@ -1,21 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web.UI;
-using Temiang.Avicenna.Common;
-using Telerik.Web.UI;
-using Temiang.Avicenna.BusinessObject;
-using System.Data;
-using System.Text;
+﻿using DocumentFormat.OpenXml.Bibliography;
 using Newtonsoft.Json;
-using Temiang.Avicenna.BusinessObject.Common;
-using Temiang.Dal.DynamicQuery;
-using Temiang.Dal.Interfaces;
-using System.Linq;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Web.UI;
+using Telerik.Web.UI;
 using Telerik.Web.UI.Barcode;
-using DocumentFormat.OpenXml.Bibliography;
+using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.BusinessObject.Common;
+using Temiang.Avicenna.Common;
+using Temiang.Avicenna.Common.BPJS.VClaim.v11;
+using Temiang.Avicenna.WebService;
+using Temiang.Dal.DynamicQuery;
+using Temiang.Dal.Interfaces;
+using Enum = Temiang.Avicenna.Common.BPJS.VClaim.Enum;
 
 namespace Temiang.Avicenna.Module.RADT.Emr
 {
@@ -127,7 +131,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 StandardReference.InitializeIncludeSpace(cboCauseOfDisease, AppEnum.StandardReference.CauseOfDisease);
                 StandardReference.InitializeIncludeSpace(cboCauseOfDevelopDisorder, AppEnum.StandardReference.CauseOfDevelopDisorder);
                 StandardReference.InitializeIncludeSpace(cboSRNatureSurgery, AppEnum.StandardReference.NatureOfSurgery);
-                if (IsToValidate) 
+                if (IsToValidate)
                     ToolBarMenuSave.Text = "Set as Final MDS";
             }
 
@@ -1811,102 +1815,264 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
                     if (!string.IsNullOrEmpty(appointmentNo))
                     {
-                        //db:20241105 - query data appointment berdasarkan no appointment
-                        var apptq = new AppointmentQuery();
-                        apptq.Where(apptq.AppointmentNo == appointmentNo, apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel);
-
-                        var appt = new BusinessObject.Appointment();
-                        if (appt.Load(apptq))
-                        {
-                            //db:20241105 - cek data ServiceUnitID, ParamedicID & ControlPlanDateTime. kalo tidak sama dg di data di control plan, cancel no appointment, u/ kemudian create no appoinment baru
-                            if (appt.ServiceUnitID != planItem.ServiceUnitID || appt.ParamedicID != planItem.ParamedicID || appt.PatientID != pat.PatientID || appt.AppointmentDate != planItem.ControlPlanDateTime.Date)
-                            {
-                                appointmentNo = string.Empty;
-                            }
-                            else
-                            {
-                                if (appointmentNos == string.Empty)
-                                    appointmentNos = appointmentNo;
-                                else
-                                    appointmentNos = ";" + appointmentNo;
-                            }
-                        }
-                        else
-                            appointmentNo = string.Empty;
-                    }
-                    else
-                    {
-                        //db:20241105 - cek apakah sudah ada data appointment yg ter-create sesuai ServiceUnitID, ParamedicID & ControlPlanDateTime (dari action save & edit)
-                        var apptq = new AppointmentQuery();
-                        apptq.Where(apptq.ServiceUnitID == planItem.ServiceUnitID, apptq.ParamedicID == planItem.ParamedicID, apptq.PatientID == pat.PatientID,
-                            apptq.AppointmentDate == planItem.ControlPlanDateTime.Date, apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel,
-                            apptq.SRAppoinmentType == AppSession.Parameter.AppointmentTypeControlPlan);
-                        apptq.Select(apptq.AppointmentNo, apptq.AppointmentQue, apptq.AppointmentTime);
-
-                        var appt = new BusinessObject.Appointment();
-                        if (appt.Load(apptq))
-                        {
-                            appointmentNo = appt.AppointmentNo;
-
-                            planItem.AppointmentTime = appt.AppointmentTime;
-                            planItem.AppointmentQue = appt.AppointmentQue;
-                            planItem.AppointmentNo = appointmentNo;
-
-                            if (appointmentNos == string.Empty)
-                                appointmentNos = appt.AppointmentNo;
-                            else
-                                appointmentNos = ";" + appt.AppointmentNo;
-                        }
-                        else
-                        {
-                            appointmentNo = string.Empty;
-                        }
-                    }
-
-                    if (string.IsNullOrEmpty(appointmentNo))
-                    {
-                        var qSchedule = new ParamedicScheduleDate();
-                        if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID, planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
+                        //teguharifandi:20250709 - rsi : pasien bpjs hanya create rencana kontrol tdk appointment, nanti pasien yg ambil apt lewat mjkn
+                        if (AppSession.Parameter.HealthcareInitial == "RSI" &&
+                            AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
+                            !string.IsNullOrWhiteSpace(reg.BpjsSepNo))
                         {
                             try
                             {
-                                // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
-                                var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS.AppointmentSetEntityValue(string.Empty, planItem.ServiceUnitID, planItem.ParamedicID,
-                                    planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
-                                    PatientID, pat.FirstName, pat.MiddleName, pat.LastName, pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
-                                    pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
-                                    pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep, AppSession.Parameter.AppointmentStatusOpen,
-                                    pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID, AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+                                var pb = new ParamedicBridging();
+                                pb.Query.Where(pb.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                                    pb.Query.ParamedicID == planItem.ParamedicID);
+                                if (!pb.Query.Load())
+                                {
+                                    args.MessageText = "Mapping dokter tidak ditemukan";
+                                    args.IsCancel = true;
+                                    return;
+                                }
 
-                                planItem.AppointmentTime = slot["AppointmentTime"].ToString();
-                                planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
-                                planItem.AppointmentNo = slot["AppointmentNo"].ToString();
+                                var ub = new ServiceUnitBridging();
+                                ub.Query.Where(ub.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                                    ub.Query.ServiceUnitID == planItem.ServiceUnitID);
+                                ub.Query.Load();
+                                if (!ub.Query.Load())
+                                {
+                                    args.MessageText = "Mapping poli/unit tidak ditemukan";
+                                    args.IsCancel = true;
+                                    return;
+                                }
 
-                                if (appointmentNos == string.Empty)
-                                    appointmentNos = planItem.AppointmentNo;
-                                else
-                                    appointmentNos = ";" + planItem.AppointmentNo;
+                                var svc = new Common.BPJS.VClaim.v11.Service();
+                                var bpjsSepNo = reg.BpjsSepNo;
+                                if (reg.SRRegistrationType == AppConstant.RegistrationType.InPatient)
+                                {
+                                    var rujukanList = new List<Common.BPJS.VClaim.v11.Rujukan.Select.Rujukan2>();
+                                    svc = new Service();
+                                    var fktp1 = svc.GetRujukan(reg.GuarantorCardNo, Common.BPJS.VClaim.Enum.JenisFaskes.Faskes_1);
+                                    if (fktp1.MetaData.IsValid && fktp1.Response.Rujukan.Any()) rujukanList.AddRange(fktp1.Response.Rujukan);
+                                    svc = new Service();
+                                    var fktp2 = svc.GetRujukan(reg.GuarantorCardNo, Common.BPJS.VClaim.Enum.JenisFaskes.RS);
+                                    if (fktp2.MetaData.IsValid && fktp2.Response.Rujukan.Any()) rujukanList.AddRange(fktp2.Response.Rujukan);
+                                    if (rujukanList.Any())
+                                    {
+                                        if (rujukanList.Any(r =>
+                                                r.PoliRujukan.Kode == ub.BridgingID &&
+                                                planItem.ControlPlanDateTime.Date <= DateTime.ParseExact(r.TglKunjungan, "yyyy-MM-dd", null, DateTimeStyles.None).AddDays(90).Date))
+                                        {
+                                            bpjsSepNo = rujukanList.Single(r =>
+                                                r.PoliRujukan.Kode == ub.BridgingID &&
+                                                planItem.ControlPlanDateTime.Date <= DateTime.ParseExact(r.TglKunjungan, "yyyy-MM-dd", null, DateTimeStyles.None).AddDays(90).Date).NoKunjungan;
+                                        }
+                                    }
+                                }
+                                var exist = false;
+                                svc = new Service();
+                                var list = svc.GetRencanaKontrolByNoPeserta(
+                                    planItem.ControlPlanDateTime.Date.ToString("MM"),
+                                    planItem.ControlPlanDateTime.Date.ToString("yyyy"), reg.GuarantorCardNo,
+                                    Temiang.Avicenna.Common.BPJS.VClaim.Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
+                                exist = list.MetaData.IsValid && list.Response.List != null && list.Response.List.Any(l => l.NoSepAsalKontrol == reg.BpjsSepNo);
+
+                                if (!exist)
+                                {
+                                    var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.Root()
+                                    {
+                                        Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.TRequest()
+                                        {
+                                            NoSEP = bpjsSepNo,
+                                            KodeDokter = pb.BridgingID,
+                                            PoliKontrol = ub.BridgingID,
+                                            TglRencanaKontrol =
+                                                planItem.ControlPlanDateTime.Date.ToString("yyyy-MM-dd"),
+                                            User = AppSession.UserLogin.UserID
+                                        }
+                                    };
+                                    svc = new Service();
+                                    var response = svc.Insert(root);
+                                    var log = new WebServiceAPILog
+                                    {
+                                        DateRequest = DateTime.Now,
+                                        IPAddress = string.Empty,
+                                        UrlAddress = "ResumeMedisOP",
+                                        Params = JsonConvert.SerializeObject(root),
+                                        Response = JsonConvert.SerializeObject(response),
+                                        Totalms = 0
+                                    };
+                                    log.Save();
+                                    //if (!response.MetaData.IsValid)
+                                    //{
+                                    //    args.MessageText = response.MetaData.Message;
+                                    //    args.IsCancel = true;
+                                    //    return;
+                                    //}
+                                }
                             }
                             catch (Exception ex)
                             {
-                                args.MessageText = ex.Message;
-                                args.IsCancel = true;
+
                             }
                         }
                         else
                         {
-                            var qSlot = new ServiceUnitParamedic();
-                            if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) && qSlot.IsUsingQue == true)
+                            //db:20241105 - query data appointment berdasarkan no appointment
+                            var apptq = new AppointmentQuery();
+                            apptq.Where(apptq.AppointmentNo == appointmentNo,
+                                apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel);
+
+                            var appt = new BusinessObject.Appointment();
+                            if (appt.Load(apptq))
+                            {
+                                //db:20241105 - cek data ServiceUnitID, ParamedicID & ControlPlanDateTime. kalo tidak sama dg di data di control plan, cancel no appointment, u/ kemudian create no appoinment baru
+                                if (appt.ServiceUnitID != planItem.ServiceUnitID ||
+                                    appt.ParamedicID != planItem.ParamedicID || appt.PatientID != pat.PatientID ||
+                                    appt.AppointmentDate != planItem.ControlPlanDateTime.Date)
+                                {
+                                    appointmentNo = string.Empty;
+                                }
+                                else
+                                {
+                                    if (appointmentNos == string.Empty)
+                                        appointmentNos = appointmentNo;
+                                    else
+                                        appointmentNos = ";" + appointmentNo;
+                                }
+                            }
+                            else
+                                appointmentNo = string.Empty;
+                        }
+                    }
+                    else
+                    {
+                        //teguharifandi:20250709 - rsi : pasien bpjs hanya create rencana kontrol tdk appointment, nanti pasien yg ambil apt lewat mjkn
+                        if (AppSession.Parameter.HealthcareInitial == "RSI" &&
+                            AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
+                            !string.IsNullOrWhiteSpace(reg.BpjsSepNo))
+                        {
+                            try
+                            {
+                                var pb = new ParamedicBridging();
+                                pb.Query.Where(pb.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                                    pb.Query.ParamedicID == planItem.ParamedicID);
+                                if (!pb.Query.Load())
+                                {
+                                    args.MessageText = "Mapping dokter tidak ditemukan";
+                                    args.IsCancel = true;
+                                    return;
+                                }
+
+                                var ub = new ServiceUnitBridging();
+                                ub.Query.Where(ub.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                                    ub.Query.ServiceUnitID == planItem.ServiceUnitID);
+                                ub.Query.Load();
+                                if (!ub.Query.Load())
+                                {
+                                    args.MessageText = "Mapping poli/unit tidak ditemukan";
+                                    args.IsCancel = true;
+                                    return;
+                                }
+
+                                var svc = new Common.BPJS.VClaim.v11.Service();
+                                var exist = false;
+                                svc = new Service();
+                                var list = svc.GetRencanaKontrolByNoPeserta(
+                                    planItem.ControlPlanDateTime.Date.ToString("MM"),
+                                    planItem.ControlPlanDateTime.Date.ToString("yyyy"), reg.GuarantorCardNo,
+                                    Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
+                                exist = list.MetaData.IsValid && list.Response.List != null && list.Response.List.Any(l => l.NoSepAsalKontrol == reg.BpjsSepNo);
+                                if (!exist)
+                                {
+                                    svc = new Service();
+                                    var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.Root()
+                                    {
+                                        Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.TRequest()
+                                        {
+                                            NoSEP = reg.BpjsSepNo,
+                                            KodeDokter = pb.BridgingID,
+                                            PoliKontrol = ub.BridgingID,
+                                            TglRencanaKontrol =
+                                                planItem.ControlPlanDateTime.Date.ToString("yyyy-MM-dd"),
+                                            User = AppSession.UserLogin.UserID
+                                        }
+                                    };
+                                    var response = svc.Insert(root);
+                                    var log = new WebServiceAPILog
+                                    {
+                                        DateRequest = DateTime.Now,
+                                        IPAddress = string.Empty,
+                                        UrlAddress = "ResumeMedisOP",
+                                        Params = JsonConvert.SerializeObject(root),
+                                        Response = JsonConvert.SerializeObject(response),
+                                        Totalms = 0
+                                    };
+                                    log.Save();
+                                    if (!response.MetaData.IsValid)
+                                    {
+                                        args.MessageText = response.MetaData.Message;
+                                        args.IsCancel = true;
+                                        return;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            //db:20241105 - cek apakah sudah ada data appointment yg ter-create sesuai ServiceUnitID, ParamedicID & ControlPlanDateTime (dari action save & edit)
+                            var apptq = new AppointmentQuery();
+                            apptq.Where(apptq.ServiceUnitID == planItem.ServiceUnitID,
+                                apptq.ParamedicID == planItem.ParamedicID, apptq.PatientID == pat.PatientID,
+                                apptq.AppointmentDate == planItem.ControlPlanDateTime.Date,
+                                apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel,
+                                apptq.SRAppoinmentType == AppSession.Parameter.AppointmentTypeControlPlan);
+                            apptq.Select(apptq.AppointmentNo, apptq.AppointmentQue, apptq.AppointmentTime);
+
+                            var appt = new BusinessObject.Appointment();
+                            if (appt.Load(apptq))
+                            {
+                                appointmentNo = appt.AppointmentNo;
+
+                                planItem.AppointmentTime = appt.AppointmentTime;
+                                planItem.AppointmentQue = appt.AppointmentQue;
+                                planItem.AppointmentNo = appointmentNo;
+
+                                if (appointmentNos == string.Empty)
+                                    appointmentNos = appt.AppointmentNo;
+                                else
+                                    appointmentNos = ";" + appt.AppointmentNo;
+                            }
+                            else
+                            {
+                                appointmentNo = string.Empty;
+                            }
+                        }
+                    }
+
+                    //teguharifandi:20250709 - rsi : pasien bpjs hanya create rencana kontrol tdk appointment, nanti pasien yg ambil apt lewat mjkn
+                    if (AppSession.Parameter.HealthcareInitial != "RSI")
+                    {
+                        if (string.IsNullOrEmpty(appointmentNo))
+                        {
+                            var qSchedule = new ParamedicScheduleDate();
+                            if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID,
+                                    planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
                             {
                                 try
                                 {
                                     // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
-                                    var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS.AppointmentSetEntityValue(string.Empty, planItem.ServiceUnitID, planItem.ParamedicID,
+                                    var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS.AppointmentSetEntityValue(
+                                        string.Empty, planItem.ServiceUnitID, planItem.ParamedicID,
                                         planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
-                                        PatientID, pat.FirstName, pat.MiddleName, pat.LastName, pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
+                                        PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                                        pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
                                         pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
-                                        pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep, AppSession.Parameter.AppointmentStatusOpen,
-                                        pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID, AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+                                        pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep,
+                                        AppSession.Parameter.AppointmentStatusOpen,
+                                        pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                                        AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
 
                                     planItem.AppointmentTime = slot["AppointmentTime"].ToString();
                                     planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
@@ -1921,6 +2087,46 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                                 {
                                     args.MessageText = ex.Message;
                                     args.IsCancel = true;
+                                }
+                            }
+                            else
+                            {
+                                var qSlot = new ServiceUnitParamedic();
+                                if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) &&
+                                    qSlot.IsUsingQue == true)
+                                {
+                                    try
+                                    {
+                                        // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
+                                        var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
+                                            .AppointmentSetEntityValue(string.Empty, planItem.ServiceUnitID,
+                                                planItem.ParamedicID,
+                                                planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO",
+                                                string.Empty,
+                                                PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                                                pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth,
+                                                pat.Sex,
+                                                pat.StreetName, pat.District, pat.City, pat.County, pat.State,
+                                                pat.ZipCode,
+                                                pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep,
+                                                AppSession.Parameter.AppointmentStatusOpen,
+                                                pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                                                AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+
+                                        planItem.AppointmentTime = slot["AppointmentTime"].ToString();
+                                        planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
+                                        planItem.AppointmentNo = slot["AppointmentNo"].ToString();
+
+                                        if (appointmentNos == string.Empty)
+                                            appointmentNos = planItem.AppointmentNo;
+                                        else
+                                            appointmentNos = ";" + planItem.AppointmentNo;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        args.MessageText = ex.Message;
+                                        args.IsCancel = true;
+                                    }
                                 }
                             }
                         }

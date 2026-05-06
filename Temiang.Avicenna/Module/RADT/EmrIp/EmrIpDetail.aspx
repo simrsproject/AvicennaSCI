@@ -395,6 +395,7 @@
                     case "dicom":
                         openDicom("");
                         break;
+
                     case "pc_visit":
                         openVisit("<%=PatientID%>", "<%=RegistrationNo%>");
                         break;
@@ -416,6 +417,7 @@
                     case "ImmHist":
                         openImmunizationHist();
                         break;
+
                     default:
                         if (value.includes('rpt_')) {
                             var vals = value.split('_');
@@ -1631,6 +1633,15 @@
                                         <asp:Label runat="server" ID="lblTglRanap" Font-Bold="true"/>
                                     </td>
                                 </tr>
+                                <tr runat="server" id="trHakKelasBpjs">
+                                    <td style="vertical-align: top;">BPJS Hak Kelas
+                                    </td>
+                                    <td style="vertical-align: top;">:
+                                    </td>
+                                    <td>
+                                        <asp:Label runat="server" ID="lblBpjsHakKelas" Font-Bold="true" />
+                                    </td>
+                                </tr>
                                 <tr runat="server" id="trCovClass">
                                     <td style="vertical-align: top;">Cov. Class
                                     </td>
@@ -1649,6 +1660,26 @@
                                         <asp:Label runat="server" ID="lblServiceUnit" Font-Bold="true" />
                                     </td>
                                 </tr>
+                                <asp:Panel runat="server" ID="trRujukan" Visible="False">
+                                    <tr>
+                                        <td style="vertical-align: top;">Tgl. Berlaku Rujukan
+                                        </td>
+                                        <td style="vertical-align: top;">:
+                                        </td>
+                                        <td>
+                                            <asp:Label runat="server" ID="lblTglRujukan" Font-Bold="true" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="vertical-align: top;">Poli Rujukan
+                                        </td>
+                                        <td style="vertical-align: top;">:
+                                        </td>
+                                        <td>
+                                            <asp:Label runat="server" ID="lblPoliRujukan" Font-Bold="true" />
+                                        </td>
+                                    </tr>
+                                </asp:Panel>
                             </table>
                         </td>
                     </tr>

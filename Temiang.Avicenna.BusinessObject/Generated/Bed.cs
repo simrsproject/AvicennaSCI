@@ -1,34 +1,36 @@
 /*
 ===============================================================================
-                       Persistence Layer and Business Objects  
+                 Persistence Layer and Business Objects
 ===============================================================================
-                       Date Generated       : 20/03/2024 20:09:14
+Version         : 2009.2.1214.0
+Driver          : SQL
+Date Generated  : 4/8/2026 2:19:23 PM
 ===============================================================================
 */
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.ComponentModel;
+using System.Data;
+using System.Text;
 using System.Xml.Serialization;
+using Temiang.Avicenna.BusinessObject;
 using Temiang.Dal.Core;
-using Temiang.Dal.Interfaces;
 using Temiang.Dal.DynamicQuery;
+using Temiang.Dal.Interfaces;
+
+
 
 namespace Temiang.Avicenna.BusinessObject
 {
+
     [Serializable]
     abstract public class esBedCollection : esEntityCollectionWAuditLog
     {
         public esBedCollection()
         {
 
-        }
-
-        protected override string GetConnectionName()
-        {
-            return "sci";
         }
 
         protected override string GetCollectionName()
@@ -84,6 +86,8 @@ namespace Temiang.Avicenna.BusinessObject
         }
     }
 
+
+
     [Serializable]
     abstract public class esBed : esEntityWAuditLog
     {
@@ -97,20 +101,17 @@ namespace Temiang.Avicenna.BusinessObject
 
         public esBed()
         {
+
         }
 
         public esBed(DataRow row)
             : base(row)
         {
-        }
 
-        protected override string GetConnectionName()
-        {
-            return "sci";
         }
 
         #region LoadByPrimaryKey
-        public virtual bool LoadByPrimaryKey(String bedID)
+        public virtual bool LoadByPrimaryKey(System.String bedID)
         {
             if (this.es.Connection.SqlAccessType == esSqlAccessType.DynamicSQL)
                 return LoadByPrimaryKeyDynamic(bedID);
@@ -118,16 +119,7 @@ namespace Temiang.Avicenna.BusinessObject
                 return LoadByPrimaryKeyStoredProcedure(bedID);
         }
 
-        /// <summary>
-        /// Loads an entity by primary key
-        /// </summary>
-        /// <remarks>
-        /// Requires primary keys be defined on all tables.
-        /// If a table does not have a primary key set,
-        /// this method will not compile.
-        /// </remarks>
-        /// <param name="sqlAccessType">Either esSqlAccessType StoredProcedure or DynamicSQL</param>
-        public virtual bool LoadByPrimaryKey(esSqlAccessType sqlAccessType, String bedID)
+        public virtual bool LoadByPrimaryKey(esSqlAccessType sqlAccessType, System.String bedID)
         {
             if (sqlAccessType == esSqlAccessType.DynamicSQL)
                 return LoadByPrimaryKeyDynamic(bedID);
@@ -135,14 +127,14 @@ namespace Temiang.Avicenna.BusinessObject
                 return LoadByPrimaryKeyStoredProcedure(bedID);
         }
 
-        private bool LoadByPrimaryKeyDynamic(String bedID)
+        private bool LoadByPrimaryKeyDynamic(System.String bedID)
         {
             esBedQuery query = this.GetDynamicQuery();
             query.Where(query.BedID == bedID);
             return query.Load();
         }
 
-        private bool LoadByPrimaryKeyStoredProcedure(String bedID)
+        private bool LoadByPrimaryKeyStoredProcedure(System.String bedID)
         {
             esParameters parms = new esParameters();
             parms.Add("BedID", bedID);
@@ -150,7 +142,10 @@ namespace Temiang.Avicenna.BusinessObject
         }
         #endregion
 
+
+
         #region Properties
+
 
         public override void SetProperties(IDictionary values)
         {
@@ -189,9 +184,11 @@ namespace Temiang.Avicenna.BusinessObject
                         case "OldBedID": this.str.OldBedID = (string)value; break;
                         case "DefaultChargeClassID": this.str.DefaultChargeClassID = (string)value; break;
                         case "Notes": this.str.Notes = (string)value; break;
-                        case "BridgingID": this.str.BridgingID = (string)value; break;
                         case "SatuSehatBridgingID": this.str.SatuSehatBridgingID = (string)value; break;
                         case "SatuSehatBridgingName": this.str.SatuSehatBridgingName = (string)value; break;
+                        case "SRBridgingType": this.str.SRBridgingType = (string)value; break;
+                        case "BridgingID": this.str.BridgingID = (string)value; break;
+                        case "BridgingName": this.str.BridgingName = (string)value; break;
                     }
                 }
                 else
@@ -203,36 +200,43 @@ namespace Temiang.Avicenna.BusinessObject
                             if (value == null || value is System.Boolean)
                                 this.IsTemporary = (System.Boolean?)value;
                             break;
+
                         case "IsActive":
 
                             if (value == null || value is System.Boolean)
                                 this.IsActive = (System.Boolean?)value;
                             break;
+
                         case "IsNeedConfirmation":
 
                             if (value == null || value is System.Boolean)
                                 this.IsNeedConfirmation = (System.Boolean?)value;
                             break;
+
                         case "LastUpdateDateTime":
 
                             if (value == null || value is System.DateTime)
                                 this.LastUpdateDateTime = (System.DateTime?)value;
                             break;
+
                         case "IsRoomIn":
 
                             if (value == null || value is System.Boolean)
                                 this.IsRoomIn = (System.Boolean?)value;
                             break;
+
                         case "BookingDateTime":
 
                             if (value == null || value is System.DateTime)
                                 this.BookingDateTime = (System.DateTime?)value;
                             break;
+
                         case "IsVisibleTo3rdParty":
 
                             if (value == null || value is System.Boolean)
                                 this.IsVisibleTo3rdParty = (System.Boolean?)value;
                             break;
+
 
                         default:
                             break;
@@ -249,6 +253,7 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+
         /// <summary>
         /// Maps to Bed.BedID
         /// </summary>
@@ -264,6 +269,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.BedID, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.RoomID
         /// </summary>
@@ -279,6 +285,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.RoomID, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.RegistrationNo
         /// </summary>
@@ -294,6 +301,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.RegistrationNo, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.ClassID
         /// </summary>
@@ -309,6 +317,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.ClassID, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.SRBedStatus
         /// </summary>
@@ -324,6 +333,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.SRBedStatus, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.BedStatusUpdatedBy
         /// </summary>
@@ -339,6 +349,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.BedStatusUpdatedBy, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.IsTemporary
         /// </summary>
@@ -354,6 +365,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(BedMetadata.ColumnNames.IsTemporary, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.IsActive
         /// </summary>
@@ -369,6 +381,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(BedMetadata.ColumnNames.IsActive, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.IsNeedConfirmation
         /// </summary>
@@ -384,6 +397,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(BedMetadata.ColumnNames.IsNeedConfirmation, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.LastUpdateDateTime
         /// </summary>
@@ -399,6 +413,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemDateTime(BedMetadata.ColumnNames.LastUpdateDateTime, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.LastUpdateByUserID
         /// </summary>
@@ -414,6 +429,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.LastUpdateByUserID, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.IsRoomIn
         /// </summary>
@@ -429,6 +445,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(BedMetadata.ColumnNames.IsRoomIn, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.BookingDateTime
         /// </summary>
@@ -444,6 +461,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemDateTime(BedMetadata.ColumnNames.BookingDateTime, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.IsVisibleTo3rdParty
         /// </summary>
@@ -459,6 +477,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(BedMetadata.ColumnNames.IsVisibleTo3rdParty, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.OldBedID
         /// </summary>
@@ -474,6 +493,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.OldBedID, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.DefaultChargeClassID
         /// </summary>
@@ -489,6 +509,7 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(BedMetadata.ColumnNames.DefaultChargeClassID, value);
             }
         }
+
         /// <summary>
         /// Maps to Bed.Notes
         /// </summary>
@@ -502,21 +523,6 @@ namespace Temiang.Avicenna.BusinessObject
             set
             {
                 base.SetSystemString(BedMetadata.ColumnNames.Notes, value);
-            }
-        }
-        /// <summary>
-        /// Maps to Bed.BridgingID
-        /// </summary>
-        virtual public System.String BridgingID
-        {
-            get
-            {
-                return base.GetSystemString(BedMetadata.ColumnNames.BridgingID);
-            }
-
-            set
-            {
-                base.SetSystemString(BedMetadata.ColumnNames.BridgingID, value);
             }
         }
 
@@ -552,34 +558,59 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        /// <summary>
+        /// Maps to Bed.SRBridgingType
+        /// </summary>
+        virtual public System.String SRBridgingType
+        {
+            get
+            {
+                return base.GetSystemString(BedMetadata.ColumnNames.SRBridgingType);
+            }
+
+            set
+            {
+                base.SetSystemString(BedMetadata.ColumnNames.SRBridgingType, value);
+            }
+        }
+
+        /// <summary>
+        /// Maps to Bed.BridgingID
+        /// </summary>
+        virtual public System.String BridgingID
+        {
+            get
+            {
+                return base.GetSystemString(BedMetadata.ColumnNames.BridgingID);
+            }
+
+            set
+            {
+                base.SetSystemString(BedMetadata.ColumnNames.BridgingID, value);
+            }
+        }
+
+        /// <summary>
+        /// Maps to Bed.BridgingName
+        /// </summary>
+        virtual public System.String BridgingName
+        {
+            get
+            {
+                return base.GetSystemString(BedMetadata.ColumnNames.BridgingName);
+            }
+
+            set
+            {
+                base.SetSystemString(BedMetadata.ColumnNames.BridgingName, value);
+            }
+        }
+
         #endregion
 
         #region String Properties
 
-        /// <summary>
-        /// Converts an entity's properties to
-        /// and from strings.
-        /// </summary>
-        /// <remarks>
-        /// The str properties Get and Set provide easy conversion
-        /// between a string and a property's data type. Not all
-        /// data types will get a str property.
-        /// </remarks>
-        /// <example>
-        /// Set a datetime from a string.
-        /// <code>
-        /// Employees entity = new Employees();
-        /// entity.LoadByPrimaryKey(10);
-        /// entity.str.HireDate = "2007-01-01 00:00:00";
-        /// entity.Save();
-        /// </code>
-        /// Get a datetime as a string.
-        /// <code>
-        /// Employees entity = new Employees();
-        /// entity.LoadByPrimaryKey(10);
-        /// string theDate = entity.str.HireDate;
-        /// </code>
-        /// </example>
+
         [BrowsableAttribute(false)]
         public esStrings str
         {
@@ -593,6 +624,7 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+
         [Serializable]
         sealed public class esStrings
         {
@@ -600,6 +632,8 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 this.entity = entity;
             }
+
+
             public System.String BedID
             {
                 get
@@ -614,6 +648,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.BedID = Convert.ToString(value);
                 }
             }
+
             public System.String RoomID
             {
                 get
@@ -628,6 +663,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.RoomID = Convert.ToString(value);
                 }
             }
+
             public System.String RegistrationNo
             {
                 get
@@ -642,6 +678,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.RegistrationNo = Convert.ToString(value);
                 }
             }
+
             public System.String ClassID
             {
                 get
@@ -656,6 +693,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.ClassID = Convert.ToString(value);
                 }
             }
+
             public System.String SRBedStatus
             {
                 get
@@ -670,6 +708,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.SRBedStatus = Convert.ToString(value);
                 }
             }
+
             public System.String BedStatusUpdatedBy
             {
                 get
@@ -684,6 +723,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.BedStatusUpdatedBy = Convert.ToString(value);
                 }
             }
+
             public System.String IsTemporary
             {
                 get
@@ -698,6 +738,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsTemporary = Convert.ToBoolean(value);
                 }
             }
+
             public System.String IsActive
             {
                 get
@@ -712,6 +753,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsActive = Convert.ToBoolean(value);
                 }
             }
+
             public System.String IsNeedConfirmation
             {
                 get
@@ -726,6 +768,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsNeedConfirmation = Convert.ToBoolean(value);
                 }
             }
+
             public System.String LastUpdateDateTime
             {
                 get
@@ -740,6 +783,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.LastUpdateDateTime = Convert.ToDateTime(value);
                 }
             }
+
             public System.String LastUpdateByUserID
             {
                 get
@@ -754,6 +798,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.LastUpdateByUserID = Convert.ToString(value);
                 }
             }
+
             public System.String IsRoomIn
             {
                 get
@@ -768,6 +813,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsRoomIn = Convert.ToBoolean(value);
                 }
             }
+
             public System.String BookingDateTime
             {
                 get
@@ -782,6 +828,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.BookingDateTime = Convert.ToDateTime(value);
                 }
             }
+
             public System.String IsVisibleTo3rdParty
             {
                 get
@@ -796,6 +843,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsVisibleTo3rdParty = Convert.ToBoolean(value);
                 }
             }
+
             public System.String OldBedID
             {
                 get
@@ -810,6 +858,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.OldBedID = Convert.ToString(value);
                 }
             }
+
             public System.String DefaultChargeClassID
             {
                 get
@@ -824,6 +873,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.DefaultChargeClassID = Convert.ToString(value);
                 }
             }
+
             public System.String Notes
             {
                 get
@@ -838,20 +888,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.Notes = Convert.ToString(value);
                 }
             }
-            public System.String BridgingID
-            {
-                get
-                {
-                    System.String data = entity.BridgingID;
-                    return (data == null) ? String.Empty : Convert.ToString(data);
-                }
 
-                set
-                {
-                    if (value == null || value.Length == 0) entity.BridgingID = null;
-                    else entity.BridgingID = Convert.ToString(value);
-                }
-            }
             public System.String SatuSehatBridgingID
             {
                 get
@@ -866,6 +903,7 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.SatuSehatBridgingID = Convert.ToString(value);
                 }
             }
+
             public System.String SatuSehatBridgingName
             {
                 get
@@ -880,6 +918,53 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.SatuSehatBridgingName = Convert.ToString(value);
                 }
             }
+
+            public System.String SRBridgingType
+            {
+                get
+                {
+                    System.String data = entity.SRBridgingType;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.SRBridgingType = null;
+                    else entity.SRBridgingType = Convert.ToString(value);
+                }
+            }
+
+            public System.String BridgingID
+            {
+                get
+                {
+                    System.String data = entity.BridgingID;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.BridgingID = null;
+                    else entity.BridgingID = Convert.ToString(value);
+                }
+            }
+
+            public System.String BridgingName
+            {
+                get
+                {
+                    System.String data = entity.BridgingName;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.BridgingName = null;
+                    else entity.BridgingName = Convert.ToString(value);
+                }
+            }
+
+
             private esBed entity;
         }
         #endregion
@@ -910,18 +995,53 @@ namespace Temiang.Avicenna.BusinessObject
     }
 
 
+
     public partial class Bed : esBed
     {
+
+
+        /// <summary>
+        /// Used internally by the entity's hierarchical properties.
+        /// </summary>
+        protected override List<esPropertyDescriptor> GetHierarchicalProperties()
+        {
+            List<esPropertyDescriptor> props = new List<esPropertyDescriptor>();
+
+
+            return props;
+        }
+
+        /// <summary>
+        /// Used internally for retrieving AutoIncrementing keys
+        /// during hierarchical PreSave.
+        /// </summary>
+        protected override void ApplyPreSaveKeys()
+        {
+        }
+
+        /// <summary>
+        /// Used internally for retrieving AutoIncrementing keys
+        /// during hierarchical PostSave.
+        /// </summary>
+        protected override void ApplyPostSaveKeys()
+        {
+        }
+
+        /// <summary>
+        /// Used internally for retrieving AutoIncrementing keys
+        /// during hierarchical PostOneToOneSave.
+        /// </summary>
+        protected override void ApplyPostOneSaveKeys()
+        {
+        }
+
     }
+
+
 
     [Serializable]
     abstract public class esBedQuery : esDynamicQuery
     {
-        protected override string GetConnectionName()
-        {
-            return "sci";
-        }
-
         override protected IMetadata Meta
         {
             get
@@ -929,6 +1049,7 @@ namespace Temiang.Avicenna.BusinessObject
                 return BedMetadata.Meta();
             }
         }
+
 
         public esQueryItem BedID
         {
@@ -1066,13 +1187,6 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        public esQueryItem BridgingID
-        {
-            get
-            {
-                return new esQueryItem(this, BedMetadata.ColumnNames.BridgingID, esSystemType.String);
-            }
-        }
         public esQueryItem SatuSehatBridgingID
         {
             get
@@ -1089,7 +1203,33 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        public esQueryItem SRBridgingType
+        {
+            get
+            {
+                return new esQueryItem(this, BedMetadata.ColumnNames.SRBridgingType, esSystemType.String);
+            }
+        }
+
+        public esQueryItem BridgingID
+        {
+            get
+            {
+                return new esQueryItem(this, BedMetadata.ColumnNames.BridgingID, esSystemType.String);
+            }
+        }
+
+        public esQueryItem BridgingName
+        {
+            get
+            {
+                return new esQueryItem(this, BedMetadata.ColumnNames.BridgingName, esSystemType.String);
+            }
+        }
+
     }
+
+
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
     [Serializable]
@@ -1122,6 +1262,8 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+
+
         override protected esDynamicQuery GetDynamicQuery()
         {
             if (this.query == null)
@@ -1142,7 +1284,9 @@ namespace Temiang.Avicenna.BusinessObject
             return new Bed();
         }
 
+
         #endregion
+
 
         [BrowsableAttribute(false)]
         public BedQuery Query
@@ -1159,95 +1303,11 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        /// <summary>
-        /// Useful for building up conditional queries.
-        /// In most cases, before loading an entity or collection,
-        /// you should instantiate a new one. This method was added
-        /// to handle specialized circumstances, and should not be
-        /// used as a substitute for that.
-        /// </summary>
-        /// <remarks>
-        /// This just sets obj.Query to null/Nothing.
-        /// In most cases, you will 'new' your object before
-        /// loading it, rather than calling this method.
-        /// It only affects obj.Query.Load(), so is not useful
-        /// when Joins are involved, or for many other situations.
-        /// Because it clears out any obj.Query.Where clauses,
-        /// it can be useful for building conditional queries on the fly.
-        /// <code>
-        /// public bool ReQuery(string lastName, string firstName)
-        /// {
-        ///     this.QueryReset();
-        ///     
-        ///     if(!String.IsNullOrEmpty(lastName))
-        ///     {
-        ///         this.Query.Where(
-        ///             this.Query.LastName == lastName);
-        ///     }
-        ///     if(!String.IsNullOrEmpty(firstName))
-        ///     {
-        ///         this.Query.Where(
-        ///             this.Query.FirstName == firstName);
-        ///     }
-        ///     
-        ///     return this.Query.Load();
-        /// }
-        /// </code>
-        /// <code lang="vbnet">
-        /// Public Function ReQuery(ByVal lastName As String, _
-        ///     ByVal firstName As String) As Boolean
-        /// 
-        ///     Me.QueryReset()
-        /// 
-        ///     If Not [String].IsNullOrEmpty(lastName) Then
-        ///         Me.Query.Where(Me.Query.LastName = lastName)
-        ///     End If
-        ///     If Not [String].IsNullOrEmpty(firstName) Then
-        ///         Me.Query.Where(Me.Query.FirstName = firstName)
-        ///     End If
-        /// 
-        ///     Return Me.Query.Load()
-        /// End Function
-        /// </code>
-        /// </remarks>
         public void QueryReset()
         {
             this.query = null;
         }
 
-        /// <summary>
-        /// Used to custom load a Join query.
-        /// Returns true if at least one record was loaded.
-        /// </summary>
-        /// <remarks>
-        /// Provides support for InnerJoin, LeftJoin,
-        /// RightJoin, and FullJoin. You must provide an alias
-        /// for each query when instantiating them.
-        /// <code>
-        /// EmployeeCollection collection = new EmployeeCollection();
-        /// 
-        /// EmployeeQuery emp = new EmployeeQuery("eq");
-        /// CustomerQuery cust = new CustomerQuery("cq");
-        /// 
-        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName);
-        /// emp.LeftJoin(cust).On(emp.EmployeeID == cust.StaffAssigned);
-        /// 
-        /// collection.Load(emp);
-        /// </code>
-        /// <code lang="vbnet">
-        /// Dim collection As New EmployeeCollection()
-        /// 
-        /// Dim emp As New EmployeeQuery("eq")
-        /// Dim cust As New CustomerQuery("cq")
-        /// 
-        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName)
-        /// emp.LeftJoin(cust).On(emp.EmployeeID = cust.StaffAssigned)
-        /// 
-        /// collection.Load(emp)
-        /// </code>
-        /// </remarks>
-        /// <param name="query">The query object instance name.</param>
-        /// <returns>True if at least one record was loaded.</returns>
         public bool Load(BedQuery query)
         {
             this.query = query;
@@ -1255,22 +1315,20 @@ namespace Temiang.Avicenna.BusinessObject
             return this.Query.Load();
         }
 
-        /// <summary>
-        /// Adds a new entity to the collection.
-        /// Always calls AddNew() on the entity, in case it is overridden.
-        /// </summary>
         public Bed AddNew()
         {
             Bed entity = base.AddNewEntity() as Bed;
 
             return entity;
         }
-        public Bed FindByPrimaryKey(String bedID)
+
+        public Bed FindByPrimaryKey(System.String bedID)
         {
             return base.FindByPrimaryKey(bedID) as Bed;
         }
 
-        #region IEnumerable< Bed> Members
+
+        #region IEnumerable<Bed> Members
 
         IEnumerator<Bed> IEnumerable<Bed>.GetEnumerator()
         {
@@ -1292,17 +1350,20 @@ namespace Temiang.Avicenna.BusinessObject
     /// <summary>
     /// Encapsulates the 'Bed' table
     /// </summary>
+
     [System.Diagnostics.DebuggerDisplay("Bed ({BedID})")]
     [Serializable]
     public partial class Bed : esBed
     {
         public Bed()
         {
+
         }
 
         public Bed(DataRow row)
             : base(row)
         {
+
         }
 
         #region Housekeeping methods
@@ -1314,6 +1375,8 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+
+
         override protected esBedQuery GetDynamicQuery()
         {
             if (this.query == null)
@@ -1324,6 +1387,9 @@ namespace Temiang.Avicenna.BusinessObject
             return this.query;
         }
         #endregion
+
+
+
 
         [BrowsableAttribute(false)]
         public BedQuery Query
@@ -1340,97 +1406,12 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        /// <summary>
-        /// Useful for building up conditional queries.
-        /// In most cases, before loading an entity or collection,
-        /// you should instantiate a new one. This method was added
-        /// to handle specialized circumstances, and should not be
-        /// used as a substitute for that.
-        /// </summary>
-        /// <remarks>
-        /// This just sets obj.Query to null/Nothing.
-        /// In most cases, you will 'new' your object before
-        /// loading it, rather than calling this method.
-        /// It only affects obj.Query.Load(), so is not useful
-        /// when Joins are involved, or for many other situations.
-        /// Because it clears out any obj.Query.Where clauses,
-        /// it can be useful for building conditional queries on the fly.
-        /// <code>
-        /// public bool ReQuery(string lastName, string firstName)
-        /// {
-        ///     this.QueryReset();
-        ///     
-        ///     if(!String.IsNullOrEmpty(lastName))
-        ///     {
-        ///         this.Query.Where(
-        ///             this.Query.LastName == lastName);
-        ///     }
-        ///     if(!String.IsNullOrEmpty(firstName))
-        ///     {
-        ///         this.Query.Where(
-        ///             this.Query.FirstName == firstName);
-        ///     }
-        ///     
-        ///     return this.Query.Load();
-        /// }
-        /// </code>
-        /// <code lang="vbnet">
-        /// Public Function ReQuery(ByVal lastName As String, _
-        ///     ByVal firstName As String) As Boolean
-        /// 
-        ///     Me.QueryReset()
-        /// 
-        ///     If Not [String].IsNullOrEmpty(lastName) Then
-        ///         Me.Query.Where(Me.Query.LastName = lastName)
-        ///     End If
-        ///     If Not [String].IsNullOrEmpty(firstName) Then
-        ///         Me.Query.Where(Me.Query.FirstName = firstName)
-        ///     End If
-        /// 
-        ///     Return Me.Query.Load()
-        /// End Function
-        /// </code>
-        /// </remarks>
         public void QueryReset()
         {
             this.query = null;
         }
 
-        /// <summary>
-        /// Used to custom load a Join query.
-        /// Returns true if at least one row is loaded.
-        /// For an entity, an exception will be thrown
-        /// if more than one row is loaded.
-        /// </summary>
-        /// <remarks>
-        /// Provides support for InnerJoin, LeftJoin,
-        /// RightJoin, and FullJoin. You must provide an alias
-        /// for each query when instantiating them.
-        /// <code>
-        /// EmployeeCollection collection = new EmployeeCollection();
-        /// 
-        /// EmployeeQuery emp = new EmployeeQuery("eq");
-        /// CustomerQuery cust = new CustomerQuery("cq");
-        /// 
-        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName);
-        /// emp.LeftJoin(cust).On(emp.EmployeeID == cust.StaffAssigned);
-        /// 
-        /// collection.Load(emp);
-        /// </code>
-        /// <code lang="vbnet">
-        /// Dim collection As New EmployeeCollection()
-        /// 
-        /// Dim emp As New EmployeeQuery("eq")
-        /// Dim cust As New CustomerQuery("cq")
-        /// 
-        /// emp.Select(emp.EmployeeID, emp.LastName, cust.CustomerName)
-        /// emp.LeftJoin(cust).On(emp.EmployeeID = cust.StaffAssigned)
-        /// 
-        /// collection.Load(emp)
-        /// </code>
-        /// </remarks>
-        /// <param name="query">The query object instance name.</param>
-        /// <returns>True if at least one record was loaded.</returns>
+
         public bool Load(BedQuery query)
         {
             this.query = query;
@@ -1441,8 +1422,11 @@ namespace Temiang.Avicenna.BusinessObject
         private BedQuery query;
     }
 
+
+
     [System.Diagnostics.DebuggerDisplay("LastQuery = {es.LastQuery}")]
     [Serializable]
+
     public partial class BedQuery : esBedQuery
     {
         public BedQuery()
@@ -1459,7 +1443,10 @@ namespace Temiang.Avicenna.BusinessObject
         {
             return "BedQuery";
         }
+
+
     }
+
 
     [Serializable]
     public partial class BedMetadata : esMetadata, IMetadata
@@ -1507,9 +1494,10 @@ namespace Temiang.Avicenna.BusinessObject
 
             c = new esColumnMetadata(BedMetadata.ColumnNames.BedStatusUpdatedBy, 5, typeof(System.String), esSystemType.String);
             c.PropertyName = BedMetadata.PropertyNames.BedStatusUpdatedBy;
-            c.CharacterMaxLength = 40;
+            c.CharacterMaxLength = 15;
             c.HasDefault = true;
             c.Default = @"('')";
+            c.IsNullable = true;
             _columns.Add(c);
 
             c = new esColumnMetadata(BedMetadata.ColumnNames.IsTemporary, 6, typeof(System.Boolean), esSystemType.Boolean);
@@ -1575,24 +1563,35 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BedMetadata.ColumnNames.BridgingID, 17, typeof(System.String), esSystemType.String);
-            c.PropertyName = BedMetadata.PropertyNames.BridgingID;
-            c.CharacterMaxLength = 50;
-            c.IsNullable = true;
-            _columns.Add(c);
-
-            c = new esColumnMetadata(BedMetadata.ColumnNames.SatuSehatBridgingID, 18, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(BedMetadata.ColumnNames.SatuSehatBridgingID, 17, typeof(System.String), esSystemType.String);
             c.PropertyName = BedMetadata.PropertyNames.SatuSehatBridgingID;
             c.CharacterMaxLength = 50;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BedMetadata.ColumnNames.SatuSehatBridgingName, 19, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(BedMetadata.ColumnNames.SatuSehatBridgingName, 18, typeof(System.String), esSystemType.String);
             c.PropertyName = BedMetadata.PropertyNames.SatuSehatBridgingName;
             c.CharacterMaxLength = 50;
             c.IsNullable = true;
             _columns.Add(c);
 
+            c = new esColumnMetadata(BedMetadata.ColumnNames.SRBridgingType, 19, typeof(System.String), esSystemType.String);
+            c.PropertyName = BedMetadata.PropertyNames.SRBridgingType;
+            c.CharacterMaxLength = 20;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(BedMetadata.ColumnNames.BridgingID, 20, typeof(System.String), esSystemType.String);
+            c.PropertyName = BedMetadata.PropertyNames.BridgingID;
+            c.CharacterMaxLength = 50;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(BedMetadata.ColumnNames.BridgingName, 21, typeof(System.String), esSystemType.String);
+            c.PropertyName = BedMetadata.PropertyNames.BridgingName;
+            c.CharacterMaxLength = 250;
+            c.IsNullable = true;
+            _columns.Add(c);
 
         }
         #endregion
@@ -1637,9 +1636,11 @@ namespace Temiang.Avicenna.BusinessObject
             public const string OldBedID = "OldBedID";
             public const string DefaultChargeClassID = "DefaultChargeClassID";
             public const string Notes = "Notes";
-            public const string BridgingID = "BridgingID";
             public const string SatuSehatBridgingID = "SatuSehatBridgingID";
             public const string SatuSehatBridgingName = "SatuSehatBridgingName";
+            public const string SRBridgingType = "SRBridgingType";
+            public const string BridgingID = "BridgingID";
+            public const string BridgingName = "BridgingName";
         }
         #endregion
 
@@ -1663,9 +1664,11 @@ namespace Temiang.Avicenna.BusinessObject
             public const string OldBedID = "OldBedID";
             public const string DefaultChargeClassID = "DefaultChargeClassID";
             public const string Notes = "Notes";
-            public const string BridgingID = "BridgingID";
             public const string SatuSehatBridgingID = "SatuSehatBridgingID";
             public const string SatuSehatBridgingName = "SatuSehatBridgingName";
+            public const string SRBridgingType = "SRBridgingType";
+            public const string BridgingID = "BridgingID";
+            public const string BridgingName = "BridgingName";
         }
         #endregion
 
@@ -1709,6 +1712,7 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 esProviderSpecificMetadata meta = new esProviderSpecificMetadata();
 
+
                 meta.AddTypeMap("BedID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("RoomID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("RegistrationNo", new esTypeMap("varchar", "System.String"));
@@ -1726,13 +1730,17 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("OldBedID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("DefaultChargeClassID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("Notes", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("BridgingID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SatuSehatBridgingID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SatuSehatBridgingName", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("SRBridgingType", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("BridgingID", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("BridgingName", new esTypeMap("varchar", "System.String"));
+
 
 
                 meta.Source = "Bed";
                 meta.Destination = "Bed";
+
                 meta.spInsert = "proc_BedInsert";
                 meta.spUpdate = "proc_BedUpdate";
                 meta.spDelete = "proc_BedDelete";
@@ -1751,5 +1759,4 @@ namespace Temiang.Avicenna.BusinessObject
         static protected Dictionary<string, MapToMeta> mapDelegates;
         static private int _esDefault = RegisterDelegateesDefault();
     }
-
 }

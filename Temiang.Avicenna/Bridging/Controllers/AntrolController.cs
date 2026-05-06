@@ -3937,8 +3937,11 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 try
                 {
                     var str = Encoding.UTF8.GetString(Convert.FromBase64String(param.NoRujukan));
-                    var decode = JsonConvert.DeserializeObject<Antrol.CheckIn.Request64String.Root>(str);
-                    if (decode != null && !string.IsNullOrWhiteSpace(decode.NomorAntrean)) param.NoRujukan = decode.KodeBooking;
+                    var decode = JsonConvert.DeserializeObject<Common.BPJS.Antrian.QrCode.Param.Root>(str);
+                    if (decode != null && !string.IsNullOrWhiteSpace(decode.KodeBooking))
+                    {
+                        param.NoRujukan = decode.KodeBooking;
+                    }
                 }
                 catch
                 {

@@ -205,6 +205,7 @@
     </Compile>
     <Compile Include="BaseControl\EntryControl.cs" />
     <Compile Include="BPJS\Antrian\List.cs" />
+    <Compile Include="BPJS\Antrian\QrCode.cs" />
     <Compile Include="BPJS\Antrian\Referensi .cs" />
     <Compile Include="BPJS\Antrian\Service.cs" />
     <Compile Include="BPJS\Antrian\Tambah.cs" />

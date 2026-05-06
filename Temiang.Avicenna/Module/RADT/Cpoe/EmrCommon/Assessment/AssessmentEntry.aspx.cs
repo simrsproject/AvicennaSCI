@@ -14,10 +14,12 @@ using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Avicenna.BusinessObject.JsonField.Assesment;
 using Temiang.Avicenna.Common;
+using Temiang.Avicenna.Common.BPJS.VClaim.v11;
 using Temiang.Avicenna.CustomControl;
 using Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
+using Enum = Temiang.Avicenna.Common.BPJS.VClaim.Enum;
 
 namespace Temiang.Avicenna.Module.RADT.Emr
 {
@@ -283,7 +285,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
 
             if (AppParameter.GetParameterValue(AppParameter.ParameterItem.IsAssessmentAutoSaveMds) == "Yes" && (RegistrationType == AppConstant.RegistrationType.OutPatient || RegistrationType == AppConstant.RegistrationType.EmergencyPatient))
-                SaveMedicalDischargeSummary(asses);
+                SaveMedicalDischargeSummary(asses, args);
 
             // UpdateSoapSubjective harus stelah proses save Asesmen supaya data history sudah tersimpan
             UpdateSoapSubjective(newRimId);
@@ -546,7 +548,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 }
 
                 if (AppParameter.GetParameterValue(AppParameter.ParameterItem.IsAssessmentAutoSaveMds) == "Yes" && (RegistrationType == AppConstant.RegistrationType.OutPatient || RegistrationType == AppConstant.RegistrationType.EmergencyPatient))
-                    SaveMedicalDischargeSummary(asses);
+                    SaveMedicalDischargeSummary(asses, args);
             }
 
             // SaveSoapSubjective harus stelah proses save Asesmen supaya data history sudah tersimpan
@@ -1368,7 +1370,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         }
 
         #region Save Medical Discharge Summary
-        private void SaveMedicalDischargeSummary(PatientAssessment asses)
+        private void SaveMedicalDischargeSummary(PatientAssessment asses, ValidateArgs args)
         {
             var medsum = new MedicalDischargeSummary();
 
@@ -1410,7 +1412,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 // Copy ulang ke MDS Casemix selama Mds Casemix belum di approve
                 var mdsCmx = new MedicalDischargeSummaryCmx();
                 if (!mdsCmx.LoadByPrimaryKey(RegistrationNo) || !(mdsCmx.IsApproved ?? false))
-                    CopyToMdsCaseMix();
+                    CopyToMdsCaseMix(args);
 
                 // Save to SEP Doc source code copy from ReportViewer
                 if (AppParameter.IsYes(AppParameter.ParameterItem.IsAutoSaveMdsDpjpToSepFolderAfterSave))
@@ -1429,7 +1431,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         }
 
         #region Copy to MDS CaseMix 
-        private void CopyToMdsCaseMix()
+        private void CopyToMdsCaseMix(ValidateArgs args)
         {
             using (var trans = new esTransactionScope())
             {
@@ -1441,6 +1443,288 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                     if (ent.LoadByPrimaryKey(RegistrationNo))
                     {
                         controlPlan = ent.ControlPlan;
+                    }
+
+                    var reg = RegistrationCurrent;
+                    if (AppSession.Parameter.HealthcareInitial == "RSI" &&
+                        AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
+                        !string.IsNullOrWhiteSpace(reg.BpjsSepNo))
+                    {
+                        var plan = JsonConvert.DeserializeObject<ControlPlan.Root>(controlPlan);
+                        if (plan != null && plan.Items.Any())
+                        {
+                            try
+                            {
+                                foreach (var item in plan.Items)
+                                {
+                                    try
+                                    {
+                                        var pb = new ParamedicBridging();
+                                        pb.Query.Where(pb.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                                            pb.Query.ParamedicID == item.ParamedicID);
+                                        if (!pb.Query.Load())
+                                        {
+                                            args.MessageText = "Mapping dokter tidak ditemukan";
+                                            args.IsCancel = true;
+                                            return;
+                                        }
+
+                                        var ub = new ServiceUnitBridging();
+                                        ub.Query.Where(ub.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                                            ub.Query.ServiceUnitID == item.ServiceUnitID);
+                                        ub.Query.Load();
+                                        if (!ub.Query.Load())
+                                        {
+                                            args.MessageText = "Mapping poli/unit tidak ditemukan";
+                                            args.IsCancel = true;
+                                            return;
+                                        }
+
+                                        var svc = new Common.BPJS.VClaim.v11.Service();
+                                        var listSrk = svc.GetRencanaKontrolByNoPeserta((item.ControlPlanDateTime ?? new DateTime()).ToString("MM"), (item.ControlPlanDateTime ?? new DateTime()).ToString("yyyy"), reg.GuarantorCardNo, Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
+                                        if (listSrk.MetaData.IsValid)
+                                        {
+                                            var srk = listSrk.Response.List.SingleOrDefault(s => s.NoKartu == reg.GuarantorCardNo && s.PoliTujuan == ub.BridgingID && s.TerbitSEP.ToLower() == "belum");
+                                            if (srk != null)
+                                            {
+                                                var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Update.Request.Root()
+                                                {
+                                                    Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Update.Request.TRequest()
+                                                    {
+                                                        NoSuratKontrol = srk.NoSuratKontrol,
+                                                        NoSEP = reg.BpjsSepNo,
+                                                        KodeDokter = pb.BridgingID,
+                                                        PoliKontrol = ub.BridgingID,
+                                                        TglRencanaKontrol = item.ControlPlanDateTime?.Date.ToString("yyyy-MM-dd"),
+                                                        User = AppSession.UserLogin.UserID
+                                                    }
+                                                };
+                                                svc = new Service();
+                                                var response = svc.Update(root);
+                                                var log = new WebServiceAPILog
+                                                {
+                                                    DateRequest = DateTime.Now,
+                                                    IPAddress = string.Empty,
+                                                    UrlAddress = "Assesment",
+                                                    Params = JsonConvert.SerializeObject(root),
+                                                    Response = JsonConvert.SerializeObject(response),
+                                                    Totalms = 0
+                                                };
+                                                log.Save();
+                                                if (!response.MetaData.IsValid)
+                                                {
+                                                    ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS GAGAL : " + response.MetaData.Message);
+                                                }
+                                                else
+                                                {
+                                                    ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS BERHASIL : " + response.Response.NoSuratKontrol);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var bpjsSepNo = reg.BpjsSepNo;
+                                                if (reg.SRRegistrationType == AppConstant.RegistrationType.InPatient)
+                                                {
+                                                    var rujukanList = new List<Common.BPJS.VClaim.v11.Rujukan.Select.Rujukan2>();
+                                                    svc = new Service();
+                                                    var fktp1 = svc.GetRujukan(reg.GuarantorCardNo, Enum.JenisFaskes.Faskes_1);
+                                                    if (fktp1.MetaData.IsValid && fktp1.Response.Rujukan.Any()) rujukanList.AddRange(fktp1.Response.Rujukan);
+                                                    svc = new Service();
+                                                    var fktp2 = svc.GetRujukan(reg.GuarantorCardNo, Enum.JenisFaskes.RS);
+                                                    if (fktp2.MetaData.IsValid && fktp2.Response.Rujukan.Any()) rujukanList.AddRange(fktp2.Response.Rujukan);
+                                                    if (rujukanList.Any())
+                                                    {
+                                                        if (rujukanList.Any(r =>
+                                                                r.PoliRujukan.Kode == ub.BridgingID &&
+                                                                item.ControlPlanDateTime?.Date <= DateTime.ParseExact(r.TglKunjungan, "yyyy-MM-dd", null, DateTimeStyles.None).AddDays(90).Date))
+                                                        {
+                                                            bpjsSepNo = rujukanList.Single(r =>
+                                                                r.PoliRujukan.Kode == ub.BridgingID &&
+                                                                item.ControlPlanDateTime?.Date <= DateTime.ParseExact(r.TglKunjungan, "yyyy-MM-dd", null, DateTimeStyles.None).AddDays(90).Date).NoKunjungan;
+                                                        }
+                                                    }
+                                                }
+
+                                                var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.Root()
+                                                {
+                                                    Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.TRequest()
+                                                    {
+                                                        NoSEP = bpjsSepNo,
+                                                        KodeDokter = pb.BridgingID,
+                                                        PoliKontrol = ub.BridgingID,
+                                                        TglRencanaKontrol = item.ControlPlanDateTime?.Date.ToString("yyyy-MM-dd"),
+                                                        User = AppSession.UserLogin.UserID
+                                                    }
+                                                };
+                                                svc = new Service();
+                                                var response = svc.Insert(root);
+                                                var log = new WebServiceAPILog
+                                                {
+                                                    DateRequest = DateTime.Now,
+                                                    IPAddress = string.Empty,
+                                                    UrlAddress = "Assesment",
+                                                    Params = JsonConvert.SerializeObject(root),
+                                                    Response = JsonConvert.SerializeObject(response),
+                                                    Totalms = 0
+                                                };
+                                                log.Save();
+                                                if (!response.MetaData.IsValid)
+                                                {
+                                                    ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS GAGAL : " + response.MetaData.Message);
+                                                }
+                                                else
+                                                {
+                                                    ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS BERHASIL : " + response.Response.NoSuratKontrol);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            svc = new Common.BPJS.VClaim.v11.Service();
+                                            listSrk = svc.GetRencanaKontrolByNoPeserta((item.ControlPlanDateTime ?? new DateTime()).AddMonths(1).ToString("MM"), (item.ControlPlanDateTime ?? new DateTime()).AddMonths(1).ToString("yyyy"), reg.GuarantorCardNo, Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
+                                            if (listSrk.MetaData.IsValid)
+                                            {
+                                                var srk = listSrk.Response.List.SingleOrDefault(s => s.NoKartu == reg.GuarantorCardNo && s.PoliTujuan == ub.BridgingID && s.TerbitSEP.ToLower() == "belum");
+                                                if (srk != null)
+                                                {
+                                                    var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Update.Request.Root()
+                                                    {
+                                                        Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Update.Request.TRequest()
+                                                        {
+                                                            NoSuratKontrol = srk.NoSuratKontrol,
+                                                            NoSEP = reg.BpjsSepNo,
+                                                            KodeDokter = pb.BridgingID,
+                                                            PoliKontrol = ub.BridgingID,
+                                                            TglRencanaKontrol = item.ControlPlanDateTime?.Date.ToString("yyyy-MM-dd"),
+                                                            User = AppSession.UserLogin.UserID
+                                                        }
+                                                    };
+                                                    svc = new Service();
+                                                    var response = svc.Update(root);
+                                                    var log = new WebServiceAPILog
+                                                    {
+                                                        DateRequest = DateTime.Now,
+                                                        IPAddress = string.Empty,
+                                                        UrlAddress = "Assesment",
+                                                        Params = JsonConvert.SerializeObject(root),
+                                                        Response = JsonConvert.SerializeObject(response),
+                                                        Totalms = 0
+                                                    };
+                                                    log.Save();
+                                                    if (!response.MetaData.IsValid)
+                                                    {
+                                                        ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS GAGAL : " + response.MetaData.Message);
+                                                    }
+                                                    else
+                                                    {
+                                                        ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS BERHASIL : " + response.Response.NoSuratKontrol);
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    var bpjsSepNo = reg.BpjsSepNo;
+                                                    if (reg.SRRegistrationType == AppConstant.RegistrationType.InPatient)
+                                                    {
+                                                        var rujukanList = new List<Common.BPJS.VClaim.v11.Rujukan.Select.Rujukan2>();
+                                                        svc = new Service();
+                                                        var fktp1 = svc.GetRujukan(reg.GuarantorCardNo, Enum.JenisFaskes.Faskes_1);
+                                                        if (fktp1.MetaData.IsValid && fktp1.Response.Rujukan.Any()) rujukanList.AddRange(fktp1.Response.Rujukan);
+                                                        svc = new Service();
+                                                        var fktp2 = svc.GetRujukan(reg.GuarantorCardNo, Enum.JenisFaskes.RS);
+                                                        if (fktp2.MetaData.IsValid && fktp2.Response.Rujukan.Any()) rujukanList.AddRange(fktp2.Response.Rujukan);
+                                                        if (rujukanList.Any())
+                                                        {
+                                                            if (rujukanList.Any(r =>
+                                                                    r.PoliRujukan.Kode == ub.BridgingID &&
+                                                                    item.ControlPlanDateTime?.Date <= DateTime.ParseExact(r.TglKunjungan, "yyyy-MM-dd", null, DateTimeStyles.None).AddDays(90).Date))
+                                                            {
+                                                                bpjsSepNo = rujukanList.Single(r =>
+                                                                    r.PoliRujukan.Kode == ub.BridgingID &&
+                                                                    item.ControlPlanDateTime?.Date <= DateTime.ParseExact(r.TglKunjungan, "yyyy-MM-dd", null, DateTimeStyles.None).AddDays(90).Date).NoKunjungan;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.Root()
+                                                    {
+                                                        Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.TRequest()
+                                                        {
+                                                            NoSEP = bpjsSepNo,
+                                                            KodeDokter = pb.BridgingID,
+                                                            PoliKontrol = ub.BridgingID,
+                                                            TglRencanaKontrol = item.ControlPlanDateTime?.Date.ToString("yyyy-MM-dd"),
+                                                            User = AppSession.UserLogin.UserID
+                                                        }
+                                                    };
+                                                    svc = new Service();
+                                                    var response = svc.Insert(root);
+                                                    var log = new WebServiceAPILog
+                                                    {
+                                                        DateRequest = DateTime.Now,
+                                                        IPAddress = string.Empty,
+                                                        UrlAddress = "Assesment",
+                                                        Params = JsonConvert.SerializeObject(root),
+                                                        Response = JsonConvert.SerializeObject(response),
+                                                        Totalms = 0
+                                                    };
+                                                    log.Save();
+                                                    if (!response.MetaData.IsValid)
+                                                    {
+                                                        ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS GAGAL : " + response.MetaData.Message);
+                                                    }
+                                                    else
+                                                    {
+                                                        ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS BERHASIL : " + response.Response.NoSuratKontrol);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                var root = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.Root()
+                                                {
+                                                    Request = new Common.BPJS.VClaim.v11.RencanaKontrol.Insert.Request.TRequest()
+                                                    {
+                                                        NoSEP = reg.BpjsSepNo,
+                                                        KodeDokter = pb.BridgingID,
+                                                        PoliKontrol = ub.BridgingID,
+                                                        TglRencanaKontrol = item.ControlPlanDateTime?.Date.ToString("yyyy-MM-dd"),
+                                                        User = AppSession.UserLogin.UserID
+                                                    }
+                                                };
+                                                svc = new Service();
+                                                var response = svc.Insert(root);
+                                                var log = new WebServiceAPILog
+                                                {
+                                                    DateRequest = DateTime.Now,
+                                                    IPAddress = string.Empty,
+                                                    UrlAddress = "Assesment",
+                                                    Params = JsonConvert.SerializeObject(root),
+                                                    Response = JsonConvert.SerializeObject(response),
+                                                    Totalms = 0
+                                                };
+                                                log.Save();
+                                                if (!response.MetaData.IsValid)
+                                                {
+                                                    ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS GAGAL : " + response.MetaData.Message);
+                                                }
+                                                else
+                                                {
+                                                    ShowInformationHeader("Penerbitan Surat Rencana Kontrol BPJS BERHASIL : " + response.Response.NoSuratKontrol);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
                     }
 
                     CopyToMdsCaseMix(medsum, controlPlan);
@@ -1571,6 +1855,45 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         }
 
         #endregion
+
+        public class ControlPlan
+        {
+            public class Item
+            {
+                [JsonProperty("ControlPlanDateTime")]
+                public DateTime? ControlPlanDateTime { get; set; }
+
+                [JsonProperty("ParamedicName")]
+                public string ParamedicName { get; set; }
+
+                [JsonProperty("ParamedicID")]
+                public string ParamedicID { get; set; }
+
+                [JsonProperty("ServiceUnitID")]
+                public string ServiceUnitID { get; set; }
+
+                [JsonProperty("SpecialtyName")]
+                public string SpecialtyName { get; set; }
+
+                [JsonProperty("AppointmentNo")]
+                public string AppointmentNo { get; set; }
+
+                [JsonProperty("AppointmentQue")]
+                public int? AppointmentQue { get; set; }
+
+                [JsonProperty("AppointmentTime")]
+                public string AppointmentTime { get; set; }
+            }
+
+            public class Root
+            {
+                [JsonProperty("Items")]
+                public List<Item> Items { get; set; }
+
+                [JsonProperty("JsonSource")]
+                public string JsonSource { get; set; }
+            }
+        }
 
         private void SaveMdsToSepFolder()
         {

@@ -189,6 +189,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
 
         private void SavePlanControl(ValidateArgs args)
         {
+            var reg = new Registration();
+            reg.LoadByPrimaryKey(RegistrationNo);
+
             var oplan = controlPlanCtl.GetControlPlan();
 
             //if (IsCallFromCaseMix)
@@ -210,8 +213,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
             //    }
             //    return; // Untuk casemix tidak di link ke yg lain
             //}
-            var reg = new Registration();
-            reg.LoadByPrimaryKey(RegistrationNo);
 
             var nosep = string.Empty;
 
@@ -236,112 +237,96 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
 
             var appointmentNos = string.Empty;
 
-            foreach (Temiang.Avicenna.BusinessObject.JsonField.ControlPlanItem planItem in oplan.Items)
+
+            // RSI : hanya create surat rencana kontrol bpjs, tidak create appointment
+            if (AppSession.Parameter.HealthcareInitial != "RSI")
             {
-                if (planItem.ControlPlanDateTime > DateTime.Today
-                    && !string.IsNullOrEmpty(planItem.ServiceUnitID)
-                    && !string.IsNullOrEmpty(planItem.ParamedicID))
+                foreach (Temiang.Avicenna.BusinessObject.JsonField.ControlPlanItem planItem in oplan.Items)
                 {
-                    var appointmentNo = planItem.AppointmentNo;
-
-                    if (!string.IsNullOrEmpty(appointmentNo))
+                    if (planItem.ControlPlanDateTime > DateTime.Today
+                        && !string.IsNullOrEmpty(planItem.ServiceUnitID)
+                        && !string.IsNullOrEmpty(planItem.ParamedicID))
                     {
-                        //db:20241105 - query data appointment berdasarkan no appointment
-                        var apptq = new AppointmentQuery();
-                        apptq.Where(apptq.AppointmentNo == appointmentNo, apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel);
+                        var appointmentNo = planItem.AppointmentNo;
 
-                        var appt = new BusinessObject.Appointment();
-                        if (appt.Load(apptq))
+                        if (!string.IsNullOrEmpty(appointmentNo))
                         {
-                            //db:20241105 - cek data ServiceUnitID, ParamedicID & ControlPlanDateTime. kalo tidak sama dg di data di control plan, cancel no appointment, u/ kemudian create no appoinment baru
-                            if (appt.ServiceUnitID != planItem.ServiceUnitID || appt.ParamedicID != planItem.ParamedicID || appt.PatientID != pat.PatientID || appt.AppointmentDate != planItem.ControlPlanDateTime.Date)
+                            //db:20241105 - query data appointment berdasarkan no appointment
+                            var apptq = new AppointmentQuery();
+                            apptq.Where(apptq.AppointmentNo == appointmentNo,
+                                apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel);
+
+                            var appt = new BusinessObject.Appointment();
+                            if (appt.Load(apptq))
+                            {
+                                //db:20241105 - cek data ServiceUnitID, ParamedicID & ControlPlanDateTime. kalo tidak sama dg di data di control plan, cancel no appointment, u/ kemudian create no appoinment baru
+                                if (appt.ServiceUnitID != planItem.ServiceUnitID ||
+                                    appt.ParamedicID != planItem.ParamedicID || appt.PatientID != pat.PatientID ||
+                                    appt.AppointmentDate != planItem.ControlPlanDateTime.Date)
+                                {
+                                    appointmentNo = string.Empty;
+                                }
+                                else
+                                {
+                                    if (appointmentNos == string.Empty)
+                                        appointmentNos = appointmentNo;
+                                    else
+                                        appointmentNos = ";" + appointmentNo;
+                                }
+                            }
+                            else
+                                appointmentNo = string.Empty;
+                        }
+                        else
+                        {
+                            //db:20241105 - cek apakah sudah ada data appointment yg ter-create sesuai ServiceUnitID, ParamedicID & ControlPlanDateTime (dari action save & edit)
+                            var apptq = new AppointmentQuery();
+                            apptq.Where(apptq.ServiceUnitID == planItem.ServiceUnitID,
+                                apptq.ParamedicID == planItem.ParamedicID, apptq.PatientID == pat.PatientID,
+                                apptq.AppointmentDate == planItem.ControlPlanDateTime.Date,
+                                apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel,
+                                apptq.SRAppoinmentType == AppSession.Parameter.AppointmentTypeControlPlan);
+                            apptq.Select(apptq.AppointmentNo, apptq.AppointmentQue, apptq.AppointmentTime);
+
+                            var appt = new BusinessObject.Appointment();
+                            if (appt.Load(apptq))
+                            {
+                                appointmentNo = appt.AppointmentNo;
+
+                                planItem.AppointmentTime = appt.AppointmentTime;
+                                planItem.AppointmentQue = appt.AppointmentQue;
+                                planItem.AppointmentNo = appointmentNo;
+
+                                if (appointmentNos == string.Empty)
+                                    appointmentNos = appt.AppointmentNo;
+                                else
+                                    appointmentNos = ";" + appt.AppointmentNo;
+                            }
+                            else
                             {
                                 appointmentNo = string.Empty;
                             }
-                            else
-                            {
-                                if (appointmentNos == string.Empty)
-                                    appointmentNos = appointmentNo;
-                                else
-                                    appointmentNos = ";" + appointmentNo;
-                            }
                         }
-                        else
-                            appointmentNo = string.Empty;
-                    }
-                    else
-                    {
-                        //db:20241105 - cek apakah sudah ada data appointment yg ter-create sesuai ServiceUnitID, ParamedicID & ControlPlanDateTime (dari action save & edit)
-                        var apptq = new AppointmentQuery();
-                        apptq.Where(apptq.ServiceUnitID == planItem.ServiceUnitID, apptq.ParamedicID == planItem.ParamedicID, apptq.PatientID == pat.PatientID,
-                            apptq.AppointmentDate == planItem.ControlPlanDateTime.Date, apptq.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel,
-                            apptq.SRAppoinmentType == AppSession.Parameter.AppointmentTypeControlPlan);
-                        apptq.Select(apptq.AppointmentNo, apptq.AppointmentQue, apptq.AppointmentTime);
 
-                        var appt = new BusinessObject.Appointment();
-                        if (appt.Load(apptq))
+                        if (string.IsNullOrEmpty(appointmentNo))
                         {
-                            appointmentNo = appt.AppointmentNo;
-
-                            planItem.AppointmentTime = appt.AppointmentTime;
-                            planItem.AppointmentQue = appt.AppointmentQue;
-                            planItem.AppointmentNo = appointmentNo;
-
-                            if (appointmentNos == string.Empty)
-                                appointmentNos = appt.AppointmentNo;
-                            else
-                                appointmentNos = ";" + appt.AppointmentNo;
-                        }
-                        else
-                        {
-                            appointmentNo = string.Empty;
-                        }
-                    }
-
-                    if (string.IsNullOrEmpty(appointmentNo))
-                    {
-                        var qSchedule = new ParamedicScheduleDate();
-                        if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID, planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
-                        {
-                            try
-                            {
-                                // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
-                                var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS.AppointmentSetEntityValue(string.Empty, planItem.ServiceUnitID, planItem.ParamedicID,
-                                    planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
-                                    PatientID, pat.FirstName, pat.MiddleName, pat.LastName, pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
-                                    pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
-                                    pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep, AppSession.Parameter.AppointmentStatusOpen,
-                                    pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID, AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
-
-                                planItem.AppointmentTime = slot["AppointmentTime"].ToString();
-                                planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
-                                planItem.AppointmentNo = slot["AppointmentNo"].ToString();
-
-                                if (appointmentNos == string.Empty)
-                                    appointmentNos = planItem.AppointmentNo;
-                                else
-                                    appointmentNos = ";" + planItem.AppointmentNo;
-                            }
-                            catch (Exception ex)
-                            {
-                                args.MessageText = ex.Message;
-                                args.IsCancel = true;
-                            }
-                        }
-                        else
-                        {
-                            var qSlot = new ServiceUnitParamedic();
-                            if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) && qSlot.IsUsingQue == true)
+                            var qSchedule = new ParamedicScheduleDate();
+                            if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID,
+                                    planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
                             {
                                 try
                                 {
                                     // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
-                                    var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS.AppointmentSetEntityValue(string.Empty, planItem.ServiceUnitID, planItem.ParamedicID,
+                                    var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS.AppointmentSetEntityValue(
+                                        string.Empty, planItem.ServiceUnitID, planItem.ParamedicID,
                                         planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
-                                        PatientID, pat.FirstName, pat.MiddleName, pat.LastName, pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
+                                        PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                                        pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
                                         pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
-                                        pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep, AppSession.Parameter.AppointmentStatusOpen,
-                                        pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID, AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+                                        pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep,
+                                        AppSession.Parameter.AppointmentStatusOpen,
+                                        pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                                        AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
 
                                     planItem.AppointmentTime = slot["AppointmentTime"].ToString();
                                     planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
@@ -358,10 +343,51 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
                                     args.IsCancel = true;
                                 }
                             }
+                            else
+                            {
+                                var qSlot = new ServiceUnitParamedic();
+                                if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) &&
+                                    qSlot.IsUsingQue == true)
+                                {
+                                    try
+                                    {
+                                        // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
+                                        var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
+                                            .AppointmentSetEntityValue(string.Empty, planItem.ServiceUnitID,
+                                                planItem.ParamedicID,
+                                                planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO",
+                                                string.Empty,
+                                                PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                                                pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth,
+                                                pat.Sex,
+                                                pat.StreetName, pat.District, pat.City, pat.County, pat.State,
+                                                pat.ZipCode,
+                                                pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, nosep,
+                                                AppSession.Parameter.AppointmentStatusOpen,
+                                                pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                                                AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+
+                                        planItem.AppointmentTime = slot["AppointmentTime"].ToString();
+                                        planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
+                                        planItem.AppointmentNo = slot["AppointmentNo"].ToString();
+
+                                        if (appointmentNos == string.Empty)
+                                            appointmentNos = planItem.AppointmentNo;
+                                        else
+                                            appointmentNos = ";" + planItem.AppointmentNo;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        args.MessageText = ex.Message;
+                                        args.IsCancel = true;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
+
 
             var ent = new MedicalDischargeSummaryByNurse();
             if (!ent.LoadByPrimaryKey(RegistrationNo))
