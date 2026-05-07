@@ -1,4 +1,7 @@
-﻿namespace Temiang.Avicenna.BusinessObject
+﻿using System;
+using System.Linq;
+
+namespace Temiang.Avicenna.BusinessObject
 {
     public partial class NursingDiagnosa
     {
@@ -38,6 +41,8 @@
             query.Select("<ISNULL(max(NursingDiagnosaID),'" + defVal + "') LastID>");
             var dttbl = query.LoadDataTable();
 
+
+            /* 
             var iLastID = 0;
             if (dttbl.Rows.Count > 0)
             {
@@ -55,6 +60,100 @@
             } while (ns.LoadByPrimaryKey(newid));
 
             return newid;
+            
+             */
+
+            /**
+             * 
+             * Modifikasi GetNewID untuk mengakomodir format ID yang memiliki karakter '.' di dalamnya
+             * e.g : 200D.0105009
+             * modif date : 2026-05-07
+             */
+            string lastId = defVal;
+
+            if (dttbl.Rows.Count > 0 && dttbl.Rows[0][0] != DBNull.Value)
+            {
+                lastId = dttbl.Rows[0][0].ToString().Trim();
+
+                if (string.IsNullOrWhiteSpace(lastId))
+                    lastId = defVal;
+            }
+
+            if (lastId.Contains("."))
+                return GenerateDotFormatID(lastId);
+
+            return GenerateNormalFormatID(lastId);
+        }
+
+        /***
+         * Keperluan modifikasi GetNewID karena Format NursingDiagnosaID yang ada char Huruf dan '."
+         * e.g : 200D.0105009
+         * modif date : 2026-05-07
+         */
+        private static string GenerateDotFormatID(string lastId)
+        {
+            // Contoh:
+            // 200D.0105009
+
+            var parts = lastId.Split('.');
+
+            if (parts.Length != 2)
+                return string.Empty;
+
+            string prefix = parts[0] + ".";
+            string numericPart = parts[1];
+
+            int numericLength = numericPart.Length;
+
+            if (!long.TryParse(numericPart, out long lastNumber))
+                return string.Empty;
+
+            string newId = string.Empty;
+
+            var ns = new NursingDiagnosa();
+
+            do
+            {
+                lastNumber++;
+
+                newId = prefix + lastNumber.ToString().PadLeft(numericLength, '0');
+
+                ns = new NursingDiagnosa();
+
+            } while (ns.LoadByPrimaryKey(newId));
+
+            return newId;
+        }
+
+        private static string GenerateNormalFormatID(string lastId)
+        {
+            // Contoh:
+            // 200000961
+
+            string numericOnly = new string(lastId
+                .Where(char.IsDigit)
+                .ToArray());
+
+            int numericLength = numericOnly.Length;
+
+            if (!long.TryParse(numericOnly, out long lastNumber))
+                return string.Empty;
+
+            string newId = string.Empty;
+
+            var ns = new NursingDiagnosa();
+
+            do
+            {
+                lastNumber++;
+
+                newId = lastNumber.ToString().PadLeft(numericLength, '0');
+
+                ns = new NursingDiagnosa();
+
+            } while (ns.LoadByPrimaryKey(newId));
+
+            return newId;
         }
 
         public static string GetNewSequenceNo(string dLevel, string SRNsDiagnosaType)

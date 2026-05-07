@@ -164,4 +164,8 @@ Titipan Daniel
 2. Modifikasi PrescriptionSalesDetail.aspx.cs. khusus RSI & Guarantor B2294 tidak usah direct print ketika approve.
 
 --- [06-05-2026 - Wiliam] ---
-1. Modifikasi order by RealizationDateTimeFrom DESC pada method ServiceUnitBookings()
+1. Modifikasi Order by RealizationDateTimeFrom DESC pada method ServiceUnitBookings()
+
+--- [07-05-2026 - Wiliam] ---
+1. Modifikasi Temiang.Avicenna.BusinessObject\Custom\NursingDiagnosa.cs pada Method GetNewID()
+   untuk mengatasi error pada saat NursingDiagnosaID yang mengandung character non numeric.
