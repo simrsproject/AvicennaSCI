@@ -830,11 +830,18 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
 
                     if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
                     {
-                        var svc = new Common.BPJS.VClaim.v11.Service();
-                        var rujukan = svc.GetRujukan(sep.NoRujukan);
-                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        try
                         {
-                            lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
+                            var svc = new Common.BPJS.VClaim.v11.Service();
+                            var rujukan = svc.GetRujukan(sep.NoRujukan);
+                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                            {
+                                lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            lblPoliRujukan.Text = "- BPJS Service Not Connected -";
                         }
                     }
 

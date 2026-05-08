@@ -660,32 +660,40 @@ namespace Temiang.Avicenna.Module.RADT
                 {
                     if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
                     {
-                        var svc = new Common.BPJS.VClaim.v11.Service();
-                        var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
-                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        try
                         {
-                            if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                            var svc = new Common.BPJS.VClaim.v11.Service();
+                            var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
+                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
                             {
-                                lblNoRujukan.Text =
-                                    rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
-                                        ?.NoKunjungan ?? string.Empty;
-                                lblPoliRujukan.Text = rujukan.Response.Rujukan
-                                    .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                {
+                                    lblNoRujukan.Text =
+                                        rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                            ?.NoKunjungan ?? string.Empty;
+                                    lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                        .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                }
+                            }
+
+                            svc = new Service();
+                            rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
+                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                            {
+                                if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                {
+                                    lblNoRujukan.Text =
+                                        rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                            ?.NoKunjungan ?? string.Empty;
+                                    lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                        .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                }
                             }
                         }
-
-                        svc = new Service();
-                        rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
-                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        catch (Exception ex)
                         {
-                            if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
-                            {
-                                lblNoRujukan.Text =
-                                    rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
-                                        ?.NoKunjungan ?? string.Empty;
-                                lblPoliRujukan.Text = rujukan.Response.Rujukan
-                                    .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
-                            }
+                            lblNoRujukan.Text = "- BPJS Service Not Connected - ";
+                            lblPoliRujukan.Text = "- BPJS Service Not Connected - ";
                         }
                     }
                     else

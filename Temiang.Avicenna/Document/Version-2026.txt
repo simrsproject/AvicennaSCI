@@ -174,3 +174,6 @@ Titipan Daniel
 1. Modifikasi EmrIpDetail.aspx.cs. penambahkan kondisi pada saat set text hak kelas BPJS :
    if(!string.IsNullOrWhiteSpace(reg.BpjsSepNo))
    karena ada Guarantor "Penjamin Belum Jelas" dengan GuarantorType BPJS
+2. Modifikasi EmrIpDetail.aspx.cs dan EmrDetail.aspx.cs :
+   membungkung statement berikut dengan try catch : var svc = new Common.BPJS.VClaim.v11.Service();
+   sehingga membuka EMR tetap bisa namun dengan pesan pada label poli : "BPJS Service Not Connected" jika service BPJS sedang down.
