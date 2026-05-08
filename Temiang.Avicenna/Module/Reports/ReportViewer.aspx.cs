@@ -1464,15 +1464,33 @@ namespace Temiang.Avicenna.Module.Reports
             errMsg = SendEmailWithAttachment(toEmail, appProgram.ProgramName, sb.ToString(), filePath);
 
             string script = string.Empty;
+            //if (!string.IsNullOrWhiteSpace(errMsg))
+            //    script = string.Format("<script type='text/javascript'>alert('Send email failed : {0}');</script>", errMsg);
+
+            //else
+            //    script = string.Format("<script type='text/javascript'>alert('Report has send to {0}');</script>", toEmail);
+
+            //if (!Page.ClientScript.IsStartupScriptRegistered("msgSave"))
+            //    Page.ClientScript.RegisterStartupScript(this.GetType(), "msgSave", script);
+
             if (!string.IsNullOrWhiteSpace(errMsg))
-                script = string.Format("<script type='text/javascript'>alert('Send email failed : {0}');</script>", errMsg);
-
+            {
+                script = string.Format(
+                    "alert('Send email failed : {0}');",
+                    HttpUtility.JavaScriptStringEncode(errMsg));
+            }
             else
-                script = string.Format("<script type='text/javascript'>alert('Report has send to {0}');</script>", toEmail);
+            {
+                script = string.Format(
+                    "alert('Report has send to {0}');",
+                    HttpUtility.JavaScriptStringEncode(toEmail));
+            }
 
-
-            if (!Page.ClientScript.IsStartupScriptRegistered("msgSave"))
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "msgSave", script);
+            Page.ClientScript.RegisterStartupScript(
+                this.GetType(),
+                Guid.NewGuid().ToString(),
+                script,
+                true);
         }
 
         internal static string CreateAttachmentFile(string userID, ref string toEmail)
@@ -1578,6 +1596,7 @@ namespace Temiang.Avicenna.Module.Reports
             var fromPassword = AppParameter.GetParameterValue(AppParameter.ParameterItem.EmailPassword);
             var host = AppParameter.GetParameterValue(AppParameter.ParameterItem.EmailHost);
             var port = AppParameter.GetParameterValue(AppParameter.ParameterItem.EmailPort).ToInt();
+
             var client = new SmtpClient();
             {
                 client.Host = string.IsNullOrEmpty(host) ? "smtp.gmail.com" : host;
@@ -1586,18 +1605,20 @@ namespace Temiang.Avicenna.Module.Reports
                 client.DeliveryMethod = System.Net.Mail.SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
                 client.Credentials = new NetworkCredential(fromAddress, fromPassword);
-                client.Timeout = 20000;
+                client.Timeout = 30000;
             }
 
             try
             {
                 client.Send(message);
+            
             }
             catch (Exception ex)
             {
-                return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.Message);
+                return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.ToString());
             }
             data.Dispose();
+            
             return string.Empty;
         }
 

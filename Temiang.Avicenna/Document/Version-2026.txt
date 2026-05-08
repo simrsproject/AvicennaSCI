@@ -177,3 +177,7 @@ Titipan Daniel
 2. Modifikasi EmrIpDetail.aspx.cs dan EmrDetail.aspx.cs :
    membungkung statement berikut dengan try catch : var svc = new Common.BPJS.VClaim.v11.Service();
    sehingga membuka EMR tetap bisa namun dengan pesan pada label poli : "BPJS Service Not Connected" jika service BPJS sedang down.
+3. Create eksplisit error message pada ReportViewer ketika gagal kirim email :
+   return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.Message());
+   menjadi
+   return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.ToString());
