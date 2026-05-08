@@ -798,9 +798,13 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             if (trHakKelasBpjs.Visible)
             {
                 var sep = new BpjsSEP();
-                if (sep.LoadByPrimaryKey(reg.BpjsSepNo) && !string.IsNullOrWhiteSpace(sep.KlsHak))
+                //ada kemungkinan SEP no masih kosong untuk penjamin belum jelas dengan guarantor type BPJS.
+                if(!string.IsNullOrWhiteSpace(reg.BpjsSepNo))
                 {
-                    lblBpjsHakKelas.Text = sep.KlsHak;
+                    if (sep.LoadByPrimaryKey(reg.BpjsSepNo) && !string.IsNullOrWhiteSpace(sep.KlsHak))
+                    {
+                        lblBpjsHakKelas.Text = sep.KlsHak;
+                    }
                 }
             }
 

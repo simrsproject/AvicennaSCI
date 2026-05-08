@@ -169,3 +169,8 @@ Titipan Daniel
 --- [07-05-2026 - Wiliam] ---
 1. Modifikasi Temiang.Avicenna.BusinessObject\Custom\NursingDiagnosa.cs pada Method GetNewID()
    untuk mengatasi error pada saat NursingDiagnosaID yang mengandung character non numeric.
+
+--- [08-05-2026 - Wiliam] ---
+1. Modifikasi EmrIpDetail.aspx.cs. penambahkan kondisi pada saat set text hak kelas BPJS :
+   if(!string.IsNullOrWhiteSpace(reg.BpjsSepNo))
+   karena ada Guarantor "Penjamin Belum Jelas" dengan GuarantorType BPJS
