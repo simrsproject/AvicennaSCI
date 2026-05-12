@@ -181,3 +181,6 @@ Titipan Daniel
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.Message());
    menjadi
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.ToString());
+
+   --- [12-05-2026 - Handono] ---
+   - Satusehat bugfix error SSN 3273057012650002 not found at fhir.kemkes.go.id untuk SSN yang sebenarnya valid
