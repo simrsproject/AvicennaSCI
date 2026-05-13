@@ -185,22 +185,41 @@ namespace Temiang.Avicenna.WebService
 
 
         //2. Generate Nomor Antrian dan Nomor Kunjungan
-        [WebMethod]
+        [WebMethod(
+            Description = @"
+            PARAMETER:
+            - PayerType (required)
+            - ServiceGroup (optional untuk selain BPJS)
+            - QueueLocation (required)
+
+            CONTOH:
+            TakeQueueVisitNumber?
+            PayerType=BPJS&
+            ServiceGroup=POLI&
+            QueueLocation=LOKET_PD
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void TakeQueueVisitNumber(
-            string PayerType,
-            string ServiceGroup,
-            string QueueLocation
-        )
+        public void TakeQueueVisitNumber()
         {
             try
             {
                 // =========================================
                 // NORMALIZE
                 // =========================================
-                PayerType = (PayerType ?? "").Trim().ToUpper();
-                QueueLocation = (QueueLocation ?? "").Trim().ToUpper();
-                ServiceGroup = (ServiceGroup ?? "").Trim().ToUpper();
+                string PayerType =
+                    (Context.Request["PayerType"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string ServiceGroup =
+                    (Context.Request["ServiceGroup"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string QueueLocation =
+                    (Context.Request["QueueLocation"] ?? "")
+                    .Trim()
+                    .ToUpper();
 
                 // =========================================
                 // VALIDASI
@@ -378,15 +397,33 @@ namespace Temiang.Avicenna.WebService
         }
 
         //3. Display Antrian Pasien
-        [WebMethod]
+        [WebMethod(Description = @"
+            PARAMETER:
+            - QueueDate (optional)
+            - QueueLocation (required)
+
+            EXAMPLE:
+            GetDisplayAntrianPasien?
+            QueueDate=2026-05-13&
+            QueueLocation=LOKET_PD
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void GetDisplayAntrianPasien(
-            string QueueDate,
-            string QueueLocation
-        )
+        public void GetDisplayAntrianPasien()
         {
             try
             {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string QueueDate =
+                    (Context.Request["QueueDate"] ?? "")
+                    .Trim();
+
+                string QueueLocation =
+                    (Context.Request["QueueLocation"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
                 // =========================================
                 // DEFAULT DATE
                 // =========================================
@@ -396,14 +433,6 @@ namespace Temiang.Avicenna.WebService
                 {
                     queueDate = DateTime.Now.Date;
                 }
-
-                // =========================================
-                // NORMALIZE
-                // =========================================
-                QueueLocation =
-                    (QueueLocation ?? "")
-                    .Trim()
-                    .ToUpper();
 
                 // =========================================
                 // VALIDASI
@@ -470,18 +499,56 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod(Description = @"
+            Display Antrian Pendaftaran
+
+            PARAMETER:
+            - QueueDate (optional)
+            - Status (optional)
+            - SRAutoNumber (optional)
+            - CurrentStage (optional, default: LOKET)
+            - QueueLocation (optional)
+
+            EXAMPLE:
+            GetDisplayAntrianPendaftaran?
+            QueueDate=2026-05-13&
+            Status=WAITING&
+            SRAutoNumber=BPJS&
+            CurrentStage=LOKET&
+            QueueLocation=LOKET_PD
+         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void GetDisplayAntrianPendaftaran(
-            string QueueDate,
-            string Status,
-            string SRAutoNumber,
-            string CurrentStage,
-            string QueueLocation
-        )
+        public void GetDisplayAntrianPendaftaran()
         {
             try
             {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string QueueDate =
+                    (Context.Request["QueueDate"] ?? "")
+                    .Trim();
+
+                string Status =
+                    (Context.Request["Status"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string SRAutoNumber =
+                    (Context.Request["SRAutoNumber"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string CurrentStage =
+                    (Context.Request["CurrentStage"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string QueueLocation =
+                    (Context.Request["QueueLocation"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
                 // =========================================
                 // DEFAULT DATE
                 // =========================================
@@ -491,29 +558,6 @@ namespace Temiang.Avicenna.WebService
                 {
                     queueDate = DateTime.Now.Date;
                 }
-
-                // =========================================
-                // NORMALIZE
-                // =========================================
-                Status =
-                    (Status ?? "")
-                    .Trim()
-                    .ToUpper();
-
-                SRAutoNumber =
-                    (SRAutoNumber ?? "")
-                    .Trim()
-                    .ToUpper();
-
-                CurrentStage =
-                    string.IsNullOrEmpty(CurrentStage)
-                        ? "LOKET"
-                        : CurrentStage.Trim().ToUpper();
-
-                QueueLocation =
-                    (QueueLocation ?? "")
-                    .Trim()
-                    .ToUpper();
 
                 // =========================================
                 // VALIDASI QueueLocation
@@ -574,30 +618,37 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        //4.Panggil Antrian di Pendaftaran
-        [WebMethod]
+        //4. Panggil Antrian di Pendaftaran
+        [WebMethod(Description = @"
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+            - CounterID (required)
+
+            EXAMPLE:
+            CallAntrianSekarangPendaftaran?
+            VisitQueueNo=VQUE-260513-0001&
+            UserID=240076&
+            CounterID=1
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void CallAntrianSekarangPendaftaran(
-            string VisitQueueNo,
-            string UserID,
-            string CounterID
-        )
+        public void CallAntrianSekarangPendaftaran()
         {
             try
             {
                 // =========================================
                 // NORMALIZE
                 // =========================================
-                VisitQueueNo =
-                    (VisitQueueNo ?? "")
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                UserID =
-                    (UserID ?? "")
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
                     .Trim();
 
-                CounterID =
-                    (CounterID ?? "")
+                string CounterID =
+                    (Context.Request["CounterID"] ?? "")
                     .Trim()
                     .ToUpper();
 
@@ -679,24 +730,30 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod(Description = @"
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            RecallAntrianPendaftaran?
+            VisitQueueNo=VQUE-260513-0001&
+            UserID=240076
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void RecallAntrianPendaftaran(
-            string VisitQueueNo,
-            string UserID
-        )
+        public void RecallAntrianPendaftaran()
         {
             try
             {
                 // =========================
                 // NORMALIZE
                 // =========================
-                VisitQueueNo =
-                    (VisitQueueNo ?? "")
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                UserID =
-                    (UserID ?? "")
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
                     .Trim();
 
                 // =========================
@@ -750,24 +807,30 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod(Description = @"
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            PendingAntrianPendaftaran?
+            VisitQueueNo=VQUE-260513-0001&
+            UserID=240076
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void PendingAntrianPendaftaran(
-            string VisitQueueNo,
-            string UserID
-        )
+        public void PendingAntrianPendaftaran()
         {
             try
             {
                 // =========================
                 // NORMALIZE
                 // =========================
-                VisitQueueNo =
-                    (VisitQueueNo ?? "")
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                UserID =
-                    (UserID ?? "")
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
                     .Trim();
 
                 // =========================
@@ -821,24 +884,30 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod(Description = @"
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            WaitingFromPendingStatusPendaftaran?
+            VisitQueueNo=VQUE-260513-0001&
+            UserID=240076
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void WaitingFromPendingStatusPendaftaran(
-            string VisitQueueNo,
-            string UserID
-        )
+        public void WaitingFromPendingStatusPendaftaran()
         {
             try
             {
                 // =========================
                 // NORMALIZE
                 // =========================
-                VisitQueueNo =
-                    (VisitQueueNo ?? "")
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                UserID =
-                    (UserID ?? "")
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
                     .Trim();
 
                 // =========================
@@ -892,33 +961,49 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod(Description = @"
+            PARAMETER:
+            - QueueLocation (required)
+            - UserID (required)
+            - CounterID (required)
+            - QueueDate (optional)
+
+            EXAMPLE:
+            NextAntrianPendaftaran?
+            QueueLocation=LOKET_PD&
+            UserID=240076&
+            CounterID=1&
+            QueueDate=2026-05-13
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void NextAntrianPendaftaran(
-            string QueueLocation,
-            string UserID,
-            string CounterID,
-            string QueueDate
-        )
+        public void NextAntrianPendaftaran()
         {
             try
             {
                 // =========================
                 // NORMALIZE
                 // =========================
-                QueueLocation =
-                    (QueueLocation ?? "")
+                string QueueLocation =
+                    (Context.Request["QueueLocation"] ?? "")
                     .Trim()
                     .ToUpper();
 
-                UserID =
-                    (UserID ?? "")
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
                     .Trim();
 
-                CounterID =
-                    (CounterID ?? "")
+                string CounterID =
+                    (Context.Request["CounterID"] ?? "")
                     .Trim()
                     .ToUpper();
+
+                string QueueDate =
+                    (Context.Request["QueueDate"] ?? "")
+                    .Trim();
+
+                // =========================
+                // DEFAULT DATE
+                // =========================
 
                 DateTime queueDateParsed;
 
@@ -1009,58 +1094,57 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void GetQueueSoundPendaftaran(string VisitQueueNo)
-        {
-            try
-            {
+        //[WebMethod]
+        //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        //public void GetQueueSoundPendaftaran(string VisitQueueNo)
+        //{
+            //try
+            //{
                 // =========================
                 // NORMALIZE
                 // =========================
-                VisitQueueNo =
-                    (VisitQueueNo ?? "")
-                    .Trim();
+                //VisitQueueNo =
+                    //(VisitQueueNo ?? "")
+                    //.Trim();
 
                 // =========================
                 // VALIDASI
                 // =========================
-                if (string.IsNullOrEmpty(VisitQueueNo))
-                {
-                    ApiResponeForAntrian.Error(
-                        Context,
-                        "VisitQueueNo wajib diisi",
-                        400
-                    );
-                    return;
-                }
+                //if (string.IsNullOrEmpty(VisitQueueNo))
+                //{
+                    //ApiResponeForAntrian.Error(
+                        //Context,
+                        //"VisitQueueNo wajib diisi",
+                        //400
+                    //);
+                    //return;
+                //}
 
                 // =========================
                 // EXEC BO
                 // =========================
-                var data =
-                    QueueingSound.GetQueueSoundPendaftaran(
-                        VisitQueueNo
-                    );
+                //var data =
+                   // QueueingSound.GetQueueSoundPendaftaran(
+                      //  VisitQueueNo
+                    //);
 
                 // =========================
                 // RESPONSE
                 // =========================
-                ApiResponeForAntrian.Success(
-                    Context,
-                    data,
-                    "Sound antrian berhasil diambil"
-                );
-            }
-            catch (Exception ex)
-            {
-                ApiResponeForAntrian.Error(
-                    Context,
-                    ex.Message,
-                    500
-                );
-            }
-        }
+                //ApiResponeForAntrian.Success(
+                   // Context,
+                   // data,
+                   // "Sound antrian berhasil diambil"
+                //);
+           // }
+            // catch (Exception ex)
+            // {
+              //  ApiResponeForAntrian.Error(
+                //    Context,
+                //    ex.Message,
+                  //  500
+                //);
+            //}
 
     }
 }

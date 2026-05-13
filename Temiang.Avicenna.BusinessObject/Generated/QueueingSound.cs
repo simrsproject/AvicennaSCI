@@ -563,36 +563,7 @@ namespace Temiang.Avicenna.BusinessObject
 
 	public partial class QueueingSound : esQueueingSound
 	{
-        public static object GetQueueSoundPendaftaran(string visitQueueNo)
-        {
-            var entity = new QueueingSound();
-
-            var reader = entity.ExecuteReader(
-                esQueryType.StoredProcedure,
-                "GetQueueSoundPendaftaran",
-                new esParameters
-                {
-            { "VisitQueueNo", visitQueueNo, esParameterDirection.Input, DbType.String, 50 }
-                }
-            );
-
-            var list = new List<object>();
-
-            while (reader.Read())
-            {
-                list.Add(new
-                {
-                    Seq = Convert.ToInt32(reader["Seq"]),
-                    SoundCode = reader["SoundCode"].ToString(),
-                    FilePath = reader["FilePath"].ToString(),
-                    VisitNo = reader["VisitNo"].ToString()
-                });
-            }
-
-            reader.Close();
-
-            return list;
-        }
+ 
     }
 
 	[Serializable]
