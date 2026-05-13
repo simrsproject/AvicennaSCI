@@ -3292,6 +3292,7 @@
     <Content Include="Views\Home\SOP.cshtml" />
     <Content Include="Views\Home\SOP2.cshtml" />
     <Content Include="Views\Queueing\DisplayPoliByPhysician.cshtml" />
+    <Content Include="WebService\AntrianRSI.asmx" />
     <Content Include="WebService\Antrol.asmx" />
     <Content Include="WebService\Attendance.asmx" />
     <Content Include="WebService\AutoBillOnSchedule.asmx" />
@@ -22490,6 +22491,9 @@
     <Compile Include="Util\Extentions.cs" />
     <Compile Include="Util\JsonHelper.cs" />
     <Compile Include="Util\SatuSehatHelper.cs" />
+    <Compile Include="WebService\AntrianRSI.asmx.cs">
+      <DependentUpon>AntrianRSI.asmx</DependentUpon>
+    </Compile>
     <Compile Include="WebService\Antrol.asmx.cs">
       <DependentUpon>Antrol.asmx</DependentUpon>
       <SubType>Component</SubType>

@@ -19,6 +19,8 @@
 /Temiang.Avicenna.ReportDataSource/bin
 /Temiang.Avicenna.ReportLibrary/obj
 /Temiang.Avicenna.ReportLibrary/bin
+/Temiang.Avicenna.ReportLibrary.Custom/obj
+/Temiang.Avicenna.ReportLibrary.Custom/bin
 /Temiang.Avicenna.Tests/obj
 /Temiang.Avicenna.Tests/bin
 /Temiang.Avicenna/obj/Debug/Temiang.Avicenna.csproj.AssemblyReference.cache

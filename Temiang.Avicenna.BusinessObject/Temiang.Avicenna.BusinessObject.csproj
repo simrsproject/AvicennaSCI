@@ -770,6 +770,7 @@
     <Compile Include="Custom\WorkingSchduleInterventionDetail.cs" />
     <Compile Include="Custom\WorkingScheduleDetail.cs" />
     <Compile Include="Generated\Announcement.cs" />
+    <Compile Include="Generated\AntrianAutoNumberSemantic.cs" />
     <Compile Include="Generated\AppStandardReferenceItemBridging.cs" />
     <Compile Include="Generated\BpjsApol.cs" />
     <Compile Include="Generated\BpjsApolDetail.cs" />
@@ -786,7 +787,9 @@
     <Compile Include="Generated\MedicalDischargeSummaryBodyDiagramCmx.cs" />
     <Compile Include="Generated\NccIDRG.cs" />
     <Compile Include="Generated\ProcedureSynonym.cs" />
+    <Compile Include="Generated\QueueCategory.cs" />
     <Compile Include="Generated\QueueingRunningText.cs" />
+    <Compile Include="Generated\QueueStage.cs" />
     <Compile Include="Generated\ReferExternalCmx.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryProcedureCmx.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryPrescHomeCmx.cs" />
@@ -1112,6 +1115,7 @@
     <Compile Include="Generated\TransPaymentItemVisiteRealization.cs" />
     <Compile Include="Generated\VisitPackage.cs" />
     <Compile Include="Generated\VisitPackageItem.cs" />
+    <Compile Include="Generated\VisitQueue.cs" />
     <Compile Include="Generated\VwEmployeeOrganizationUnit.cs" />
     <Compile Include="Generated\VwItemProductFabric.cs" />
     <Compile Include="Generated\WageBase.cs" />

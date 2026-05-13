@@ -9,12 +9,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.ComponentModel;
+using System.Data;
+using System.Linq;
 using System.Xml.Serialization;
 using Temiang.Dal.Core;
-using Temiang.Dal.Interfaces;
 using Temiang.Dal.DynamicQuery;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.BusinessObject
 {
@@ -561,8 +562,38 @@ namespace Temiang.Avicenna.BusinessObject
 
 
 	public partial class QueueingSound : esQueueingSound
-	{	
-	}
+	{
+        public static object GetQueueSoundPendaftaran(string visitQueueNo)
+        {
+            var entity = new QueueingSound();
+
+            var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "GetQueueSoundPendaftaran",
+                new esParameters
+                {
+            { "VisitQueueNo", visitQueueNo, esParameterDirection.Input, DbType.String, 50 }
+                }
+            );
+
+            var list = new List<object>();
+
+            while (reader.Read())
+            {
+                list.Add(new
+                {
+                    Seq = Convert.ToInt32(reader["Seq"]),
+                    SoundCode = reader["SoundCode"].ToString(),
+                    FilePath = reader["FilePath"].ToString(),
+                    VisitNo = reader["VisitNo"].ToString()
+                });
+            }
+
+            reader.Close();
+
+            return list;
+        }
+    }
 
 	[Serializable]
 	abstract public class esQueueingSoundQuery : esDynamicQuery
@@ -1200,5 +1231,6 @@ namespace Temiang.Avicenna.BusinessObject
 		static protected Dictionary<string, MapToMeta> mapDelegates;
 		static private int _esDefault = RegisterDelegateesDefault();
 	}
+
 
 }		

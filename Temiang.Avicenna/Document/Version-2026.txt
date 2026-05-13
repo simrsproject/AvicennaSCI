@@ -181,3 +181,8 @@ Titipan Daniel
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.Message());
    menjadi
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.ToString());
+
+--- [13-05-2026 - Andika RSI] ---
+1. Menambahkan statement pada BusinessObject AntrianNumberAutoSemantic.cs, VisitQueue.cs dan QueueingSound.cs untuk Execute Store Procedure.
+2. Menambahkan 1 file .asmx dengan nama AntrianRSI.asmx untuk keperluan API Sistem Antrian Rumah Sakit Immanuel.
+3. Menambahkan Script Sql pada folder 2026/05/13/AntrianRSI tidak WAJIB di eksekusi di Rumah Sakit lain.
