@@ -629,6 +629,7 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             refsItemColl.LoadAll();
 
             entity.IsNonMasterOrder = refs.IsNonMasterOrder;
+            entity.IsAssets = refs.IsAssets; //kalau tidak ditambahkan entity.IsAssets akan selalu NULL
             entity.IsInventoryItem = refs.IsInventoryItem;
             entity.SRPurchaseOrderType = refs.SRPurchaseOrderType;
             entity.IsTaxable = refs.IsTaxable;

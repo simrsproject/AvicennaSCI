@@ -181,3 +181,12 @@ Titipan Daniel
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.Message());
    menjadi
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.ToString());
+
+
+---- [15-05-2026 - Wiliam] ---
+1. Modifikasi PrescriptionSalesDetail.aspx.cs 
+   Ketika disave error, karena belum ada kondisi untuk pengecekkan apakah SEPNo kosong atau tidak.
+2. Pada POS nilai Total ditambahkan .toFixed(2), karena ada case nilai belakang komanya sangat panjang :
+   $('#spanTotal').html((sum + addVal).toFixed(2));
+3. Modifikasi SetEntityValue() di PurchaseOrderReturnDetail.aspx.cs. Penambahan 1 baris statement :
+   entity.IsAssets = refs.IsAssets;
