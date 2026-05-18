@@ -191,6 +191,7 @@ Titipan Daniel
 3. Modifikasi SetEntityValue() di PurchaseOrderReturnDetail.aspx.cs. Penambahan 1 baris statement :
    entity.IsAssets = refs.IsAssets;
 
+
 --- [18-05-2026 - Wiliam] ---
 1. Modifikasi pada file-file berikut, karena di RSI tidak ingin pada Assesment, ComboBox ICD X (ICD 10) ada info DTD :
     EpisodeDiagnoseItemCtl.ascx
@@ -216,3 +217,7 @@ Titipan Daniel
                 qr.Synonym
             );
     }
+=======
+
+---- [18-05-2026 - Danang] ---
+1. CR Odoo Perubahan JSON untuk bridging SatuSehat RIS
