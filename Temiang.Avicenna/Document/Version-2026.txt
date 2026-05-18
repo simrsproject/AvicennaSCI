@@ -190,3 +190,29 @@ Titipan Daniel
    $('#spanTotal').html((sum + addVal).toFixed(2));
 3. Modifikasi SetEntityValue() di PurchaseOrderReturnDetail.aspx.cs. Penambahan 1 baris statement :
    entity.IsAssets = refs.IsAssets;
+
+--- [18-05-2026 - Wiliam] ---
+1. Modifikasi pada file-file berikut, karena di RSI tidak ingin pada Assesment, ComboBox ICD X (ICD 10) ada info DTD :
+    EpisodeDiagnoseItemCtl.ascx
+	EpisodeDiagnoseCtl.ascx
+	RegInMedDiagnoseCtl.ascx
+	MdsDiagnoseCtl.ascx
+	MdsDiagnoseEMPatientCtl.ascx
+	MdsDiagnoseOutPatientCtl.ascx
+
+2. Modifikasi ComboBoxDataService.asmx.cs method DiagnosePerSmf(). menambahkan kondisi :
+   if (AppSession.Parameter.HealthcareID == "RSI")
+    {
+        qr.Select
+            (
+                string.Format("<CASE WHEN  CHARINDEX('{0}', d.DiagnoseName) = 0 THEN 1000 ELSE CHARINDEX('{0}', d.DiagnoseName) END  SearchIdx>", context.Text),
+                qr.DiagnoseID.As("ValueField"),
+                qr.DiagnoseID.As("TextField"),
+                qr.DiagnoseName,
+                @"<'' AS DtdNo>",
+                @"<'' AS DtdName>",
+                qr.IsDisease,
+                qr.IsChronicDisease,
+                qr.Synonym
+            );
+    }
