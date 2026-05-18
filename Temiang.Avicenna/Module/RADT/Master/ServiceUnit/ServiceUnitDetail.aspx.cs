@@ -90,6 +90,8 @@ namespace Temiang.Avicenna.Module.RADT.Master
             if (IsPostBack) return;
 
             ComboBox.PopulateWithServiceUnitForTransaction(cboServiceUnitPharmacy, BusinessObject.Reference.TransactionCode.Prescription, false);
+            PopulateCurrentStage();
+            SetCurrentStageVisibility(); // Hide Dropbox Current Stage (Jika bukan RSI)
         }
 
         protected override void OnInitializeAjaxManagerSettingsCollection(AjaxSettingsCollection ajax)
@@ -583,6 +585,29 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     trCoaPpnIn.Visible = false;
                     trSlPpnIn.Visible = false;
                 }
+
+                //Mapping Current Stage
+                var mapping = new QueueMappingPivotCollection();
+
+                mapping.Query.Where(
+                    mapping.Query.ServiceUnitID == serviceUnit.ServiceUnitID
+                );
+
+                mapping.Load(mapping.Query);
+
+                if (mapping.Count > 0)
+                {
+                    var stage = new QueueStage();
+
+                    if (stage.LoadByPrimaryKey(mapping[0].StageID))
+                    {
+                        cboSRCurrentStage.SelectedValue = stage.ServiceGroup;
+                    }
+                }
+                else
+                {
+                    cboSRCurrentStage.SelectedValue = string.Empty;
+                }
             }
             else
             {
@@ -1033,6 +1058,27 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 serviceUnitAssessmentTypes.Save();
                 ServiceUnitSchedules.Save();
 
+                // Current Stage New Service Unit
+                var stages = new QueueStageCollection();
+
+                stages.Query.Where(
+                    stages.Query.ServiceGroup == cboSRCurrentStage.SelectedValue
+                );
+
+                stages.Load(stages.Query);
+
+                foreach (QueueStage stage in stages)
+                {
+                    var mapping = new QueueMappingPivot();
+
+                    mapping.AddNew();
+
+                    mapping.StageID = stage.StageID;
+                    mapping.ServiceUnitID = txtServiceUnitID.Text;
+
+                    mapping.Save();
+                }
+
                 //subledger
                 var subledgerGroupId = AppSession.Parameter.SubLedgerGroupIdServiceUnit;
                 if (subledgerGroupId != "")
@@ -1079,6 +1125,45 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
                 //Commit if success, Rollback if failed
                 trans.Complete();
+            }
+        }
+
+        //Dropbox Current Stage
+        private void PopulateCurrentStage()
+        {
+            var query = new QueueStageQuery();
+
+            query.Select(query.ServiceGroup);
+            query.GroupBy(query.ServiceGroup);
+            query.OrderBy(query.ServiceGroup.Ascending);
+
+            DataTable dt = query.LoadDataTable();
+
+            cboSRCurrentStage.DataSource = dt;
+            cboSRCurrentStage.DataTextField = "ServiceGroup";
+            cboSRCurrentStage.DataValueField = "ServiceGroup";
+            cboSRCurrentStage.DataBind();
+
+            cboSRCurrentStage.Items.Insert(0, new RadComboBoxItem("", ""));
+        }
+
+        private void SetCurrentStageVisibility()
+        {
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            bool isEnable = string.Equals(
+                healthCareId,
+                "RSI",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            trCurrentStage.Visible = isEnable;
+            cboSRCurrentStage.Enabled = isEnable;
+
+            if (!isEnable)
+            {
+                cboSRCurrentStage.ClearSelection();
+                cboSRCurrentStage.Items.Clear(); // optional biar benar-benar kosong
             }
         }
 

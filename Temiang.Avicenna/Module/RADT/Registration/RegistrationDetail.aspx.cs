@@ -232,6 +232,8 @@ namespace Temiang.Avicenna.Module.RADT
         {
             pnlInfoReg.Visible = !_isNewRecord || pnlBtnPrint.Visible == true;
             hdnSRPatientRiskStatus.Value = string.Empty;
+            PopulateVisitNo();
+            SetVisitNoVisibility(); // Hide label VisitNo jika bukan RSI
 
             //Service Unit & Paramedic
             var suColl = new ServiceUnitCollection();
@@ -705,6 +707,51 @@ namespace Temiang.Avicenna.Module.RADT
                 txtRegistrationDate.DatePopupButton.Enabled = false;
                 txtRegistrationTime.ReadOnly = true;
                 chkIsSkipAutoBill.Enabled = false;
+            }
+        }
+
+        //Method VisitNo
+        private void PopulateVisitNo()
+        {
+            var coll = new VisitQueueCollection();
+
+            coll.Query.Where(
+                coll.Query.UpdatedBy == AppSession.UserLogin.UserID,
+                coll.Query.Status == "CALLED"
+            );
+
+            coll.Query.OrderBy(
+                coll.Query.LastUpdated.Descending
+            );
+
+            coll.LoadAll();
+
+            if (coll.Count > 0)
+            {
+                txtVisitNo.Text = coll[0].VisitNo;
+            }
+            else
+            {
+                txtVisitNo.Text = string.Empty;
+            }
+        }
+
+        private void SetVisitNoVisibility()
+        {
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            bool isEnable = string.Equals(
+                healthCareId,
+                "RSI",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            tblVisitNo.Visible = isEnable;
+            txtVisitNo.Enabled = isEnable;
+
+            if (!isEnable)
+            {
+                txtVisitNo.Text = string.Empty;
             }
         }
 
@@ -4884,6 +4931,41 @@ namespace Temiang.Avicenna.Module.RADT
 
                 //Registrasi
                 reg.Save();
+
+                //Save Data Visit Queue To Stage (POLI, REHAB, HD)
+                #region Insert VisitQueue
+
+                var lastQueue = new VisitQueue();
+
+                lastQueue.Query.es.Top = 1;
+
+                lastQueue.Query.Where(
+                    lastQueue.Query.VisitNo == txtVisitNo.Text
+                );
+
+                lastQueue.Query.OrderBy(
+                    lastQueue.Query.CreatedDate.Descending
+                );
+
+                string srAutoNumber = "VisitTunaiNo";
+
+                if (lastQueue.Query.Load())
+                {
+                    srAutoNumber = lastQueue.SRAutoNumber;
+                }
+
+                VisitQueue.InsertVisitQueueStage(
+                    txtVisitNo.Text,
+                    srAutoNumber,
+                    AppSession.UserLogin.UserID,
+                    DateTime.Now.Date,
+                    reg.ServiceUnitID,
+                    reg.ParamedicID,
+                    reg.RegistrationNo,
+                    reg.PatientID
+                );
+
+                #endregion
 
                 //AutoNumber
                 if (_isNewRecord && pnlBtnPrint.Visible == false)

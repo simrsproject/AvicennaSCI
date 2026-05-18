@@ -88,7 +88,14 @@ namespace Temiang.Avicenna.WebService
         }
 
         //1. Pasien Ambil Antrian
-        [WebMethod]
+        [WebMethod( Description = @"
+           Ambil Data List PayerType untuk pasien memilih type TUNAI, MITRA DAN BPJS
+
+           RESPONSE:
+            200 = Berhasil mendapatkan data payer type
+            404 = Data payer type tidak ditemukan
+            500 = Terjadi kesalahan pada server
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetPayerType()
         {
@@ -135,7 +142,14 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod(Description = @"
+            Ambil Data List Service BPJS untuk kebutuhan pengambilan antrian pasien BPJS
+
+            RESPONSE:
+            200 = Berhasil mendapatkan list service BPJS
+            404 = List data service BPJS tidak ditemukan
+            500 = Terjadi kesalahan pada server
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetServiceBPJS()
         {
@@ -185,8 +199,9 @@ namespace Temiang.Avicenna.WebService
 
 
         //2. Generate Nomor Antrian dan Nomor Kunjungan
-        [WebMethod(
-            Description = @"
+        [WebMethod(Description = @"
+            Ambil Nomor Antrian Pasien
+
             PARAMETER:
             - PayerType (required)
             - ServiceGroup (optional untuk selain BPJS)
@@ -197,6 +212,17 @@ namespace Temiang.Avicenna.WebService
             PayerType=BPJS&
             ServiceGroup=POLI&
             QueueLocation=LOKET_PD
+
+            KETERANGAN:
+            - PayerType : Jenis pembayaran pasien (BPJS, TUNAI, MITRA)
+            - ServiceGroup : Wajib diisi jika PayerType = BPJS
+            - QueueLocation : Lokasi/channel antrian
+
+            RESPONSE:
+               200 = Berhasil mengambil nomor antrian
+               400 = Parameter request tidak valid (PayerType wajib diisi / QueueLocation wajib diisi)
+               404 = Mapping antrian tidak ditemukan
+               500 = Terjadi kesalahan pada server
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void TakeQueueVisitNumber()
@@ -398,17 +424,29 @@ namespace Temiang.Avicenna.WebService
 
         //3. Display Antrian Pasien
         [WebMethod(Description = @"
+            Ambil Display Pasien Pendaftaran
+
             PARAMETER:
             - QueueDate (optional)
             - QueueLocation (required)
 
-            EXAMPLE:
+            CONTOH:
             GetDisplayAntrianPasien?
             QueueDate=2026-05-13&
             QueueLocation=LOKET_PD
+            
+            KETERANGAN:
+               - QueueDate : Tanggal antrian (default hari ini jika kosong atau invalid)
+               - QueueLocation : Lokasi/channel antrian
+
+            RESPONSE:
+               200 = Berhasil mengambil display antrian pasien pendaftaran
+               400 = Parameter request tidak valid (QueueLocation wajib diisi / QueueLocation tidak ditemukan)
+               500 = Terjadi kesalahan pada server / Data display tidak ditemukan
+            
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void GetDisplayAntrianPasien()
+        public void GetDisplayAntrianPasienPendaftaran()
         {
             try
             {
@@ -486,7 +524,7 @@ namespace Temiang.Avicenna.WebService
                 ApiResponeForAntrian.Success(
                     Context,
                     data,
-                    "Berhasil mengambil Display Antrian Pasien"
+                    "Berhasil mengambil Display Antrian Pasien Pendaftaran"
                 );
             }
             catch (Exception ex)
@@ -500,7 +538,7 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
-            Display Antrian Pendaftaran
+            Ambil Display Antrian khusus pegawai Pendaftaran
 
             PARAMETER:
             - QueueDate (optional)
@@ -516,6 +554,19 @@ namespace Temiang.Avicenna.WebService
             SRAutoNumber=BPJS&
             CurrentStage=LOKET&
             QueueLocation=LOKET_PD
+
+            KETERANGAN:
+               - QueueDate : Tanggal antrian (default hari ini jika kosong atau invalid)
+               - Status : Filter status antrian
+               - SRAutoNumber : Filter jenis nomor antrian
+               - CurrentStage : Tahapan antrian saat ini
+               - QueueLocation : Lokasi/channel antrian
+
+            RESPONSE:
+               200 = Berhasil mengambil display antrian pendaftaran
+               400 = Parameter request tidak valid (QueueLocation tidak ditemukan)
+               500 = Terjadi kesalahan pada server
+
          ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetDisplayAntrianPendaftaran()
@@ -620,6 +671,8 @@ namespace Temiang.Avicenna.WebService
 
         //4. Panggil Antrian di Pendaftaran
         [WebMethod(Description = @"
+            Digunakan untuk memanggil nomor antrian pasien pada loket pendaftaran
+
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
@@ -630,6 +683,16 @@ namespace Temiang.Avicenna.WebService
             VisitQueueNo=VQUE-260513-0001&
             UserID=240076&
             CounterID=1
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien
+               - UserID : User petugas yang memanggil antrian
+               - CounterID : Nomor loket/counter pelayanan
+
+            RESPONSE:
+               200 = Antrian berhasil dipanggil
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi / CounterID tidak valid / tidak terdaftar)
+               500 = Terjadi kesalahan pada server
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void CallAntrianSekarangPendaftaran()
@@ -731,6 +794,8 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
+            Digunakan untuk memanggil ulang nomor antrian pasien pada loket pendaftaran.
+
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
@@ -739,6 +804,15 @@ namespace Temiang.Avicenna.WebService
             RecallAntrianPendaftaran?
             VisitQueueNo=VQUE-260513-0001&
             UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien
+               - UserID : User petugas yang melakukan recall antrian
+
+            RESPONSE:
+               200 = Antrian berhasil di-recall
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void RecallAntrianPendaftaran()
@@ -808,6 +882,8 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
+            Digunakan untuk mengubah status antrian pasien menjadi pending pada loket pendaftaran.
+
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
@@ -816,6 +892,15 @@ namespace Temiang.Avicenna.WebService
             PendingAntrianPendaftaran?
             VisitQueueNo=VQUE-260513-0001&
             UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien
+               - UserID : User petugas yang melakukan pending antrian
+
+            RESPONSE:
+               200 = Antrian berhasil di-pending
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void PendingAntrianPendaftaran()
@@ -885,6 +970,8 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
+            Digunakan untuk mengubah status antrian pasien dari PENDING kembali menjadi WAITING pada loket pendaftaran.
+
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
@@ -893,6 +980,16 @@ namespace Temiang.Avicenna.WebService
             WaitingFromPendingStatusPendaftaran?
             VisitQueueNo=VQUE-260513-0001&
             UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien
+               - UserID : User petugas yang mengubah status antrian
+
+            RESPONSE:
+               200 = Antrian berhasil dikembalikan ke WAITING
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
+
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void WaitingFromPendingStatusPendaftaran()
@@ -962,6 +1059,8 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
+            Digunakan untuk memanggil nomor antrian berikutnya pada loket pendaftaran berdasarkan lokasi antrian dan counter petugas.
+
             PARAMETER:
             - QueueLocation (required)
             - UserID (required)
@@ -974,6 +1073,17 @@ namespace Temiang.Avicenna.WebService
             UserID=240076&
             CounterID=1&
             QueueDate=2026-05-13
+
+            KETERANGAN:
+               - QueueLocation : Lokasi/channel antrian
+               - UserID : User petugas yang memanggil antrian
+               - CounterID : Nomor loket/counter pelayanan
+               - QueueDate : Tanggal antrian (default hari ini jika kosong atau invalid)
+
+            RESPONSE:
+               200 = Berhasil memanggil antrian berikutnya / Tidak ada antrian yang bisa dipanggil
+               400 = Parameter request tidak valid (QueueLocation, UserID dan CounterID wajib diisi)
+               500 = Terjadi kesalahan pada server
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void NextAntrianPendaftaran()
@@ -1070,7 +1180,16 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod]
+        [WebMethod (Description = @"
+            Digunakan untuk mengambil daftar counter/loket pendaftaran yang tersedia.
+
+            KETERANGAN:
+               - API akan mengembalikan daftar CounterID yang dapat digunakan pada proses pemanggilan antrian.
+
+            RESPONSE:
+                200 = List counter pendaftaran berhasil diambil
+                500 = Terjadi kesalahan pada server
+        ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetCounterIDList()
         {
@@ -1094,57 +1213,1178 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        //[WebMethod]
-        //[ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        //public void GetQueueSoundPendaftaran(string VisitQueueNo)
-        //{
-            //try
-            //{
+        //5.Get Display Semua Service Unit
+        [WebMethod(Description = @"
+            Digunakan untuk mengambil daftar antrian pasien berdasarkan stage/service unit tertentu.
+
+            PARAMETER:
+            - Status
+            - ServiceUnitID
+            - ParamedicID
+            - QueueDate
+            - StageID
+            
+            DAFTAR STAGEID:
+            - FARMASI_AMBIL
+            - FARMASI_VERIF
+            - LAB_SAMPLE
+            - LAB_VERIF
+            - LOKET
+            - POLI
+            - REHAB_TINDAKAN
+            - USG_TINDAKAN
+            - USG_VERIF
+
+            CONTOH REQUEST:
+            GetDisplayAntrianForAllServiceUnitPasien?
+            Status=WAITING&
+            StageID=POLI&
+            ServiceUnitID=D1.0.01&
+            ParamedicID=DR001&
+            QueueDate=2026-05-13
+
+            KETERANGAN:
+               - Status : Filter status antrian
+               - StageID : Tahapan antrian/service
+               - ServiceUnitID : Filter unit pelayanan
+               - ParamedicID : Filter dokter/paramedis
+               - QueueDate : Tanggal antrian (default hari ini jika kosong atau invalid)
+
+            RESPONSE:
+               200 = Berhasil mengambil data antrian service unit pasien
+               400 = Parameter request tidak valid
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetDisplayAntrianForAllServiceUnitPasien()
+        {
+            try
+            {
                 // =========================
-                // NORMALIZE
+                // NORMALIZE INPUT
                 // =========================
-                //VisitQueueNo =
-                    //(VisitQueueNo ?? "")
-                    //.Trim();
+                string Status =
+                    (Context.Request["Status"] ?? "").Trim().ToUpper();
+
+                string StageID =
+                    (Context.Request["StageID"] ?? "").Trim().ToUpper();
+
+                string ServiceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "").Trim();
+
+                string ParamedicID =
+                    (Context.Request["ParamedicID"] ?? "").Trim();
+
+                string QueueDateStr =
+                    (Context.Request["QueueDate"] ?? "").Trim();
 
                 // =========================
-                // VALIDASI
+                // PARSE DATE
                 // =========================
-                //if (string.IsNullOrEmpty(VisitQueueNo))
-                //{
-                    //ApiResponeForAntrian.Error(
-                        //Context,
-                        //"VisitQueueNo wajib diisi",
-                        //400
-                    //);
-                    //return;
-                //}
+                DateTime queueDate;
+
+                if (
+                    !string.IsNullOrWhiteSpace(QueueDateStr)
+                    && DateTime.TryParse(QueueDateStr, out queueDate)
+                )
+                {
+                    // pakai tanggal input user
+                }
+                else
+                {
+                    // default hari ini
+                    queueDate = DateTime.Now;
+                }
 
                 // =========================
-                // EXEC BO
+                // CALL BUSINESS OBJECT
                 // =========================
-                //var data =
-                   // QueueingSound.GetQueueSoundPendaftaran(
-                      //  VisitQueueNo
-                    //);
+                var data =
+                    VisitQueue.GetQueueForAllServieUnitPasien(
+                        queueDate,
+                        Status,
+                        StageID,
+                        ServiceUnitID,
+                        ParamedicID
+                    );
 
                 // =========================
                 // RESPONSE
                 // =========================
-                //ApiResponeForAntrian.Success(
-                   // Context,
-                   // data,
-                   // "Sound antrian berhasil diambil"
-                //);
-           // }
-            // catch (Exception ex)
-            // {
-              //  ApiResponeForAntrian.Error(
-                //    Context,
-                //    ex.Message,
-                  //  500
-                //);
-            //}
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Berhasil mengambil data antrian service unit pasien"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(Context, ex.Message, 500);
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengambil daftar antrian pasien berdasarkan stage/service unit tertentu untuk kebutuhan monitoring admin atau pegawai.
+
+            PARAMETER:
+            - Status
+            - ServiceUnitID
+            - ParamedicID
+            - QueueDate
+            - StageID
+
+            DAFTAR STAGEID:
+            - FARMASI_AMBIL
+            - FARMASI_VERIF
+            - LAB_SAMPLE
+            - LAB_VERIF
+            - LOKET
+            - POLI
+            - REHAB_TINDAKAN
+            - USG_TINDAKAN
+            - USG_VERIF
+
+            CONTOH REQUEST:
+            GetDisplayAntrianForAllServiceUnitAdmin?
+            Status=WAITING&
+            StageID=POLI&
+            ServiceUnitID=D1.0.01&
+            ParamedicID=DR001&
+            QueueDate=2026-05-13
+
+            KETERANGAN:
+               - Status : Filter status antrian
+               - StageID : Tahapan antrian/service
+               - ServiceUnitID : Filter unit pelayanan
+               - ParamedicID : Filter dokter/paramedis
+               - QueueDate : Tanggal antrian (default hari ini jika kosong atau invalid)
+
+            RESPONSE:
+               200 = Berhasil mengambil data antrian service unit admin atau pegawai
+               400 = Parameter request tidak valid
+               500 = Terjadi kesalahan pada server
+
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetDisplayAntrianForAllServiceUnitAdmin()
+        {
+            try
+            {
+                // =========================
+                // NORMALIZE INPUT
+                // =========================
+                string Status =
+                    (Context.Request["Status"] ?? "").Trim().ToUpper();
+
+                string StageID =
+                    (Context.Request["StageID"] ?? "").Trim().ToUpper();
+
+                string ServiceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "").Trim();
+
+                string ParamedicID =
+                    (Context.Request["ParamedicID"] ?? "").Trim();
+
+                string QueueDateStr =
+                    (Context.Request["QueueDate"] ?? "").Trim();
+
+                // =========================
+                // PARSE DATE
+                // =========================
+                DateTime queueDate;
+
+                if (
+                    !string.IsNullOrWhiteSpace(QueueDateStr)
+                    && DateTime.TryParse(QueueDateStr, out queueDate)
+                )
+                {
+                    // pakai tanggal input user
+                }
+                else
+                {
+                    // default hari ini
+                    queueDate = DateTime.Now;
+                }
+
+                // =========================
+                // CALL BUSINESS OBJECT
+                // =========================
+                var data =
+                    VisitQueue.GetQueueForAllServieUnitAdmin(
+                        queueDate,
+                        Status,
+                        StageID,
+                        ServiceUnitID,
+                        ParamedicID
+                    );
+
+                // =========================
+                // RESPONSE
+                // =========================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Berhasil mengambil data antrian service unit admin atau pegawai"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(Context, ex.Message, 500);
+            }
+        }
+
+        //6.Edit atau Move Antrian
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan posisi antrian pasien ke urutan bawah dalam daftar antrian.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveQueueDown?
+            VisitQueueNo=VQUE-260516-0001&
+            UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien yang akan dipindahkan
+               - UserID : User petugas yang melakukan perubahan antrian
+
+            RESPONSE:
+               200 = Berhasil memindahkan antrian ke bawah
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
+
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveQueueDown()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                var result =
+                    VisitQueue.MoveQueueDown(
+                        VisitQueueNo,
+                        UserID
+                    );
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan antrian ke bawah"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan posisi antrian pasien ke urutan atas dalam daftar antrian.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveQueueUp?
+            VisitQueueNo=VQUE-260516-0002&
+            UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien yang akan dipindahkan
+               - UserID : User petugas yang melakukan perubahan antrian
+
+            RESPONSE:
+               200 = Berhasil memindahkan antrian ke atas
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
+
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveQueueUp()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                var result =
+                    VisitQueue.MoveQueueUp(
+                        VisitQueueNo,
+                        UserID
+                    );
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan antrian ke atas"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan posisi antrian pasien langsung ke urutan paling atas pada daftar antrian.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveQueueToTop?
+            VisitQueueNo=VQUE-260516-0011&
+            UserID=240076
+            
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien yang akan dipindahkan
+               - UserID : User petugas yang melakukan perubahan antrian
+
+            RESPONSE:
+               200 = Berhasil memindahkan antrian ke paling atas
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveQueueToTop()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                var result =
+                    VisitQueue.MoveQueueToTop(
+                        VisitQueueNo,
+                        UserID
+                    );
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan antrian ke paling atas"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan posisi antrian pasien langsung ke urutan paling bawah pada daftar antrian.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveQueueToBottom?
+            VisitQueueNo=VQUE-260516-0001&
+            UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian pasien yang akan dipindahkan
+               - UserID : User petugas yang melakukan perubahan antrian
+
+            RESPONSE:
+               200 = Berhasil memindahkan antrian ke paling bawah
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveQueueToBottom()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                var result =
+                    VisitQueue.MoveQueueToBottom(
+                        VisitQueueNo,
+                        UserID
+                    );
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan antrian ke paling bawah"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan posisi antrian pasien sebelum atau sesudah antrian target menggunakan metode drag & drop.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - TargetVisitQueueNo (required)
+            - Position (required: BEFORE / AFTER)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveQueueDragDrop?
+            VisitQueueNo=VQUE-260516-0001&
+            TargetVisitQueueNo=VQUE-260516-0005&
+            Position=BEFORE&
+            UserID=240076
+
+            KETERANGAN:
+               - VisitQueueNo : Nomor antrian yang akan dipindahkan
+               - TargetVisitQueueNo : Nomor antrian target tujuan
+               - Position : Posisi penempatan antrian (BEFORE / AFTER)
+               - UserID : User petugas yang melakukan perubahan antrian
+
+            RESPONSE:
+               200 = Berhasil memindahkan posisi antrian
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi / TargetVisitQueueNo wajib diisi / Position wajib diisi / Position hanya boleh BEFORE atau AFTER / UserID wajib diisi)
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveQueueDragDrop()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string TargetVisitQueueNo =
+                    (Context.Request["TargetVisitQueueNo"] ?? "")
+                    .Trim();
+
+                string Position =
+                    (Context.Request["Position"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(TargetVisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "TargetVisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(Position))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Position wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (
+                    Position != "BEFORE" &&
+                    Position != "AFTER"
+                )
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Position hanya boleh BEFORE atau AFTER",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                var result =
+                    VisitQueue.MoveQueueDragDrop(
+                        VisitQueueNo,
+                        TargetVisitQueueNo,
+                        Position,
+                        UserID
+                    );
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan posisi antrian"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        //7. CALL, RECALL, PENDING All Service Unit
+        [WebMethod(Description = @"
+            Digunakan untuk memanggil antrian pada seluruh Service Unit.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            CallAntrianAllServiceUnit?
+            VisitQueueNo=VQUE-260516-0015&
+            UserID=Admin
+
+            RESPONSE:
+               200 = Berhasil memanggil antrian
+               400 = Parameter request tidak valid
+               404 = Data antrian tidak ditemukan
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void CallAntrianAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.CallAntrianAllServiceUnit(
+                            VisitQueueNo,
+                            UserID
+                        );
+
+                    if (result == null)
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            "Data antrian tidak ditemukan",
+                            404
+                        );
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Antrian berhasil dipanggil"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk recall antrian pada seluruh Service Unit.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            RecallAntrianAllServiceUnit?
+            VisitQueueNo=VQUE-260516-0015&
+            UserID=Admin
+
+            RESPONSE:
+               200 = Berhasil recall antrian
+               400 = Parameter request tidak valid
+               404 = Data antrian tidak ditemukan
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void RecallAntrianAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.RecallAntrianAllServiceUnit(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // NO DATA
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Antrian berhasil di-recall"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengubah status antrian menjadi PENDING pada seluruh Service Unit.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            PendingAntrianAllServiceUnit?
+            VisitQueueNo=VQUE-260516-0013&
+            UserID=admin
+
+            RESPONSE:
+               200 = Berhasil ubah status ke PENDING
+               400 = Parameter tidak valid
+               404 = Data antrian tidak ditemukan
+               500 = Error server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void PendingAntrianAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(Context,
+                        "VisitQueueNo wajib diisi",
+                        400);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(Context,
+                        "UserID wajib diisi",
+                        400);
+                    return;
+                }
+
+                // =========================================
+                // EXEC BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.SetPendingAllServiceUnit(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
+                    {
+                        ApiResponeForAntrian.Error(Context,
+                            ex.Message,
+                            404);
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // NOT FOUND
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(Context,
+                        "Data antrian tidak ditemukan",
+                        404);
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil ubah status ke PENDING"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(Context, ex.Message, 500);
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengembalikan antrian dari PENDING ke WAITING
+            berdasarkan ServiceUnit, Stage, dan Paramedic (All Service Unit Context)
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            CONTOH:
+            WaitingFromPendingStatusAllServiceUnit?
+            VisitQueueNo=VQUE-260516-0012&
+            UserID=admin
+
+            RESPONSE:
+               200 = Berhasil dikembalikan ke WAITING
+               400 = Parameter tidak valid
+               404 = Data tidak ditemukan
+               500 = Server error
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void WaitingFromPendingStatusAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.SetWaitingFromPendingAllServiceUnit(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // RESULT CHECK
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil mengembalikan antrian ke WAITING"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
 
     }
 }

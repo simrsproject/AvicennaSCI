@@ -1846,6 +1846,16 @@
     <Content Include="Document\2026\05\13\AntrianRSI\019-SP-Call next Antrian.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\020-SP-AntrianSetPending.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\021-SP-AntrianSetWaitingFromPending.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\022-CREATE TABLE - QueueMappingPivot.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\023-SP-TakeQueueVisitNumber_Stage.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\024-SP-AntrianMoveQueueDown.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\025-SP-AntrianMoveQueueUp.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\026-SP-AntrianMoveQueueToTop.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\027-SP-AntrianMoveQueueToBottom.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\028-SP-AntrianMoveQueueDragDrop.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\029-SP-AntrianCallNowAllServiceUnit.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\030-SP-AntrianRecallAllServiceUnit.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\031-SP-AntrianSetPendingAllServiceUnit.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />

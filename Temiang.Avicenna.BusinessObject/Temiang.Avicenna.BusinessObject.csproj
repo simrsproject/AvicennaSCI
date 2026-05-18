@@ -789,6 +789,7 @@
     <Compile Include="Generated\ProcedureSynonym.cs" />
     <Compile Include="Generated\QueueCategory.cs" />
     <Compile Include="Generated\QueueingRunningText.cs" />
+    <Compile Include="Generated\QueueMappingPivot.cs" />
     <Compile Include="Generated\QueueStage.cs" />
     <Compile Include="Generated\ReferExternalCmx.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryProcedureCmx.cs" />

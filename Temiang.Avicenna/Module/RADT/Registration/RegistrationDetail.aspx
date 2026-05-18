@@ -1116,6 +1116,22 @@
                         <td width="20px"></td>
                     </tr>
                 </table>
+                <table id="tblVisitNo" runat="server" width="100%">
+                 <tr>
+                     <td class="label">Visit No</td>
+                     <td class="entry300">
+                         <table cellpadding="0" cellspacing="0">
+                             <tr>
+                                 <td>
+                                     <telerik:RadTextBox runat="server" ID="txtVisitNo" MaxLength="20" Width="283px" ReadOnly="true"></telerik:RadTextBox>
+                                 </td>
+                                 <td width="5px"></td>
+                             </tr>
+                         </table>
+                     </td>
+                     <td width="20px"></td>
+                 </tr>
+                </table>
                 <table width="100%">
                     <tr>
                         <td>

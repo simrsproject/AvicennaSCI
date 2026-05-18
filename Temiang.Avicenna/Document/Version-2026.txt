@@ -186,3 +186,10 @@ Titipan Daniel
 1. Menambahkan statement pada BusinessObject AntrianNumberAutoSemantic.cs, VisitQueue.cs dan QueueingSound.cs untuk Execute Store Procedure.
 2. Menambahkan 1 file .asmx dengan nama AntrianRSI.asmx untuk keperluan API Sistem Antrian Rumah Sakit Immanuel.
 3. Menambahkan Script Sql pada folder 2026/05/13/AntrianRSI tidak WAJIB di eksekusi di Rumah Sakit lain.
+4. Menambahkan Bussiness Object QueueMappingPivot dan Create Tabel QueueMappingPivot.
+5. Menambahkan Void baru pada code behind ServiceUnitDetail yaitu "private void PopulateCurrentStage", dropbox Current Stage,
+   dan statement Insert atau Edit Current Stage.
+6. Menambahkan statement baru pada code behind RegistrationDetail pada SaveEntity untuk HIT Procedure supaya ServiceUnitID, ParamedicID dan PatientID
+   bisa terinput ke tabel VisitQueue.
+7. Menambahkan private void SetCurrentStageVisibility untuk menyembunyikan dropbox dengan parameter RSI (Jika bukan RSI maka sembunyikan)
+8.

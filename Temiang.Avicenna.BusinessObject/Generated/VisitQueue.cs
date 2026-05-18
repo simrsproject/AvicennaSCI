@@ -1671,6 +1671,1041 @@ namespace Temiang.Avicenna.BusinessObject
                 CounterID = queue.CalledByCounterID ?? counterID
             };
         }
+
+        public static object InsertVisitQueueStage
+        (
+            string visitNo,
+            string srAutoNumber,
+            string userID,
+            DateTime transDate,
+            string serviceUnitID,
+            string paramedicID,
+            string registrationNo,
+            string patientID
+        )
+        {
+            esParameters prms =
+                new esParameters();
+
+            // =========================================
+            // INPUT
+            // =========================================
+
+            prms.Add(
+                "VisitNo",
+                visitNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "SRAutoNumber",
+                srAutoNumber,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "TransDate",
+                transDate.Date,
+                esParameterDirection.Input,
+                DbType.Date,
+                0
+            );
+
+            prms.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "ParamedicID",
+                paramedicID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "RegistrationNo",
+                registrationNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "PatientID",
+                patientID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // OUTPUT
+            // =========================================
+
+            prms.Add(
+                "VisitQueueNo",
+                esParameterDirection.Output,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE SP
+            // =========================================
+
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "TakeQueueVisitNumber_Stage",
+                prms
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+
+            string visitQueueNo =
+                prms["VisitQueueNo"].Value == null
+                    ? ""
+                    : prms["VisitQueueNo"].Value.ToString();
+
+            if (string.IsNullOrEmpty(visitQueueNo))
+            {
+                return null;
+            }
+
+            var queue =
+                new VisitQueue();
+
+            queue.LoadByPrimaryKey(
+                visitQueueNo
+            );
+
+            return new
+            {
+                VisitQueueNo = queue.VisitQueueNo,
+                VisitNo = queue.VisitNo,
+                CurrentStage = queue.CurrentStage,
+                StageID = queue.StageID,
+                Status = queue.Status,
+                QueueSequence = queue.QueueSequence
+            };
+        }
+
+        public static object GetQueueForAllServieUnitPasien(
+            DateTime queueDate,
+            string status,
+            string stageID,
+            string serviceUnitID,
+            string paramedicID
+        )
+        {
+            var collection = new VisitQueueCollection();
+            var query = new VisitQueueQuery("v");
+
+            query.es.WithNoLock = true;
+
+            query.Select(
+                query.VisitQueueNo,
+                query.VisitNo,
+                query.QueueDate,
+                query.Status,
+                query.ServiceUnitID,
+                query.ParamedicID,
+                query.QueueSequence
+            );
+
+            // =========================================
+            // FILTER DATE
+            // =========================================
+            var startDate = queueDate.Date;
+            var endDate = startDate.AddDays(1);
+
+            query.Where(
+                query.QueueDate >= startDate,
+                query.QueueDate < endDate
+            );
+
+            // =========================================
+            // OPTIONAL FILTERS
+            // =========================================
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query.Where(query.Status == status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(stageID))
+            {
+                query.Where(query.StageID == stageID);
+            }
+
+            if (!string.IsNullOrWhiteSpace(serviceUnitID))
+            {
+                query.Where(query.ServiceUnitID == serviceUnitID);
+            }
+
+            if (!string.IsNullOrWhiteSpace(paramedicID))
+            {
+                query.Where(query.ParamedicID == paramedicID);
+            }
+
+            // =========================================
+            // ORDER + TOP
+            // =========================================
+            query.OrderBy(query.QueueSequence.Ascending);
+            query.es.Top = 50;
+
+            collection.Load(query);
+
+            // =========================================
+            // LOAD MASTER
+            // =========================================
+            var serviceUnits = new ServiceUnitCollection();
+            serviceUnits.LoadAll();
+
+            var paramedics = new ParamedicCollection();
+            paramedics.LoadAll();
+
+            // =========================================
+            // RESULT
+            // =========================================
+            return collection
+                .Select(x => new
+                {
+                    x.VisitQueueNo,
+                    x.VisitNo,
+                    x.QueueDate,
+                    x.Status,
+
+                    x.ServiceUnitID,
+
+                    ServiceUnitName =
+                        serviceUnits
+                            .FirstOrDefault(s =>
+                                s.ServiceUnitID == x.ServiceUnitID
+                            )
+                            ?.ServiceUnitName,
+
+                    x.ParamedicID,
+
+                    ParamedicName =
+                        paramedics
+                            .FirstOrDefault(p =>
+                                p.ParamedicID == x.ParamedicID
+                            )
+                            ?.ParamedicName,
+                })
+                .ToList();
+        }
+
+        public static object GetQueueForAllServieUnitAdmin(
+            DateTime queueDate,
+            string status,
+            string stageID,
+            string serviceUnitID,
+            string paramedicID
+        )
+        {
+            var collection = new VisitQueueCollection();
+            var query = new VisitQueueQuery("v");
+
+            query.es.WithNoLock = true;
+
+            query.Select(
+                query.VisitQueueNo,
+                query.VisitNo,
+                query.RegistrationNo,
+                query.PatientID,
+                query.QueueDate,
+                query.Status,
+                query.ServiceUnitID,
+                query.ParamedicID,
+                query.QueueSequence,
+                query.StageID
+            );
+
+            // =========================================
+            // FILTER DATE
+            // =========================================
+            var startDate = queueDate.Date;
+            var endDate = startDate.AddDays(1);
+
+            query.Where(
+                query.QueueDate >= startDate,
+                query.QueueDate < endDate
+            );
+
+            // =========================================
+            // OPTIONAL FILTERS
+            // =========================================
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query.Where(query.Status == status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(stageID))
+            {
+                query.Where(query.StageID == stageID);
+            }
+
+            if (!string.IsNullOrWhiteSpace(serviceUnitID))
+            {
+                query.Where(query.ServiceUnitID == serviceUnitID);
+            }
+
+            if (!string.IsNullOrWhiteSpace(paramedicID))
+            {
+                query.Where(query.ParamedicID == paramedicID);
+            }
+
+            // =========================================
+            // ORDER + TOP
+            // =========================================
+            query.OrderBy(query.QueueSequence.Ascending);
+            query.es.Top = 50;
+
+            collection.Load(query);
+
+            // =========================================
+            // LOAD SERVICE UNIT
+            // =========================================
+            var serviceUnits = new ServiceUnitCollection();
+            serviceUnits.LoadAll();
+
+            var serviceUnitDict =
+                serviceUnits.ToDictionary(
+                    x => x.ServiceUnitID,
+                    x => x.ServiceUnitName
+                );
+
+            // =========================================
+            // LOAD PARAMEDIC
+            // =========================================
+            var paramedics = new ParamedicCollection();
+            paramedics.LoadAll();
+
+            var paramedicDict =
+                paramedics.ToDictionary(
+                    x => x.ParamedicID,
+                    x => x.ParamedicName
+                );
+
+            // =========================================
+            // LOAD PATIENT YANG DIPAKAI SAJA
+            // =========================================
+            var patientIDs = collection
+                .Where(x => !string.IsNullOrEmpty(x.PatientID))
+                .Select(x => x.PatientID)
+                .Distinct()
+                .ToList();
+
+            var patients = new PatientCollection();
+
+            if (patientIDs.Count > 0)
+            {
+                patients.Query.Where(
+                    patients.Query.PatientID.In(patientIDs)
+                );
+
+                patients.Query.Load();
+            }
+
+            var patientDict =
+                patients.ToDictionary(
+                    x => x.PatientID,
+                    x => x.FirstName
+                );
+
+            // =========================================
+            // RESULT
+            // =========================================
+            return collection
+                .Select(x => new
+                {
+                    x.VisitQueueNo,
+                    x.VisitNo,
+                    x.RegistrationNo,
+                    x.PatientID,
+                    FirstName =
+                        !string.IsNullOrEmpty(x.PatientID)
+                        && patientDict.ContainsKey(x.PatientID)
+                            ? patientDict[x.PatientID]
+                            : null,
+                    x.QueueDate,
+                    x.Status,
+                    x.QueueSequence,
+                    x.StageID,
+
+                    x.ServiceUnitID,
+                    ServiceUnitName =
+                        !string.IsNullOrEmpty(x.ServiceUnitID)
+                        && serviceUnitDict.ContainsKey(x.ServiceUnitID)
+                            ? serviceUnitDict[x.ServiceUnitID]
+                            : null,
+
+                    x.ParamedicID,
+
+                    ParamedicName =
+                        !string.IsNullOrEmpty(x.ParamedicID)
+                        && paramedicDict.ContainsKey(x.ParamedicID)
+                            ? paramedicDict[x.ParamedicID]
+                            : null,
+                })
+                .ToList();
+        }
+
+        public static object MoveQueueDown(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            // =========================================
+            // VALIDASI
+            // =========================================
+            if (string.IsNullOrWhiteSpace(visitQueueNo))
+            {
+                throw new Exception(
+                    "VisitQueueNo wajib diisi"
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(userID))
+            {
+                throw new Exception(
+                    "UserID wajib diisi"
+                );
+            }
+
+            // =========================================
+            // PARAMETERS
+            // =========================================
+            esParameters prms =
+                new esParameters();
+
+            prms.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE PROCEDURE
+            // =========================================
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianMoveQueueDown",
+                prms
+            );
+
+            // =========================================
+            // RELOAD DATA
+            // =========================================
+            var queue =
+                new VisitQueue();
+
+            queue.LoadByPrimaryKey(
+                visitQueueNo
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+            return new
+            {
+                VisitQueueNo = queue.VisitQueueNo,
+                VisitNo = queue.VisitNo,
+                QueueSequence = queue.QueueSequence,
+                QueueKey = queue.QueueKey,
+                Status = queue.Status,
+                StageID = queue.StageID,
+                LastUpdated = queue.LastUpdated
+            };
+        }
+
+        public static object MoveQueueUp(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            // =========================================
+            // VALIDASI
+            // =========================================
+            if (string.IsNullOrWhiteSpace(visitQueueNo))
+            {
+                throw new Exception(
+                    "VisitQueueNo wajib diisi"
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(userID))
+            {
+                throw new Exception(
+                    "UserID wajib diisi"
+                );
+            }
+
+            // =========================================
+            // PARAMETERS
+            // =========================================
+            esParameters prms =
+                new esParameters();
+
+            prms.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE PROCEDURE
+            // =========================================
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianMoveQueueUp",
+                prms
+            );
+
+            // =========================================
+            // RELOAD DATA
+            // =========================================
+            var queue =
+                new VisitQueue();
+
+            queue.LoadByPrimaryKey(
+                visitQueueNo
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+            return new
+            {
+                VisitQueueNo = queue.VisitQueueNo,
+                VisitNo = queue.VisitNo,
+                QueueSequence = queue.QueueSequence,
+                QueueKey = queue.QueueKey,
+                Status = queue.Status,
+                StageID = queue.StageID,
+                LastUpdated = queue.LastUpdated
+            };
+        }
+
+        public static object MoveQueueToTop(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            // =========================================
+            // VALIDASI
+            // =========================================
+            if (string.IsNullOrWhiteSpace(visitQueueNo))
+            {
+                throw new Exception(
+                    "VisitQueueNo wajib diisi"
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(userID))
+            {
+                throw new Exception(
+                    "UserID wajib diisi"
+                );
+            }
+
+            // =========================================
+            // PARAMETERS
+            // =========================================
+            esParameters prms =
+                new esParameters();
+
+            prms.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE PROCEDURE
+            // =========================================
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianMoveQueueToTop",
+                prms
+            );
+
+            // =========================================
+            // RELOAD DATA
+            // =========================================
+            var queue =
+                new VisitQueue();
+
+            queue.LoadByPrimaryKey(
+                visitQueueNo
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+            return new
+            {
+                VisitQueueNo = queue.VisitQueueNo,
+                VisitNo = queue.VisitNo,
+                QueueSequence = queue.QueueSequence,
+                QueueKey = queue.QueueKey,
+                Status = queue.Status,
+                StageID = queue.StageID,
+                LastUpdated = queue.LastUpdated
+            };
+        }
+
+        public static object MoveQueueToBottom(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            var prms =
+                new esParameters();
+
+            // =========================================
+            // INPUT
+            // =========================================
+
+            prms.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE PROCEDURE
+            // =========================================
+
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianMoveQueueToBottom",
+                prms
+            );
+
+            // =========================================
+            // RELOAD DATA
+            // =========================================
+
+            var queue =
+                new VisitQueue();
+
+            queue.LoadByPrimaryKey(
+                visitQueueNo
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+
+            return new
+            {
+                queue.VisitQueueNo,
+                queue.VisitNo,
+                queue.QueueSequence,
+                queue.QueueKey,
+                queue.Status,
+                queue.LastUpdated
+            };
+        }
+
+        public static object MoveQueueDragDrop(
+            string visitQueueNo,
+            string targetVisitQueueNo,
+            string position,
+            string userID
+        )
+        {
+            var prms =
+                new esParameters();
+
+            // =========================================
+            // INPUT
+            // =========================================
+
+            prms.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "TargetVisitQueueNo",
+                targetVisitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "Position",
+                position,
+                esParameterDirection.Input,
+                DbType.String,
+                10
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE PROCEDURE
+            // =========================================
+
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianMoveQueueDragDrop",
+                prms
+            );
+
+            // =========================================
+            // RELOAD DATA
+            // =========================================
+
+            var queue =
+                new VisitQueue();
+
+            queue.LoadByPrimaryKey(
+                visitQueueNo
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+
+            return new
+            {
+                queue.VisitQueueNo,
+                queue.VisitNo,
+                queue.QueueSequence,
+                queue.QueueKey,
+                queue.StageID,
+                queue.Status,
+                queue.LastUpdated
+            };
+        }
+
+        public static object CallAntrianAllServiceUnit(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            object result = null;
+
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (
+                var reader =
+                    entity.ExecuteReader(
+                        esQueryType.StoredProcedure,
+                        "AntrianCallNowAllServiceUnit",
+                        parameters
+                    )
+            )
+            {
+                if (reader.Read())
+                {
+                    result = new
+                    {
+                        VisitQueueNo =
+                            reader["VisitQueueNo"].ToString(),
+
+                        VisitNo =
+                            reader["VisitNo"].ToString(),
+
+                        Status =
+                            reader["Status"].ToString(),
+
+                        StageID =
+                            reader["StageID"].ToString(),
+
+                        ServiceUnitID =
+                            reader["ServiceUnitID"].ToString(),
+
+                        ParamedicID =
+                            reader["ParamedicID"] == DBNull.Value
+                                ? ""
+                                : reader["ParamedicID"].ToString(),
+
+                        CalledTime =
+                            reader["CalledTime"] == DBNull.Value
+                                ? null
+                                : reader["CalledTime"],
+
+                        LastUpdated =
+                            reader["LastUpdated"] == DBNull.Value
+                                ? null
+                                : reader["LastUpdated"],
+
+                        UpdatedBy =
+                            reader["UpdatedBy"].ToString()
+                    };
+                }
+            }
+
+            return result;
+        }
+
+        public static object RecallAntrianAllServiceUnit(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE SP
+            // =========================================
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianRecallAllServiceUnit",
+                parameters
+            );
+
+            // =========================================
+            // RELOAD DATA TERBARU
+            // =========================================
+            var result = new VisitQueue();
+
+            if (!result.LoadByPrimaryKey(visitQueueNo))
+            {
+                return null;
+            }
+
+            return new
+            {
+                VisitQueueNo = result.VisitQueueNo,
+                VisitNo = result.VisitNo,
+                Status = result.Status,
+                StageID = result.CurrentStage,
+                ServiceUnitID = result.ServiceUnitID,
+                ParamedicID = result.ParamedicID,
+                CalledTime = result.CalledTime,
+                LastUpdated = result.LastUpdated,
+                UpdatedBy = result.UpdatedBy,
+                IsRecall = result.GetColumn("IsRecall")
+            };
+        }
+
+        public static object SetPendingAllServiceUnit(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "AntrianSetPendingAllServiceUnit",
+                parameters
+            );
+
+            if (reader == null || !reader.Read())
+                return null;
+
+            return new
+            {
+                VisitQueueNo = reader["VisitQueueNo"]?.ToString(),
+                VisitNo = reader["VisitNo"]?.ToString(),
+                Status = reader["Status"]?.ToString(),
+                StageID = reader["StageID"]?.ToString(),
+                ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
+                ParamedicID = reader["ParamedicID"]?.ToString(),
+                CalledTime = reader["CalledTime"] == DBNull.Value ? null : reader["CalledTime"],
+                LastUpdated = reader["LastUpdated"] == DBNull.Value ? null : reader["LastUpdated"],
+                UpdatedBy = reader["UpdatedBy"]?.ToString()
+            };
+        }
+
+        public static object SetWaitingFromPendingAllServiceUnit(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "AntrianSetWaitingFromPendingAllServiceUnit",
+                parameters
+            ))
+            {
+                if (reader == null || !reader.Read())
+                    return null;
+
+                return new
+                {
+                    VisitQueueNo = reader["VisitQueueNo"]?.ToString(),
+                    VisitNo = reader["VisitNo"]?.ToString(),
+                    Status = reader["Status"]?.ToString(),
+                    StageID = reader["StageID"]?.ToString(),
+                    ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
+                    ParamedicID = reader["ParamedicID"]?.ToString(),
+                    QueueSequence = reader["QueueSequence"] == DBNull.Value ? null : reader["QueueSequence"],
+                    CalledTime = reader["CalledTime"] == DBNull.Value ? null : reader["CalledTime"],
+                    LastUpdated = reader["LastUpdated"] == DBNull.Value ? null : reader["LastUpdated"],
+                    UpdatedBy = reader["UpdatedBy"]?.ToString()
+                };
+            }
+        }
+
+
     }
 
     [Serializable]

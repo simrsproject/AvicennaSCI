@@ -319,6 +319,17 @@
                         <td width="20"></td>
                         <td></td>
                     </tr>
+                    <tr id="trCurrentStage" runat="server">
+                         <td class="label">
+                             <asp:Label ID="Label9" runat="server" Text="Current Stage"></asp:Label>
+                         </td>
+                         <td class="entry">
+                             <telerik:RadComboBox ID="cboSRCurrentStage" runat="server" Width="300px" AllowCustomText="true"
+                                 Filter="Contains" />
+                         </td>
+                         <td width="20"></td>
+                         <td></td>
+                     </tr>
                     <tr>
                         <td class="label">Kemenkes Group
                         </td>
