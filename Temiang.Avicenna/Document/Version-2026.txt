@@ -190,3 +190,7 @@ Titipan Daniel
    $('#spanTotal').html((sum + addVal).toFixed(2));
 3. Modifikasi SetEntityValue() di PurchaseOrderReturnDetail.aspx.cs. Penambahan 1 baris statement :
    entity.IsAssets = refs.IsAssets;
+
+
+---- [18-05-2026 - Danang] ---
+1. CR Odoo Perubahan JSON untuk bridging SatuSehat RIS
