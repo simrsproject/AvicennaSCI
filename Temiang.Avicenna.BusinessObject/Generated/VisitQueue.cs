@@ -1123,7 +1123,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.VisitNo,
                 query.Status,
                 query.QueueLocation,
-                semantic.DisplayName
+                semantic.DisplayName,
+                query.CalledByCounterID
             );
 
             query.LeftJoin(semantic)
@@ -1162,7 +1163,9 @@ namespace Temiang.Avicenna.BusinessObject
                     DisplayName =
                         x.GetColumn("DisplayName") == null
                             ? ""
-                            : x.GetColumn("DisplayName").ToString()
+                            : x.GetColumn("DisplayName").ToString(),
+
+                    CalledByCounterID = x.CalledByCounterID
                 })
                 .ToList();
         }
@@ -1191,7 +1194,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.SRAutoNumber,
                 query.CurrentStage,
                 query.QueueLocation,
-                query.QueueSequence
+                query.QueueSequence,
+                query.CalledByCounterID
             );
 
             // =========================================
@@ -1252,7 +1256,8 @@ namespace Temiang.Avicenna.BusinessObject
                     SRAutoNumber = x.SRAutoNumber,
                     CurrentStage = x.CurrentStage,
                     QueueLocation = x.QueueLocation,
-                    QueueSequence = x.QueueSequence
+                    QueueSequence = x.QueueSequence,
+                    CalledByCounterID = x.CalledByCounterID
                 })
                 .ToList();
         }
