@@ -1180,6 +1180,78 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
+        [WebMethod(Description = @"
+            Digunakan untuk memunculkan suara berdasarkan VisitQueueNo.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+
+            EXAMPLE:
+            GetQueueSoundPendaftaran?
+            VisitQueueNo = 'VQUE-260518-0008'
+
+            KETERANGAN:
+               - VisitQueueNo = Nomor Antrian yang akan di convert menjadi suara
+               - Contoh Test suara MP3 ada di link dev http://10.200.200.185/dev/Audio/nomor-urut.mp3
+
+            RESPONSE:
+               200 = Sound antrian berhasil diambil
+               400 = Parameter request tidak valid (VisitQueueNo wajib diisi)
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetQueueSoundPendaftaran()
+        {
+            try
+            {
+                // =========================
+                // NORMALIZE
+                // =========================
+                string VisitQueueNo =
+                   (Context.Request["VisitQueueNo"] ?? "")
+                   .Trim()
+                   .ToUpper();
+
+                // =========================
+                // VALIDASI
+                // =========================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================
+                // EXEC BO
+                // =========================
+                var data =
+                    QueueingSound.GetQueueSoundPendaftaran(
+                        VisitQueueNo
+                    );
+
+                // =========================
+                // RESPONSE
+                // =========================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Sound antrian berhasil diambil"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
         [WebMethod (Description = @"
             Digunakan untuk mengambil daftar counter/loket pendaftaran yang tersedia.
 

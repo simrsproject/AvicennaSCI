@@ -84,7 +84,7 @@ namespace Temiang.Avicenna.BusinessObject
 	[Serializable]
 	abstract public class esQueueingSound : esEntityWAuditLog
 	{
-		/// <summary>
+		/// <summary>g
 		/// Used internally by the entity's DynamicQuery mechanism.
 		/// </summary>
 		virtual protected esQueueingSoundQuery GetDynamicQuery()
@@ -563,7 +563,36 @@ namespace Temiang.Avicenna.BusinessObject
 
 	public partial class QueueingSound : esQueueingSound
 	{
- 
+        public static object GetQueueSoundPendaftaran(string visitQueueNo)
+        {
+            var entity = new QueueingSound();
+
+            var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "GetQueueSoundPendaftaran",
+                new esParameters
+                {
+            { "VisitQueueNo", visitQueueNo, esParameterDirection.Input, DbType.String, 50 }
+                }
+            );
+
+            var list = new List<object>();
+
+            while (reader.Read())
+            {
+                list.Add(new
+                {
+                    Seq = reader["Seq"] == DBNull.Value ? 0 : Convert.ToInt32(reader["Seq"]),
+                    SoundCode = reader["SoundCode"]?.ToString() ?? "",
+                    FilePath = reader["FilePath"]?.ToString() ?? "",
+                    VisitNo = reader["VisitNo"]?.ToString() ?? ""
+                });
+            }
+
+            reader.Close();
+
+            return list;
+        }
     }
 
 	[Serializable]
