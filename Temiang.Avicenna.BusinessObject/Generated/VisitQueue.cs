@@ -1124,7 +1124,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.Status,
                 query.QueueLocation,
                 semantic.DisplayName,
-                query.CalledByCounterID
+                query.CalledByCounterID,
+                query.QueueSequence
             );
 
             query.LeftJoin(semantic)
@@ -1136,6 +1137,13 @@ namespace Temiang.Avicenna.BusinessObject
 
             query.Where(
                 query.QueueLocation == queueLocation
+            );
+
+            query.Where(
+                query.Status.In(
+                    "WAITING",
+                    "CALLED"
+                )
             );
 
             query.Where(
@@ -1152,22 +1160,53 @@ namespace Temiang.Avicenna.BusinessObject
             collection.Load(query);
 
             return collection
-                .Select(x => new
-                {
-                    VisitNo = x.VisitNo,
+             .Select(x => new
+             {
+                 VisitNo = x.VisitNo,
 
-                    Status = x.Status,
+                 Status = x.Status,
 
-                    QueueLocation = x.QueueLocation,
+                 QueueLocation = x.QueueLocation,
 
-                    DisplayName =
-                        x.GetColumn("DisplayName") == null
-                            ? ""
-                            : x.GetColumn("DisplayName").ToString(),
+                 QueueSequence = x.QueueSequence,
 
-                    CalledByCounterID = x.CalledByCounterID
-                })
-                .ToList();
+                 DisplayName =
+                     x.GetColumn("DisplayName") == null
+                         ? ""
+                         : x.GetColumn("DisplayName").ToString(),
+
+                 CalledByCounterID =
+                     string.IsNullOrEmpty(x.CalledByCounterID)
+                         ? "-"
+                         : x.CalledByCounterID
+             })
+             .OrderBy(x => x.Status == "CALLED" ? 0 : 1)
+             .ThenBy(x => x.CalledByCounterID)
+             .ThenBy(x => x.QueueSequence)
+             .GroupBy(x => x.Status)
+             .Select(statusGroup => new
+             {
+                 Status = statusGroup.Key,
+
+                 Counters = statusGroup
+                     .GroupBy(x => x.CalledByCounterID)
+                     .Select(counterGroup => new
+                     {
+                         CalledByCounterID = counterGroup.Key,
+
+                         Queues = counterGroup
+                             .Select(q => new
+                             {
+                                 q.VisitNo,
+                                 q.DisplayName,
+                                 q.QueueLocation,
+                                 q.QueueSequence
+                             })
+                             .ToList()
+                     })
+                     .ToList()
+             })
+             .ToList();
         }
 
         public static object GetDisplayAntrianPendaftaran(
