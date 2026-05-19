@@ -1223,6 +1223,9 @@ namespace Temiang.Avicenna.BusinessObject
             var query =
                 new VisitQueueQuery("v");
 
+            var payerType =
+                new AntrianAutoNumberSemanticQuery("b");
+
             query.es.WithNoLock = true;
 
             query.Select(
@@ -1234,7 +1237,15 @@ namespace Temiang.Avicenna.BusinessObject
                 query.CurrentStage,
                 query.QueueLocation,
                 query.QueueSequence,
-                query.CalledByCounterID
+                query.CalledByCounterID,
+                payerType.PayerType
+            );
+
+            query.LeftJoin(payerType)
+            .On(
+                query.SRAutoNumber == payerType.SRAutoNumber
+                &&
+                query.QueueLocation == payerType.Channel
             );
 
             // =========================================
@@ -1293,6 +1304,11 @@ namespace Temiang.Avicenna.BusinessObject
                     QueueDate = x.QueueDate,
                     Status = x.Status,
                     SRAutoNumber = x.SRAutoNumber,
+                    PayerType =
+                    x.GetColumn("PayerType") == null
+                        ? ""
+                        : x.GetColumn("PayerType").ToString(),
+
                     CurrentStage = x.CurrentStage,
                     QueueLocation = x.QueueLocation,
                     QueueSequence = x.QueueSequence,
