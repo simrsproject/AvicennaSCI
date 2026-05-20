@@ -495,10 +495,12 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 if (ChkIsInventoryItem.Checked)
                 {
                     var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+
                     var isExist =
                         coll.Any(
                             entity =>
                             entity.ItemID.Equals(cboItemID.SelectedValue) &&
+                            entity.SequenceNo.Trim() != txtSequenceNo.Text.Trim() &&
                             entity.IsBonusItem.Equals(chkIsBonusItem.Checked));
                     if (isExist)
                     {
@@ -514,6 +516,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                         coll.Any(
                             entity =>
                             entity.ItemID.Equals(cboItemID.SelectedValue) &&
+                            entity.SequenceNo.Trim() != txtSequenceNo.Text.Trim() &&
                             entity.IsBonusItem.Equals(chkIsBonusItem.Checked) &&
                             entity.Specification.Equals(txtSpecs.Text));
                     if (isExist)
