@@ -491,17 +491,18 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 }
             } else
             {
+                var transactionNo = TxtTransactionNo.Text.Trim();
                 //modif 2026-05-20 validasi ketika edit
                 if (ChkIsInventoryItem.Checked)
                 {
                     var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
 
                     var isExist =
-                        coll.Any(
-                            entity =>
-                            entity.ItemID.Equals(cboItemID.SelectedValue) &&
-                            entity.SequenceNo.Trim() != txtSequenceNo.Text.Trim() &&
-                            entity.IsBonusItem.Equals(chkIsBonusItem.Checked));
+                            coll.Any(entity =>
+                                entity.TransactionNo == transactionNo &&
+                                entity.ItemID == cboItemID.SelectedValue &&
+                                entity.IsBonusItem == chkIsBonusItem.Checked &&
+                                entity.SequenceNo != txtSequenceNo.Text);
                     if (isExist)
                     {
                         args.IsValid = false;
@@ -515,10 +516,16 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     var isExist =
                         coll.Any(
                             entity =>
+                            entity.TransactionNo == transactionNo &&
                             entity.ItemID.Equals(cboItemID.SelectedValue) &&
-                            entity.SequenceNo.Trim() != txtSequenceNo.Text.Trim() &&
                             entity.IsBonusItem.Equals(chkIsBonusItem.Checked) &&
-                            entity.Specification.Equals(txtSpecs.Text));
+                            entity.Specification.Equals(txtSpecs.Text) &&
+                            !(
+                                entity.TransactionNo.Trim() == transactionNo &&
+                                entity.SequenceNo.Trim() == txtSequenceNo.Text
+                            )
+                         );
+
                     if (isExist)
                     {
                         args.IsValid = false;
