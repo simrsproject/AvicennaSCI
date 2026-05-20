@@ -1,15 +1,16 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using System;
+using System.Data;
 using System.Linq;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Temiang.Avicenna.BusinessObject.Reference;
-using Temiang.Dal.Interfaces;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.BusinessObject.Reference;
 using Temiang.Avicenna.Common;
-using System.Data;
-using DocumentFormat.OpenXml.Bibliography;
-using System.Text;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
@@ -497,12 +498,18 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 {
                     var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
 
-                    var isExist =
-                            coll.Any(entity =>
-                                entity.TransactionNo == transactionNo &&
-                                entity.ItemID == cboItemID.SelectedValue &&
-                                entity.IsBonusItem == chkIsBonusItem.Checked &&
-                                entity.SequenceNo != txtSequenceNo.Text);
+                    var isExist = false;
+                    foreach (BusinessObject.ItemTransactionItem entity in coll)
+                    {
+                        if (entity.ItemID == cboItemID.SelectedValue 
+                            && entity.SequenceNo != txtSequenceNo.Text
+                            )
+                        {
+                            isExist = true;
+                            break;
+                        }
+                    }
+
                     if (isExist)
                     {
                         args.IsValid = false;
@@ -513,18 +520,18 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 if (!chkIsNonMasterOrder.Checked)
                 {
                     var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
-                    var isExist =
-                        coll.Any(
-                            entity =>
-                            entity.TransactionNo == transactionNo &&
-                            entity.ItemID.Equals(cboItemID.SelectedValue) &&
-                            entity.IsBonusItem.Equals(chkIsBonusItem.Checked) &&
-                            entity.Specification.Equals(txtSpecs.Text) &&
-                            !(
-                                entity.TransactionNo.Trim() == transactionNo &&
-                                entity.SequenceNo.Trim() == txtSequenceNo.Text
+                    
+                    var isExist = false;
+                    foreach (BusinessObject.ItemTransactionItem entity in coll)
+                    {
+                        if (entity.ItemID == cboItemID.SelectedValue
+                            && entity.SequenceNo != txtSequenceNo.Text
                             )
-                         );
+                        {
+                            isExist = true;
+                            break;
+                        }
+                    }
 
                     if (isExist)
                     {
