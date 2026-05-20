@@ -221,3 +221,7 @@ Titipan Daniel
 
 ---- [18-05-2026 - Danang] ---
 1. CR Odoo Perubahan JSON untuk bridging SatuSehat RIS
+
+--- [20-05-2026 - Wiliam] ---
+1. Perbaikan bug usia Pasien pada Temiang.Avicenna.ReportLibrary\RLib_Slip\PatientManagement\PatientHealthRecord\General\GeneralExam.cs
+2. Validasi ketika edit Purchase Order agar ItemID tidak diisi double. Modifikasi pada file PurchaseOrderItemDetail.ascx.cs 

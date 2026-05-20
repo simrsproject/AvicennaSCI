@@ -489,7 +489,59 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                         return;
                     }
                 }
+            } else
+            {
+                //modif 2026-05-20 validasi ketika edit
+                if (ChkIsInventoryItem.Checked)
+                {
+                    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+                    var isExist =
+                        coll.Any(
+                            entity =>
+                            entity.ItemID.Equals(cboItemID.SelectedValue) &&
+                            entity.IsBonusItem.Equals(chkIsBonusItem.Checked));
+                    if (isExist)
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} has exist", cboItemID.SelectedValue);
+                        return;
+                    }
+                }
+                if (!chkIsNonMasterOrder.Checked)
+                {
+                    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+                    var isExist =
+                        coll.Any(
+                            entity =>
+                            entity.ItemID.Equals(cboItemID.SelectedValue) &&
+                            entity.IsBonusItem.Equals(chkIsBonusItem.Checked) &&
+                            entity.Specification.Equals(txtSpecs.Text));
+                    if (isExist)
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} with same spesification has exist", cboItemID.SelectedValue);
+                        return;
+                    }
+
+                    if (string.IsNullOrEmpty(cboItemID.SelectedValue))
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
+                        return;
+                    }
+
+                    var item = new Item();
+                    if (!item.LoadByPrimaryKey(cboItemID.SelectedValue))
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
+                        return;
+                    }
+                }
+
             }
+
+
             if (chkIsNonMasterOrder.Checked && string.IsNullOrEmpty(txtDescription.Text))
             {
                 args.IsValid = false;
