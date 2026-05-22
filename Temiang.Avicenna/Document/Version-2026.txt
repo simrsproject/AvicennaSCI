@@ -225,3 +225,7 @@ Titipan Daniel
 --- [20-05-2026 - Wiliam] ---
 1. Perbaikan bug usia Pasien pada Temiang.Avicenna.ReportLibrary\RLib_Slip\PatientManagement\PatientHealthRecord\General\GeneralExam.cs
 2. Validasi ketika edit Purchase Order agar ItemID tidak diisi double. Modifikasi pada file PurchaseOrderItemDetail.ascx.cs 
+
+--- [21-05-2026 - Wiliam] ---
+1. Modifikasi pada method MedicalDischargeSummaryInPatient() di Temiang.Avicenna.ReportDataSource\RSMM\Emr\PatientFormAndLetter.asmx.cs
+   type case SignatureImage : ([]byte)
