@@ -229,3 +229,6 @@ Titipan Daniel
 --- [21-05-2026 - Wiliam] ---
 1. Modifikasi pada method MedicalDischargeSummaryInPatient() di Temiang.Avicenna.ReportDataSource\RSMM\Emr\PatientFormAndLetter.asmx.cs
    type case SignatureImage : ([]byte)
+
+--- [22-05-2026 - Fahri] ---
+1. menampilkan data Allergies Satu Sehat ketika sudah input, odoo : http://103.56.148.57:8069/odoo/action-535/7426
