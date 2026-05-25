@@ -232,3 +232,7 @@ Titipan Daniel
 
 --- [22-05-2026 - Fahri] ---
 1. menampilkan data Allergies Satu Sehat ketika sudah input, odoo : http://103.56.148.57:8069/odoo/action-535/7426
+
+--- [25-05-2026 - Wiliam] ---
+1. modifikasi pada EmrDetail.aspx.cs dan EmrIpDetail.aspx.cs untuk membungkus sep.LoadByPrimaryKey(NoSEP) dengan try catch, 
+   in case double SEP / not found SEP.
