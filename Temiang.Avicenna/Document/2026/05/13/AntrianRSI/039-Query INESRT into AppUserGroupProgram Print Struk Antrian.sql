@@ -1,0 +1,34 @@
+INSERT INTO AppUserGroupProgram
+(
+    UserGroupID,
+    ProgramID,
+    IsUserGroupAddAble,
+    IsUserGroupEditAble,
+    IsUserGroupDeleteAble,
+    IsUserGroupApprovalAble,
+    IsUserGroupUnApprovalAble,
+    IsUserGroupVoidAble,
+    IsUserGroupUnVoidAble,
+    IsUserGroupExportAble,
+    IsUserGroupCrossUnitAble,
+    IsUserGroupPowerUserAble,
+    LastUpdateDateTime,
+    LastUpdateByUserID
+)
+VALUES
+(
+    'ADMIN',
+    'STK.01.0001',
+    1,
+    1,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    '2026-05-23 08:42:46.587',
+    '240076'
+);

@@ -1,4 +1,4 @@
-﻿CREATE OR ALTER PROCEDURE AntrianCallNowAllServiceUnit
+﻿CREATE OR ALTER PROCEDURE AntrianSetWaitingFromPendingAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
     @UserID       VARCHAR(50)
@@ -13,8 +13,10 @@ BEGIN
         @StageID       VARCHAR(50),
 		@CurrentStage  VARCHAR(50),
         @ServiceUnitID VARCHAR(50),
-		@CategoryID	   VARCHAR(50),
-        @ParamedicID   VARCHAR(50);
+        @ParamedicID   VARCHAR(50),
+        @MaxSeq        INT,
+        @NewSeq        INT,
+		@CategoryID    VARCHAR(50);
 
     BEGIN TRAN;
 
@@ -47,45 +49,46 @@ BEGIN
         -- =========================================
         -- VALIDASI STATUS
         -- =========================================
-        IF @CurrentStatus <> 'WAITING'
+        IF @CurrentStatus <> 'PENDING'
         BEGIN
             THROW 50002,
-            'Hanya antrian WAITING yang bisa dipanggil',
+            'Hanya antrian PENDING yang bisa dikembalikan ke WAITING',
             1;
         END
 
         -- =========================================
-        -- 2. TURUNKAN CALLED → PENDING
-        -- GROUP YANG SAMA
+        -- 2. AMBIL MAX SEQUENCE PER GROUP
+        -- =========================================
+        SELECT
+            @MaxSeq = MAX(QueueSequence)
+        FROM VisitQueue WITH (UPDLOCK, HOLDLOCK)
+        WHERE
+            CAST(QueueDate AS DATE) = @QueueDate
+            AND CurrentStage = @StageID
+            AND ServiceUnitID = @ServiceUnitID
+            AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
+			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '')
+            AND Status = 'WAITING';
+
+        SET @NewSeq = ISNULL(@MaxSeq, 0) + 10;
+
+        -- =========================================
+        -- 3. UPDATE → WAITING
         -- =========================================
         UPDATE VisitQueue
         SET
-            Status           = 'PENDING',
-            QueueSequence    = NULL,
+            Status           = 'WAITING',
+            QueueSequence    = @NewSeq,
             IsManualOverride = 1,
             UpdatedBy        = @UserID,
             LastUpdated      = GETDATE()
         WHERE
-            Status = 'CALLED'
+            VisitQueueNo = @VisitQueueNo
             AND CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @CurrentStage
-            AND StageID = @StageID
+            AND CurrentStage = @StageID
             AND ServiceUnitID = @ServiceUnitID
             AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
 			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '');
-
-        -- =========================================
-        -- 3. UPDATE TARGET → CALLED
-        -- =========================================
-        UPDATE VisitQueue
-        SET
-            Status           = 'CALLED',
-            CalledTime       = GETDATE(),
-            IsManualOverride = 1,
-            UpdatedBy        = @UserID,
-            LastUpdated      = GETDATE()
-        WHERE
-            VisitQueueNo = @VisitQueueNo;
 
         -- =========================================
         -- 4. RETURN RESULT
@@ -95,11 +98,12 @@ BEGIN
             VisitNo,
             Status,
             StageID,
-			CurrentStage,
+            CurrentStage,
 			CategoryID,
+            QueueSequence,
             ServiceUnitID,
             ParamedicID,
-            CalledTime,
+            IsManualOverride,
             LastUpdated,
             UpdatedBy
         FROM VisitQueue
@@ -118,11 +122,3 @@ BEGIN
     END CATCH
 END
 GO
-
-DECLARE @VisitNo VARCHAR(50);
-
-EXEC AntrianCallNowAllServiceUnit
-    @VisitQueueNo = 'VQUE-260516-0018',
-    @UserID       = 'Admin'
-
-SELECT @VisitNo;

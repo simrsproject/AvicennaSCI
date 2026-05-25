@@ -1117,6 +1117,7 @@
     <Compile Include="Generated\VisitPackage.cs" />
     <Compile Include="Generated\VisitPackageItem.cs" />
     <Compile Include="Generated\VisitQueue.cs" />
+    <Compile Include="Generated\VisitQueueBarcode.cs" />
     <Compile Include="Generated\VwEmployeeOrganizationUnit.cs" />
     <Compile Include="Generated\VwItemProductFabric.cs" />
     <Compile Include="Generated\WageBase.cs" />

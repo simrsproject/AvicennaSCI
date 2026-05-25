@@ -2,12 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Http;
 using System.Web.Script.Services;
 using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Avicenna.BusinessObject.Generated;
+using Temiang.Avicenna.Common;
 using Temiang.Dal;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
@@ -1295,6 +1299,7 @@ namespace Temiang.Avicenna.WebService
             - ParamedicID
             - QueueDate
             - StageID
+            - CategoryID (untuk antrian FARMASI)
             
             DAFTAR STAGEID:
             - FARMASI_AMBIL
@@ -1306,6 +1311,17 @@ namespace Temiang.Avicenna.WebService
             - REHAB_TINDAKAN
             - USG_TINDAKAN
             - USG_VERIF
+            - RADIOLOGI_VERIF
+            - RADIOLOGI_AMBIL
+            - CTSCAN_VERIF
+            - CTSCAN_AMBIL
+            - ENDOSCOPY_VERIF
+            - ENDOSCOPY_AMBIL
+
+            DAFTAR CATEGORYID :
+            -FARMASI_A
+            -FARMASI_B
+            -FARMASI_C
 
             CONTOH REQUEST:
             GetDisplayAntrianForAllServiceUnitPasien?
@@ -1337,6 +1353,9 @@ namespace Temiang.Avicenna.WebService
                 // =========================
                 string Status =
                     (Context.Request["Status"] ?? "").Trim().ToUpper();
+
+                string CategoryID =
+                    (Context.Request["CategoryID"]);
 
                 string StageID =
                     (Context.Request["StageID"] ?? "").Trim().ToUpper();
@@ -1377,7 +1396,8 @@ namespace Temiang.Avicenna.WebService
                         Status,
                         StageID,
                         ServiceUnitID,
-                        ParamedicID
+                        ParamedicID,
+                        CategoryID
                     );
 
                 // =========================
@@ -1451,6 +1471,9 @@ namespace Temiang.Avicenna.WebService
                 string StageID =
                     (Context.Request["StageID"] ?? "").Trim().ToUpper();
 
+                string CategoryID =
+                    (Context.Request["CategoryID"] ?? "").Trim().ToUpper();
+
                 string ServiceUnitID =
                     (Context.Request["ServiceUnitID"] ?? "").Trim();
 
@@ -1487,7 +1510,8 @@ namespace Temiang.Avicenna.WebService
                         Status,
                         StageID,
                         ServiceUnitID,
-                        ParamedicID
+                        ParamedicID,
+                        CategoryID
                     );
 
                 // =========================
@@ -2457,6 +2481,630 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
+        //8. SCAN BARCODE PENUNJANG
+        [WebMethod(Description = @"
+            Digunakan untuk generate antrian penunjang medis
+            berdasarkan barcode pasien dan lokasi scanner ServiceUnit
+
+            PARAMETER:
+            - RegistrationNo (required)
+            - ServiceUnitID (required)
+            - TransDate (optional)
+
+            CONTOH:
+            TakeQueueVisitNumberForPenunjang?
+            RegistrationNo=REG/OP/260516-0008&
+            ServiceUnitID=D3.0.04&
+            UserID=KIOSK&
+            TransDate=2026-05-19
+
+            RESPONSE:
+               200 = Berhasil generate antrian
+               400 = Parameter tidak valid
+               404 = Data tidak ditemukan / Job Order Tidak ditemukan
+               500 = Server error
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void TakeQueueVisitNumberForPenunjang()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+
+                string RegistrationNo =
+                    (Context.Request["RegistrationNo"] ?? "")
+                    .Trim();
+
+                string ServiceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "KIOSK")
+                    .Trim();
+
+                string TransDateText =
+                    (Context.Request["TransDate"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+
+                if (string.IsNullOrEmpty(RegistrationNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "RegistrationNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(ServiceUnitID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "ServiceUnitID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // PARSE DATE
+                // =========================================
+
+                DateTime? TransDate = null;
+
+                if (!string.IsNullOrEmpty(TransDateText))
+                {
+                    DateTime tempDate;
+
+                    if (!DateTime.TryParse(TransDateText, out tempDate))
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            "Format TransDate tidak valid",
+                            400
+                        );
+                        return;
+                    }
+
+                    TransDate = tempDate;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.TakeQueueVisitNumberForPenunjang(
+                            RegistrationNo,
+                            ServiceUnitID,
+                            UserID,
+                            TransDate
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // RESULT CHECK
+                // =========================================
+
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil generate antrian penunjang"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        //9. SCAN BARCODE FARMASI
+        [WebMethod(Description = @"
+            Digunakan untuk melihat list CategoryID dan petugas farmasi dapat
+            menentukan Verifikasi Antrian Farmasi
+
+            RESPONSE:
+                200 = Berhasil mengambil list CategoryID Farmasi
+                404 = Data CategoryID tidak ditemukan
+                500 = Server error
+        ")]
+        public void GetCategoryIDFarmasi()
+        {
+            try
+            {
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+
+                object result =
+                    QueueCategory.GetQueueCategoryFarmasi();
+
+                // =========================================
+                // VALIDASI RESULT
+                // =========================================
+
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        HttpContext.Current,
+                        "Data CategoryID tidak ditemukan",
+                        404
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+
+                ApiResponeForAntrian.Success(
+                    HttpContext.Current,
+                    result,
+                    "Berhasil mengambil list CategoryID farmasi"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    HttpContext.Current,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk update CategoryID Farmasi
+            pada antrian pasien farmasi
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+            - CategoryID (optional)
+
+            CONTOH:
+            GetCategoryIDFarmasi?
+            VisitQueueNo=VQUE-260520-0007&
+            UserID=240076&
+            CategoryID=FARMASI_A
+
+            RESPONSE:
+                200 = Berhasil update CategoryID Farmasi
+                400 = Parameter tidak valid
+                404 = Data tidak ditemukan
+                500 = Server error
+        ")]
+        public void UpdateCategoryIDFarmasi()
+        {
+            try
+            {
+                // =========================================
+                // PARAMETER
+                // =========================================
+
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string CategoryID =
+                    (Context.Request["CategoryID"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(CategoryID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "CategoryID wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // VALIDASI CATEGORY
+                // =========================================
+
+                var category =
+                    new QueueCategory();
+
+                var categoryQuery =
+                    new QueueCategoryQuery("qc");
+
+                categoryQuery.Where(
+                    categoryQuery.CategoryID == CategoryID
+                    && categoryQuery.IsActive == true
+                );
+
+                if (!category.Load(categoryQuery))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "CategoryID tidak ditemukan",
+                        404
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // LOAD VISIT QUEUE
+                // =========================================
+
+                var entity = new VisitQueue();
+
+                if (!entity.LoadByPrimaryKey(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // UPDATE
+                // =========================================
+
+                entity.CategoryID = CategoryID;
+                entity.UpdatedBy = UserID;
+                entity.LastUpdated = DateTime.Now;
+
+                // =========================================
+                // LOAD PATIENT
+                // =========================================
+
+                string PatientName = "";
+
+                var patient = new Patient();
+
+                if (!string.IsNullOrEmpty(entity.PatientID))
+                {
+                    if (patient.LoadByPrimaryKey(entity.PatientID))
+                    {
+                        PatientName =
+                            patient.FirstName;
+                    }
+                }
+
+                // =========================================
+                // LOAD CATEGORY NAME
+                // =========================================
+
+                string CategoryName = "";
+
+                var ctgname = new QueueCategory();
+
+                if (!string.IsNullOrEmpty(entity.CategoryID))
+                {
+                    if (ctgname.LoadByPrimaryKey(entity.CategoryID))
+                    {
+                        CategoryName =
+                            ctgname.CategoryName;
+                    }
+                }
+
+                entity.Save();
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        VisitQueueNo = entity.VisitQueueNo,
+                        VisitNo = entity.VisitNo,
+                        PatienID = entity.PatientID,
+                        PatientName = PatientName,
+                        RegistrationNo = entity.RegistrationNo,
+                        CategoryID = entity.CategoryID,
+                        CategoryName = CategoryName,
+                        Status = entity.Status,
+                        CurrentStage = entity.CurrentStage,
+                        StageID = entity.StageID
+                    },
+                    "Berhasil update CategoryID farmasi"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = true, Description = @"
+            Digunakan untuk print struk antrian pasien
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+            - Barcode (Base64)
+            - IPAdress (optional)
+
+            CONTOH:
+            PrintVisitQueueReceipt?
+            VisitQueueNo=VQUE-260520-0007&
+            UserID=240076&
+            Barcode=iVBORw0KGgoAAAANSUhEUgAAAeoAAAHqCAYAAADLbQ06AAA2UklEQVR4nO3dCZwcd33n/W9&
+            IPAdress=192.168.8.52
+
+            RESPONSE:
+                200 = Berhasil print struk antrian
+                400 = Parameter tidak valid
+                404 = Data tidak ditemukan / Printer tidak ditemukan untuk host ini
+                500 = Server error
+        ")]
+        public void PrintVisitQueueReceipt()
+        {
+            try
+            {
+                // =========================================
+                // PARAMETER
+                // =========================================
+
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string Barcode =
+                    (Context.Request["Barcode"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string IPAdress =
+                    (Context.Request["IPAdress"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // LOAD VISIT QUEUE
+                // =========================================
+
+                var entity = new VisitQueue();
+
+                if (!entity.LoadByPrimaryKey(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // SESSION LOGIN
+                // =========================================
+
+                if (HttpContext.Current.Session["_UserLogin"] == null)
+                {
+                    HttpContext.Current.Session["_UserLogin"] =
+                        new UserLogin()
+                        {
+                            UserID = UserID,
+                            UserName = UserID
+                        };
+                }
+
+                // =========================================
+                // SAVE BARCODE IMAGE
+                // =========================================
+
+                if (!string.IsNullOrEmpty(Barcode))
+                {
+                    byte[] barcodeBytes =
+                        Convert.FromBase64String(Barcode);
+
+                    var visitQueueBarcode =
+                        new VisitQueueBarcode();
+
+                    visitQueueBarcode.AddNew();
+
+                    visitQueueBarcode.VisitQueueNo =
+                        VisitQueueNo;
+
+                    visitQueueBarcode.BarcodeImage =
+                        barcodeBytes;
+
+                    visitQueueBarcode.CreatedDateTime =
+                        DateTime.Now;
+
+                    visitQueueBarcode.Save();
+                }
+
+                // =========================================
+                // PRINT
+                // =========================================
+
+                const string programID = "STK.01.0001";
+
+                var parametersSlip =
+                    new PrintJobParameterCollection();
+
+                parametersSlip.AddNew(
+                    "VisitQueueNo",
+                    VisitQueueNo,
+                    null,
+                    null
+                );
+
+                parametersSlip.AddNew(
+                    "UserID",
+                    UserID,
+                    null,
+                    null
+                );
+
+                parametersSlip.AddNew(
+                    "IPAdress",
+                    IPAdress,
+                    null,
+                    null
+                );
+
+                string printerName = "";
+
+                try
+                {
+                    printerName =
+                        PrintManager.CreatePrintJob(
+                            programID,
+                            parametersSlip,
+                            UserID,
+                            IPAdress
+                        );
+                }
+                catch (Exception ex)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "PRINT ERROR : " + ex.Message,
+                        500
+                    );
+
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(printerName))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Printer tidak ditemukan untuk host ini",
+                        404
+                    );
+
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        VisitQueueNo = entity.VisitQueueNo,
+                        VisitNo = entity.VisitNo,
+                        IPAdress = IPAdress,
+                        PrintedBy = UserID,
+                        PrinterName = printerName,
+                        ProgramID = programID
+                    },
+                    "Berhasil print struk antrian"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
 
     }
 }

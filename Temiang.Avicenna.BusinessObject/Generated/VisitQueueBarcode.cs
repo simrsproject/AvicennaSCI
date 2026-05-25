@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-05-05 08:43:08 AM
+                    Date Generated       : 2026-05-25 10:02:22 AM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -11,20 +11,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Linq;
+using System.ComponentModel;
 using System.Xml.Serialization;
 using Temiang.Dal.Core;
-using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
+using Temiang.Dal.DynamicQuery;
 
 namespace Temiang.Avicenna.BusinessObject
 {
     [Serializable]
-    abstract public class esQueueCategoryCollection : esEntityCollectionWAuditLog
+    abstract public class esVisitQueueBarcodeCollection : esEntityCollectionWAuditLog
     {
-        public esQueueCategoryCollection()
+        public esVisitQueueBarcodeCollection()
         {
 
         }
@@ -32,11 +31,11 @@ namespace Temiang.Avicenna.BusinessObject
 
         protected override string GetCollectionName()
         {
-            return "QueueCategoryCollection";
+            return "VisitQueueBarcodeCollection";
         }
 
         #region Query Logic
-        protected void InitQuery(esQueueCategoryQuery query)
+        protected void InitQuery(esVisitQueueBarcodeQuery query)
         {
             query.OnLoadDelegate = this.OnQueryLoaded;
             query.es2.Connection = ((IEntityCollection)this).Connection;
@@ -50,99 +49,61 @@ namespace Temiang.Avicenna.BusinessObject
 
         protected override void HookupQuery(esDynamicQuery query)
         {
-            this.InitQuery(query as esQueueCategoryQuery);
+            this.InitQuery(query as esVisitQueueBarcodeQuery);
         }
         #endregion
 
-        virtual public QueueCategory DetachEntity(QueueCategory entity)
+        virtual public VisitQueueBarcode DetachEntity(VisitQueueBarcode entity)
         {
-            return base.DetachEntity(entity) as QueueCategory;
+            return base.DetachEntity(entity) as VisitQueueBarcode;
         }
 
-        virtual public QueueCategory AttachEntity(QueueCategory entity)
+        virtual public VisitQueueBarcode AttachEntity(VisitQueueBarcode entity)
         {
-            return base.AttachEntity(entity) as QueueCategory;
+            return base.AttachEntity(entity) as VisitQueueBarcode;
         }
 
-        virtual public void Combine(QueueCategoryCollection collection)
+        virtual public void Combine(VisitQueueBarcodeCollection collection)
         {
             base.Combine(collection);
         }
 
-        new public QueueCategory this[int index]
+        new public VisitQueueBarcode this[int index]
         {
             get
             {
-                return base[index] as QueueCategory;
+                return base[index] as VisitQueueBarcode;
             }
         }
 
         public override Type GetEntityType()
         {
-            return typeof(QueueCategory);
+            return typeof(VisitQueueBarcode);
         }
     }
 
     [Serializable]
-    abstract public class esQueueCategory : esEntityWAuditLog
+    abstract public class esVisitQueueBarcode : esEntityWAuditLog
     {
         /// <summary>
         /// Used internally by the entity's DynamicQuery mechanism.
         /// </summary>
-        virtual protected esQueueCategoryQuery GetDynamicQuery()
+        virtual protected esVisitQueueBarcodeQuery GetDynamicQuery()
         {
             return null;
         }
 
-        public esQueueCategory()
+        public esVisitQueueBarcode()
         {
         }
 
-        public esQueueCategory(DataRow row)
+        public esVisitQueueBarcode(DataRow row)
             : base(row)
         {
         }
 
 
         #region LoadByPrimaryKey
-        public virtual bool LoadByPrimaryKey(String categoryID)
-        {
-            if (this.es.Connection.SqlAccessType == esSqlAccessType.DynamicSQL)
-                return LoadByPrimaryKeyDynamic(categoryID);
-            else
-                return LoadByPrimaryKeyStoredProcedure(categoryID);
-        }
-
-        /// <summary>
-        /// Loads an entity by primary key
-        /// </summary>
-        /// <remarks>
-        /// Requires primary keys be defined on all tables.
-        /// If a table does not have a primary key set,
-        /// this method will not compile.
-        /// </remarks>
-        /// <param name="sqlAccessType">Either esSqlAccessType StoredProcedure or DynamicSQL</param>
-        public virtual bool LoadByPrimaryKey(esSqlAccessType sqlAccessType, String categoryID)
-        {
-            if (sqlAccessType == esSqlAccessType.DynamicSQL)
-                return LoadByPrimaryKeyDynamic(categoryID);
-            else
-                return LoadByPrimaryKeyStoredProcedure(categoryID);
-        }
-
-        private bool LoadByPrimaryKeyDynamic(String categoryID)
-        {
-            esQueueCategoryQuery query = this.GetDynamicQuery();
-            query.Where(query.CategoryID == categoryID);
-            return query.Load();
-        }
-
-        private bool LoadByPrimaryKeyStoredProcedure(String categoryID)
-        {
-            esParameters parms = new esParameters();
-            parms.Add("CategoryID", categoryID);
-            return this.Load(esQueryType.StoredProcedure, this.es.spLoadByPrimaryKey, parms);
-        }
         #endregion
 
         #region Properties
@@ -167,21 +128,24 @@ namespace Temiang.Avicenna.BusinessObject
                     // Use the strongly typed property
                     switch (name)
                     {
-                        case "CategoryID": this.str.CategoryID = (string)value; break;
-                        case "CategoryName": this.str.CategoryName = (string)value; break;
-                        case "StageID": this.str.StageID = (string)value; break;
-                        case "ServiceUnitID": this.str.ServiceUnitID = (string)value; break;
-                        case "IsActive": this.str.IsActive = (string)value; break;
+                        case "VisitQueueNo": this.str.VisitQueueNo = (string)value; break;
+                        case "BarcodeImage": this.str.BarcodeImage = (string)value; break;
+                        case "CreatedDateTime": this.str.CreatedDateTime = (string)value; break;
                     }
                 }
                 else
                 {
                     switch (name)
                     {
-                        case "IsActive":
+                        case "BarcodeImage":
 
-                            if (value == null || value is System.Boolean)
-                                this.IsActive = (System.Boolean?)value;
+                            if (value == null || value is System.Byte[])
+                                this.BarcodeImage = (System.Byte[])value;
+                            break;
+                        case "CreatedDateTime":
+
+                            if (value == null || value is System.DateTime)
+                                this.CreatedDateTime = (System.DateTime?)value;
                             break;
 
                         default:
@@ -200,78 +164,48 @@ namespace Temiang.Avicenna.BusinessObject
         }
 
         /// <summary>
-        /// Maps to QueueCategory.CategoryID
+        /// Maps to VisitQueueBarcode.VisitQueueNo
         /// </summary>
-        virtual public System.String CategoryID
+        virtual public System.String VisitQueueNo
         {
             get
             {
-                return base.GetSystemString(QueueCategoryMetadata.ColumnNames.CategoryID);
+                return base.GetSystemString(VisitQueueBarcodeMetadata.ColumnNames.VisitQueueNo);
             }
 
             set
             {
-                base.SetSystemString(QueueCategoryMetadata.ColumnNames.CategoryID, value);
+                base.SetSystemString(VisitQueueBarcodeMetadata.ColumnNames.VisitQueueNo, value);
             }
         }
         /// <summary>
-        /// Maps to QueueCategory.CategoryName
+        /// Maps to VisitQueueBarcode.BarcodeImage
         /// </summary>
-        virtual public System.String CategoryName
+        virtual public System.Byte[] BarcodeImage
         {
             get
             {
-                return base.GetSystemString(QueueCategoryMetadata.ColumnNames.CategoryName);
+                return base.GetSystemByteArray(VisitQueueBarcodeMetadata.ColumnNames.BarcodeImage);
             }
 
             set
             {
-                base.SetSystemString(QueueCategoryMetadata.ColumnNames.CategoryName, value);
+                base.SetSystemByteArray(VisitQueueBarcodeMetadata.ColumnNames.BarcodeImage, value);
             }
         }
         /// <summary>
-        /// Maps to QueueCategory.StageID
+        /// Maps to VisitQueueBarcode.CreatedDateTime
         /// </summary>
-        virtual public System.String StageID
+        virtual public System.DateTime? CreatedDateTime
         {
             get
             {
-                return base.GetSystemString(QueueCategoryMetadata.ColumnNames.StageID);
+                return base.GetSystemDateTime(VisitQueueBarcodeMetadata.ColumnNames.CreatedDateTime);
             }
 
             set
             {
-                base.SetSystemString(QueueCategoryMetadata.ColumnNames.StageID, value);
-            }
-        }
-        /// <summary>
-        /// Maps to QueueCategory.ServiceUnitID
-        /// </summary>
-        virtual public System.String ServiceUnitID
-        {
-            get
-            {
-                return base.GetSystemString(QueueCategoryMetadata.ColumnNames.ServiceUnitID);
-            }
-
-            set
-            {
-                base.SetSystemString(QueueCategoryMetadata.ColumnNames.ServiceUnitID, value);
-            }
-        }
-        /// <summary>
-        /// Maps to QueueCategory.IsActive
-        /// </summary>
-        virtual public System.Boolean? IsActive
-        {
-            get
-            {
-                return base.GetSystemBoolean(QueueCategoryMetadata.ColumnNames.IsActive);
-            }
-
-            set
-            {
-                base.SetSystemBoolean(QueueCategoryMetadata.ColumnNames.IsActive, value);
+                base.SetSystemDateTime(VisitQueueBarcodeMetadata.ColumnNames.CreatedDateTime, value);
             }
         }
 
@@ -320,87 +254,59 @@ namespace Temiang.Avicenna.BusinessObject
         [Serializable]
         sealed public class esStrings
         {
-            public esStrings(esQueueCategory entity)
+            public esStrings(esVisitQueueBarcode entity)
             {
                 this.entity = entity;
             }
-            public System.String CategoryID
+            public System.String VisitQueueNo
             {
                 get
                 {
-                    System.String data = entity.CategoryID;
+                    System.String data = entity.VisitQueueNo;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.CategoryID = null;
-                    else entity.CategoryID = Convert.ToString(value);
+                    if (value == null || value.Length == 0) entity.VisitQueueNo = null;
+                    else entity.VisitQueueNo = Convert.ToString(value);
                 }
             }
-            public System.String CategoryName
+            public System.String BarcodeImage
             {
                 get
                 {
-                    System.String data = entity.CategoryName;
+                    System.Byte[] data = entity.BarcodeImage;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.CategoryName = null;
-                    else entity.CategoryName = Convert.ToString(value);
+                    if (value == null || value.Length == 0) entity.BarcodeImage = null;
+                    else entity.BarcodeImage = Convert.FromBase64String(value);
                 }
             }
-            public System.String StageID
+            public System.String CreatedDateTime
             {
                 get
                 {
-                    System.String data = entity.StageID;
+                    System.DateTime? data = entity.CreatedDateTime;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.StageID = null;
-                    else entity.StageID = Convert.ToString(value);
-                }
-            }
-            public System.String ServiceUnitID
-            {
-                get
-                {
-                    System.String data = entity.ServiceUnitID;
-                    return (data == null) ? String.Empty : Convert.ToString(data);
-                }
-
-                set
-                {
-                    if (value == null || value.Length == 0) entity.ServiceUnitID = null;
-                    else entity.ServiceUnitID = Convert.ToString(value);
-                }
-            }
-            public System.String IsActive
-            {
-                get
-                {
-                    System.Boolean? data = entity.IsActive;
-                    return (data == null) ? String.Empty : Convert.ToString(data);
-                }
-
-                set
-                {
-                    if (value == null || value.Length == 0) entity.IsActive = null;
-                    else entity.IsActive = Convert.ToBoolean(value);
+                    if (value == null || value.Length == 0) entity.CreatedDateTime = null;
+                    else entity.CreatedDateTime = Convert.ToDateTime(value);
                 }
             }
 
-            private esQueueCategory entity;
+            private esVisitQueueBarcode entity;
         }
         #endregion
 
         #region Query Logic
-        protected void InitQuery(esQueueCategoryQuery query)
+        protected void InitQuery(esVisitQueueBarcodeQuery query)
         {
             query.OnLoadDelegate = this.OnQueryLoaded;
             query.es2.Connection = ((IEntity)this).Connection;
@@ -413,7 +319,7 @@ namespace Temiang.Avicenna.BusinessObject
 
             if (this.RowCount > 1)
             {
-                throw new Exception("esQueueCategory can only hold one record of data");
+                throw new Exception("esVisitQueueBarcode can only hold one record of data");
             }
 
             return dataFound;
@@ -425,100 +331,60 @@ namespace Temiang.Avicenna.BusinessObject
     }
 
 
-    public partial class QueueCategory : esQueueCategory
+    public partial class VisitQueueBarcode : esVisitQueueBarcode
     {
-        public static object GetQueueCategoryFarmasi()
-        {
-            var collection = new QueueCategoryCollection();
-
-            var query = new QueueCategoryQuery("qc");
-
-            query.Where(
-                query.IsActive == true
-                && query.StageID == "FARMASI_AMBIL"
-            );
-
-            query.OrderBy(
-                query.CategoryName.Ascending
-            );
-
-            collection.Load(query);
-
-            return collection
-                .Select(x => new
-                {
-                    CategoryID = x.CategoryID,
-                    CategoryName = x.CategoryName,
-                    StageID = x.StageID
-                })
-                .ToList();
-        }
     }
 
     [Serializable]
-    abstract public class esQueueCategoryQuery : esDynamicQuery
+    abstract public class esVisitQueueBarcodeQuery : esDynamicQuery
     {
 
         override protected IMetadata Meta
         {
             get
             {
-                return QueueCategoryMetadata.Meta();
+                return VisitQueueBarcodeMetadata.Meta();
             }
         }
 
-        public esQueryItem CategoryID
+        public esQueryItem VisitQueueNo
         {
             get
             {
-                return new esQueryItem(this, QueueCategoryMetadata.ColumnNames.CategoryID, esSystemType.String);
+                return new esQueryItem(this, VisitQueueBarcodeMetadata.ColumnNames.VisitQueueNo, esSystemType.String);
             }
         }
-        public esQueryItem CategoryName
+        public esQueryItem BarcodeImage
         {
             get
             {
-                return new esQueryItem(this, QueueCategoryMetadata.ColumnNames.CategoryName, esSystemType.String);
+                return new esQueryItem(this, VisitQueueBarcodeMetadata.ColumnNames.BarcodeImage, esSystemType.ByteArray);
             }
         }
-        public esQueryItem StageID
+        public esQueryItem CreatedDateTime
         {
             get
             {
-                return new esQueryItem(this, QueueCategoryMetadata.ColumnNames.StageID, esSystemType.String);
-            }
-        }
-        public esQueryItem ServiceUnitID
-        {
-            get
-            {
-                return new esQueryItem(this, QueueCategoryMetadata.ColumnNames.ServiceUnitID, esSystemType.String);
-            }
-        }
-        public esQueryItem IsActive
-        {
-            get
-            {
-                return new esQueryItem(this, QueueCategoryMetadata.ColumnNames.IsActive, esSystemType.Boolean);
+                return new esQueryItem(this, VisitQueueBarcodeMetadata.ColumnNames.CreatedDateTime, esSystemType.DateTime);
             }
         }
     }
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
     [Serializable]
-    [XmlType("QueueCategoryCollection")]
-    public partial class QueueCategoryCollection : esQueueCategoryCollection, IEnumerable<QueueCategory>
+    [XmlType("VisitQueueBarcodeCollection")]
+    public partial class VisitQueueBarcodeCollection : esVisitQueueBarcodeCollection, IEnumerable<VisitQueueBarcode>
     {
-        public QueueCategoryCollection()
+        public VisitQueueBarcodeCollection()
         {
 
         }
 
-        public static implicit operator List<QueueCategory>(QueueCategoryCollection coll)
+        public static implicit operator List<VisitQueueBarcode>(VisitQueueBarcodeCollection coll)
         {
-            List<QueueCategory> list = new List<QueueCategory>();
+            List<VisitQueueBarcode> list = new List<VisitQueueBarcode>();
 
-            foreach (QueueCategory emp in coll)
+            foreach (VisitQueueBarcode emp in coll)
             {
                 list.Add(emp);
             }
@@ -531,7 +397,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             get
             {
-                return QueueCategoryMetadata.Meta();
+                return VisitQueueBarcodeMetadata.Meta();
             }
         }
 
@@ -539,7 +405,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             if (this.query == null)
             {
-                this.query = new QueueCategoryQuery();
+                this.query = new VisitQueueBarcodeQuery();
                 this.InitQuery(query);
             }
             return this.query;
@@ -547,24 +413,24 @@ namespace Temiang.Avicenna.BusinessObject
 
         override protected esEntity CreateEntityForCollection(DataRow row)
         {
-            return new QueueCategory(row);
+            return new VisitQueueBarcode(row);
         }
 
         override protected esEntity CreateEntity()
         {
-            return new QueueCategory();
+            return new VisitQueueBarcode();
         }
 
         #endregion
 
         [BrowsableAttribute(false)]
-        public QueueCategoryQuery Query
+        public VisitQueueBarcodeQuery Query
         {
             get
             {
                 if (this.query == null)
                 {
-                    this.query = new QueueCategoryQuery();
+                    this.query = new VisitQueueBarcodeQuery();
                     base.InitQuery(this.query);
                 }
 
@@ -661,7 +527,7 @@ namespace Temiang.Avicenna.BusinessObject
         /// </remarks>
         /// <param name="query">The query object instance name.</param>
         /// <returns>True if at least one record was loaded.</returns>
-        public bool Load(QueueCategoryQuery query)
+        public bool Load(VisitQueueBarcodeQuery query)
         {
             this.query = query;
             base.InitQuery(this.query);
@@ -672,48 +538,48 @@ namespace Temiang.Avicenna.BusinessObject
         /// Adds a new entity to the collection.
         /// Always calls AddNew() on the entity, in case it is overridden.
         /// </summary>
-        public QueueCategory AddNew()
+        public VisitQueueBarcode AddNew()
         {
-            QueueCategory entity = base.AddNewEntity() as QueueCategory;
+            VisitQueueBarcode entity = base.AddNewEntity() as VisitQueueBarcode;
 
             return entity;
         }
-        public QueueCategory FindByPrimaryKey(String standardReferenceID)
+        public VisitQueueBarcode FindByPrimaryKey(String standardReferenceID)
         {
-            return base.FindByPrimaryKey(standardReferenceID) as QueueCategory;
+            return base.FindByPrimaryKey(standardReferenceID) as VisitQueueBarcode;
         }
 
-        #region IEnumerable< QueueCategory> Members
+        #region IEnumerable< VisitQueueBarcode> Members
 
-        IEnumerator<QueueCategory> IEnumerable<QueueCategory>.GetEnumerator()
+        IEnumerator<VisitQueueBarcode> IEnumerable<VisitQueueBarcode>.GetEnumerator()
         {
             System.Collections.IEnumerable enumer = this as System.Collections.IEnumerable;
             System.Collections.IEnumerator iterator = enumer.GetEnumerator();
 
             while (iterator.MoveNext())
             {
-                yield return iterator.Current as QueueCategory;
+                yield return iterator.Current as VisitQueueBarcode;
             }
         }
 
         #endregion
 
-        private QueueCategoryQuery query;
+        private VisitQueueBarcodeQuery query;
     }
 
 
     /// <summary>
-    /// Encapsulates the 'QueueCategory' table
+    /// Encapsulates the 'VisitQueueBarcode' table
     /// </summary>
-    [System.Diagnostics.DebuggerDisplay("QueueCategory ({StandardReferenceID})")]
+    [System.Diagnostics.DebuggerDisplay("VisitQueueBarcode ({StandardReferenceID})")]
     [Serializable]
-    public partial class QueueCategory : esQueueCategory
+    public partial class VisitQueueBarcode : esVisitQueueBarcode
     {
-        public QueueCategory()
+        public VisitQueueBarcode()
         {
         }
 
-        public QueueCategory(DataRow row)
+        public VisitQueueBarcode(DataRow row)
             : base(row)
         {
         }
@@ -723,15 +589,15 @@ namespace Temiang.Avicenna.BusinessObject
         {
             get
             {
-                return QueueCategoryMetadata.Meta();
+                return VisitQueueBarcodeMetadata.Meta();
             }
         }
 
-        override protected esQueueCategoryQuery GetDynamicQuery()
+        override protected esVisitQueueBarcodeQuery GetDynamicQuery()
         {
             if (this.query == null)
             {
-                this.query = new QueueCategoryQuery();
+                this.query = new VisitQueueBarcodeQuery();
                 this.InitQuery(query);
             }
             return this.query;
@@ -739,13 +605,13 @@ namespace Temiang.Avicenna.BusinessObject
         #endregion
 
         [BrowsableAttribute(false)]
-        public QueueCategoryQuery Query
+        public VisitQueueBarcodeQuery Query
         {
             get
             {
                 if (this.query == null)
                 {
-                    this.query = new QueueCategoryQuery();
+                    this.query = new VisitQueueBarcodeQuery();
                     base.InitQuery(this.query);
                 }
 
@@ -844,79 +710,64 @@ namespace Temiang.Avicenna.BusinessObject
         /// </remarks>
         /// <param name="query">The query object instance name.</param>
         /// <returns>True if at least one record was loaded.</returns>
-        public bool Load(QueueCategoryQuery query)
+        public bool Load(VisitQueueBarcodeQuery query)
         {
             this.query = query;
             base.InitQuery(this.query);
             return this.Query.Load();
         }
 
-        private QueueCategoryQuery query;
+        private VisitQueueBarcodeQuery query;
     }
 
     [System.Diagnostics.DebuggerDisplay("LastQuery = {es.LastQuery}")]
     [Serializable]
-    public partial class QueueCategoryQuery : esQueueCategoryQuery
+    public partial class VisitQueueBarcodeQuery : esVisitQueueBarcodeQuery
     {
-        public QueueCategoryQuery()
+        public VisitQueueBarcodeQuery()
         {
 
         }
 
-        public QueueCategoryQuery(string joinAlias)
+        public VisitQueueBarcodeQuery(string joinAlias)
         {
             this.es.JoinAlias = joinAlias;
         }
 
         override protected string GetQueryName()
         {
-            return "QueueCategoryQuery";
+            return "VisitQueueBarcodeQuery";
         }
     }
 
     [Serializable]
-    public partial class QueueCategoryMetadata : esMetadata, IMetadata
+    public partial class VisitQueueBarcodeMetadata : esMetadata, IMetadata
     {
         #region Protected Constructor
-        protected QueueCategoryMetadata()
+        protected VisitQueueBarcodeMetadata()
         {
             _columns = new esColumnMetadataCollection();
             esColumnMetadata c;
 
-            c = new esColumnMetadata(QueueCategoryMetadata.ColumnNames.CategoryID, 0, typeof(System.String), esSystemType.String);
-            c.PropertyName = QueueCategoryMetadata.PropertyNames.CategoryID;
-            c.IsInPrimaryKey = true;
-            c.CharacterMaxLength = 50;
-            _columns.Add(c);
-
-            c = new esColumnMetadata(QueueCategoryMetadata.ColumnNames.CategoryName, 1, typeof(System.String), esSystemType.String);
-            c.PropertyName = QueueCategoryMetadata.PropertyNames.CategoryName;
-            c.CharacterMaxLength = 100;
-            c.IsNullable = true;
-            _columns.Add(c);
-
-            c = new esColumnMetadata(QueueCategoryMetadata.ColumnNames.StageID, 2, typeof(System.String), esSystemType.String);
-            c.PropertyName = QueueCategoryMetadata.PropertyNames.StageID;
+            c = new esColumnMetadata(VisitQueueBarcodeMetadata.ColumnNames.VisitQueueNo, 0, typeof(System.String), esSystemType.String);
+            c.PropertyName = VisitQueueBarcodeMetadata.PropertyNames.VisitQueueNo;
             c.CharacterMaxLength = 50;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(QueueCategoryMetadata.ColumnNames.ServiceUnitID, 3, typeof(System.String), esSystemType.String);
-            c.PropertyName = QueueCategoryMetadata.PropertyNames.ServiceUnitID;
-            c.CharacterMaxLength = 50;
+            c = new esColumnMetadata(VisitQueueBarcodeMetadata.ColumnNames.BarcodeImage, 1, typeof(System.Byte[]), esSystemType.ByteArray);
+            c.PropertyName = VisitQueueBarcodeMetadata.PropertyNames.BarcodeImage;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(QueueCategoryMetadata.ColumnNames.IsActive, 4, typeof(System.Boolean), esSystemType.Boolean);
-            c.PropertyName = QueueCategoryMetadata.PropertyNames.IsActive;
-            c.HasDefault = true;
-            c.Default = @"((1))";
+            c = new esColumnMetadata(VisitQueueBarcodeMetadata.ColumnNames.CreatedDateTime, 2, typeof(System.DateTime), esSystemType.DateTime);
+            c.PropertyName = VisitQueueBarcodeMetadata.PropertyNames.CreatedDateTime;
             c.IsNullable = true;
             _columns.Add(c);
         }
         #endregion
 
-        static public QueueCategoryMetadata Meta()
+        static public VisitQueueBarcodeMetadata Meta()
         {
             return meta;
         }
@@ -939,22 +790,18 @@ namespace Temiang.Avicenna.BusinessObject
         #region ColumnNames
         public class ColumnNames
         {
-            public const string CategoryID = "CategoryID";
-            public const string CategoryName = "CategoryName";
-            public const string StageID = "StageID";
-            public const string ServiceUnitID = "ServiceUnitID";
-            public const string IsActive = "IsActive";
+            public const string VisitQueueNo = "VisitQueueNo";
+            public const string BarcodeImage = "BarcodeImage";
+            public const string CreatedDateTime = "CreatedDateTime";
         }
         #endregion
 
         #region PropertyNames
         public class PropertyNames
         {
-            public const string CategoryID = "CategoryID";
-            public const string CategoryName = "CategoryName";
-            public const string StageID = "StageID";
-            public const string ServiceUnitID = "ServiceUnitID";
-            public const string IsActive = "IsActive";
+            public const string VisitQueueNo = "VisitQueueNo";
+            public const string BarcodeImage = "BarcodeImage";
+            public const string CreatedDateTime = "CreatedDateTime";
         }
         #endregion
 
@@ -973,16 +820,16 @@ namespace Temiang.Avicenna.BusinessObject
         static private int RegisterDelegateesDefault()
         {
             // This is only executed once per the life of the application
-            lock (typeof(QueueCategoryMetadata))
+            lock (typeof(VisitQueueBarcodeMetadata))
             {
-                if (QueueCategoryMetadata.mapDelegates == null)
+                if (VisitQueueBarcodeMetadata.mapDelegates == null)
                 {
-                    QueueCategoryMetadata.mapDelegates = new Dictionary<string, MapToMeta>();
+                    VisitQueueBarcodeMetadata.mapDelegates = new Dictionary<string, MapToMeta>();
                 }
 
-                if (QueueCategoryMetadata.meta == null)
+                if (VisitQueueBarcodeMetadata.meta == null)
                 {
-                    QueueCategoryMetadata.meta = new QueueCategoryMetadata();
+                    VisitQueueBarcodeMetadata.meta = new VisitQueueBarcodeMetadata();
                 }
 
                 MapToMeta mapMethod = new MapToMeta(meta.esDefault);
@@ -998,20 +845,18 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 esProviderSpecificMetadata meta = new esProviderSpecificMetadata();
 
-                meta.AddTypeMap("CategoryID", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("CategoryName", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("StageID", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("ServiceUnitID", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("IsActive", new esTypeMap("bit", "System.Boolean"));
+                meta.AddTypeMap("VisitQueueNo", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("BarcodeImage", new esTypeMap("varbinary", "System.Byte[]"));
+                meta.AddTypeMap("CreatedDateTime", new esTypeMap("datetime", "System.DateTime"));
 
 
-                meta.Source = "QueueCategory";
-                meta.Destination = "QueueCategory";
-                meta.spInsert = "proc_QueueCategoryInsert";
-                meta.spUpdate = "proc_QueueCategoryUpdate";
-                meta.spDelete = "proc_QueueCategoryDelete";
-                meta.spLoadAll = "proc_QueueCategoryLoadAll";
-                meta.spLoadByPrimaryKey = "proc_QueueCategoryLoadByPrimaryKey";
+                meta.Source = "VisitQueueBarcode";
+                meta.Destination = "VisitQueueBarcode";
+                meta.spInsert = "proc_VisitQueueBarcodeInsert";
+                meta.spUpdate = "proc_VisitQueueBarcodeUpdate";
+                meta.spDelete = "proc_VisitQueueBarcodeDelete";
+                meta.spLoadAll = "proc_VisitQueueBarcodeLoadAll";
+                meta.spLoadByPrimaryKey = "proc_VisitQueueBarcodeLoadByPrimaryKey";
 
                 this._providerMetadataMaps["esDefault"] = meta;
             }
@@ -1021,7 +866,7 @@ namespace Temiang.Avicenna.BusinessObject
 
         #endregion
 
-        static private QueueCategoryMetadata meta;
+        static private VisitQueueBarcodeMetadata meta;
         static protected Dictionary<string, MapToMeta> mapDelegates;
         static private int _esDefault = RegisterDelegateesDefault();
     }
