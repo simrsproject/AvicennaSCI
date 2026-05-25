@@ -5432,6 +5432,7 @@
     <Compile Include="Bridging\Controllers\TokenController.cs" />
     <Compile Include="Bridging\CustomAuthorization.cs" />
     <Compile Include="Bridging\Startup.cs" />
+    <Compile Include="Controllers\AntrianSatuTiketController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\KioskselfregController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
