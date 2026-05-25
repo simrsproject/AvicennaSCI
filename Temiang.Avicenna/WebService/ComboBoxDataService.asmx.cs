@@ -549,18 +549,41 @@ namespace Temiang.Avicenna.WebService
             var qr = new DiagnoseQuery("d");
             var dtdQr = new DtdQuery("dtd");
             qr.InnerJoin(dtdQr).On(qr.DtdNo == dtdQr.DtdNo);
-            qr.Select
-                (
-                    string.Format("<CASE WHEN  CHARINDEX('{0}', d.DiagnoseName) = 0 THEN 1000 ELSE CHARINDEX('{0}', d.DiagnoseName) END  SearchIdx>", context.Text),
-                    qr.DiagnoseID.As("ValueField"),
-                    qr.DiagnoseID.As("TextField"),
-                    qr.DiagnoseName,
-                    qr.DtdNo,
-                    dtdQr.DtdName,
-                    qr.IsDisease,
-                    qr.IsChronicDisease,
-                    qr.Synonym
-                );
+
+            if (AppSession.Parameter.HealthcareID == "RSI")
+            {
+                qr.Select
+                    (
+                        string.Format("<CASE WHEN  CHARINDEX('{0}', d.DiagnoseName) = 0 THEN 1000 ELSE CHARINDEX('{0}', d.DiagnoseName) END  SearchIdx>", context.Text),
+                        qr.DiagnoseID.As("ValueField"),
+                        qr.DiagnoseID.As("TextField"),
+                        qr.DiagnoseName,
+                        @"<'' AS DtdNo>",
+                        @"<'' AS DtdName>",
+                        //qr.DtdNo,
+                        //dtdQr.DtdName,
+                        qr.IsDisease,
+                        qr.IsChronicDisease,
+                        qr.Synonym
+                    );
+            }
+            else
+            {
+
+                qr.Select
+                    (
+                        string.Format("<CASE WHEN  CHARINDEX('{0}', d.DiagnoseName) = 0 THEN 1000 ELSE CHARINDEX('{0}', d.DiagnoseName) END  SearchIdx>", context.Text),
+                        qr.DiagnoseID.As("ValueField"),
+                        qr.DiagnoseID.As("TextField"),
+                        qr.DiagnoseName,
+                        qr.DtdNo,
+                        dtdQr.DtdName,
+                        qr.IsDisease,
+                        qr.IsChronicDisease,
+                        qr.Synonym
+                    );
+            }
+            
             qr.Where
                 (
                     qr.IsActive == 1

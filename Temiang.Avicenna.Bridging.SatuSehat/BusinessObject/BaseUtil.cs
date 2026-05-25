@@ -36,7 +36,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat.BusinessObject
         protected const string DateFormatLong = "yyyy-MM-ddTHH:mm:ss";
         protected const string DateFormatSort = "yyyy-MM-dd";
         protected string[] DayNames = { "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" };
-        protected int GmtDif = 0 - AppParameter.GetParameterValue(AppParameter.ParameterItem.GMT).ToInt();
+        protected int GmtDif => 0 - AppParameter.GetParameterValue(AppParameter.ParameterItem.GMT).ToInt();
 
         // diganti public karena akan di-invoke dari DynamicInvoker
         public static string SatuSehatKey(string key)

@@ -178,6 +178,21 @@ BEGIN
             @UserID
         );
 
+		-- =========================================
+        -- RESULT
+        -- =========================================
+        SELECT
+            VisitQueueNo,
+            VisitNo,
+            RegistrationNo,
+            ServiceUnitID,
+            CurrentStage,
+            StageID,
+            QueueSequence,
+            Status
+        FROM VisitQueue
+        WHERE VisitQueueNo = @VisitQueueNo;
+
         COMMIT;
 
     END TRY

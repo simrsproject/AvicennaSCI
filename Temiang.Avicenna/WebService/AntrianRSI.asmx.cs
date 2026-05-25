@@ -2645,6 +2645,108 @@ namespace Temiang.Avicenna.WebService
 
         //9. SCAN BARCODE FARMASI
         [WebMethod(Description = @"
+            Digunakan untuk mengambil nomor antrian pada farmasi
+
+            PARAMETER:
+            - RegistrationNo (required)
+            - ServiceUnitID (required)
+            - UserID (optional)
+            - TransDate (optional)
+
+            RESPONSE:
+            200 = Berhasil mengambil antrian farmasi
+            400 = Parameter tidak valid (RegistrationNo wajib diisi / ServiceUnitID wajib diisi)
+            500 = Server error
+        ")]
+        public void TakeQueueVisitNumberForFarmasi()
+        {
+            try
+            {
+                string registrationNo =
+                    (Context.Request["RegistrationNo"] ?? "")
+                    .Trim();
+
+                string serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                string userID =
+                    (Context.Request["UserID"] ?? "KIOSK_FARMASI")
+                    .Trim();
+
+                string transDateString =
+                    (Context.Request["TransDate"] ?? "")
+                    .Trim();
+
+                DateTime? transDate = null;
+
+                if (!string.IsNullOrEmpty(transDateString))
+                {
+                    transDate = Convert.ToDateTime(transDateString);
+                }
+
+                // VALIDASI
+
+                if (string.IsNullOrEmpty(registrationNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "RegistrationNo wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(serviceUnitID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "ServiceUnitID wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                // EXECUTE
+
+                var result =
+                    VisitQueue.TakeQueueVisitNumberForFarmasi(
+                        registrationNo,
+                        serviceUnitID,
+                        userID,
+                        transDate
+                    );
+
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Gagal mengambil antrian farmasi",
+                        500
+                    );
+
+                    return;
+                }
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil mengambil antrian farmasi"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
             Digunakan untuk melihat list CategoryID dan petugas farmasi dapat
             menentukan Verifikasi Antrian Farmasi
 
@@ -2885,6 +2987,7 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
+        //10. PRINT STRUK ANTRIAN (APM)
         [WebMethod(EnableSession = true, Description = @"
             Digunakan untuk print struk antrian pasien
 

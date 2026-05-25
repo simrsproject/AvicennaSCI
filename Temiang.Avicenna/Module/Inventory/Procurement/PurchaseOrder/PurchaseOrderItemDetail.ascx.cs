@@ -1,15 +1,16 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using System;
+using System.Data;
 using System.Linq;
+using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Temiang.Avicenna.BusinessObject.Reference;
-using Temiang.Dal.Interfaces;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.BusinessObject.Reference;
 using Temiang.Avicenna.Common;
-using System.Data;
-using DocumentFormat.OpenXml.Bibliography;
-using System.Text;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
@@ -489,7 +490,75 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                         return;
                     }
                 }
+            } else
+            {
+                var transactionNo = TxtTransactionNo.Text.Trim();
+                //modif 2026-05-20 validasi ketika edit
+                if (ChkIsInventoryItem.Checked)
+                {
+                    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+
+                    var isExist = false;
+                    foreach (BusinessObject.ItemTransactionItem entity in coll)
+                    {
+                        if (entity.ItemID == cboItemID.SelectedValue 
+                            && entity.SequenceNo != txtSequenceNo.Text
+                            )
+                        {
+                            isExist = true;
+                            break;
+                        }
+                    }
+
+                    if (isExist)
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} has exist", cboItemID.SelectedValue);
+                        return;
+                    }
+                }
+                if (!chkIsNonMasterOrder.Checked)
+                {
+                    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+                    
+                    var isExist = false;
+                    foreach (BusinessObject.ItemTransactionItem entity in coll)
+                    {
+                        if (entity.ItemID == cboItemID.SelectedValue
+                            && entity.SequenceNo != txtSequenceNo.Text
+                            )
+                        {
+                            isExist = true;
+                            break;
+                        }
+                    }
+
+                    if (isExist)
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} with same spesification has exist", cboItemID.SelectedValue);
+                        return;
+                    }
+
+                    if (string.IsNullOrEmpty(cboItemID.SelectedValue))
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
+                        return;
+                    }
+
+                    var item = new Item();
+                    if (!item.LoadByPrimaryKey(cboItemID.SelectedValue))
+                    {
+                        args.IsValid = false;
+                        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
+                        return;
+                    }
+                }
+
             }
+
+
             if (chkIsNonMasterOrder.Checked && string.IsNullOrEmpty(txtDescription.Text))
             {
                 args.IsValid = false;

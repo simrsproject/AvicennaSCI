@@ -144,13 +144,36 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Slip.PatientManagement.PatientHeal
                 var pat = new Patient();
                 if (pat.LoadByPrimaryKey(reg.PatientID))
                 {
-                    var deceasedDate = pat.DeceasedDateTime ?? DateTime.Now;
-                    int Agey = pat.IsAlive == true ? new DateTime((DateTime.Now - pat.DateOfBirth.Value).Ticks).Year : new DateTime((deceasedDate - pat.DateOfBirth.Value).Ticks).Year - 1;
-                    int Agem = pat.IsAlive == true ? new DateTime((DateTime.Now - pat.DateOfBirth.Value).Ticks).Month : new DateTime((deceasedDate - pat.DateOfBirth.Value).Ticks).Month - 1;
-                    int Aged = pat.IsAlive == true ? new DateTime((DateTime.Now - pat.DateOfBirth.Value).Ticks).Day : new DateTime((deceasedDate - pat.DateOfBirth.Value).Ticks).Day - 1;
+                    DateTime birthDate = pat.DateOfBirth.Value;
+
+                    DateTime endDate = pat.IsAlive == true
+                        ? DateTime.Now.Date
+                        : (pat.DeceasedDateTime ?? DateTime.Now).Date;
+
+                    int Agey = endDate.Year - birthDate.Year;
+                    int Agem = endDate.Month - birthDate.Month;
+                    int Aged = endDate.Day - birthDate.Day;
+
+                    // Koreksi hari
+                    if (Aged < 0)
+                    {
+                        Agem--;
+
+                        DateTime previousMonth = endDate.AddMonths(-1);
+
+                        Aged += DateTime.DaysInMonth(previousMonth.Year, previousMonth.Month);
+                    }
+
+                    // Koreksi bulan
+                    if (Agem < 0)
+                    {
+                        Agey--;
+                        Agem += 12;
+                    }
+
                     textBox23.Value = pat.PatientName;
-                    textBox24.Value = pat.DateOfBirth.Value.ToString("dd-MM-yyyy");
-                    textBox40.Value = Agey + " th " + Agem + " bl " + Aged + " Hr";
+                    textBox24.Value = birthDate.ToString("dd-MM-yyyy");
+                    textBox40.Value = Agey + " th " + Agem + " bl " + Aged + " hr";
                     textBox26.Value = pat.MedicalNo + " / " + RegistrationNo;
 
                     if (pat.Sex == "M")

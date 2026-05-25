@@ -801,9 +801,16 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
                 //ada kemungkinan SEP no masih kosong untuk penjamin belum jelas dengan guarantor type BPJS.
                 if(!string.IsNullOrWhiteSpace(reg.BpjsSepNo))
                 {
-                    if (sep.LoadByPrimaryKey(reg.BpjsSepNo) && !string.IsNullOrWhiteSpace(sep.KlsHak))
+                    try
                     {
-                        lblBpjsHakKelas.Text = sep.KlsHak;
+                        if (sep.LoadByPrimaryKey(reg.BpjsSepNo) && !string.IsNullOrWhiteSpace(sep.KlsHak))
+                        {
+                            lblBpjsHakKelas.Text = sep.KlsHak;
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        lblBpjsHakKelas.Text = "- error: double SEP / not found -";
                     }
                 }
             }
@@ -824,28 +831,36 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
                 !string.IsNullOrWhiteSpace(reg.BpjsSepNo) && reg.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
             {
                 var sep = new BpjsSEP();
-                if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
+                try
                 {
-                    lblTglRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
-
-                    if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
+                    if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
                     {
-                        try
+                        lblTglRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
+
+                        if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
                         {
-                            var svc = new Common.BPJS.VClaim.v11.Service();
-                            var rujukan = svc.GetRujukan(sep.NoRujukan);
-                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                            try
                             {
-                                lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
+                                var svc = new Common.BPJS.VClaim.v11.Service();
+                                var rujukan = svc.GetRujukan(sep.NoRujukan);
+                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                {
+                                    lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                lblPoliRujukan.Text = "- BPJS Service Not Connected -";
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            lblPoliRujukan.Text = "- BPJS Service Not Connected -";
-                        }
-                    }
 
+                        trRujukan.Visible = true;
+                    }
+                }
+                catch (Exception ex)
+                {
                     trRujukan.Visible = true;
+                    lblPoliRujukan.Text = "error : double SEP / not found";
                 }
             }
 

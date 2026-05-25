@@ -147,9 +147,9 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 var response = new RestResponse();
 
                 if (!string.IsNullOrEmpty(pat.Ssn))
-                    response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id/", string.Concat("nik|", pat.Ssn), ref accessToken);
+                    response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id", string.Concat("nik|", pat.Ssn), ref accessToken);
                 else if (!string.IsNullOrEmpty(pat.MotherSsn))
-                    response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id/", string.Concat("nik-ibu|", pat.MotherSsn, "&birthdate=", pat.DateOfBirth.Value.ToString("yyyy-MM-dd")), ref accessToken);
+                    response = RestClientGet("Patient?identifier=https://fhir.kemkes.go.id/id", string.Concat("nik-ibu|", pat.MotherSsn, "&birthdate=", pat.DateOfBirth.Value.ToString("yyyy-MM-dd")), ref accessToken);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Created || response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

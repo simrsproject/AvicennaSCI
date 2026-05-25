@@ -13,6 +13,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Xml.Serialization;
 using Temiang.Avicenna.BusinessObject.Generated;
@@ -2864,6 +2865,82 @@ namespace Temiang.Avicenna.BusinessObject
                     VisitNo = reader["VisitNo"]?.ToString(),
                     RegistrationNo = reader["RegistrationNo"]?.ToString(),
                     TransactionNo = reader["TransactionNo"]?.ToString(),
+                    ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
+                    CurrentStage = reader["CurrentStage"]?.ToString(),
+                    StageID = reader["StageID"]?.ToString(),
+                    QueueSequence = reader["QueueSequence"] == DBNull.Value
+                        ? null
+                        : reader["QueueSequence"],
+                    Status = reader["Status"]?.ToString()
+                };
+            }
+        }
+
+        public static object TakeQueueVisitNumberForFarmasi(
+            string registrationNo,
+            string serviceUnitID,
+            string userID = "KIOSK_FARMASI",
+            DateTime? transDate = null
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "RegistrationNo",
+                registrationNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "TransDate",
+                transDate,
+                esParameterDirection.Input,
+                DbType.Date,
+                0
+            );
+
+            parameters.Add(
+                "VisitQueueNo",
+                "",
+                esParameterDirection.Output,
+                DbType.String,
+                50
+            );
+
+            using (var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "TakeQueueVisitNumberForFarmasi",
+                parameters
+            ))
+            {
+                if (reader == null || !reader.Read())
+                    return null;
+
+                return new
+                {
+                    VisitQueueNo = reader["VisitQueueNo"]?.ToString(),
+                    VisitNo = reader["VisitNo"]?.ToString(),
+                    RegistrationNo = reader["RegistrationNo"]?.ToString(),
                     ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
                     CurrentStage = reader["CurrentStage"]?.ToString(),
                     StageID = reader["StageID"]?.ToString(),

@@ -5409,8 +5409,8 @@ namespace Temiang.Avicenna.Module.Charges
                                                                 //    _filmNo.Save();
                                                                 //}
                                                                 //else 
-                                                                root.patientid = patient.MedicalNo;
-                                                                root.mrn = detail.FilmNo;
+                                                                root.patientid = detail.FilmNo;
+                                                                root.mrn = patient.MedicalNo;
                                                                 root.name = patient.PatientName;
                                                                 root.address = patient.Address;
                                                                 root.sex = patient.Sex;
