@@ -19,7 +19,6 @@ using Temiang.Avicenna.BusinessObject.Generated;
 using Temiang.Dal.Core;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
-
 namespace Temiang.Avicenna.BusinessObject
 {
     [Serializable]
@@ -1876,7 +1875,8 @@ namespace Temiang.Avicenna.BusinessObject
             string status,
             string stageID,
             string serviceUnitID,
-            string paramedicID
+            string paramedicID,
+            string categoryID
         )
         {
             var collection = new VisitQueueCollection();
@@ -1891,7 +1891,9 @@ namespace Temiang.Avicenna.BusinessObject
                 query.Status,
                 query.ServiceUnitID,
                 query.ParamedicID,
-                query.QueueSequence
+                query.QueueSequence,
+                query.StageID,
+                query.CategoryID
             );
 
             // =========================================
@@ -1926,6 +1928,11 @@ namespace Temiang.Avicenna.BusinessObject
             if (!string.IsNullOrWhiteSpace(paramedicID))
             {
                 query.Where(query.ParamedicID == paramedicID);
+            }
+
+            if (!string.IsNullOrWhiteSpace(categoryID))
+            {
+                query.Where(query.CategoryID == categoryID);
             }
 
             // =========================================
@@ -1955,8 +1962,9 @@ namespace Temiang.Avicenna.BusinessObject
                     x.VisitNo,
                     x.QueueDate,
                     x.Status,
-
+                    x.StageID,
                     x.ServiceUnitID,
+                    x.CategoryID,
 
                     ServiceUnitName =
                         serviceUnits
@@ -1966,6 +1974,7 @@ namespace Temiang.Avicenna.BusinessObject
                             ?.ServiceUnitName,
 
                     x.ParamedicID,
+                    
 
                     ParamedicName =
                         paramedics
@@ -1982,7 +1991,8 @@ namespace Temiang.Avicenna.BusinessObject
             string status,
             string stageID,
             string serviceUnitID,
-            string paramedicID
+            string paramedicID,
+            string categoryID
         )
         {
             var collection = new VisitQueueCollection();
@@ -2000,7 +2010,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.ServiceUnitID,
                 query.ParamedicID,
                 query.QueueSequence,
-                query.StageID
+                query.StageID,
+                query.CategoryID
             );
 
             // =========================================
@@ -2035,6 +2046,11 @@ namespace Temiang.Avicenna.BusinessObject
             if (!string.IsNullOrWhiteSpace(paramedicID))
             {
                 query.Where(query.ParamedicID == paramedicID);
+            }
+
+            if (!string.IsNullOrWhiteSpace(categoryID))
+            {
+                query.Where(query.CategoryID == categoryID);
             }
 
             // =========================================
@@ -2114,6 +2130,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.Status,
                     x.QueueSequence,
                     x.StageID,
+                    x.CategoryID,
 
                     x.ServiceUnitID,
                     ServiceUnitName =
@@ -2581,6 +2598,16 @@ namespace Temiang.Avicenna.BusinessObject
                         StageID =
                             reader["StageID"].ToString(),
 
+                        CurrentStage =
+                            reader["CurrentStage"] == DBNull.Value
+                                ? ""
+                                : reader["CurrentStage"].ToString(),
+
+                        CategoryID =
+                            reader["CategoryID"] == DBNull.Value
+                                ? ""
+                                : reader["CategoryID"].ToString(),
+
                         ServiceUnitID =
                             reader["ServiceUnitID"].ToString(),
 
@@ -2657,7 +2684,9 @@ namespace Temiang.Avicenna.BusinessObject
                 VisitQueueNo = result.VisitQueueNo,
                 VisitNo = result.VisitNo,
                 Status = result.Status,
-                StageID = result.CurrentStage,
+                StageID = result.StageID,
+                CurrentStage = result.CurrentStage,
+                CategoryID = result.CategoryID,
                 ServiceUnitID = result.ServiceUnitID,
                 ParamedicID = result.ParamedicID,
                 CalledTime = result.CalledTime,
@@ -2707,6 +2736,8 @@ namespace Temiang.Avicenna.BusinessObject
                 VisitNo = reader["VisitNo"]?.ToString(),
                 Status = reader["Status"]?.ToString(),
                 StageID = reader["StageID"]?.ToString(),
+                CurrentStage = reader["CurrentStage"]?.ToString(),
+                CategoryID = reader["CategoryID"]?.ToString(),
                 ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
                 ParamedicID = reader["ParamedicID"]?.ToString(),
                 CalledTime = reader["CalledTime"] == DBNull.Value ? null : reader["CalledTime"],
@@ -2755,6 +2786,8 @@ namespace Temiang.Avicenna.BusinessObject
                     VisitNo = reader["VisitNo"]?.ToString(),
                     Status = reader["Status"]?.ToString(),
                     StageID = reader["StageID"]?.ToString(),
+                    CurrentStage = reader["CurrentStage"]?.ToString(),
+                    CategoryID = reader["CategoryID"]?.ToString(),
                     ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
                     ParamedicID = reader["ParamedicID"]?.ToString(),
                     QueueSequence = reader["QueueSequence"] == DBNull.Value ? null : reader["QueueSequence"],
@@ -2765,6 +2798,82 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        public static object TakeQueueVisitNumberForPenunjang(
+            string registrationNo,
+            string serviceUnitID,
+            string userID = "KIOSK",
+            DateTime? transDate = null
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "RegistrationNo",
+                registrationNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "TransDate",
+                transDate,
+                esParameterDirection.Input,
+                DbType.Date,
+                0
+            );
+
+            parameters.Add(
+                "VisitQueueNo",
+                "",
+                esParameterDirection.Output,
+                DbType.String,
+                50
+            );
+
+            using (var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "TakeQueueVisitNumberForPenunjang",
+                parameters
+            ))
+            {
+                if (reader == null || !reader.Read())
+                    return null;
+
+                return new
+                {
+                    VisitQueueNo = reader["VisitQueueNo"]?.ToString(),
+                    VisitNo = reader["VisitNo"]?.ToString(),
+                    RegistrationNo = reader["RegistrationNo"]?.ToString(),
+                    TransactionNo = reader["TransactionNo"]?.ToString(),
+                    ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
+                    CurrentStage = reader["CurrentStage"]?.ToString(),
+                    StageID = reader["StageID"]?.ToString(),
+                    QueueSequence = reader["QueueSequence"] == DBNull.Value
+                        ? null
+                        : reader["QueueSequence"],
+                    Status = reader["Status"]?.ToString()
+                };
+            }
+        }
 
     }
 

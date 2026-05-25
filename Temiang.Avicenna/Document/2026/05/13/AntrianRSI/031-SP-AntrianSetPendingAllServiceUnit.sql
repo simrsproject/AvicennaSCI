@@ -12,7 +12,9 @@ BEGIN
         @QueueDate     DATE,
         @StageID       VARCHAR(50),
         @ServiceUnitID VARCHAR(50),
-        @ParamedicID   VARCHAR(50);
+		@CurrentStage  VARCHAR(50),
+        @ParamedicID   VARCHAR(50),
+		@CategoryID    VARCHAR(50);
 
     BEGIN TRAN;
 
@@ -24,9 +26,11 @@ BEGIN
         SELECT 
             @CurrentStatus = vq.Status,
             @QueueDate     = CAST(vq.QueueDate AS DATE),
-            @StageID       = vq.CurrentStage,
+            @StageID       = vq.StageID,
+			@CurrentStage  = vq.CurrentStage,
             @ServiceUnitID = vq.ServiceUnitID,
-            @ParamedicID   = vq.ParamedicID
+            @ParamedicID   = vq.ParamedicID,
+			@CategoryID    = vq.CategoryID
         FROM VisitQueue vq WITH (UPDLOCK, HOLDLOCK)
         WHERE 
             vq.VisitQueueNo = @VisitQueueNo;
@@ -64,9 +68,11 @@ BEGIN
         WHERE 
             VisitQueueNo = @VisitQueueNo
             AND CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @StageID
+            AND CurrentStage = @CurrentStage
+			AND StageID      = @StageID
             AND ServiceUnitID = @ServiceUnitID
-            AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '');
+            AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
+			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '');
 
         -- =========================================
         -- 3. RETURN DATA
@@ -75,7 +81,9 @@ BEGIN
             VisitQueueNo,
             VisitNo,
             Status,
-            CurrentStage AS StageID,
+			StageID,
+            CurrentStage,
+			CategoryID,
             ServiceUnitID,
             ParamedicID,
             CalledTime,
