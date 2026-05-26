@@ -164,3 +164,7 @@ D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Test
 D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.dll
 D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.pdb
 D:\Repos\YBRS-EMR_GitYbrs\Temiang.Avicenna.Tests\bin\Debug\RestSharp.xml
+C:\Development\source_vs2022\YBRS\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.csproj.AssemblyReference.cache
+C:\Development\source_vs2022\YBRS\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.csproj.CoreCompileInputs.cache
+C:\Development\source_vs2022\YBRS\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.dll
+C:\Development\source_vs2022\YBRS\Temiang.Avicenna.Tests\obj\Debug\Temiang.Avicenna.Tests.pdb
