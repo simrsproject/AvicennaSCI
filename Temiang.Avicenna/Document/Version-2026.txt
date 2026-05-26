@@ -182,6 +182,9 @@ Titipan Daniel
    menjadi
    return string.Format("Exception caught in CreateMessageWithAttachment(): {0}", ex.ToString());
 
+   --- [12-05-2026 - Handono] ---
+   - Satusehat bugfix error SSN 3273057012650002 not found at fhir.kemkes.go.id untuk SSN yang sebenarnya valid
+
 
 ---- [15-05-2026 - Wiliam] ---
 1. Modifikasi PrescriptionSalesDetail.aspx.cs 
