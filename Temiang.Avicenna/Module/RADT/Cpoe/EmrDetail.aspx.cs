@@ -656,54 +656,64 @@ namespace Temiang.Avicenna.Module.RADT
                 !string.IsNullOrWhiteSpace(reg.BpjsSepNo) && reg.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
             {
                 var sep = new BpjsSEP();
-                if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
+                try
+                {   //in case No SEP double atau kosong
+
+                    if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
+                    {
+                        if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
+                        {
+                            try
+                            {
+                                var svc = new Common.BPJS.VClaim.v11.Service();
+                                var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
+                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                {
+                                    if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                    {
+                                        lblNoRujukan.Text =
+                                            rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                                ?.NoKunjungan ?? string.Empty;
+                                        lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                            .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                    }
+                                }
+
+                                svc = new Service();
+                                rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
+                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                {
+                                    if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                    {
+                                        lblNoRujukan.Text =
+                                            rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                                ?.NoKunjungan ?? string.Empty;
+                                        lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                            .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                lblNoRujukan.Text = "- BPJS Service Not Connected - ";
+                                lblPoliRujukan.Text = "- BPJS Service Not Connected - ";
+                            }
+                        }
+                        else
+                        {
+                            lblNoRujukan.Text = sep.NoRujukan;
+                        }
+                        if (!string.IsNullOrWhiteSpace(lblNoRujukan.Text))
+                            lblTglBerlakuRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
+
+                        trRujukan.Visible = true;
+                    }
+                }
+                catch (Exception e)
                 {
-                    if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
-                    {
-                        try
-                        {
-                            var svc = new Common.BPJS.VClaim.v11.Service();
-                            var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
-                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
-                            {
-                                if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
-                                {
-                                    lblNoRujukan.Text =
-                                        rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
-                                            ?.NoKunjungan ?? string.Empty;
-                                    lblPoliRujukan.Text = rujukan.Response.Rujukan
-                                        .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
-                                }
-                            }
-
-                            svc = new Service();
-                            rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
-                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
-                            {
-                                if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
-                                {
-                                    lblNoRujukan.Text =
-                                        rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
-                                            ?.NoKunjungan ?? string.Empty;
-                                    lblPoliRujukan.Text = rujukan.Response.Rujukan
-                                        .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            lblNoRujukan.Text = "- BPJS Service Not Connected - ";
-                            lblPoliRujukan.Text = "- BPJS Service Not Connected - ";
-                        }
-                    }
-                    else
-                    {
-                        lblNoRujukan.Text = sep.NoRujukan;
-                    }
-                    if (!string.IsNullOrWhiteSpace(lblNoRujukan.Text))
-                        lblTglBerlakuRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
-
                     trRujukan.Visible = true;
+                    lblTglBerlakuRujukan.Text = "- error : double SEP / not found -";
+                    lblNoRujukan.Text = "- error : double SEP / not found -";
                 }
             }
 

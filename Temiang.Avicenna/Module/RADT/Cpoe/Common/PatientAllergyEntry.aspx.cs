@@ -341,8 +341,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             {
                 foreach (var all in allergyCollection)
                 {
-                    if (row["StandardReferenceID"].ToString() == all.AllergyGroup && row["ItemID"].ToString() == all.Allergen)
+                    if (row["StandardReferenceID"].ToString() == all.AllergyGroup && row["ItemID"].ToString() == all.SRAnaphylaxis)
                     {
+                        row["Allergen"] = all.Allergen;
                         row["AllergenName"] = all.AllergenName;
                         row["DescAndReaction"] = all.DescAndReaction;
                         row["SRAllergyClinicalStatus"] = all.SRAllergyClinicalStatus;
@@ -363,20 +364,26 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             {
                 var dataItem = (DataRowView)item.DataItem;
 
+                var cboDrugAllergy = (RadComboBox)item.FindControl("cboDrugAllergy");
                 var cboAllergyVerif = (RadComboBox)item.FindControl("cboAllergyVerif");
                 var cboAllergyStatus = (RadComboBox)item.FindControl("cboAllergyStatus");
 
                 FillRadComboBox(cboAllergyVerif, AppEnum.StandardReference.AllergyVerificationStatus);
                 FillRadComboBox(cboAllergyStatus, AppEnum.StandardReference.AllergyClinicalStatus);
 
+                if (cboDrugAllergy != null)
+                {
+                    cboDrugAllergy.Text = dataItem["Allergen"].ToString();
+                }
+
                 if (cboAllergyVerif != null)
                 {
-                    cboAllergyVerif.SelectedValue = dataItem["SRAllergyVerificationStatus"].ToString();
+                    cboAllergyVerif.Text = dataItem["SRAllergyVerificationStatus"].ToString();
                 }
 
                 if (cboAllergyStatus != null)
                 {
-                    cboAllergyStatus.SelectedValue = dataItem["SRAllergyClinicalStatus"].ToString();
+                    cboAllergyStatus.Text = dataItem["SRAllergyClinicalStatus"].ToString();
                 }
             }
         }

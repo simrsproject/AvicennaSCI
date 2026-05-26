@@ -92,7 +92,13 @@
                                                         <ul class="details">
                                                             <li class="bold"><span>#= Value #</span></li>
                                                             <li class="small"><span>#= Attributes.DiagnoseName #</span></li>
-                                                            <li class="smaller"><span>DTD: [#= Attributes.DtdNo #] #= Attributes.DtdName #  </span></li>
+                                                             # if (Attributes.DtdNo != null && Attributes.DtdNo.toString().trim() != "") { #
+                                                            <li class="smaller">
+                                                                <span>
+                                                                    DTD: [#= Attributes.DtdNo #] #= Attributes.DtdName #
+                                                                </span>
+                                                            </li>
+                                                            # } #
                                                         </ul>
                                                     </div>
                                 </ClientItemTemplate>

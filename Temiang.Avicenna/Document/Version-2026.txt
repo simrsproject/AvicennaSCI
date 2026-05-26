@@ -184,3 +184,58 @@ Titipan Daniel
 
    --- [12-05-2026 - Handono] ---
    - Satusehat bugfix error SSN 3273057012650002 not found at fhir.kemkes.go.id untuk SSN yang sebenarnya valid
+
+
+---- [15-05-2026 - Wiliam] ---
+1. Modifikasi PrescriptionSalesDetail.aspx.cs 
+   Ketika disave error, karena belum ada kondisi untuk pengecekkan apakah SEPNo kosong atau tidak.
+2. Pada POS nilai Total ditambahkan .toFixed(2), karena ada case nilai belakang komanya sangat panjang :
+   $('#spanTotal').html((sum + addVal).toFixed(2));
+3. Modifikasi SetEntityValue() di PurchaseOrderReturnDetail.aspx.cs. Penambahan 1 baris statement :
+   entity.IsAssets = refs.IsAssets;
+
+
+--- [18-05-2026 - Wiliam] ---
+1. Modifikasi pada file-file berikut, karena di RSI tidak ingin pada Assesment, ComboBox ICD X (ICD 10) ada info DTD :
+    EpisodeDiagnoseItemCtl.ascx
+	EpisodeDiagnoseCtl.ascx
+	RegInMedDiagnoseCtl.ascx
+	MdsDiagnoseCtl.ascx
+	MdsDiagnoseEMPatientCtl.ascx
+	MdsDiagnoseOutPatientCtl.ascx
+
+2. Modifikasi ComboBoxDataService.asmx.cs method DiagnosePerSmf(). menambahkan kondisi :
+   if (AppSession.Parameter.HealthcareID == "RSI")
+    {
+        qr.Select
+            (
+                string.Format("<CASE WHEN  CHARINDEX('{0}', d.DiagnoseName) = 0 THEN 1000 ELSE CHARINDEX('{0}', d.DiagnoseName) END  SearchIdx>", context.Text),
+                qr.DiagnoseID.As("ValueField"),
+                qr.DiagnoseID.As("TextField"),
+                qr.DiagnoseName,
+                @"<'' AS DtdNo>",
+                @"<'' AS DtdName>",
+                qr.IsDisease,
+                qr.IsChronicDisease,
+                qr.Synonym
+            );
+    }
+
+
+---- [18-05-2026 - Danang] ---
+1. CR Odoo Perubahan JSON untuk bridging SatuSehat RIS
+
+--- [20-05-2026 - Wiliam] ---
+1. Perbaikan bug usia Pasien pada Temiang.Avicenna.ReportLibrary\RLib_Slip\PatientManagement\PatientHealthRecord\General\GeneralExam.cs
+2. Validasi ketika edit Purchase Order agar ItemID tidak diisi double. Modifikasi pada file PurchaseOrderItemDetail.ascx.cs 
+
+--- [21-05-2026 - Wiliam] ---
+1. Modifikasi pada method MedicalDischargeSummaryInPatient() di Temiang.Avicenna.ReportDataSource\RSMM\Emr\PatientFormAndLetter.asmx.cs
+   type case SignatureImage : ([]byte)
+
+--- [22-05-2026 - Fahri] ---
+1. menampilkan data Allergies Satu Sehat ketika sudah input, odoo : http://103.56.148.57:8069/odoo/action-535/7426
+
+--- [25-05-2026 - Wiliam] ---
+1. modifikasi pada EmrDetail.aspx.cs dan EmrIpDetail.aspx.cs untuk membungkus sep.LoadByPrimaryKey(NoSEP) dengan try catch, 
+   in case double SEP / not found SEP.

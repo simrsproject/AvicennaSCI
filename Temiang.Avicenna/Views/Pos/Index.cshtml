@@ -640,7 +640,7 @@
                 @:addVal += calcFN('@addCharges.ItemID', '@addCharges.ItemName', '@addCharges.NumericValue', '@addCharges.CustomField', sum, sum + addVal);
             }
 
-            $('#spanTotal').html(sum + addVal);
+            $('#spanTotal').html((sum + addVal).toFixed(2));
             $('.number').formatNumber({
                 cents: '.',
                 decimal: ','
