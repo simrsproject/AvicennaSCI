@@ -239,3 +239,6 @@ Titipan Daniel
 --- [25-05-2026 - Wiliam] ---
 1. modifikasi pada EmrDetail.aspx.cs dan EmrIpDetail.aspx.cs untuk membungkus sep.LoadByPrimaryKey(NoSEP) dengan try catch, 
    in case double SEP / not found SEP.
+
+--- [29-05-2026 - Wiliam] ---
+1. Modifikasi Master Operational Time agar Operational Time ID menggunakan AutoNumber. (khusus RSI)
