@@ -807,6 +807,15 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
         protected global::Telerik.Web.UI.RadTextBox txtPostDiagnosisNotes;
 
         /// <summary>
+        /// divOperatingNotesToolbar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divOperatingNotesToolbar;
+
+        /// <summary>
         /// txtOperatingNotes control.
         /// </summary>
         /// <remarks>
@@ -814,6 +823,15 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtOperatingNotes;
+
+        /// <summary>
+        /// divPostSurgeryInstructionToolbar control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divPostSurgeryInstructionToolbar;
 
         /// <summary>
         /// txtPostSurgeryInstructions control.

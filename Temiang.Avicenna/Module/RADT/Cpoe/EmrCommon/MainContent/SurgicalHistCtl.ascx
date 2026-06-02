@@ -79,6 +79,18 @@
                                     <telerik:GridTemplateColumn UniqueName="colMenu" HeaderText="" HeaderStyle-Width="30px">
                                         <ItemStyle VerticalAlign="Top"></ItemStyle>
                                         <ItemTemplate>
+                                            <%# string.Format(
+                                                "<a href=\"#\" onclick=\"javascript:entryEpisodeProcedure('view&source=procedureentryview', '{0}', '{1}', '{2}'); return false;\"><img src=\"{3}/Images/Toolbar/views16.png\" /></a>",
+                                                DataBinder.Eval(Container.DataItem, "RegistrationNo"),
+                                                DataBinder.Eval(Container.DataItem, "SequenceNo"),
+                                                DataBinder.Eval(Container.DataItem, "BookingNo"),
+                                                Helper.UrlRoot()
+                                            ) %>
+                                        </ItemTemplate>
+                                    </telerik:GridTemplateColumn>
+                                    <telerik:GridTemplateColumn UniqueName="colMenu" HeaderText="" HeaderStyle-Width="30px">
+                                        <ItemStyle VerticalAlign="Top"></ItemStyle>
+                                        <ItemTemplate>
                                             <%# IsUserEditAble.Equals(false) || DataBinder.Eval(Container.DataItem, "IsEditable").Equals(false)? string.Format("<img src=\"{0}/Images/Toolbar/edit16_d.png\" />",Helper.UrlRoot()) : 
                                                     string.Format("<a href=\"#\" onclick=\"javascript:entryEpisodeProcedure('edit', '{0}', '{1}','{2}'); return false;\"><img src=\"{3}/Images/Toolbar/edit16.png\"  /></a>",DataBinder.Eval(Container.DataItem, "RegistrationNo"),DataBinder.Eval(Container.DataItem, "SequenceNo"),DataBinder.Eval(Container.DataItem, "BookingNo"), Helper.UrlRoot())%>
                                         </ItemTemplate>

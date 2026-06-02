@@ -242,3 +242,6 @@ Titipan Daniel
 
 --- [29-05-2026 - Wiliam] ---
 1. Modifikasi Master Operational Time agar Operational Time ID menggunakan AutoNumber. (khusus RSI)
+
+--- [02-06-2026 - Wiliam] ---
+1. Menambahkan tombol view pada Procedure & Operating Notes (EMR --> Surgical History).
