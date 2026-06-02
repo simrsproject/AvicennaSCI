@@ -60,6 +60,7 @@ namespace Temiang.Avicenna.WebService
     {
         public string CounterID { get; set; }
         public string CounterName { get; set; }
+        public string Name {  get; set; }
     }
 
     [WebService(Namespace = "http://tempuri.org/")]
@@ -77,7 +78,8 @@ namespace Temiang.Avicenna.WebService
                 data.Add(new CounterItem
                 {
                     CounterID = i.ToString(),
-                    CounterName = "Counter_" + i
+                    CounterName = "Counter_" + i,
+                    Name = "Loket Pendaftaran " + i
                 });
             }
 
@@ -3197,6 +3199,121 @@ namespace Temiang.Avicenna.WebService
                         ProgramID = programID
                     },
                     "Berhasil print struk antrian"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        //11. PRINT STRUK ANTRIAN UNTUK PETUGAS 
+        [WebMethod(Description = @"
+            Digunakan untuk mengambil daftar antrian untuk kebutuhan reprint oleh petugas.
+
+            PARAMETER:
+            - StartDate (required)
+            - EndDate (required)
+            - ServiceUnitID (optional)
+            - VisitNo (optional)
+            - RegistrationNo (optional)
+            - Status (optional)
+
+            RESPONSE:
+            200 = Data antrian untuk print berhasil diambil
+            400 = Parameter tidak valid
+            500 = Server error
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetQueueReprintForPetugas()
+        {
+            try
+            {
+                string startDateString =
+                    (Context.Request["StartDate"] ?? "")
+                    .Trim();
+
+                string endDateString =
+                    (Context.Request["EndDate"] ?? "")
+                    .Trim();
+
+                string serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                string visitNo =
+                    (Context.Request["VisitNo"] ?? "")
+                    .Trim();
+
+                string registrationNo =
+                    (Context.Request["RegistrationNo"] ?? "")
+                    .Trim();
+
+                string status =
+                    (Context.Request["Status"] ?? "")
+                    .Trim();
+
+                if (string.IsNullOrEmpty(startDateString))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "StartDate wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(endDateString))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "EndDate wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                DateTime startDate;
+                DateTime endDate;
+
+                if (!DateTime.TryParse(startDateString, out startDate))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Format StartDate tidak valid",
+                        400
+                    );
+                    return;
+                }
+
+                if (!DateTime.TryParse(endDateString, out endDate))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Format EndDate tidak valid",
+                        400
+                    );
+                    return;
+                }
+
+                var result =
+                    VisitQueue.GetQueueReprintForPetugas(
+                        startDate,
+                        endDate,
+                        string.IsNullOrWhiteSpace(serviceUnitID) ? null : serviceUnitID,
+                        string.IsNullOrWhiteSpace(visitNo) ? null : visitNo,
+                        string.IsNullOrWhiteSpace(registrationNo) ? null : registrationNo,
+                        string.IsNullOrWhiteSpace(status) ? null : status
+                    );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Data antrian untuk print berhasil diambil"
                 );
             }
             catch (Exception ex)

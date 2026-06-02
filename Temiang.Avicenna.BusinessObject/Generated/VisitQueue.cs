@@ -2952,6 +2952,101 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        public static List<object> GetQueueReprintForPetugas(
+            DateTime startDate,
+            DateTime endDate,
+            string serviceUnitID = null,
+            string visitNo = null,
+            string registrationNo = null,
+            string status = null
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "StartDate",
+                startDate,
+                esParameterDirection.Input,
+                DbType.DateTime,
+                0
+            );
+
+            parameters.Add(
+                "EndDate",
+                endDate,
+                esParameterDirection.Input,
+                DbType.DateTime,
+                0
+            );
+
+            parameters.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "VisitNo",
+                visitNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "RegistrationNo",
+                registrationNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "Status",
+                status,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            var result = new List<object>();
+
+            using (var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "GetQueueReprintForPetugas",
+                parameters
+            ))
+            {
+                if (reader == null)
+                    return result;
+
+                while (reader.Read())
+                {
+                    result.Add(new
+                    {
+                        VisitQueueNo = reader["VisitQueueNo"]?.ToString(),
+                        VisitNo = reader["VisitNo"]?.ToString(),
+                        RegistrationNo = reader["RegistrationNo"]?.ToString(),
+                        QueueDate = reader["QueueDate"],
+                        QueueSequence = reader["QueueSequence"],
+                        Status = reader["Status"]?.ToString(),
+                        ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
+                        CalledByCounterID = reader["CalledByCounterID"]?.ToString(),
+                        CreatedDate = reader["CreatedDate"],
+                        CurrentStage = reader["CurrentStage"]?.ToString(),
+                        QueueLocation = reader["QueueLocation"]?.ToString(),
+                        ParamedicID = reader["ParamedicID"]?.ToString()
+                    });
+                }
+            }
+
+            return result;
+        }
+
     }
 
     [Serializable]
