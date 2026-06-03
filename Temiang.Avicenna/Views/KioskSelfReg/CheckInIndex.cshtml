@@ -96,3 +96,19 @@
         });
     }
 </script>
+
+<script>
+    $(document).ready(function () {
+
+        setTimeout(function () {
+            $("#txtNomor").focus();
+        }, 100);
+
+        $("#txtNomor").on("blur", function () {
+            setTimeout(function () {
+                $("#txtNomor").focus();
+            }, 10);
+        });
+
+    });
+</script>
