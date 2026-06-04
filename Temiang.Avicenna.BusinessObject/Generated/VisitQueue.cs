@@ -1732,6 +1732,97 @@ namespace Temiang.Avicenna.BusinessObject
             };
         }
 
+        public static object SetCanceledPendaftaran(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (
+                var reader = entity.ExecuteReader(
+                    esQueryType.StoredProcedure,
+                    "AntrianSetCanceled",
+                    parameters
+                )
+            )
+            {
+                if (reader == null || !reader.Read())
+                    return null;
+
+                return new
+                {
+                    VisitQueueNo =
+                        reader["VisitQueueNo"]?.ToString(),
+
+                    VisitNo =
+                        reader["VisitNo"]?.ToString(),
+
+                    Status =
+                        reader["Status"]?.ToString(),
+
+                    StageID =
+                        reader["StageID"]?.ToString(),
+
+                    CurrentStage =
+                        reader["CurrentStage"] == DBNull.Value
+                            ? ""
+                            : reader["CurrentStage"].ToString(),
+
+                    CategoryID =
+                        reader["CategoryID"] == DBNull.Value
+                            ? ""
+                            : reader["CategoryID"].ToString(),
+
+                    ServiceUnitID =
+                        reader["ServiceUnitID"] == DBNull.Value
+                            ? ""
+                            : reader["ServiceUnitID"].ToString(),
+
+                    ParamedicID =
+                        reader["ParamedicID"] == DBNull.Value
+                            ? ""
+                            : reader["ParamedicID"].ToString(),
+
+                    QueueSequence =
+                        reader["QueueSequence"] == DBNull.Value
+                            ? null
+                            : reader["QueueSequence"],
+
+                    CalledTime =
+                        reader["CalledTime"] == DBNull.Value
+                            ? null
+                            : reader["CalledTime"],
+
+                    LastUpdated =
+                        reader["LastUpdated"] == DBNull.Value
+                            ? null
+                            : reader["LastUpdated"],
+
+                    UpdatedBy =
+                        reader["UpdatedBy"]?.ToString()
+                };
+            }
+        }
+
         public static object InsertVisitQueueStage
         (
             string visitNo,
@@ -2636,6 +2727,87 @@ namespace Temiang.Avicenna.BusinessObject
             return result;
         }
 
+        public static object CallNextQueueAllServiceUnit(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            object result = null;
+
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (
+                var reader =
+                    entity.ExecuteReader(
+                        esQueryType.StoredProcedure,
+                        "AntrianCallNextQueueAllServiceUnit",
+                        parameters
+                    )
+            )
+            {
+                if (reader.Read())
+                {
+                    result = new
+                    {
+                        NextVisitQueueNo =
+                            reader["NextVisitQueueNo"] == DBNull.Value
+                                ? ""
+                                : reader["NextVisitQueueNo"].ToString(),
+
+                        NextVisitNo =
+                            reader["NextVisitNo"] == DBNull.Value
+                                ? ""
+                                : reader["NextVisitNo"].ToString(),
+
+                        Status =
+                            reader["Status"] == DBNull.Value
+                                ? ""
+                                : reader["Status"].ToString(),
+
+                        ParamedicID =
+                            reader["ParamedicID"] == DBNull.Value
+                                ? ""
+                                : reader["ParamedicID"].ToString(),
+
+                        ServiceUnitID =
+                            reader["ServiceUnitID"] == DBNull.Value
+                                ? ""
+                                : reader["ServiceUnitID"].ToString(),
+
+                        CurrentStage =
+                            reader["CurrentStage"] == DBNull.Value
+                                ? ""
+                                : reader["CurrentStage"].ToString(),
+
+                        StageID =
+                            reader["StageID"] == DBNull.Value
+                                ? ""
+                                : reader["StageID"].ToString()
+                    };
+                }
+            }
+
+            return result;
+        }
+
         public static object RecallAntrianAllServiceUnit(
             string visitQueueNo,
             string userID
@@ -2795,6 +2967,97 @@ namespace Temiang.Avicenna.BusinessObject
                     CalledTime = reader["CalledTime"] == DBNull.Value ? null : reader["CalledTime"],
                     LastUpdated = reader["LastUpdated"] == DBNull.Value ? null : reader["LastUpdated"],
                     UpdatedBy = reader["UpdatedBy"]?.ToString()
+                };
+            }
+        }
+
+        public static object SetCanceledAllServiceUnit(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (
+                var reader = entity.ExecuteReader(
+                    esQueryType.StoredProcedure,
+                    "AntrianSetCanceledAllServiceUnit",
+                    parameters
+                )
+            )
+            {
+                if (reader == null || !reader.Read())
+                    return null;
+
+                return new
+                {
+                    VisitQueueNo =
+                        reader["VisitQueueNo"]?.ToString(),
+
+                    VisitNo =
+                        reader["VisitNo"]?.ToString(),
+
+                    Status =
+                        reader["Status"]?.ToString(),
+
+                    StageID =
+                        reader["StageID"]?.ToString(),
+
+                    CurrentStage =
+                        reader["CurrentStage"] == DBNull.Value
+                            ? ""
+                            : reader["CurrentStage"].ToString(),
+
+                    CategoryID =
+                        reader["CategoryID"] == DBNull.Value
+                            ? ""
+                            : reader["CategoryID"].ToString(),
+
+                    ServiceUnitID =
+                        reader["ServiceUnitID"] == DBNull.Value
+                            ? ""
+                            : reader["ServiceUnitID"].ToString(),
+
+                    ParamedicID =
+                        reader["ParamedicID"] == DBNull.Value
+                            ? ""
+                            : reader["ParamedicID"].ToString(),
+
+                    QueueSequence =
+                        reader["QueueSequence"] == DBNull.Value
+                            ? null
+                            : reader["QueueSequence"],
+
+                    CalledTime =
+                        reader["CalledTime"] == DBNull.Value
+                            ? null
+                            : reader["CalledTime"],
+
+                    LastUpdated =
+                        reader["LastUpdated"] == DBNull.Value
+                            ? null
+                            : reader["LastUpdated"],
+
+                    UpdatedBy =
+                        reader["UpdatedBy"]?.ToString()
                 };
             }
         }

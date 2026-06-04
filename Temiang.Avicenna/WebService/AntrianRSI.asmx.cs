@@ -1187,6 +1187,125 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
+            Digunakan untuk membatalkan antrian pendaftaran.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            CONTOH:
+            CancelAntrian?
+            VisitQueueNo=VQUE-260421-0010&
+            UserID=admin
+
+            RESPONSE:
+               200 = Berhasil membatalkan antrian
+               400 = Parameter tidak valid
+               404 = Data tidak ditemukan
+               500 = Server error
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void CancelAntrianPendaftaran()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.SetCanceledPendaftaran(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // RESULT CHECK
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil membatalkan antrian"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
             Digunakan untuk memunculkan suara berdasarkan VisitQueueNo.
 
             PARAMETER:
@@ -2261,6 +2380,126 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
+            Digunakan untuk menyelesaikan antrian yang sedang CALLED
+            dan otomatis memanggil antrian berikutnya pada Service Unit yang sama.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            CallNextQueueAllServiceUnit?
+            VisitQueueNo=VQUE-260520-0020&
+            UserID=240076
+
+            RESPONSE:
+               200 = Berhasil memanggil antrian berikutnya
+               400 = Parameter tidak valid
+               404 = Data antrian tidak ditemukan
+               500 = Error server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void CallNextQueueAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXEC BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.CallNextQueueAllServiceUnit(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // NOT FOUND
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memanggil antrian berikutnya"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
             Digunakan untuk mengubah status antrian menjadi PENDING pada seluruh Service Unit.
 
             PARAMETER:
@@ -2471,6 +2710,125 @@ namespace Temiang.Avicenna.WebService
                     Context,
                     result,
                     "Berhasil mengembalikan antrian ke WAITING"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk membatalkan antrian pada seluruh Service Unit.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            CONTOH:
+            CancelAntrianAllServiceUnit?
+            VisitQueueNo=VQUE-260516-0013&
+            UserID=admin
+
+            RESPONSE:
+               200 = Berhasil membatalkan antrian
+               400 = Parameter tidak valid
+               404 = Data tidak ditemukan
+               500 = Server error
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void CancelAntrianAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.SetCanceledAllServiceUnit(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // RESULT CHECK
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil membatalkan antrian"
                 );
             }
             catch (Exception ex)
@@ -3314,6 +3672,79 @@ namespace Temiang.Avicenna.WebService
                     Context,
                     result,
                     "Data antrian untuk print berhasil diambil"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        //12.Master Queue Stage
+        [WebMethod(Description = @"
+            Mengambil data master Queue Stage.
+
+            PARAMETER (Optional):
+            - StageID
+            - ServiceGroup
+            - IsActive
+
+            EXAMPLE:
+            GetQueueStage
+
+            GetQueueStage?ServiceGroup=LAB
+
+            GetQueueStage?StageID=POLI
+
+            GetQueueStage?IsActive=1
+
+            GetQueueStage?ServiceGroup=USG&IsActive=1
+            
+            RESPONSE:
+            200 = Berhasil mengambil data Queue Stage
+            500 = Server error
+            
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetQueueStage()
+        {
+            try
+            {
+                string StageID =
+                    (Context.Request["StageID"] ?? "")
+                    .Trim();
+
+                string ServiceGroup =
+                    (Context.Request["ServiceGroup"] ?? "")
+                    .Trim();
+
+                string IsActive =
+                    (Context.Request["IsActive"] ?? "")
+                    .Trim();
+
+                var result =
+                    QueueStage.GetQueueStage(
+                        string.IsNullOrEmpty(StageID)
+                            ? null
+                            : StageID,
+
+                        string.IsNullOrEmpty(ServiceGroup)
+                            ? null
+                            : ServiceGroup,
+
+                        string.IsNullOrEmpty(IsActive)
+                            ? null
+                            : IsActive
+                    );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil mengambil data Queue Stage"
                 );
             }
             catch (Exception ex)
