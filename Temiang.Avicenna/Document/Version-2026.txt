@@ -245,3 +245,7 @@ Titipan Daniel
 
 --- [02-06-2026 - Wiliam] ---
 1. Menambahkan tombol view pada Procedure & Operating Notes (EMR --> Surgical History).
+
+--- [04-06-2026 - Wiliam] ---
+1. Modifikasi pada webservice Assessment.asmx.cs - method GeneralInitialInPatient(). 
+   menambahkan field response SignImageByte agar ResumeMedisOutpatient.trdx muncul tanda tangan.
