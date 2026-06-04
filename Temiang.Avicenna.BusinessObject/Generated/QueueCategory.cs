@@ -383,6 +383,7 @@ namespace Temiang.Avicenna.BusinessObject
             public System.String IsActive
             {
                 get
+
                 {
                     System.Boolean? data = entity.IsActive;
                     return (data == null) ? String.Empty : Convert.ToString(data);

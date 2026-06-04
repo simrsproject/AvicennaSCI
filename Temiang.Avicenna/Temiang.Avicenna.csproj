@@ -1864,6 +1864,8 @@
     <Content Include="Document\2026\05\13\AntrianRSI\038-Query INESRT into AppProgram Print Struk Antrian.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\039-Query INESRT into AppUserGroupProgram Print Struk Antrian.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\040-Query CREATE TABEL VisistQueueBarcode.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\041-SP AntrianSetCanceledForPendaftaran.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\042-SP AntrianSetCanceledForAllServiceUnit.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />

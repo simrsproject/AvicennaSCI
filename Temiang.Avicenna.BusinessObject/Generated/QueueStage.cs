@@ -466,6 +466,101 @@ namespace Temiang.Avicenna.BusinessObject
 
     public partial class QueueStage : esQueueStage
     {
+        public static List<object> GetQueueStage(
+     string stageID,
+     string serviceGroup,
+     string isActive
+ )
+        {
+            var result = new List<object>();
+
+            var entity = new QueueStage();
+
+            var parameters = new esParameters();
+
+            string sql = @"
+                SELECT
+                    StageID,
+                    StageName,
+                    ServiceGroup,
+                    StepOrder,
+                    IsQueue,
+                    IsActive
+                FROM QueueStage
+                WHERE 1 = 1
+            ";
+
+                    if (!string.IsNullOrEmpty(stageID))
+                    {
+                        sql += " AND StageID = @StageID";
+
+                        parameters.Add(
+                            "StageID",
+                            stageID,
+                            esParameterDirection.Input,
+                            DbType.String,
+                            50
+                        );
+                    }
+
+                    if (!string.IsNullOrEmpty(serviceGroup))
+                    {
+                        sql += " AND ServiceGroup = @ServiceGroup";
+
+                        parameters.Add(
+                            "ServiceGroup",
+                            serviceGroup,
+                            esParameterDirection.Input,
+                            DbType.String,
+                            50
+                        );
+                    }
+
+                    if (!string.IsNullOrEmpty(isActive))
+                    {
+                        sql += " AND CAST(IsActive AS VARCHAR(1)) = @IsActive";
+
+                        parameters.Add(
+                            "IsActive",
+                            isActive,
+                            esParameterDirection.Input,
+                            DbType.String,
+                            5
+                        );
+                    }
+
+                    sql += @"
+                ORDER BY
+                    ServiceGroup,
+                    StepOrder,
+                    StageName
+            ";
+
+            using (
+                var reader =
+                    entity.ExecuteReader(
+                        esQueryType.Text,
+                        sql,
+                        parameters
+                    )
+            )
+            {
+                while (reader.Read())
+                {
+                    result.Add(new
+                    {
+                        StageID = reader["StageID"].ToString(),
+                        StageName = reader["StageName"].ToString(),
+                        ServiceGroup = reader["ServiceGroup"].ToString(),
+                        StepOrder = Convert.ToInt32(reader["StepOrder"]),
+                        IsQueue = Convert.ToBoolean(reader["IsQueue"]),
+                        IsActive = Convert.ToBoolean(reader["IsActive"])
+                    });
+                }
+            }
+
+            return result;
+        }
     }
 
     [Serializable]

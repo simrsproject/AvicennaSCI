@@ -1,4 +1,4 @@
-﻿CREATE OR ALTER PROCEDURE AntrianSetWaitingFromPendingAllServiceUnit
+﻿CREATE OR ALTER PROCEDURE AntrianSetCanceledAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
     @UserID       VARCHAR(50)
@@ -11,12 +11,10 @@ BEGIN
         @CurrentStatus VARCHAR(50),
         @QueueDate     DATE,
         @StageID       VARCHAR(50),
-		@CurrentStage  VARCHAR(50),
+        @CurrentStage  VARCHAR(50),
         @ServiceUnitID VARCHAR(50),
         @ParamedicID   VARCHAR(50),
-        @MaxSeq        INT,
-        @NewSeq        INT,
-		@CategoryID    VARCHAR(50);
+        @CategoryID    VARCHAR(50);
 
     BEGIN TRAN;
 
@@ -28,13 +26,14 @@ BEGIN
         SELECT
             @CurrentStatus = vq.Status,
             @QueueDate     = CAST(vq.QueueDate AS DATE),
+            @StageID       = vq.StageID,
             @CurrentStage  = vq.CurrentStage,
-			@StageID       = vq.StageID,
             @ServiceUnitID = vq.ServiceUnitID,
             @ParamedicID   = vq.ParamedicID,
-			@CategoryID    = vq.CategoryID
+            @CategoryID    = vq.CategoryID
         FROM VisitQueue vq WITH (UPDLOCK, HOLDLOCK)
-        WHERE vq.VisitQueueNo = @VisitQueueNo;
+        WHERE
+            vq.VisitQueueNo = @VisitQueueNo;
 
         -- =========================================
         -- VALIDASI DATA
@@ -49,49 +48,34 @@ BEGIN
         -- =========================================
         -- VALIDASI STATUS
         -- =========================================
-        IF @CurrentStatus <> 'PENDING'
+        IF @CurrentStatus NOT IN ('WAITING','PENDING')
         BEGIN
             THROW 50002,
-            'Hanya antrian PENDING yang bisa dikembalikan ke WAITING',
+            'Hanya antrian WAITING atau PENDING yang bisa di-CANCELED',
             1;
         END
 
         -- =========================================
-        -- 2. AMBIL MAX SEQUENCE PER GROUP
-        -- =========================================
-        SELECT
-            @MaxSeq = MAX(QueueSequence)
-        FROM VisitQueue WITH (UPDLOCK, HOLDLOCK)
-        WHERE
-            CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @StageID
-            AND ServiceUnitID = @ServiceUnitID
-            AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
-			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '')
-            AND Status = 'WAITING';
-
-        SET @NewSeq = ISNULL(@MaxSeq, 0) + 10;
-
-        -- =========================================
-        -- 3. UPDATE → WAITING
+        -- UPDATE → CANCELED
         -- =========================================
         UPDATE VisitQueue
         SET
-            Status           = 'WAITING',
-            QueueSequence    = @NewSeq,
+            Status           = 'CANCELED',
+            QueueSequence    = NULL,
             IsManualOverride = 1,
             UpdatedBy        = @UserID,
             LastUpdated      = GETDATE()
         WHERE
             VisitQueueNo = @VisitQueueNo
             AND CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @StageID
+            AND CurrentStage = @CurrentStage
+            AND StageID = @StageID
             AND ServiceUnitID = @ServiceUnitID
-            AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
-			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '');
+            AND ISNULL(ParamedicID,'') = ISNULL(@ParamedicID,'')
+            AND ISNULL(CategoryID,'') = ISNULL(@CategoryID,'');
 
         -- =========================================
-        -- 4. RETURN RESULT
+        -- RETURN DATA
         -- =========================================
         SELECT
             VisitQueueNo,
@@ -99,12 +83,11 @@ BEGIN
             Status,
             StageID,
             CurrentStage,
-			CategoryID,
-            QueueSequence,
+            CategoryID,
             ServiceUnitID,
             ParamedicID,
-			CalledTime,
-            IsManualOverride,
+            QueueSequence,
+            CalledTime,
             LastUpdated,
             UpdatedBy
         FROM VisitQueue
@@ -123,3 +106,4 @@ BEGIN
     END CATCH
 END
 GO
+
