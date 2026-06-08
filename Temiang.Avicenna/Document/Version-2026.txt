@@ -249,3 +249,6 @@ Titipan Daniel
 --- [04-06-2026 - Wiliam] ---
 1. Modifikasi pada webservice Assessment.asmx.cs - method GeneralInitialInPatient(). 
    menambahkan field response SignImageByte agar ResumeMedisOutpatient.trdx muncul tanda tangan.
+
+--- [08-06-2026 - Danang] ---
+1. CR Odoo Feature Topup IDRG 

@@ -308,7 +308,6 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
             txtIDRGDRGCode.Text = string.Empty;
             txtCostWeight.Text = string.Empty;
             txtNBR.Text = string.Empty;
-            rowCostWeight.Visible = false;
             rowNBR.Visible = false;
             txtIDRGStatus.Text = string.Empty;
 
@@ -1239,7 +1238,6 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
             txtIDRGDRGCode.Text = string.Empty;
             txtCostWeight.Text = string.Empty;
             txtNBR.Text = string.Empty;
-            rowCostWeight.Visible = false;
             rowNBR.Visible = false;
             txtIDRGStatus.Text = string.Empty;
 
@@ -2721,17 +2719,29 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                         txtIDRGDRG.Text = drgDesc;
                         txtIDRGDRGCode.Text = drgCode;
 
-                        txtCostWeight.Text = grouper.ResponseIdrg.total_cost_weight;
-                        txtNBR.Text = Convert.ToInt64(grouper.ResponseIdrg.nbr)
-                                          .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                        //txtCostWeight.Text = grouper.ResponseIdrg.total_cost_weight;
+                        //txtNBR.Text = Convert.ToInt64(grouper.ResponseIdrg.nbr)
+                        //                  .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
-                        bool hasCostWeight = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.total_cost_weight);
-                        bool hasNBR = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.nbr);
+                        //bool hasCostWeight = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.total_cost_weight);
+                        //bool hasNBR = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.nbr);
 
-                        rowCostWeight.Visible = hasCostWeight;
+                        //rowNBR.Visible = hasNBR;
+
+                        //rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
+
+                        BindIdrgTopupOptionsFromGetDetail(grouper.ResponseIdrg);
+                        BindIdrgFinancialFromGetDetail(grouper.ResponseIdrg);
+
+                        bool hasCostWeight =
+                            !string.IsNullOrWhiteSpace(
+                                grouper.ResponseIdrg.cost_weight.ToString("0.00"));
+
+                        bool hasNBR =
+                            !string.IsNullOrWhiteSpace(
+                                grouper.ResponseIdrg.nbr);
+
                         rowNBR.Visible = hasNBR;
-
-                        rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
 
                         txtIDRGStatus.Text = string.IsNullOrWhiteSpace(s) ? "" : char.ToUpper(s[0]) + (s.Length > 1 ? s.Substring(1).ToLower() : "");
 
@@ -2855,17 +2865,29 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                         txtIDRGDRG.Text = drgDesc;
                         txtIDRGDRGCode.Text = drgCode;
 
-                        txtCostWeight.Text = grouper.ResponseIdrg.total_cost_weight;
-                        txtNBR.Text = Convert.ToInt64(grouper.ResponseIdrg.nbr)
-                                          .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                        //txtCostWeight.Text = grouper.ResponseIdrg.total_cost_weight;
+                        //txtNBR.Text = Convert.ToInt64(grouper.ResponseIdrg.nbr)
+                        //                  .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
-                        bool hasCostWeight = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.total_cost_weight);
-                        bool hasNBR = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.nbr);
+                        //bool hasCostWeight = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.total_cost_weight);
+                        //bool hasNBR = !string.IsNullOrWhiteSpace(grouper.ResponseIdrg.nbr);
 
-                        rowCostWeight.Visible = hasCostWeight;
+                        //rowNBR.Visible = hasNBR;
+
+                        //rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
+
+                        BindIdrgTopupOptionsFromGetDetail(grouper.ResponseIdrg);
+                        BindIdrgFinancialFromGetDetail(grouper.ResponseIdrg);
+
+                        bool hasCostWeight =
+                            !string.IsNullOrWhiteSpace(
+                                grouper.ResponseIdrg.cost_weight.ToString("0.00"));
+
+                        bool hasNBR =
+                            !string.IsNullOrWhiteSpace(
+                                grouper.ResponseIdrg.nbr);
+
                         rowNBR.Visible = hasNBR;
-
-                        rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
 
                         txtIDRGStatus.Text = string.IsNullOrWhiteSpace(s) ? "" : char.ToUpper(s[0]) + (s.Length > 1 ? s.Substring(1).ToLower() : "");
 
@@ -3331,9 +3353,15 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                 var klaimStatus = detailBefore?.DataResponse?.Data?.KlaimStatusCd;
 
                 var reqGroup = new Common.Inacbg.v510.Gruoper.IdrgGrouper.Data { nomor_sep = txtNoSep.Text };
-                var run = (klaimStatus != null && klaimStatus.Equals("final", StringComparison.OrdinalIgnoreCase))
-                    ? svc.EditIdrgGrouper(reqGroup)
-                    : svc.IdrgGrouper(reqGroup);
+                //var run = (klaimStatus != null && klaimStatus.Equals("final", StringComparison.OrdinalIgnoreCase))
+                //    ? svc.EditIdrgGrouper(reqGroup)
+                //    : svc.IdrgGrouper(reqGroup);
+
+                var run = svc.IdrgGrouper1(new Common.Inacbg.v510.Gruoper.IdrgGrouper1.Data
+                {
+                    nomor_sep = txtNoSep.Text
+                });
+
                 if (run == null || run.Meta == null || !run.Meta.IsValid)
                 {
                     var msg = run?.Meta?.Message ?? "Gagal menjalankan (Group/Edit) iDRG.";
@@ -3369,14 +3397,21 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                     string kelas = kr == "1" ? "Kelas 1" : kr == "2" ? "Kelas 2" : kr == "3" ? "Kelas 3" : string.Empty;
                     string jenisKelasText = jenis + (jenis == "IGD" ? "" : (string.IsNullOrEmpty(kelas) ? "" : " " + kelas)) + (jenis == "Rawat Inap" && los > 0 ? $" ({los} Hari)" : "");
                     txtIDRGJenisRawat.Text = jenisKelasText.Trim();
-                    txtCostWeight.Text = g.ResponseIdrg.total_cost_weight;
-                    txtNBR.Text = Convert.ToInt64(g.ResponseIdrg.nbr)
-                                      .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+                    txtCostWeight.Text = g.ResponseIdrg.cost_weight.ToString("0.00");
+                    txtNBR.Text = Convert.ToInt64(g.ResponseIdrg.nbr).ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
-                    bool hasCostWeight = !string.IsNullOrWhiteSpace(g.ResponseIdrg.total_cost_weight);
+                    decimal drgCostWeight = ToDecimal(g.ResponseIdrg.cost_weight);
+
+                    decimal nbr = ToDecimal(g.ResponseIdrg.nbr);
+
+                    BindIdrgFinancial(drgCostWeight, 0M, nbr);
+                    BindIdrgFinancialFromGetDetail(g.ResponseIdrg);
+
+                    ResetIdrgTopupUi();
+
+                    bool hasCostWeight = !string.IsNullOrWhiteSpace(g.ResponseIdrg.cost_weight.ToString("0.00"));
                     bool hasNBR = !string.IsNullOrWhiteSpace(g.ResponseIdrg.nbr);
 
-                    rowCostWeight.Visible = hasCostWeight;
                     rowNBR.Visible = hasNBR;
                     rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
                     txtIDRGStatus.Text = g?.ResponseIdrg.status_cd ?? string.Empty;
@@ -3394,6 +3429,38 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                     bool isUngroup = HasUngroupFlag(mdcDesc) || HasUngroupFlag(drgDesc);
 
                     hfIdrgIsUngroup.Value = isUngroup ? "1" : "0";
+
+                    bool hasTopupOption =
+                       run.ResponseIdrg != null &&
+                       run.ResponseIdrg.Topup_options != null &&
+                       run.ResponseIdrg.Topup_options.Any();
+
+                    if (hasTopupOption)
+                    {
+                        foreach (var item in run.ResponseIdrg.Topup_options)
+                        {
+                            var cboItem =
+                                new RadComboBoxItem(
+                                    item.Description,
+                                    item.Code);
+
+                            cboItem.Attributes["CostWeight"] =
+                                Convert.ToString(
+                                    item.CostWeight,
+                                    CultureInfo.InvariantCulture);
+
+                            cboIdrgTopup.Items.Add(cboItem);
+                        }
+
+                        rowIdrgTopup.Visible = true;
+
+                        ResetIdrgTopupSelection();
+                    }
+                    else
+                    {
+                        rowIdrgTopup.Visible = false;
+                        ResetIdrgTopupSelection();
+                    }
 
                     SetErrorColor(txtIDRGMDC, isUngroup);
                     SetErrorColor(txtIDRGMDCCode, isUngroup);
@@ -3422,6 +3489,282 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                      $"alert('Terjadi kesalahan saat (Group/Edit) iDRG: {ex.Message.Replace("'", "`")}');", true);
             }
         }
+
+        protected void cboIdrgTopup_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(cboIdrgTopup.SelectedValue))
+            {
+                txtTopupcode.Text = string.Empty;
+                txtTopupcw.Text = string.Empty;
+
+                decimal drgCostWeight = ToDecimal(txtCostWeight.Text);
+                decimal nbr = ToDecimal(txtNBR.Text);
+
+                BindIdrgFinancial(drgCostWeight, 0M, nbr);
+
+                btnFnliDRG.Enabled = false;
+                return;
+            }
+            try
+            {
+                var svc = new Common.Inacbg.v510.Service();
+
+                var result = svc.IdrgGrouper2(new Common.Inacbg.v510.Gruoper.IdrgGrouper2.Data
+                {
+                    nomor_sep = txtNoSep.Text,
+                    topup_codes = cboIdrgTopup.SelectedValue
+                });
+
+                if (result == null || result.Meta == null || !result.Meta.IsValid)
+                {
+                    ScriptManager.RegisterStartupScript(
+                        this,
+                        GetType(),
+                        "idrg-stage2-fail",
+                        $"alert('{result?.Meta?.Message ?? "Grouping Stage 2 gagal"}');",
+                        true);
+
+                    return;
+                }
+
+                BindIdrgStage2(result);
+            }
+            catch (Exception ex)
+            {
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "idrg-stage2-ex",
+                    $"alert('{ex.Message.Replace("'", "`")}');",
+                    true);
+            }
+        }
+
+        private void BindIdrgStage2(Common.Inacbg.v510.Gruoper.IdrgGrouper2.Result result)
+        {
+            var r = result.ResponseIdrg;
+
+            if (r == null)
+                return;
+
+            decimal drgCostWeight = ToDecimal(r.CostWeight);
+            decimal topupCostWeight = 0M;
+
+            if (r.Topup != null && r.Topup.Any())
+            {
+                topupCostWeight = r.Topup.Sum(x => ToDecimal(x.CostWeight));
+
+                txtTopupcode.Text =
+                    string.Join(", ", r.Topup.Select(x => x.Code));
+            }
+            else
+            {
+                txtTopupcode.Text = string.Empty;
+            }
+
+            decimal nbr = ToDecimal(r.Nbr);
+
+            BindIdrgFinancial(drgCostWeight, topupCostWeight, nbr);
+
+            txtIDRGStatus.Text = r.StatusCd ?? string.Empty;
+
+            bool isUngroup = hfIdrgIsUngroup.Value == "1";
+            btnFnliDRG.Enabled = !isUngroup;
+        }
+
+        private decimal ToDecimal(object value)
+        {
+            if (value == null)
+                return 0M;
+
+            if (value is decimal)
+                return (decimal)value;
+
+            if (value is int)
+                return Convert.ToDecimal(value);
+
+            if (value is long)
+                return Convert.ToDecimal(value);
+
+            if (value is double)
+                return Convert.ToDecimal(value);
+
+            var text = Convert.ToString(value);
+
+            if (string.IsNullOrWhiteSpace(text))
+                return 0M;
+
+            decimal result;
+
+            if (decimal.TryParse(
+                text,
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out result))
+            {
+                return result;
+            }
+
+            if (decimal.TryParse(
+                text,
+                NumberStyles.Any,
+                new CultureInfo("id-ID"),
+                out result))
+            {
+                return result;
+            }
+
+            return 0M;
+        }
+
+        private void BindIdrgFinancial(decimal drgCostWeight, decimal topupCostWeight, decimal nbr)
+        {
+            decimal totalCostWeight = drgCostWeight + topupCostWeight;
+
+            txtCostWeight.Text =
+                drgCostWeight.ToString("0.00", CultureInfo.InvariantCulture);
+
+            txtTopupcw.Text =
+                topupCostWeight > 0
+                    ? topupCostWeight.ToString("0.00", CultureInfo.InvariantCulture)
+                    : string.Empty;
+
+            txtTotalcw.Text =
+                totalCostWeight.ToString("0.00", CultureInfo.InvariantCulture);
+
+            txtNBR.Text =
+                nbr.ToString("N0", new CultureInfo("id-ID"));
+
+            decimal totalKlaim =
+                Math.Round(
+                    nbr * totalCostWeight,
+                    0,
+                    MidpointRounding.AwayFromZero);
+
+            txtTotalKlaimIdrg.Value = Convert.ToDouble(totalKlaim);
+
+            rowNBR.Visible = true;
+            rowNoteBelumFinal.Visible = true;
+        }
+
+        private void ResetIdrgTopupUi()
+        {
+            cboIdrgTopup.Items.Clear();
+            cboIdrgTopup.Items.Add(new RadComboBoxItem("None", ""));
+
+            rowIdrgTopup.Visible = false;
+
+            txtTopupcode.Text = string.Empty;
+            txtTopupcw.Text = string.Empty;
+        }
+
+        private void ResetIdrgTopupSelection()
+        {
+            cboIdrgTopup.ClearSelection();
+
+            var emptyItem = cboIdrgTopup.FindItemByValue(string.Empty);
+            if (emptyItem != null)
+            {
+                emptyItem.Selected = true;
+                cboIdrgTopup.Text = emptyItem.Text;
+            }
+            else
+            {
+                cboIdrgTopup.Text = string.Empty;
+            }
+
+            txtTopupcode.Text = string.Empty;
+            txtTopupcw.Text = string.Empty;
+        }
+
+        private void BindIdrgFinancialFromGetDetail(Common.Inacbg.v510.Claim.Get.GetDetailResponse.iDRG r)
+        {
+            if (r == null)
+                return;
+
+            decimal drgCostWeight =
+                ToDecimal(r.cost_weight);
+
+            decimal topupCostWeight = 0M;
+
+            if (r.topup != null && r.topup.Any())
+            {
+                topupCostWeight =
+                    r.topup.Sum(x => ToDecimal(x.cost_weight));
+
+                txtTopupcode.Text =
+                    string.Join(", ", r.topup.Select(x => x.Code));
+            }
+            else
+            {
+                txtTopupcode.Text = string.Empty;
+            }
+
+            decimal nbr =
+                ToDecimal(r.nbr);
+
+            BindIdrgFinancial(
+                drgCostWeight,
+                topupCostWeight,
+                nbr);
+        }
+
+        private bool BindIdrgTopupOptionsFromGetDetail(Common.Inacbg.v510.Claim.Get.GetDetailResponse.iDRG r)
+        {
+            ResetIdrgTopupUi();
+
+            if (r == null ||
+                r.topup_options == null ||
+                !r.topup_options.Any())
+            {
+                rowIdrgTopup.Visible = false;
+                return false;
+            }
+
+            foreach (var item in r.topup_options)
+            {
+                var cboItem =
+                    new RadComboBoxItem(
+                        item.Description,
+                        item.Code);
+
+                cboItem.Attributes["CostWeight"] =
+                    ToDecimal(item.cost_weight)
+                        .ToString("0.00", CultureInfo.InvariantCulture);
+
+                cboIdrgTopup.Items.Add(cboItem);
+            }
+
+            rowIdrgTopup.Visible = true;
+
+            if (r.topup != null && r.topup.Any())
+            {
+                var selectedTopup = r.topup.First();
+                var selectedCode = selectedTopup.Code;
+
+                var selectedItem =
+                    cboIdrgTopup.FindItemByValue(selectedCode);
+
+                if (selectedItem != null)
+                {
+                    cboIdrgTopup.ClearSelection();
+                    selectedItem.Selected = true;
+                    cboIdrgTopup.Text = selectedItem.Text;
+                }
+
+                txtTopupcode.Text = selectedTopup.Code;
+                txtTopupcw.Text =
+                    ToDecimal(selectedTopup.cost_weight)
+                        .ToString("0.00", CultureInfo.InvariantCulture);
+            }
+            else
+            {
+                ResetIdrgTopupSelection();
+            }
+
+            return true;
+        }
+
 
         protected void btnFnliDRG_Click(object sender, EventArgs e)
         {
@@ -3528,14 +3871,16 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                             (jenis == "Rawat Inap" && los > 0 ? $" ({los} Hari)" : "");
 
                         txtIDRGJenisRawat.Text = jenisKelasText.Trim();
-                        txtCostWeight.Text = g.ResponseIdrg.total_cost_weight;
+                        txtCostWeight.Text = g.ResponseIdrg.cost_weight.ToString("0.00");
                         txtNBR.Text = Convert.ToInt64(g.ResponseIdrg.nbr)
                                           .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
 
-                        bool hasCostWeight = !string.IsNullOrWhiteSpace(g.ResponseIdrg.total_cost_weight);
+                        BindIdrgFinancialFromGetDetail(g.ResponseIdrg);
+                        BindIdrgTopupOptionsFromGetDetail(g.ResponseIdrg);
+
+                        bool hasCostWeight = !string.IsNullOrWhiteSpace(g.ResponseIdrg.cost_weight.ToString("0.00"));
                         bool hasNBR = !string.IsNullOrWhiteSpace(g.ResponseIdrg.nbr);
 
-                        rowCostWeight.Visible = hasCostWeight;
                         rowNBR.Visible = hasNBR;
 
                         rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
@@ -3998,18 +4343,23 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                             (jenis == "Rawat Inap" && los > 0 ? $" ({los} Hari)" : "");
 
                         txtIDRGJenisRawat.Text = jenisKelasText.Trim();
-                        txtCostWeight.Text = g.ResponseIdrg.total_cost_weight;
-                        txtNBR.Text = Convert.ToInt64(g.ResponseIdrg.nbr)
-                                          .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
-                        bool hasCostWeight = !string.IsNullOrWhiteSpace(g.ResponseIdrg.total_cost_weight);
+                        //txtCostWeight.Text = g.ResponseIdrg.cost_weight.ToString("0.00");
+                        //txtNBR.Text = Convert.ToInt64(g.ResponseIdrg.nbr)
+                        //                  .ToString("N0", new System.Globalization.CultureInfo("id-ID"));
+
+                        BindIdrgFinancialFromGetDetail(g.ResponseIdrg);
+
+                        bool hasCostWeight = !string.IsNullOrWhiteSpace(g.ResponseIdrg.cost_weight.ToString("0.00"));
                         bool hasNBR = !string.IsNullOrWhiteSpace(g.ResponseIdrg.nbr);
 
-                        rowCostWeight.Visible = hasCostWeight;
                         rowNBR.Visible = hasNBR;
 
                         rowNoteBelumFinal.Visible = hasCostWeight || hasNBR;
                     }
                 }
+
+                ResetIdrgTopupUi();
+                btnFnliDRG.Enabled = false;
 
                 cboDiagnosaIdrg.Enabled = true;
                 btnInsertDiagnosaIdrg.Enabled = true;

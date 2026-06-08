@@ -341,7 +341,7 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Claim
                 public string logic_version { get; set; }
 
                 [JsonProperty("cost_weight")]
-                public string cost_weight { get; set; }
+                public decimal cost_weight { get; set; }
 
                 [JsonProperty("sub_acute_weight")]
                 public string sub_acute_weight { get; set; }
@@ -350,13 +350,36 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Claim
                 public string chronic_weight { get; set; }
 
                 [JsonProperty("total_cost_weight")]
-                public string total_cost_weight { get; set; }
+                public decimal total_cost_weight { get; set; }
 
                 [JsonProperty("nbr")]
                 public string nbr { get; set; }
 
                 [JsonProperty("status_cd")]
                 public string status_cd { get; set; }
+
+                [JsonProperty("topup")]
+                public Topup[] topup { get; set; }
+
+                [JsonProperty("topup_options")]
+                public Topup[] topup_options { get; set; }
+
+            }
+
+            public class Topup
+            {
+
+                [JsonProperty("code")]
+                public string Code { get; set; }
+
+                [JsonProperty("description")]
+                public string Description { get; set; }
+
+                [JsonProperty("type")]
+                public string Type { get; set; }
+
+                [JsonProperty("cost_weight")]
+                public decimal cost_weight { get; set; }
             }
 
             public class Cbg
