@@ -73,7 +73,8 @@
                     CssClass="multiPage">
                     <telerik:RadPageView ID="pgProcedure" runat="server">
                         <telerik:RadGrid ID="grdEpisodeProcedureDetail" runat="server"
-                            AutoGenerateColumns="False" GridLines="None" OnDeleteCommand="grdEpisodeProcedure_DeleteCommand">
+                            AutoGenerateColumns="False" GridLines="None" OnDeleteCommand="grdEpisodeProcedure_DeleteCommand"
+                            OnItemCommand="grdEpisodeProcedureDetail_ItemCommand">
                             <MasterTableView DataKeyNames="BookingNo, SequenceNo, OpNotesSeqNo" ShowHeader="True">
                                 <Columns>
                                     <telerik:GridTemplateColumn UniqueName="colMenu" HeaderText="" HeaderStyle-Width="30px">
@@ -98,7 +99,16 @@
                                     <telerik:GridTemplateColumn UniqueName="colPrintOperatingNotes" HeaderText="" HeaderStyle-Width="35px">
                                         <ItemStyle VerticalAlign="Top"></ItemStyle>
                                         <ItemTemplate>
-                                            <%# string.Format("<a href=\"#\" onclick=\"javascript:printPreviewOperatingNotes('{0}', '{1}'); return false;\"><img src=\"{2}/Images/Toolbar/print16.png\"  /></a>",DataBinder.Eval(Container.DataItem, "BookingNo"), DataBinder.Eval(Container.DataItem, "OpNotesSeqNo"),Helper.UrlRoot())%>
+                                            <%# Convert.ToBoolean(DataBinder.Eval(Container.DataItem, "IsVoid"))
+                                                ? string.Format(
+                                                    "<img src=\"{0}/Images/Toolbar/print16_d.png\" title=\"Data sudah di-void\" />",
+                                                    Helper.UrlRoot())
+                                                : string.Format(
+                                                    "<a href=\"#\" onclick=\"javascript:printPreviewOperatingNotes('{0}', '{1}'); return false;\"><img src=\"{2}/Images/Toolbar/print16.png\" /></a>",
+                                                    DataBinder.Eval(Container.DataItem, "BookingNo"),
+                                                    DataBinder.Eval(Container.DataItem, "OpNotesSeqNo"),
+                                                    Helper.UrlRoot())
+                                            %>
                                         </ItemTemplate>
                                     </telerik:GridTemplateColumn>
                                     <telerik:GridBoundColumn HeaderStyle-Width="150px" DataField="ParamedicName" HeaderText="Physician" UniqueName="ParamedicName"
@@ -107,16 +117,37 @@
                                     <telerik:GridBoundColumn HeaderStyle-Width="150px" DataField="Regio" HeaderText="Regio" UniqueName="Regio"
                                         SortExpression="Regio" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left"
                                         AllowSorting="false" />
-                                    <telerik:GridBoundColumn DataField="ProcedureName" HeaderText="Procedure Name" UniqueName="ProcedureName"
-                                        SortExpression="ProcedureName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left"
-                                        AllowSorting="false" HeaderStyle-Width="250px" />
-                                    <telerik:GridBoundColumn DataField="OperatingNotes" HeaderText="Operating Notes" UniqueName="OperatingNotes"
-                                        SortExpression="OperatingNotes" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left"
-                                        AllowSorting="false" />
-                                    <telerik:GridBoundColumn DataField="PostSurgeryInstructions" HeaderText="Post Surgery Instructions" UniqueName="PostSurgeryInstructions"
-                                        SortExpression="PostSurgeryInstructions" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left"
-                                        AllowSorting="false" />
-                                    <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderStyle-Width="30px">
+                                    <telerik:GridTemplateColumn HeaderText="Procedure Name" UniqueName="ProcedureName"
+                                        HeaderStyle-HorizontalAlign="Left"
+                                        ItemStyle-HorizontalAlign="Left"
+                                        HeaderStyle-Width="250px">
+                                        <ItemTemplate>
+                                            <%# Convert.ToBoolean(Eval("IsVoid"))
+                                                ? "<strike>" + Eval("ProcedureName") + "</strike>"
+                                                : Eval("ProcedureName") %>
+                                        </ItemTemplate>
+                                    </telerik:GridTemplateColumn>
+
+                                    <telerik:GridTemplateColumn HeaderText="Operating Notes" UniqueName="OperatingNotes"
+                                        HeaderStyle-HorizontalAlign="Left"
+                                        ItemStyle-HorizontalAlign="Left">
+                                        <ItemTemplate>
+                                            <%# Convert.ToBoolean(Eval("IsVoid"))
+                                                ? "<strike>" + Eval("OperatingNotes") + "</strike>"
+                                                : Eval("OperatingNotes") %>
+                                        </ItemTemplate>
+                                    </telerik:GridTemplateColumn>
+
+                                    <telerik:GridTemplateColumn HeaderText="Post Surgery Instructions" UniqueName="PostSurgeryInstructions"
+                                        HeaderStyle-HorizontalAlign="Left"
+                                        ItemStyle-HorizontalAlign="Left">
+                                        <ItemTemplate>
+                                            <%# Convert.ToBoolean(Eval("IsVoid"))
+                                                ? "<strike>" + Eval("PostSurgeryInstructions") + "</strike>"
+                                                : Eval("PostSurgeryInstructions") %>
+                                        </ItemTemplate>
+                                    </telerik:GridTemplateColumn>
+                                    <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderStyle-Width="30px" Display="false">
                                         <ItemStyle VerticalAlign="Middle"></ItemStyle>
                                         <ItemTemplate>
                                             <asp:LinkButton ID="lblDelete" runat="server" CommandName="Delete" ToolTip="Delete" Visible="<%#IsUserEditAble.Equals(true)%>"
@@ -126,6 +157,26 @@
 
                                         </ItemTemplate>
                                     </telerik:GridTemplateColumn>
+                                     <telerik:GridTemplateColumn UniqueName="colMenu" HeaderText="" HeaderStyle-Width="30px">
+                                         <ItemStyle VerticalAlign="Top"></ItemStyle>
+                                         <ItemTemplate>
+
+                                            <asp:ImageButton ID="btnVoid"
+                                                runat="server"
+                                                ImageUrl="~/Images/Toolbar/cancel16.png"
+                                                CommandName="Void"
+                                                CommandArgument='<%# Eval("BookingNo") + "|" + Eval("SequenceNo") %>'
+                                                Visible='<%# !(bool)Eval("IsVoid") %>'
+                                                ToolTip="Void"
+                                                OnClientClick="return confirm('Anda yakin ingin divoid?');" />
+
+                                            <asp:Image ID="imgVoidDisabled"
+                                                runat="server"
+                                                ImageUrl="~/Images/Toolbar/cancel16_d.png"
+                                                Visible='<%# (bool)Eval("IsVoid") %>'
+                                                ToolTip="Sudah di-void" />
+                                        </ItemTemplate>
+                                     </telerik:GridTemplateColumn>
                                 </Columns>
                             </MasterTableView>
                             <ClientSettings EnableRowHoverStyle="False">
