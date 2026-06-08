@@ -53,7 +53,21 @@ namespace Temiang.Avicenna.WebService
             else
             {
                 var str = string.Empty;
-                foreach (DataRow row in new ServiceUnitCollection().InpatientBedAvailability().Rows)
+                //modify from InpatientBedAvailability to InpatientBedAvailabilityCustom 
+                //for case HCU, ICU, NICU, PICU, ISOLASI
+                //2026-06-05 Wiliam Decosta
+                DataTable bedAvailability = null;
+                if (AppSession.Parameter.HealthcareID.ToUpper() == "RSI")
+                {
+                    bedAvailability = new ServiceUnitCollection().InpatientBedAvailabilityCustom();
+                }
+                else
+                {
+                    bedAvailability = new ServiceUnitCollection().InpatientBedAvailability();
+                }
+
+
+                foreach (DataRow row in bedAvailability.Rows)
                 {
                     var param = new Common.BPJS.Applicare.RuanganBaru.RootObject()
                     {
@@ -141,8 +155,73 @@ namespace Temiang.Avicenna.WebService
             }
             else
             {
-                DeleteSemuaRuangan();
-                InsertRuangan();
+
+                var service = new Common.BPJS.Applicare.Service();
+                var health = service.HealthCheck();
+
+                if (!health.IsHealthy)
+                {
+                    return String.Format("Aplicares service {0} failed (HTTP {1}: {2}).", health.Url, health.StatusCode, health.Message);
+                }
+
+                //DeleteSemuaRuangan();
+                //InsertRuangan();
+
+                var str = string.Empty;
+                var listRoomUpdate = new List<Common.BPJS.Applicare.UpdateKetersediaanTempatTidur.RootObject>();
+                DataTable bedAvailability =  null;
+                if(AppSession.Parameter.HealthcareID.ToUpper() == "RSI")
+                {
+                    bedAvailability = new ServiceUnitCollection().InpatientBedAvailabilityCustom();
+                }else
+                {
+                    bedAvailability = new ServiceUnitCollection().InpatientBedAvailability();
+                }
+
+                foreach (DataRow row in bedAvailability.Rows)
+                {
+                    service = new Common.BPJS.Applicare.Service();
+                    var room = new Common.BPJS.Applicare.UpdateKetersediaanTempatTidur.RootObject()
+                    {
+                        kodekelas = row["BpjsClassID"].ToString(),
+                        koderuang = row["RoomID"].ToString(),
+                        namaruang = row["ServiceUnitName"].ToString(),
+                        kapasitas = row["Capacity"].ToString(),
+                        tersedia = row["Available"].ToString(),
+                        tersediapria = "0",
+                        tersediawanita = "0",
+                        tersediapriawanita = "0"
+                    };
+
+                    var response = service.UpdateRuangan(room);
+                    var meta = fastJSON.JSON.ToObject<Common.BPJS.MetadataResponse>(response);
+                    if (meta.Metadata.Code == "0")
+                    {//failed update
+                        str += String.Format("OnUpdate : Server message (HTTP {0}: {1} {2}).", meta.Metadata.Code, meta.Metadata.Message, JsonConvert.SerializeObject(room));
+                        listRoomUpdate.Add(room);
+                    }
+                }
+
+                foreach(var room in listRoomUpdate)
+                {
+                    service = new Common.BPJS.Applicare.Service();
+                    var response = service.InsertRuangan(new Common.BPJS.Applicare.RuanganBaru.RootObject()
+                    {
+                        kodekelas = room.kodekelas,
+                        koderuang = room.koderuang,
+                        namaruang = room.namaruang,
+                        kapasitas = room.kapasitas,
+                        tersedia = room.tersedia,
+                        tersediapria = "0",
+                        tersediawanita = "0",
+                        tersediapriawanita = "0"
+                    });
+                    var meta = fastJSON.JSON.ToObject<Common.BPJS.MetadataResponse>(response);
+                    if(meta.Metadata.Code == "0")
+                    {//failed insert
+                        str += String.Format("OnInsert : Server message (HTTP {0}: {1} {2}).", meta.Metadata.Code, meta.Metadata.Message, JsonConvert.SerializeObject(room));
+                    }
+                }
 
                 //foreach (DataRow row in new ServiceUnitCollection().InpatientBedAvailability().Rows)
                 //{
@@ -179,7 +258,7 @@ namespace Temiang.Avicenna.WebService
                 //        //if (str != "success") return String.Format("Server message (HTTP {0}: {1}).", meta.Metadata.Code, meta.Metadata.Message);
                 //    }
                 //}
-                return "success";
+                return String.IsNullOrEmpty(str) ? "success" : str;
             }
 
         }
@@ -227,6 +306,18 @@ namespace Temiang.Avicenna.WebService
             var meta = fastJSON.JSON.ToObject<Common.BPJS.Applicare.KetersediaanKamarRS.KetersediaanKamar>(response);
             if (meta.Metadata.Code != "1") return String.Format("Server message (HTTP {0}: {1}).", meta.Metadata.Code, meta.Metadata.Message);
             return JsonConvert.SerializeObject(meta.Response);
+        }
+
+        [WebMethod]
+        public string HealthCheck()
+        {
+            var service = new Common.BPJS.Applicare.Service();
+            var health = service.HealthCheck();
+            if (!health.IsHealthy)
+            {
+                return String.Format("Failed : Aplicares service {0} not connected (HTTP {1}: {2}).", health.Url, health.StatusCode, health.Message);
+            }
+            return String.Format("Success : Aplicares service {0} connected (HTTP {1}: {2}).", health.Url, health.StatusCode, health.Message);
         }
 
         public Common.BPJS.Applicare.KetersediaanKamarRS.KetersediaanKamar ReadSemuaRuangan()
@@ -544,6 +635,12 @@ namespace Temiang.Avicenna.WebService
                 Kodedokter = kodeDokter
             });
             return response;
+        }
+
+        [WebMethod]
+        public string DoNothing()
+        {
+            return string.Format("ok : {0}", AppSession.Parameter.HealthcareID.ToUpper());
         }
     }
 }
