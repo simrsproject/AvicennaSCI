@@ -4,35 +4,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Temiang.Avicenna.Common.Inacbg.v510.Gruoper.IdrgGrouper1.Result;
 
 namespace Temiang.Avicenna.Common.Inacbg.v510.Gruoper
 {
     public class importcoding
     {
-        // ===== Request payload =====
-        public class Data          // { "nomor_sep": "..." }
+        public class Data
         {
             [JsonProperty("nomor_sep")]
             public string nomor_sep { get; set; }
         }
 
-        public class RootObject    // { "data": { "nomor_sep": "..." } }
+        public class RootObject
         {
             [JsonProperty("data")]
             public Data data { get; set; }
         }
 
-        // ===== Response payload =====
-        public class Result        // top-level response: { "metadata": {...}, "data": {...} }
+        public class Result
         {
-            // metadata di level atas (punya method juga)
             public class Metadata : Inacbg.Metadata
             {
                 [JsonProperty("method")]
                 public string Method { get; set; }
             }
 
-            // metadata di item expanded (punya error_no optional)
             public class ItemMetadata
             {
                 [JsonProperty("code")]
@@ -45,7 +42,6 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Gruoper
                 public string Message { get; set; }
             }
 
-            // 1 item pada array expanded
             public class ExpandedItem
             {
                 [JsonProperty("code")]
@@ -64,10 +60,8 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Gruoper
                 public ItemMetadata Metadata { get; set; }
             }
 
-            // blok diagnosa/procedure
             public class Section
             {
-                // field bernama "string" di JSON → kita map ke "Joined"
                 [JsonProperty("string")]
                 public string Joined { get; set; }
 
@@ -75,7 +69,6 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Gruoper
                 public List<ExpandedItem> Expanded { get; set; }
             }
 
-            // data: { diagnosa: {...}, procedure: {...} }
             public class DataResponse
             {
                 [JsonProperty("diagnosa")]
@@ -131,6 +124,177 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Gruoper
 
                 [JsonProperty("logic_version")]
                 public string LogicVersion { get; set; }
+            }
+
+            [JsonProperty("metadata")]
+            public Metadata Meta { get; set; }
+
+            [JsonProperty("response_idrg")]
+            public Idrg ResponseIdrg { get; set; }
+        }
+    }
+
+    public class IdrgGrouper1
+    {
+        public class Data
+        {
+            public string nomor_sep { get; set; }
+        }
+
+        public class RootObject
+        {
+            public Data data { get; set; }
+        }
+
+        public class Result
+        {
+            public class Metadata : Inacbg.Metadata
+            {
+
+            }
+
+            public class Idrg
+            {
+                [JsonProperty("mdc_number")]
+                public string MdcNumber { get; set; }
+
+                [JsonProperty("mdc_description")]
+                public string MdcDescription { get; set; }
+
+                [JsonProperty("drg_code")]
+                public string DrgCode { get; set; }
+
+                [JsonProperty("drg_description")]
+                public string DrgDescription { get; set; }
+
+                [JsonProperty("script_version")]
+                public string ScriptVersion { get; set; }
+
+                [JsonProperty("logic_version")]
+                public string LogicVersion { get; set; }
+
+                [JsonProperty("cost_weight")]
+                public string CostWeight { get; set; }
+
+                [JsonProperty("sub_acute_weight")]
+                public string SubAcuteWeight { get; set; }
+
+                [JsonProperty("chronic_weight")]
+                public string ChronicWeight { get; set; }
+
+                [JsonProperty("total_cost_weight")]
+                public string TotalCostWeight { get; set; }
+
+                [JsonProperty("nbr")]
+                public string Nbr { get; set; }
+
+                [JsonProperty("status_cd")]
+                public string StatusCd { get; set; }
+
+                [JsonProperty("topup_options")]
+                public List<Topup> Topup_options { get; set; }
+            }
+
+            public class Topup
+            {
+                [JsonProperty("code")]
+                public string Code { get; set; }
+
+                [JsonProperty("description")]
+                public string Description { get; set; }
+
+                [JsonProperty("type")]
+                public string Type { get; set; }
+
+                [JsonProperty("cost_weight")]
+                public string CostWeight { get; set; }
+            }
+
+            [JsonProperty("metadata")]
+            public Metadata Meta { get; set; }
+
+            [JsonProperty("response_idrg")]
+            public Idrg ResponseIdrg { get; set; }
+        }
+    }
+
+    public class IdrgGrouper2
+    {
+        public class Data : IdrgGrouper1.Data
+        {
+            public string topup_codes { get; set; }
+        }
+
+        public class RootObject
+        {
+            public Data data { get; set; }
+        }
+
+        public class Result
+        {
+            public class Metadata : Inacbg.Metadata
+            {
+
+            }
+
+            public class Idrg
+            {
+                [JsonProperty("mdc_number")]
+                public string MdcNumber { get; set; }
+
+                [JsonProperty("mdc_description")]
+                public string MdcDescription { get; set; }
+
+                [JsonProperty("drg_code")]
+                public string DrgCode { get; set; }
+
+                [JsonProperty("drg_description")]
+                public string DrgDescription { get; set; }
+
+                [JsonProperty("script_version")]
+                public string ScriptVersion { get; set; }
+
+                [JsonProperty("logic_version")]
+                public string LogicVersion { get; set; }
+
+                [JsonProperty("cost_weight")]
+                public decimal CostWeight { get; set; }
+
+                [JsonProperty("sub_acute_weight")]
+                public string SubAcuteWeight { get; set; }
+
+                [JsonProperty("chronic_weight")]
+                public string ChronicWeight { get; set; }
+
+                [JsonProperty("total_cost_weight")]
+                public string TotalCostWeight { get; set; }
+
+                [JsonProperty("nbr")]
+                public string Nbr { get; set; }
+
+                [JsonProperty("status_cd")]
+                public string StatusCd { get; set; }
+
+                [JsonProperty("topup")]
+                public List<Topup> Topup { get; set; }
+
+                [JsonProperty("topup_options")]
+                public List<Topup> Topup_options { get; set; }
+            }
+
+            public class Topup
+            {
+                [JsonProperty("code")]
+                public string Code { get; set; }
+
+                [JsonProperty("description")]
+                public string Description { get; set; }
+
+                [JsonProperty("type")]
+                public string Type { get; set; }
+
+                [JsonProperty("cost_weight")]
+                public decimal CostWeight { get; set; }
             }
 
             [JsonProperty("metadata")]
@@ -575,7 +739,6 @@ namespace Temiang.Avicenna.Common.Inacbg.v510.Gruoper
                 [JsonProperty("response")]
                 public Response Response { get; set; }
 
-                // ⬇️ ini yang penting: nama harus "response_inacbg"
                 [JsonProperty("response_inacbg")]
                 public Response ResponseInacbg { get; set; }
 

@@ -54,6 +54,7 @@ $app->post('/idrg_diagnosa_get2', 'idrg_diagnosa_get2');
 $app->post('/idrg_procedure_set2', 'idrg_procedure_set2');
 $app->post('/idrg_procedure_get2', 'idrg_procedure_get2');
 $app->post('/grouper1idrg2', 'grouper1idrg2');
+$app->post('/grouper2idrg2', 'grouper2idrg2');
 $app->post('/idrg_grouper_final2', 'idrg_grouper_final2');
 $app->post('/idrg_grouper_reedit2', 'idrg_grouper_reedit2');
 $app->post('/idrg_to_inacbg_import2', 'idrg_to_inacbg_import2');
@@ -505,6 +506,40 @@ function grouper1idrg2($request, $response, $args) {
 	},
 	"data":{
 		"nomor_sep":"'.$nomor_sep.'"
+	}}';   
+    
+	$json = mc_encrypt ($json, getKey());
+	$ch = curl_init(getUrlWS());	
+
+    curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+	$result = curl_exec($ch);
+	curl_close($ch);			
+
+	$result = str_replace('----BEGIN ENCRYPTED DATA----', '', $result);
+	$result = str_replace('----END ENCRYPTED DATA----', '', $result);
+	$result = mc_decrypt (getKey(), $result);			    
+    
+	$response->write($result);	
+	
+	return $response;
+}
+
+function grouper2idrg2($request, $response, $args) {
+	$nomor_sep = $request->getParsedBody()['nomor_sep'];
+	$topup_code = $request->getParsedBody()['topup_codes'];
+	
+	$json = '{
+	"metadata":{
+		"method":"grouper",
+		"stage":"2",
+		"grouper":"idrg"
+	},
+	"data":{
+		"nomor_sep":"'.$nomor_sep.'",
+		"topup_codes": "'.$topup_code.'"
 	}}';   
     
 	$json = mc_encrypt ($json, getKey());

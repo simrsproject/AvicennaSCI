@@ -1653,15 +1653,6 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
         protected global::Telerik.Web.UI.RadTextBox txtIDRGDRGCode;
 
         /// <summary>
-        /// rowCostWeight control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTableRow rowCostWeight;
-
-        /// <summary>
         /// txtCostWeight control.
         /// </summary>
         /// <remarks>
@@ -1669,6 +1660,42 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtCostWeight;
+
+        /// <summary>
+        /// rowIdrgTopup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow rowIdrgTopup;
+
+        /// <summary>
+        /// cboIdrgTopup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboIdrgTopup;
+
+        /// <summary>
+        /// txtTopupcode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtTopupcode;
+
+        /// <summary>
+        /// txtTopupcw control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtTopupcw;
 
         /// <summary>
         /// rowNBR control.
@@ -1687,6 +1714,24 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadTextBox txtNBR;
+
+        /// <summary>
+        /// txtTotalcw control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtTotalcw;
+
+        /// <summary>
+        /// txtTotalKlaimIdrg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadNumericTextBox txtTotalKlaimIdrg;
 
         /// <summary>
         /// txtIDRGStatus control.

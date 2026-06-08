@@ -2344,7 +2344,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                               $"{response5?.DataResponse?.Data?.Grouper?.ResponseIdrg?.mdc_number}";
                 lblDrg.Text = $"{response5?.DataResponse?.Data?.Grouper?.ResponseIdrg?.drg_description} - " +
                               $"{response5?.DataResponse?.Data?.Grouper?.ResponseIdrg?.drg_code}";
-                lblCostWeight.Text = response5?.DataResponse?.Data?.Grouper?.ResponseIdrg?.cost_weight ?? string.Empty;
+                lblCostWeight.Text = response5?.DataResponse?.Data?.Grouper?.ResponseIdrg?.cost_weight.ToString("0.00") ?? string.Empty;
                 lblNBR.Text = response5?.DataResponse?.Data?.Grouper?.ResponseIdrg?.nbr ?? string.Empty;
                 lblIdrgStatus.Text = response5?.DataResponse?.Data?.KlaimStatusCd ?? string.Empty;
             }
