@@ -94,6 +94,7 @@
     <Content Include="RSMM\Emr\Assessment.asmx" />
     <Content Include="Global.asax" />
     <Content Include="RSMM\Emr\NosocomialMon.asmx" />
+    <Content Include="RSMM\Emr\SEP.asmx" />
     <Content Include="RSMM\Emr\PatientFormAndLetter.asmx" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -127,6 +128,10 @@
     </Compile>
     <Compile Include="RSMM\Emr\NosocomialMon.asmx.cs">
       <DependentUpon>NosocomialMon.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RSMM\Emr\SEP.asmx.cs">
+      <DependentUpon>SEP.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="RSMM\Emr\PatientFormAndLetter.asmx.cs">

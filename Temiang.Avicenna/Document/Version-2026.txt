@@ -252,3 +252,9 @@ Titipan Daniel
 
 --- [08-06-2026 - Danang] ---
 1. CR Odoo Feature Topup IDRG 
+
+--- [09-06-2026 - Wiliam] ---
+1. Modifikasi Bed Information untuk MJKN
+2. Menambahkan Report Data Source SEP.asmx 
+3. Menambahkan fitur View untuk Procedure dan Operating Notes di EMR Detail
+4. Menambahkan fitur Void untuk Procedure dan Operating Notes di EMR Detail
