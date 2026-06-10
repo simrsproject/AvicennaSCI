@@ -193,6 +193,7 @@ GROUP BY c.BpjsClassID, sr.RoomID, sr.RoomName
                                         WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
                                         WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
                                         WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'  
                                         WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
 			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
                                         ELSE c.BpjsClassID
@@ -219,6 +220,7 @@ GROUP BY c.BpjsClassID, sr.RoomID, sr.RoomName
                                         WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
                                         WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
                                         WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
                                         WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
 			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
                                         ELSE c.BpjsClassID
@@ -233,6 +235,7 @@ GROUP BY c.BpjsClassID, sr.RoomID, sr.RoomName
                                         WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
                                         WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
                                         WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
                                         WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
 			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
                                         ELSE c.BpjsClassID
@@ -260,6 +263,7 @@ GROUP BY c.BpjsClassID, sr.RoomID, sr.RoomName
                                         WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
                                         WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
                                         WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
                                         WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
 			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
                                         ELSE c.BpjsClassID

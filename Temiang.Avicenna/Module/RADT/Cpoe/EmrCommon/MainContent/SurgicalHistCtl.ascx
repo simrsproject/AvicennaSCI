@@ -158,25 +158,28 @@
                                         </ItemTemplate>
                                     </telerik:GridTemplateColumn>
                                      <telerik:GridTemplateColumn UniqueName="colMenu" HeaderText="" HeaderStyle-Width="30px">
-                                         <ItemStyle VerticalAlign="Top"></ItemStyle>
-                                         <ItemTemplate>
+                                        <ItemStyle VerticalAlign="Top"></ItemStyle>
+                                        <ItemTemplate>
 
-                                            <asp:ImageButton ID="btnVoid"
-                                                runat="server"
-                                                ImageUrl="~/Images/Toolbar/cancel16.png"
-                                                CommandName="Void"
-                                                CommandArgument='<%# Eval("BookingNo") + "|" + Eval("SequenceNo") %>'
-                                                Visible='<%# !(bool)Eval("IsVoid") %>'
-                                                ToolTip="Void"
-                                                OnClientClick="return confirm('Anda yakin ingin divoid?');" />
+                                           <asp:ImageButton ID="btnVoid"
+                                               runat="server"
+                                               ImageUrl="~/Images/Toolbar/cancel16.png"
+                                               CommandName="Void"
+                                               CommandArgument='<%# Eval("BookingNo") + "|" + Eval("SequenceNo") %>'
+                                               Visible='<%# Convert.ToBoolean(Eval("IsEditable")) 
+                                                           && !Convert.ToBoolean(Eval("IsVoid")) %>'
+                                               ToolTip="Void"
+                                               OnClientClick="return confirm('Anda yakin ingin divoid?');" />
 
-                                            <asp:Image ID="imgVoidDisabled"
-                                                runat="server"
-                                                ImageUrl="~/Images/Toolbar/cancel16_d.png"
-                                                Visible='<%# (bool)Eval("IsVoid") %>'
-                                                ToolTip="Sudah di-void" />
-                                        </ItemTemplate>
-                                     </telerik:GridTemplateColumn>
+                                           <asp:Image ID="imgVoidDisabled"
+                                               runat="server"
+                                               ImageUrl="~/Images/Toolbar/cancel16_d.png"
+                                               Visible='<%# Convert.ToBoolean(Eval("IsEditable")) 
+                                                           && Convert.ToBoolean(Eval("IsVoid")) %>'
+                                               ToolTip="Sudah di-void" />
+
+                                       </ItemTemplate>
+                                    </telerik:GridTemplateColumn>
                                 </Columns>
                             </MasterTableView>
                             <ClientSettings EnableRowHoverStyle="False">
