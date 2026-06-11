@@ -349,7 +349,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 tloc = "xxx";
 
             // ===========================================================
-            // OPTIMASI 2: Pre-load supplier item IDs untuk filter di SQL
+            // OPTIMASI 1: Pre-load supplier item IDs untuk filter di SQL
             // ===========================================================
             HashSet<string> supplierItemIds = null;
             bool hasSupplierFilter = !string.IsNullOrEmpty(cboSupplierID.SelectedValue);
@@ -525,7 +525,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             }
 
             // ===========================================================
-            // OPTIMASI 2: Filter supplier di SQL, bukan post-query C#
+            // OPTIMASI 2: Filter supplier
             // ===========================================================
             if (hasSupplierFilter)
             {
@@ -546,7 +546,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             var tbl = query.LoadDataTable();
 
             // ===========================================================
-            // OPTIMASI 1: Post-process QtyOrder dari pre-computed dictionary
+            // OPTIMASI 3: Post-process QtyOrder dari pre-computed dictionary
             // Dipanggil SETELAH LoadDataTable agar bisa filter view
             // hanya untuk TransactionNo yang ada di hasil query
             // ===========================================================
