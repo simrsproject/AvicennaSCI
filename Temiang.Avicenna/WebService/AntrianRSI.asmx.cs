@@ -69,6 +69,21 @@ namespace Temiang.Avicenna.WebService
     [ScriptService]
     public class AntrianRSI : System.Web.Services.WebService
     {
+        private string GetChannelByServiceUnit(string serviceUnitID)
+        {
+            switch (serviceUnitID)
+            {
+                case "D2.2.60.4":
+                    return "LOKET_PD";
+
+                case "D2.2.60.5":
+                    return "LOKET_PM";
+
+                default:
+                    return "";
+            }
+        }
+
         private List<CounterItem> GetCounterList()
         {
             var data = new List<CounterItem>();
@@ -94,27 +109,119 @@ namespace Temiang.Avicenna.WebService
         }
 
         //1. Pasien Ambil Antrian
-        [WebMethod( Description = @"
+        [WebMethod(EnableSession = true, Description = @"
            Ambil Data List PayerType untuk pasien memilih type TUNAI, MITRA DAN BPJS
+
+           PARAMETER:
+           - UserID (required)
 
            RESPONSE:
             200 = Berhasil mendapatkan data payer type
             404 = Data payer type tidak ditemukan
             500 = Terjadi kesalahan pada server
+
+            
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetPayerType()
         {
             try
             {
-                var collection = new AntrianAutoNumberSemanticCollection();
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                AppUserServiceUnitCollection userSU =
+                    new AppUserServiceUnitCollection();
+
+                userSU.Query.Where(
+                    userSU.Query.UserID == UserID
+                );
+
+                userSU.Query.Load();
+
+                System.Diagnostics.Debug.WriteLine("===== GET PAYER TYPE =====");
+                System.Diagnostics.Debug.WriteLine("UserID : " + UserID);
+                System.Diagnostics.Debug.WriteLine("Total Service Unit : " + userSU.Count);
+
+                for (int i = 0; i < userSU.Count; i++)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"ServiceUnitID[{i}] = {userSU[i].ServiceUnitID}"
+                    );
+                }
+
+                if (userSU.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Service Unit user tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                string serviceUnitID = "";
+                string channel = "";
+
+                foreach (AppUserServiceUnit item in userSU)
+                {
+                    string tempChannel =
+                        GetChannelByServiceUnit(item.ServiceUnitID);
+
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Check ServiceUnitID = {item.ServiceUnitID}, Channel = {tempChannel}"
+                    );
+
+                    if (!string.IsNullOrEmpty(tempChannel))
+                    {
+                        serviceUnitID = item.ServiceUnitID;
+                        channel = tempChannel;
+                        break;
+                    }
+                }
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Selected ServiceUnitID = {serviceUnitID}"
+                );
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Channel = {channel}"
+                );
+
+                if (string.IsNullOrEmpty(channel))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "User tidak memiliki akses ke Rawat Jalan PD atau Rawat Jalan PM",
+                        404
+                    );
+                    return;
+                }
+
+                var collection =
+                    new AntrianAutoNumberSemanticCollection();
 
                 collection.Query.Where(
-                    collection.Query.Channel == "LOKET_PD",
+                    collection.Query.Channel == channel,
                     collection.Query.IsActive == true
                 );
 
                 collection.Query.Load();
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Total Data Channel {channel} = {collection.Count}"
+                );
 
                 var data = collection
                     .Select(x => x.PayerType)
@@ -130,6 +237,10 @@ namespace Temiang.Avicenna.WebService
                     })
                     .ToList();
 
+                System.Diagnostics.Debug.WriteLine(
+                    $"Total PayerType = {data.Count}"
+                );
+
                 if (data.Count == 0)
                 {
                     ApiResponeForAntrian.Error(
@@ -140,11 +251,28 @@ namespace Temiang.Avicenna.WebService
                     return;
                 }
 
-                ApiResponeForAntrian.Success(Context, data);
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        UserID = UserID,
+                        ServiceUnitID = serviceUnitID,
+                        Channel = channel,
+                        PayerTypes = data
+                    }
+                );
             }
             catch (Exception ex)
             {
-                ApiResponeForAntrian.Error(Context, ex.Message);
+                System.Diagnostics.Debug.WriteLine(
+                    "ERROR : " + ex.ToString()
+                );
+
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
             }
         }
 
@@ -2248,6 +2376,81 @@ namespace Temiang.Avicenna.WebService
                     Context,
                     result,
                     "Antrian berhasil dipanggil"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memunculkan suara antrian berdasarkan
+            Service Unit (Poli, Farmasi, Radiologi, Lab, Rehab, USG, dll).
+
+            PARAMETER:
+            - VisitQueueNo (required)
+
+            EXAMPLE:
+
+            GetQueueSoundForAllServiceUnit?
+            VisitQueueNo=VQUE-260603-0006
+
+            RESPONSE:
+               200 = Sound antrian All Service Unit berhasil diambil
+               400 = Parameter request tidak valid
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetQueueSoundForAllServiceUnit()
+        {
+            try
+            {
+                // =========================
+                // NORMALIZE
+                // =========================
+
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                // =========================
+                // VALIDASI
+                // =========================
+
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+
+                    return;
+                }
+
+                // =========================
+                // EXECUTE BO
+                // =========================
+
+                var data =
+                    QueueingSound.GetQueueSoundForAllServiceUnit(
+                        VisitQueueNo
+                    );
+
+                // =========================
+                // RESPONSE
+                // =========================
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Sound antrian All Service Unit berhasil diambil"
                 );
             }
             catch (Exception ex)

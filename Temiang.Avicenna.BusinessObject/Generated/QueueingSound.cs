@@ -593,6 +593,48 @@ namespace Temiang.Avicenna.BusinessObject
 
             return list;
         }
+
+        public static object GetQueueSoundForAllServiceUnit(string visitQueueNo)
+        {
+            var entity = new QueueingSound();
+
+            var reader = entity.ExecuteReader(
+                esQueryType.StoredProcedure,
+                "GetQueueSoundForAllServiceUnit",
+                new esParameters
+                {
+            { "VisitQueueNo", visitQueueNo, esParameterDirection.Input, DbType.String, 50 }
+                }
+            );
+
+            var list = new List<object>();
+
+            while (reader.Read())
+            {
+                list.Add(new
+                {
+                    Seq = reader["Seq"] == DBNull.Value
+                        ? 0
+                        : Convert.ToInt32(reader["Seq"]),
+
+                    SoundCode = reader["SoundCode"]?.ToString() ?? "",
+
+                    FilePath = reader["FilePath"]?.ToString() ?? "",
+
+                    VisitNo = reader["VisitNo"]?.ToString() ?? "",
+
+                    CurrentStage = reader["CurrentStage"]?.ToString() ?? "",
+
+                    ServiceUnitID = reader["ServiceUnitID"]?.ToString() ?? "",
+
+                    ServiceUnitName = reader["ServiceUnitName"]?.ToString() ?? ""
+                });
+            }
+
+            reader.Close();
+
+            return list;
+        }
     }
 
 	[Serializable]

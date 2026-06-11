@@ -48,10 +48,10 @@ BEGIN
         -- =========================================
         -- VALIDASI STATUS
         -- =========================================
-        IF @CurrentStatus <> 'WAITING'
+        IF @CurrentStatus <> 'WAITING' AND @CurrentStatus <> 'CALLED'
         BEGIN
             THROW 50002,
-            'Hanya antrian WAITING yang bisa di-PENDING',
+            'Hanya antrian WAITING dan CALLED yang bisa di-PENDING',
             1;
         END
 
