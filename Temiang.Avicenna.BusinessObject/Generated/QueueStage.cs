@@ -467,10 +467,11 @@ namespace Temiang.Avicenna.BusinessObject
     public partial class QueueStage : esQueueStage
     {
         public static List<object> GetQueueStage(
-     string stageID,
-     string serviceGroup,
-     string isActive
- )
+          string stageID,
+          string serviceGroup,
+          string isActive,
+          string serviceUnitID
+        )
         {
             var result = new List<object>();
 
@@ -479,64 +480,89 @@ namespace Temiang.Avicenna.BusinessObject
             var parameters = new esParameters();
 
             string sql = @"
-                SELECT
-                    StageID,
-                    StageName,
-                    ServiceGroup,
-                    StepOrder,
-                    IsQueue,
-                    IsActive
-                FROM QueueStage
-                WHERE 1 = 1
-            ";
+            SELECT DISTINCT
+                qs.StageID,
+                qs.StageName,
+                qs.ServiceGroup,
+                qs.StepOrder,
+                qs.IsQueue,
+                qs.IsActive
+            FROM QueueStage qs
+        ";
 
-                    if (!string.IsNullOrEmpty(stageID))
-                    {
-                        sql += " AND StageID = @StageID";
+            if (!string.IsNullOrEmpty(serviceUnitID))
+            {
+                sql += @"
+            INNER JOIN QueueMappingPivot qmp
+                ON qmp.StageID = qs.StageID
+        ";
+            }
 
-                        parameters.Add(
-                            "StageID",
-                            stageID,
-                            esParameterDirection.Input,
-                            DbType.String,
-                            50
-                        );
-                    }
+            sql += @"
+            WHERE 1 = 1
+        ";
 
-                    if (!string.IsNullOrEmpty(serviceGroup))
-                    {
-                        sql += " AND ServiceGroup = @ServiceGroup";
+            if (!string.IsNullOrEmpty(stageID))
+            {
+                sql += " AND qs.StageID = @StageID";
 
-                        parameters.Add(
-                            "ServiceGroup",
-                            serviceGroup,
-                            esParameterDirection.Input,
-                            DbType.String,
-                            50
-                        );
-                    }
+                parameters.Add(
+                    "StageID",
+                    stageID,
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+            }
 
-                    if (!string.IsNullOrEmpty(isActive))
-                    {
-                        sql += " AND CAST(IsActive AS VARCHAR(1)) = @IsActive";
+            if (!string.IsNullOrEmpty(serviceGroup))
+            {
+                sql += " AND qs.ServiceGroup = @ServiceGroup";
 
-                        parameters.Add(
-                            "IsActive",
-                            isActive,
-                            esParameterDirection.Input,
-                            DbType.String,
-                            5
-                        );
-                    }
+                parameters.Add(
+                    "ServiceGroup",
+                    serviceGroup,
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+            }
 
-                    sql += @"
+            if (!string.IsNullOrEmpty(isActive))
+            {
+                sql += " AND CAST(qs.IsActive AS VARCHAR(1)) = @IsActive";
+
+                parameters.Add(
+                    "IsActive",
+                    isActive,
+                    esParameterDirection.Input,
+                    DbType.String,
+                    5
+                );
+            }
+
+            if (!string.IsNullOrEmpty(serviceUnitID))
+            {
+                sql += " AND qmp.ServiceUnitID = @ServiceUnitID";
+
+                parameters.Add(
+                    "ServiceUnitID",
+                    serviceUnitID,
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+            }
+
+            sql += @"
                 ORDER BY
-                    ServiceGroup,
-                    StepOrder,
-                    StageName
+                    qs.ServiceGroup,
+                    qs.StepOrder,
+                    qs.StageName
             ";
 
-            using (
+            using
+            (
                 var reader =
                     entity.ExecuteReader(
                         esQueryType.Text,

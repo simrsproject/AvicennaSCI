@@ -3895,6 +3895,7 @@ namespace Temiang.Avicenna.WebService
             - StageID
             - ServiceGroup
             - IsActive
+            - ServiceUnitID
 
             EXAMPLE:
             GetQueueStage
@@ -3905,12 +3906,15 @@ namespace Temiang.Avicenna.WebService
 
             GetQueueStage?IsActive=1
 
+            GetQueueStage?ServiceUnitID=D2.2.41.1
+
+            GetQueueStage?ServiceUnitID=D3.0.02
+
             GetQueueStage?ServiceGroup=USG&IsActive=1
-            
+
             RESPONSE:
             200 = Berhasil mengambil data Queue Stage
             500 = Server error
-            
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetQueueStage()
@@ -3929,6 +3933,10 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["IsActive"] ?? "")
                     .Trim();
 
+                string ServiceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
                 var result =
                     QueueStage.GetQueueStage(
                         string.IsNullOrEmpty(StageID)
@@ -3941,7 +3949,11 @@ namespace Temiang.Avicenna.WebService
 
                         string.IsNullOrEmpty(IsActive)
                             ? null
-                            : IsActive
+                            : IsActive,
+
+                        string.IsNullOrEmpty(ServiceUnitID)
+                            ? null
+                            : ServiceUnitID
                     );
 
                 ApiResponeForAntrian.Success(
