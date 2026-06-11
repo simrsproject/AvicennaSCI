@@ -1139,6 +1139,7 @@
     <Compile Include="Generated\VisitPackageItem.cs" />
     <Compile Include="Generated\VwEmployeeOrganizationUnit.cs" />
     <Compile Include="Generated\VwItemProductFabric.cs" />
+    <Compile Include="Generated\VwPOPreComputeQtyFinished.cs" />
     <Compile Include="Generated\WageBase.cs" />
     <Compile Include="Generated\WageStructureAndScale.cs" />
     <Compile Include="Generated\WageStructureAndScaleItem.cs" />

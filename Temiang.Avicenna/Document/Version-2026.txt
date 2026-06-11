@@ -258,3 +258,9 @@ Titipan Daniel
 2. Menambahkan Report Data Source SEP.asmx 
 3. Menambahkan fitur View untuk Procedure dan Operating Notes di EMR Detail
 4. Menambahkan fitur Void untuk Procedure dan Operating Notes di EMR Detail
+
+-- [09-06-2026 - Wiliam] ---
+1. Modifikasi ReOrderPoBasedOnPrList.aspx.cs untuk optimalisasi Query
+
+--[09-06-2026 - Aminudin] ---
+1. Modifikasi DistributionList.aspx.cs untuk optimalisasi query
