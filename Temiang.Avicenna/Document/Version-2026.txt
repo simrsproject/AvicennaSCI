@@ -193,6 +193,7 @@ Titipan Daniel
 6. Menambahkan statement baru pada code behind RegistrationDetail pada SaveEntity untuk HIT Procedure supaya ServiceUnitID, ParamedicID dan PatientID
    bisa terinput ke tabel VisitQueue.
 7. Menambahkan private void SetCurrentStageVisibility untuk menyembunyikan dropbox dengan parameter RSI (Jika bukan RSI maka sembunyikan)
+8. Menambahkan 1 kolom pada tabel ServiceUnitParamedic yaitu kolom IsDisplayActive
 
 ---- [15-05-2026 - Wiliam] ---
 1. Modifikasi PrescriptionSalesDetail.aspx.cs 

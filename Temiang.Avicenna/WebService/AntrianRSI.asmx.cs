@@ -1505,7 +1505,7 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-        [WebMethod (Description = @"
+        [WebMethod(Description = @"
             Digunakan untuk mengambil daftar counter/loket pendaftaran yang tersedia.
 
             KETERANGAN:
@@ -3960,6 +3960,112 @@ namespace Temiang.Avicenna.WebService
                     Context,
                     result,
                     "Berhasil mengambil data Queue Stage"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengambil daftar dokter yang aktif ditampilkan
+            pada display antrian berdasarkan Service Unit.
+
+            PARAMETER:
+            - ServiceUnitID
+
+            CONTOH REQUEST:
+
+            GetListUpdateDisplayDokterForPoli?
+            ServiceUnitID=D2.2.41.1
+
+            KETERANGAN:
+               - ServiceUnitID :
+                 Kode poli/unit pelayanan yang akan ditampilkan.
+
+            RESPONSE:
+               200 = Berhasil mengambil daftar dokter display
+               500 = Terjadi kesalahan pada server 
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetListUpdateDisplayDokterForPoli()
+        {
+            try
+            {
+                string serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                var data =
+                    VisitQueue.GetDisplayDoctorListForPoli(
+                        serviceUnitID
+                    );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Berhasil mengambil daftar dokter"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengatur dokter yang akan ditampilkan pada display antrian.
+
+            PARAMETER:
+            - ServiceUnitID
+            - ParamedicID
+
+            CONTOH REQUEST:
+
+            UpdateDisplayDoctorList?
+            ServiceUnitID=D2.2.41.1&
+            ParamedicID=MD-00170,MD-00145,MD-00023
+
+            RESPONSE:
+            200 = Berhasil update dokter display
+            500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void UpdateDisplayDoctorListForPoli()
+        {
+            try
+            {
+                string serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                string paramedicIDs =
+                    (Context.Request["ParamedicID"] ?? "")
+                    .Trim();
+
+                VisitQueue.UpdateDisplayDoctorList(
+                    serviceUnitID,
+                    paramedicIDs
+                );
+
+                var data =
+                    VisitQueue.GetDisplayDoctorListForPoli(
+                        serviceUnitID
+                    );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Berhasil update dokter display"
                 );
             }
             catch (Exception ex)

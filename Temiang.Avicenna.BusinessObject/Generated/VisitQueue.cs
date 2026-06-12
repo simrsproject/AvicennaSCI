@@ -16,6 +16,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Xml.Serialization;
+using Temiang.Avicenna.BusinessObject.Common.Inacbg;
 using Temiang.Avicenna.BusinessObject.Generated;
 using Temiang.Dal.Core;
 using Temiang.Dal.DynamicQuery;
@@ -3308,6 +3309,142 @@ namespace Temiang.Avicenna.BusinessObject
             }
 
             return result;
+        }
+
+        public static List<object> GetDisplayDoctorListForPoli(
+            string serviceUnitID
+        )
+                {
+                    var result =
+                        new List<object>();
+
+                    var entity =
+                        new VisitQueue();
+
+                    var parameters =
+                        new esParameters();
+
+                string sql = @"
+                SELECT
+                    SUP.ParamedicID,
+                    P.ParamedicName
+                FROM ServiceUnitParamedic SUP
+                INNER JOIN Paramedic P
+                    ON P.ParamedicID = SUP.ParamedicID
+                WHERE
+                    SUP.ServiceUnitID = @ServiceUnitID
+                    AND SUP.IsDisplayActive = 1
+                ORDER BY P.ParamedicName
+            ";
+
+            parameters.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (
+                var reader =
+                    entity.ExecuteReader(
+                        esQueryType.Text,
+                        sql,
+                        parameters
+                    )
+            )
+            {
+                while (reader.Read())
+                {
+                    result.Add(new
+                    {
+                        ParamedicID =
+                            reader["ParamedicID"]
+                            .ToString(),
+
+                        ParamedicName =
+                            reader["ParamedicName"]
+                            .ToString()
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        public static void UpdateDisplayDoctorList(
+            string serviceUnitID,
+            string paramedicIDs
+        )
+        {
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            // Matikan semua dokter pada poli tersebut
+            string sqlReset = @"
+                UPDATE ServiceUnitParamedic
+                SET IsDisplayActive = 0
+                WHERE ServiceUnitID = @ServiceUnitID
+            ";
+
+            parameters.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            entity.ExecuteNonQuery(
+                esQueryType.Text,
+                sqlReset,
+                parameters
+            );
+
+            // Jika tidak ada dokter dipilih selesai
+            if (string.IsNullOrWhiteSpace(paramedicIDs))
+                return;
+
+            // Hindari spasi
+            string[] dokterList =
+                paramedicIDs
+                .Split(',')
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrEmpty(x))
+                .ToArray();
+
+            if (dokterList.Length == 0)
+                return;
+
+            string inClause =
+                "'" +
+                string.Join("','", dokterList) +
+                "'";
+
+            string sqlUpdate = $@"
+                UPDATE ServiceUnitParamedic
+                SET IsDisplayActive = 1
+                WHERE ServiceUnitID = @ServiceUnitID
+                AND ParamedicID IN ({inClause})
+            ";
+
+            var parametersUpdate =
+                new esParameters();
+
+            parametersUpdate.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            entity.ExecuteNonQuery(
+                esQueryType.Text,
+                sqlUpdate,
+                parametersUpdate
+            );
         }
 
     }
