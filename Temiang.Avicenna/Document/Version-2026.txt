@@ -267,3 +267,6 @@ Titipan Daniel
 
 --[12-06-2026 - Danang] ---
 1. Feature Rujukan Satusehat Final fixed after UAT
+
+--[12-06-2026 - Wiliam] ---
+1. Optimasi tampilan list paramedic fee calculation tanpa mengubah logic dan output yang sudah ada. tampilan lebih cepat 2 detik.
