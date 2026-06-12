@@ -1,10 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using DevExpress.Web.Internal.XmlProcessor;
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Drawing;
-using System.Collections.Generic;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -122,13 +123,365 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
                     grd.DataSource = dataSource;
         }
 
+        //private DataTable ParamedicFee()
+        //{
+        //    var isEmptyFilter = txtDatePeriode1.IsEmpty && txtDatePeriode2.IsEmpty && string.IsNullOrEmpty(cboParamedicID.SelectedValue);
+        //    if (!ValidateSearch(isEmptyFilter, "Physician Service Fee Calculation")) return null;
+
+        //    try
+        //    {
+        //        //ExtractByDateRangeAndParamedicWithNoMergeBillingWithCorrection();
+        //        ExtractByDateRangeAndParamedicWithMergeBilling();
+
+        //        pnlInfo.Visible = false;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        pnlInfo.Visible = true;
+        //        lblInfo.Text = e.Message;
+        //        return null;
+        //    }
+
+        //    #region Fee4Service
+        //    var query = new ParamedicFeeTransChargesItemCompByDischargeDateQuery("a");
+        //    var transH = new TransChargesQuery("b");
+        //    var reg = new RegistrationQuery("c");
+        //    var item = new ItemQuery("d");
+        //    var medic = new ParamedicQuery("e");
+        //    var patient = new PatientQuery("f");
+        //    var unit = new ServiceUnitQuery("g");
+        //    var toUnit = new ServiceUnitQuery("h");
+        //    //var guar = new GuarantorQuery("i");
+        //    var guarCOB = new vwRegistrationGuarantorCOBQuery("j");
+
+        //        query.Select(
+        //            transH.RegistrationNo,
+        //            query.RegistrationNoMergeTo,
+        //            transH.TransactionDate,
+        //            query.ParamedicID,
+        //            medic.ParamedicName,
+        //            "<ISNULL(e.IsPhysicianTeam, 0) IsPhysicianTeam>",//medic.IsPhysicianTeam,
+        //            "<CAST(0 as bit) IsPhysicianMember>",
+        //            patient.MedicalNo,
+        //            patient.PatientName,
+        //            query.DischargeDate,
+        //            //transH.ToServiceUnitID,
+        //            unit.ServiceUnitName,
+        //            transH.TransactionNo,
+        //            query.SequenceNo,
+        //            transH.ToServiceUnitID,
+        //            "<h.ServiceUnitName AS ToServiceUnitName>",
+        //            query.TariffComponentID,
+        //            query.SRPhysicianFeeCategory,
+        //            query.ItemID,
+        //            item.ItemName,
+        //            guarCOB.GuarantorName.As("refToGuarantor_GuarantorName"),
+        //            query.PriceItem,
+        //            query.Price,
+        //            query.Discount,
+        //            query.Qty,
+        //            "<(a.Price - a.Discount) * a.Qty AS ParamedicFee>",
+        //            query.FeeAmount,
+        //            "<ISNULL(a.DiscountExtra, 0) DiscountExtra>",
+        //            query.DeductionAmount,
+        //            query.LastCalculatedDateTime,
+        //            query.IsModified,
+        //            query.PaymentMethodName,
+        //            query.SumDeductionAmount,
+        //            //guar.GuarantorName.As("refToGuarantor_GuarantorName"),
+        //            "<CASE WHEN c.SRRegistrationType = 'IPR' THEN DATEDIFF(d,c.RegistrationDate, c.DischargeDate) + 1 ELSE 1 END as refToRegistration_LOS>"
+        //            );
+        //    query.InnerJoin(transH).On(transH.TransactionNo == query.TransactionNo);
+        //    query.InnerJoin(reg).On(reg.RegistrationNo == transH.RegistrationNo);
+        //    query.InnerJoin(item).On(item.ItemID == query.ItemID);
+        //    query.InnerJoin(medic).On(medic.ParamedicID == query.ParamedicID);
+        //    query.InnerJoin(patient).On(patient.PatientID == reg.PatientID);
+        //    query.InnerJoin(unit).On(unit.ServiceUnitID == reg.ServiceUnitID);
+        //    query.InnerJoin(toUnit).On(toUnit.ServiceUnitID == transH.ToServiceUnitID);
+        //    //query.InnerJoin(guar).On(reg.GuarantorID == guar.GuarantorID);
+        //    query.InnerJoin(guarCOB).On(reg.RegistrationNo == guarCOB.RegistrationNo);
+
+        //    query.Where(query.DischargeDateMergeTo.Between(txtDatePeriode1.SelectedDate, txtDatePeriode2.SelectedDate),
+        //                //query.VerificationNo.IsNull(), 
+        //                query.SRPhysicianFeeCategory != "03"/*remun*/); //.In(new string[]{"01","04"})/*fee 4 service v1 dan v2*/);
+        //    // filter hanya yang bisa proses ke jasmed saja
+        //    query.Where(medic.ParamedicFee == true);
+
+        //    if (!string.IsNullOrEmpty(cboParamedicID.SelectedValue))
+        //        query.Where(query.ParamedicID == cboParamedicID.SelectedValue);
+
+        //    // exclude
+        //    var aCollGuar = new AppStandardReferenceItemCollection();
+        //    aCollGuar.Query.Where(aCollGuar.Query.StandardReferenceID == "PhysFeeCalcGuarExcl");
+        //    aCollGuar.LoadAll();
+        //    if (aCollGuar.Count > 0)
+        //    {
+        //        query.Where(reg.GuarantorID.NotIn(from a in aCollGuar select a.ItemID));
+        //    }
+
+        //    query.OrderBy(query.IsModified.Descending, transH.RegistrationNo.Ascending);
+
+        //    var res = query.LoadDataTable();
+
+        //    ParamedicFeeTransChargesItemCompByDischargeDateCollection.UpdateMoreInfo(res,
+        //        AppSession.Parameter.IsPhysicianFeeShowProcedureNote);
+
+        //    #endregion
+
+        //    #region FeeByTeam
+        //    var feeTeams = res.AsEnumerable().Where(r => ((!(r["IsPhysicianTeam"] is DBNull)) && (bool)r["IsPhysicianTeam"]));
+        //    if (feeTeams.Any()) {
+        //        var qMember = new ParamedicFeeTransChargesItemCompByTeamQuery("qMember");
+        //        var parMember = new ParamedicQuery("parMember");
+
+        //        qMember.InnerJoin(parMember).On(qMember.ParamedicID == parMember.ParamedicID)
+        //            .Select(
+        //                qMember.RegistrationNo,
+        //                qMember.RegistrationNoMergeTo,
+        //                "<getdate() as TransactionDate>", //qMember.TransactionDate,
+        //                qMember.ParamedicID,
+        //                parMember.ParamedicName,
+        //                "<ISNULL(parMember.IsPhysicianTeam, 0) IsPhysicianTeam>", //parMember.IsPhysicianTeam,
+        //                "<CAST(1 as bit) IsPhysicianMember>",
+        //                "<'' MedicalNo>",//qMember.MedicalNo,
+        //                "<'' PatientName>",//qMember.PatientName,
+        //                qMember.DischargeDate,
+        //                //"<'' ToServiceUnitID>",//qMember.ToServiceUnitID,
+        //                "<'' ServiceUnitName>",//qMember.ServiceUnitName,
+        //                qMember.TransactionNo,
+        //                qMember.SequenceNo,
+        //                "<'' ToServiceUnitID>",//qMember.ToServiceUnitID,
+        //                "<'' ToServiceUnitName>",
+        //                qMember.TariffComponentID,
+        //                "<'' SRPhysicianFeeCategory>",//qMember.SRPhysicianFeeCategory,
+        //                qMember.ItemID,
+        //                "<'' ItemName>",//qMember.ItemName,
+        //                "<'' refToGuarantor_GuarantorName>",//qMember.GuarantorName.As("refToGuarantor_GuarantorName"),
+        //                qMember.PriceItem,
+        //                qMember.Price,
+        //                qMember.Discount,
+        //                qMember.Qty,
+        //                "<(qMember.Price - qMember.Discount) * qMember.Qty AS ParamedicFee>",
+        //                qMember.FeeAmount,
+        //                "<cast(0 as decimal(18,2)) DiscountExtra>",
+        //                "<cast(0 as decimal(18,2)) DeductionAmount>",//qMember.DeductionAmount,
+        //                qMember.LastCalculatedDateTime,
+        //                "<cast(0 as bit) IsModified>",//qMember.IsModified,
+        //                "<'' PaymentMethodName>",//qMember.PaymentMethodName,
+        //                "<cast(0 as decimal(18,2)) SumDeductionAmount>",//qMember.SumDeductionAmount,
+        //                "<cast(0 as int) refToRegistration_LOS>"
+        //        );
+        //        qMember.Where(qMember.TransactionNo.In(feeTeams.Select(f => f["TransactionNo"].ToString()).Distinct()));
+        //        var resMember = qMember.LoadDataTable();
+        //        if (resMember.Rows.Count > 0) {
+        //            foreach (System.Data.DataRow rMember in resMember.Rows) {
+        //                var feeTeam = feeTeams.Where(f =>
+        //                    f["TransactionNo"].ToString() == rMember["TransactionNo"].ToString() &&
+        //                    f["SequenceNo"].ToString() == rMember["SequenceNo"].ToString() &&
+        //                    f["TariffComponentID"].ToString() == rMember["TariffComponentID"].ToString()).First();
+
+        //                rMember["TransactionDate"] = feeTeam["TransactionDate"];
+        //                rMember["MedicalNo"] = feeTeam["MedicalNo"];
+        //                rMember["PatientName"] = feeTeam["PatientName"];
+        //                rMember["ServiceUnitName"] = feeTeam["ServiceUnitName"];
+        //                rMember["ToServiceUnitID"] = feeTeam["ToServiceUnitID"];
+        //                rMember["ToServiceUnitName"] = feeTeam["ToServiceUnitName"];
+        //                rMember["SRPhysicianFeeCategory"] = feeTeam["SRPhysicianFeeCategory"];
+        //                rMember["ItemName"] = feeTeam["ItemName"];
+        //                rMember["refToGuarantor_GuarantorName"] = feeTeam["refToGuarantor_GuarantorName"];
+        //                rMember["DiscountExtra"] = feeTeam["DiscountExtra"];
+        //                rMember["PaymentMethodName"] = feeTeam["PaymentMethodName"];
+        //                rMember["refToRegistration_LOS"] = feeTeam["refToRegistration_LOS"];
+        //            }
+        //            resMember.AcceptChanges();
+
+        //            //hapus yang team
+        //            var feeTeamToRemoves = from t in res.AsEnumerable()
+        //                     join m in resMember.AsEnumerable()
+        //                     on new
+        //                     {
+        //                         TransactionNo = t["TransactionNo"].ToString(),
+        //                         SequenceNo = t["SequenceNo"].ToString(),
+        //                         TariffComponentID = t["TariffComponentID"].ToString()
+        //                     } equals new {
+        //                         TransactionNo = m["TransactionNo"].ToString(),
+        //                         SequenceNo = m["SequenceNo"].ToString(),
+        //                         TariffComponentID = m["TariffComponentID"].ToString()
+        //                     }
+        //                     select t;
+
+        //            foreach (var feeTeamToRemove in feeTeamToRemoves) {
+        //                feeTeamToRemove.Delete();
+        //            }
+        //            res.AcceptChanges();
+
+        //            res.Merge(resMember);
+        //        }
+        //    }
+        //    #endregion
+
+        //    #region FeeByAR
+        //    var queryAR = new ParamedicFeeTransChargesItemCompByDischargeDateQuery("a");
+        //    var guarAR = new GuarantorQuery("b");
+        //    var regAR = new RegistrationQuery("c");
+        //    var medicAR = new ParamedicQuery("e");
+        //    var patientAR = new PatientQuery("f");
+        //    var unitAR = new ServiceUnitQuery("g");
+        //    var vwGuarCOB = new vwRegistrationGuarantorCOBQuery("cob");
+
+        //        queryAR.Select(
+        //        queryAR.RegistrationNo,
+        //        queryAR.RegistrationNoMergeTo,
+        //        queryAR.DischargeDate.As("TransactionDate"),
+        //        queryAR.ParamedicID,
+        //        medicAR.ParamedicName,
+        //        "<ISNULL(e.IsPhysicianTeam, 0) IsPhysicianTeam>", //medicAR.IsPhysicianTeam,
+        //        "<CAST(0 as bit) IsPhysicianMember>",
+        //        patientAR.MedicalNo,
+        //        patientAR.PatientName,
+        //        queryAR.DischargeDate,
+        //        //unitAR.ServiceUnitID.As("ToServiceUnitID"),
+        //        unitAR.ServiceUnitName,
+        //        queryAR.TransactionNo,
+        //        queryAR.SequenceNo,
+        //        unitAR.ServiceUnitID.As("ToServiceUnitID"),
+        //        "<g.ServiceUnitName AS ToServiceUnitName>",
+        //        queryAR.TariffComponentID,
+        //        queryAR.SRPhysicianFeeCategory,
+        //        queryAR.ItemID,
+        //        //guarAR.GuarantorName.As("ItemName"),
+        //        vwGuarCOB.GuarantorName.As("ItemName"),
+        //        queryAR.PriceItem,
+        //        queryAR.Price,
+        //        queryAR.Discount,
+        //        queryAR.Qty,
+        //        "<(a.Price - a.Discount) * a.Qty AS ParamedicFee>",
+
+        //        queryAR.FeeAmount,
+        //        "<ISNULL(a.DiscountExtra, 0) DiscountExtra>",
+        //        queryAR.DeductionAmount,
+        //        queryAR.LastCalculatedDateTime,
+        //        queryAR.IsModified,
+        //        queryAR.PaymentMethodName,
+        //        queryAR.SumDeductionAmount,
+        //        //guarAR.GuarantorName.As("refToGuarantor_GuarantorName"),
+        //        vwGuarCOB.GuarantorName.As("refToGuarantor_GuarantorName"),
+        //        "<CASE WHEN c.SRRegistrationType = 'IPR' THEN DATEDIFF(d,c.RegistrationDate, c.DischargeDate) + 1 ELSE 1 END as refToRegistration_LOS>"
+        //        );
+
+        //    queryAR.InnerJoin(guarAR).On(queryAR.ItemID.Equal(guarAR.GuarantorID));
+        //    queryAR.InnerJoin(regAR).On(regAR.RegistrationNo == queryAR.RegistrationNo);
+        //    queryAR.InnerJoin(medicAR).On(medicAR.ParamedicID == queryAR.ParamedicID);
+        //    queryAR.InnerJoin(patientAR).On(patientAR.PatientID == regAR.PatientID);
+        //    queryAR.InnerJoin(unitAR).On(unitAR.ServiceUnitID == regAR.ServiceUnitID);
+        //    queryAR.InnerJoin(vwGuarCOB).On(queryAR.RegistrationNo == vwGuarCOB.RegistrationNo);
+
+        //    queryAR.Where(queryAR.DischargeDateMergeTo.Between(txtDatePeriode1.SelectedDate, txtDatePeriode2.SelectedDate),
+        //        queryAR.VerificationNo.IsNull(), queryAR.SRPhysicianFeeCategory == "02" /*Fee by AR*/,
+        //        queryAR.TariffComponentID == string.Empty);
+
+        //    // filter hanya yang bisa proses ke jasmed saja
+        //    query.Where(medicAR.ParamedicFee == true);
+
+        //    if (!string.IsNullOrEmpty(cboParamedicID.SelectedValue))
+        //        queryAR.Where(queryAR.ParamedicID == cboParamedicID.SelectedValue);
+
+        //    // exclude
+        //    if (aCollGuar.Count > 0)
+        //    {
+        //        queryAR.Where(regAR.GuarantorID.NotIn(from a in aCollGuar select a.ItemID));
+        //    }
+
+        //    queryAR.OrderBy(queryAR.IsModified.Descending, queryAR.RegistrationNo.Ascending);
+
+        //    var resAR = queryAR.LoadDataTable();
+
+        //    //khusus rsmp nilai dasar perhitungan jasa dari nilai perhitungan bpjs eklaim
+        //    if (AppSession.Parameter.HealthcareInitial == "RSMP")
+        //    {
+        //        foreach (DataRow row in resAR.Rows)
+        //        {
+        //            var ncc = new NccInacbg();
+        //            if (ncc.LoadByPrimaryKey(row["RegistrationNo"].ToString()))
+        //            {
+        //                row["PriceItem"] = ncc.CoverageAmount ?? 0;
+        //                row["Price"] = ncc.CoverageAmount ?? 0;
+        //                row["ParamedicFee"] = Convert.ToDecimal(row["Price"]) - Convert.ToDecimal(row["Discount"]);
+
+        //                var fee = new ParamedicFeeTransChargesItemCompByDischargeDate();
+        //                fee.Query.Where(fee.Query.TransactionNo == row["RegistrationNo"].ToString(), 
+        //                    fee.Query.ParamedicID == row["ParamedicID"].ToString(),
+        //                    fee.Query.SequenceNo == row["SequenceNo"].ToString());
+        //                if (fee.Query.Load())
+        //                {
+        //                    fee.Price = ncc.CoverageAmount ?? 0;
+        //                    fee.PriceItem = ncc.CoverageAmount ?? 0;
+        //                }
+        //                fee.Save();
+        //            }
+        //            else //reload ulang dari eklaim jika tidak ada
+        //            {
+        //                var regs = new Registration();
+        //                if (!regs.LoadByPrimaryKey(row["RegistrationNo"].ToString())) continue;
+        //                if (string.IsNullOrEmpty(regs.BpjsSepNo)) continue;
+
+        //                var service = new Common.Inacbg.v51.Service();
+        //                var response = service.GetDetail(new Common.Inacbg.v51.Claim.Get.GetDetail.Data() { nomor_sep = reg.BpjsSepNo });
+        //                if (response.Metadata.IsValid)
+        //                {
+        //                    var entity = new NccInacbg();
+        //                    entity.RegistrationNo = row["RegistrationNo"].ToString();
+
+        //                    entity.PatientId = response.DataResponse.Data.PatientId.ToInt();
+        //                    entity.AdmissionId = response.DataResponse.Data.AdmissionId.ToInt();
+        //                    entity.HospitalAdmissionId = response.DataResponse.Data.HospitalAdmissionId.ToInt();
+
+        //                    entity.LastUpdateDateTime = DateTime.Now;
+        //                    entity.LastUpdateByUserID = AppSession.UserLogin.UserID;
+
+        //                    entity.AddPaymentAmt = Convert.ToDecimal(string.IsNullOrEmpty(response.DataResponse.Data.AddPaymentAmt) ? 0 : Convert.ToDouble(response.DataResponse.Data.AddPaymentAmt));
+
+        //                    var grouper = response.DataResponse.Data.Grouper;
+        //                    if (grouper.Response != null) entity.CoverageAmount = Convert.ToDecimal(grouper.Response.Cbg.Tariff);
+        //                    else entity.CoverageAmount = 0;
+
+        //                    entity.Save();
+
+        //                    row["PriceItem"] = entity.CoverageAmount ?? 0;
+        //                    row["Price"] = entity.CoverageAmount ?? 0;
+        //                    row["ParamedicFee"] = Convert.ToDecimal(row["Price"]) - Convert.ToDecimal(row["Discount"]);
+
+        //                    var fee = new ParamedicFeeTransChargesItemCompByDischargeDate();
+        //                    fee.Query.Where(fee.Query.TransactionNo == row["RegistrationNo"].ToString(),
+        //                        fee.Query.SequenceNo == row["SequenceNo"].ToString());
+        //                    if (fee.Query.Load())
+        //                    {
+        //                        fee.Price = ncc.CoverageAmount ?? 0;
+        //                        fee.PriceItem = ncc.CoverageAmount ?? 0;
+        //                    }
+        //                    fee.Save();
+        //                }
+        //            }
+        //        }
+        //    }
+        //    #endregion
+
+        //    res.Merge(resAR);
+
+        //    return res;
+        //}
+
         private DataTable ParamedicFee()
         {
-            var isEmptyFilter = txtDatePeriode1.IsEmpty && txtDatePeriode2.IsEmpty && string.IsNullOrEmpty(cboParamedicID.SelectedValue);
-            if (!ValidateSearch(isEmptyFilter, "Physician Service Fee Calculation")) return null;
-
+            
             try
             {
+                var isEmptyFilter = txtDatePeriode1.IsEmpty || txtDatePeriode2.IsEmpty || string.IsNullOrEmpty(cboParamedicID.SelectedValue);
+                if (!ValidateSearch(isEmptyFilter, "Physician Service Fee Calculation"))
+                {
+                    throw new Exception("Please entry Physician Service Fee Calculation searching criteria");
+                }
+
                 //ExtractByDateRangeAndParamedicWithNoMergeBillingWithCorrection();
                 ExtractByDateRangeAndParamedicWithMergeBilling();
 
@@ -153,43 +506,43 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
             //var guar = new GuarantorQuery("i");
             var guarCOB = new vwRegistrationGuarantorCOBQuery("j");
 
-                query.Select(
-                    transH.RegistrationNo,
-                    query.RegistrationNoMergeTo,
-                    transH.TransactionDate,
-                    query.ParamedicID,
-                    medic.ParamedicName,
-                    "<ISNULL(e.IsPhysicianTeam, 0) IsPhysicianTeam>",//medic.IsPhysicianTeam,
-                    "<CAST(0 as bit) IsPhysicianMember>",
-                    patient.MedicalNo,
-                    patient.PatientName,
-                    query.DischargeDate,
-                    //transH.ToServiceUnitID,
-                    unit.ServiceUnitName,
-                    transH.TransactionNo,
-                    query.SequenceNo,
-                    transH.ToServiceUnitID,
-                    "<h.ServiceUnitName AS ToServiceUnitName>",
-                    query.TariffComponentID,
-                    query.SRPhysicianFeeCategory,
-                    query.ItemID,
-                    item.ItemName,
-                    guarCOB.GuarantorName.As("refToGuarantor_GuarantorName"),
-                    query.PriceItem,
-                    query.Price,
-                    query.Discount,
-                    query.Qty,
-                    "<(a.Price - a.Discount) * a.Qty AS ParamedicFee>",
-                    query.FeeAmount,
-                    "<ISNULL(a.DiscountExtra, 0) DiscountExtra>",
-                    query.DeductionAmount,
-                    query.LastCalculatedDateTime,
-                    query.IsModified,
-                    query.PaymentMethodName,
-                    query.SumDeductionAmount,
-                    //guar.GuarantorName.As("refToGuarantor_GuarantorName"),
-                    "<CASE WHEN c.SRRegistrationType = 'IPR' THEN DATEDIFF(d,c.RegistrationDate, c.DischargeDate) + 1 ELSE 1 END as refToRegistration_LOS>"
-                    );
+            query.Select(
+                transH.RegistrationNo,
+                query.RegistrationNoMergeTo,
+                transH.TransactionDate,
+                query.ParamedicID,
+                medic.ParamedicName,
+                "<ISNULL(e.IsPhysicianTeam, 0) IsPhysicianTeam>",//medic.IsPhysicianTeam,
+                "<CAST(0 as bit) IsPhysicianMember>",
+                patient.MedicalNo,
+                patient.PatientName,
+                query.DischargeDate,
+                //transH.ToServiceUnitID,
+                unit.ServiceUnitName,
+                transH.TransactionNo,
+                query.SequenceNo,
+                transH.ToServiceUnitID,
+                "<h.ServiceUnitName AS ToServiceUnitName>",
+                query.TariffComponentID,
+                query.SRPhysicianFeeCategory,
+                query.ItemID,
+                item.ItemName,
+                guarCOB.GuarantorName.As("refToGuarantor_GuarantorName"),
+                query.PriceItem,
+                query.Price,
+                query.Discount,
+                query.Qty,
+                "<(a.Price - a.Discount) * a.Qty AS ParamedicFee>",
+                query.FeeAmount,
+                "<ISNULL(a.DiscountExtra, 0) DiscountExtra>",
+                query.DeductionAmount,
+                query.LastCalculatedDateTime,
+                query.IsModified,
+                query.PaymentMethodName,
+                query.SumDeductionAmount,
+                //guar.GuarantorName.As("refToGuarantor_GuarantorName"),
+                "<CASE WHEN c.SRRegistrationType = 'IPR' THEN DATEDIFF(d,c.RegistrationDate, c.DischargeDate) + 1 ELSE 1 END as refToRegistration_LOS>"
+                );
             query.InnerJoin(transH).On(transH.TransactionNo == query.TransactionNo);
             query.InnerJoin(reg).On(reg.RegistrationNo == transH.RegistrationNo);
             query.InnerJoin(item).On(item.ItemID == query.ItemID);
@@ -203,7 +556,7 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
             query.Where(query.DischargeDateMergeTo.Between(txtDatePeriode1.SelectedDate, txtDatePeriode2.SelectedDate),
                         //query.VerificationNo.IsNull(), 
                         query.SRPhysicianFeeCategory != "03"/*remun*/); //.In(new string[]{"01","04"})/*fee 4 service v1 dan v2*/);
-            // filter hanya yang bisa proses ke jasmed saja
+                                                                        // filter hanya yang bisa proses ke jasmed saja
             query.Where(medic.ParamedicFee == true);
 
             if (!string.IsNullOrEmpty(cboParamedicID.SelectedValue))
@@ -228,8 +581,18 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
             #endregion
 
             #region FeeByTeam
-            var feeTeams = res.AsEnumerable().Where(r => ((!(r["IsPhysicianTeam"] is DBNull)) && (bool)r["IsPhysicianTeam"]));
-            if (feeTeams.Any()) {
+            // [OPTIMIZED] Materialize feeTeams dengan .ToList() agar tidak re-evaluate setiap akses
+            var feeTeams = res.AsEnumerable().Where(r => ((!(r["IsPhysicianTeam"] is DBNull)) && (bool)r["IsPhysicianTeam"])).ToList();
+            if (feeTeams.Any())
+            {
+
+                // [OPTIMIZED] Pre-build Dictionary untuk O(1) lookup per member row (menggantikan nested loop O(n×m))
+                var feeTeamDict = feeTeams.ToDictionary(
+                    f => (f["TransactionNo"].ToString(), f["SequenceNo"].ToString(), f["TariffComponentID"].ToString()));
+
+                // [OPTIMIZED] Pre-build HashSet untuk distinct TransactionNo
+                var distinctTransNos = new HashSet<string>(feeTeams.Select(f => f["TransactionNo"].ToString()));
+
                 var qMember = new ParamedicFeeTransChargesItemCompByTeamQuery("qMember");
                 var parMember = new ParamedicQuery("parMember");
 
@@ -270,14 +633,16 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
                         "<cast(0 as decimal(18,2)) SumDeductionAmount>",//qMember.SumDeductionAmount,
                         "<cast(0 as int) refToRegistration_LOS>"
                 );
-                qMember.Where(qMember.TransactionNo.In(feeTeams.Select(f => f["TransactionNo"].ToString()).Distinct()));
+                // [OPTIMIZED] Menggunakan HashSet distinctTransNos
+                qMember.Where(qMember.TransactionNo.In(distinctTransNos));
                 var resMember = qMember.LoadDataTable();
-                if (resMember.Rows.Count > 0) {
-                    foreach (System.Data.DataRow rMember in resMember.Rows) {
-                        var feeTeam = feeTeams.Where(f =>
-                            f["TransactionNo"].ToString() == rMember["TransactionNo"].ToString() &&
-                            f["SequenceNo"].ToString() == rMember["SequenceNo"].ToString() &&
-                            f["TariffComponentID"].ToString() == rMember["TariffComponentID"].ToString()).First();
+                if (resMember.Rows.Count > 0)
+                {
+                    foreach (System.Data.DataRow rMember in resMember.Rows)
+                    {
+                        // [OPTIMIZED] Dictionary lookup O(1) menggantikan .Where(...).First() O(n)
+                        var key = (rMember["TransactionNo"].ToString(), rMember["SequenceNo"].ToString(), rMember["TariffComponentID"].ToString());
+                        var feeTeam = feeTeamDict[key];
 
                         rMember["TransactionDate"] = feeTeam["TransactionDate"];
                         rMember["MedicalNo"] = feeTeam["MedicalNo"];
@@ -295,22 +660,20 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
                     resMember.AcceptChanges();
 
                     //hapus yang team
-                    var feeTeamToRemoves = from t in res.AsEnumerable()
-                             join m in resMember.AsEnumerable()
-                             on new
-                             {
-                                 TransactionNo = t["TransactionNo"].ToString(),
-                                 SequenceNo = t["SequenceNo"].ToString(),
-                                 TariffComponentID = t["TariffComponentID"].ToString()
-                             } equals new {
-                                 TransactionNo = m["TransactionNo"].ToString(),
-                                 SequenceNo = m["SequenceNo"].ToString(),
-                                 TariffComponentID = m["TariffComponentID"].ToString()
-                             }
-                             select t;
+                    // [OPTIMIZED] HashSet lookup menggantikan LINQ join untuk row removal
+                    var memberKeys = new HashSet<(string, string, string)>(
+                        resMember.AsEnumerable().Select(m => (
+                            m["TransactionNo"].ToString(),
+                            m["SequenceNo"].ToString(),
+                            m["TariffComponentID"].ToString())));
 
-                    foreach (var feeTeamToRemove in feeTeamToRemoves) {
-                        feeTeamToRemove.Delete();
+                    foreach (var row in res.AsEnumerable().ToList())
+                    {
+                        var key = (row["TransactionNo"].ToString(), row["SequenceNo"].ToString(), row["TariffComponentID"].ToString());
+                        if (memberKeys.Contains(key))
+                        {
+                            row.Delete();
+                        }
                     }
                     res.AcceptChanges();
 
@@ -328,45 +691,45 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
             var unitAR = new ServiceUnitQuery("g");
             var vwGuarCOB = new vwRegistrationGuarantorCOBQuery("cob");
 
-                queryAR.Select(
-                queryAR.RegistrationNo,
-                queryAR.RegistrationNoMergeTo,
-                queryAR.DischargeDate.As("TransactionDate"),
-                queryAR.ParamedicID,
-                medicAR.ParamedicName,
-                "<ISNULL(e.IsPhysicianTeam, 0) IsPhysicianTeam>", //medicAR.IsPhysicianTeam,
-                "<CAST(0 as bit) IsPhysicianMember>",
-                patientAR.MedicalNo,
-                patientAR.PatientName,
-                queryAR.DischargeDate,
-                //unitAR.ServiceUnitID.As("ToServiceUnitID"),
-                unitAR.ServiceUnitName,
-                queryAR.TransactionNo,
-                queryAR.SequenceNo,
-                unitAR.ServiceUnitID.As("ToServiceUnitID"),
-                "<g.ServiceUnitName AS ToServiceUnitName>",
-                queryAR.TariffComponentID,
-                queryAR.SRPhysicianFeeCategory,
-                queryAR.ItemID,
-                //guarAR.GuarantorName.As("ItemName"),
-                vwGuarCOB.GuarantorName.As("ItemName"),
-                queryAR.PriceItem,
-                queryAR.Price,
-                queryAR.Discount,
-                queryAR.Qty,
-                "<(a.Price - a.Discount) * a.Qty AS ParamedicFee>",
-                
-                queryAR.FeeAmount,
-                "<ISNULL(a.DiscountExtra, 0) DiscountExtra>",
-                queryAR.DeductionAmount,
-                queryAR.LastCalculatedDateTime,
-                queryAR.IsModified,
-                queryAR.PaymentMethodName,
-                queryAR.SumDeductionAmount,
-                //guarAR.GuarantorName.As("refToGuarantor_GuarantorName"),
-                vwGuarCOB.GuarantorName.As("refToGuarantor_GuarantorName"),
-                "<CASE WHEN c.SRRegistrationType = 'IPR' THEN DATEDIFF(d,c.RegistrationDate, c.DischargeDate) + 1 ELSE 1 END as refToRegistration_LOS>"
-                );
+            queryAR.Select(
+            queryAR.RegistrationNo,
+            queryAR.RegistrationNoMergeTo,
+            queryAR.DischargeDate.As("TransactionDate"),
+            queryAR.ParamedicID,
+            medicAR.ParamedicName,
+            "<ISNULL(e.IsPhysicianTeam, 0) IsPhysicianTeam>", //medicAR.IsPhysicianTeam,
+            "<CAST(0 as bit) IsPhysicianMember>",
+            patientAR.MedicalNo,
+            patientAR.PatientName,
+            queryAR.DischargeDate,
+            //unitAR.ServiceUnitID.As("ToServiceUnitID"),
+            unitAR.ServiceUnitName,
+            queryAR.TransactionNo,
+            queryAR.SequenceNo,
+            unitAR.ServiceUnitID.As("ToServiceUnitID"),
+            "<g.ServiceUnitName AS ToServiceUnitName>",
+            queryAR.TariffComponentID,
+            queryAR.SRPhysicianFeeCategory,
+            queryAR.ItemID,
+            //guarAR.GuarantorName.As("ItemName"),
+            vwGuarCOB.GuarantorName.As("ItemName"),
+            queryAR.PriceItem,
+            queryAR.Price,
+            queryAR.Discount,
+            queryAR.Qty,
+            "<(a.Price - a.Discount) * a.Qty AS ParamedicFee>",
+
+            queryAR.FeeAmount,
+            "<ISNULL(a.DiscountExtra, 0) DiscountExtra>",
+            queryAR.DeductionAmount,
+            queryAR.LastCalculatedDateTime,
+            queryAR.IsModified,
+            queryAR.PaymentMethodName,
+            queryAR.SumDeductionAmount,
+            //guarAR.GuarantorName.As("refToGuarantor_GuarantorName"),
+            vwGuarCOB.GuarantorName.As("refToGuarantor_GuarantorName"),
+            "<CASE WHEN c.SRRegistrationType = 'IPR' THEN DATEDIFF(d,c.RegistrationDate, c.DischargeDate) + 1 ELSE 1 END as refToRegistration_LOS>"
+            );
 
             queryAR.InnerJoin(guarAR).On(queryAR.ItemID.Equal(guarAR.GuarantorID));
             queryAR.InnerJoin(regAR).On(regAR.RegistrationNo == queryAR.RegistrationNo);
@@ -380,7 +743,7 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
                 queryAR.TariffComponentID == string.Empty);
 
             // filter hanya yang bisa proses ke jasmed saja
-            query.Where(medicAR.ParamedicFee == true);
+            queryAR.Where(medicAR.ParamedicFee == true);
 
             if (!string.IsNullOrEmpty(cboParamedicID.SelectedValue))
                 queryAR.Where(queryAR.ParamedicID == cboParamedicID.SelectedValue);
@@ -408,7 +771,7 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
                         row["ParamedicFee"] = Convert.ToDecimal(row["Price"]) - Convert.ToDecimal(row["Discount"]);
 
                         var fee = new ParamedicFeeTransChargesItemCompByDischargeDate();
-                        fee.Query.Where(fee.Query.TransactionNo == row["RegistrationNo"].ToString(), 
+                        fee.Query.Where(fee.Query.TransactionNo == row["RegistrationNo"].ToString(),
                             fee.Query.ParamedicID == row["ParamedicID"].ToString(),
                             fee.Query.SequenceNo == row["SequenceNo"].ToString());
                         if (fee.Query.Load())
