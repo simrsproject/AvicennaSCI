@@ -264,3 +264,6 @@ Titipan Daniel
 
 --[09-06-2026 - Aminudin] ---
 1. Modifikasi DistributionList.aspx.cs untuk optimalisasi query
+
+--[12-06-2026 - Danang] ---
+1. Feature Rujukan Satusehat Final fixed after UAT

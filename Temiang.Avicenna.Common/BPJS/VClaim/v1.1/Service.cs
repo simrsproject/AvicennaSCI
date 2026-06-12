@@ -922,7 +922,7 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
             var root = new Common.BPJS.VClaim.v20.Sep.InsertRequest.Root();
             root.Request = new Common.BPJS.VClaim.v20.Sep.InsertRequest.TRequest { TSep = tsep };
 
-            using (var response = PopulateWebRequest(_url, Helper.WebRequestMethod.POST, Helper.WebRequestContentType.FORM, JsonConvert.SerializeObject(root), out var timeStamp).GetResponse() as HttpWebResponse)
+            using (var response = PopulateWebRequest(_url, Helper.WebRequestMethod.POST, Helper.WebRequestContentType.TEXT, JsonConvert.SerializeObject(root), out var timeStamp).GetResponse() as HttpWebResponse)
             {
                 if (response.StatusCode != HttpStatusCode.OK) throw new Exception(String.Format("Server error (HTTP {0}: {1}).", response.StatusCode, response.StatusDescription));
 
@@ -3194,33 +3194,28 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11
 
         public v11.RujukanSatuSehat.DeleteRujukanResponse DeleteRujukan(v11.RujukanSatuSehat.DeleteRujukanRequest root)
         {
-            // {BASE URL}/Rujukan/Delete
-
             var url = _urlrujukan + "Rujukan/Delete";
 
-            using (var response = PopulateWebRequestR(url,
-                Helper.WebRequestMethod.POST, // ⚠️ BPJS biasanya tetap POST
-                Helper.WebRequestContentType.JSON,
-                JsonConvert.SerializeObject(root),
-                out var timeStamp).GetResponse() as HttpWebResponse)
+            var payload = JsonConvert.SerializeObject(root, new JsonSerializerSettings
             {
+                NullValueHandling = NullValueHandling.Ignore
+            });
 
+            using (var response = PopulateWebRequestR(url, Helper.WebRequestMethod.DELETE, Helper.WebRequestContentType.JSON, payload, out var timeStamp).GetResponse() as HttpWebResponse)
+            {
                 if (response.StatusCode != HttpStatusCode.OK)
                     throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
 
                 var sr = new StreamReader(response.GetResponseStream());
 
-                // 🔹 NON ENCRYPT
                 if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
                     return JsonConvert.DeserializeObject<v11.RujukanSatuSehat.DeleteRujukanResponse>(sr.ReadToEnd());
 
-                // 🔹 ENCRYPTED
                 var encryptedResponse = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(sr.ReadToEnd());
 
                 if (encryptedResponse.MetaData.IsValid)
                 {
-                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(
-                        DecryptResponse(timeStamp, encryptedResponse.Response));
+                    var decryptResponse = LZString.DecompressFromEncodedURIComponent(DecryptResponse(timeStamp, encryptedResponse.Response));
 
                     return new v11.RujukanSatuSehat.DeleteRujukanResponse
                     {

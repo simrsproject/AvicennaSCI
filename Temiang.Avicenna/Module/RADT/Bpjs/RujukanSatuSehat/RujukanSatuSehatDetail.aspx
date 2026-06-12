@@ -40,6 +40,41 @@
             }
         </script>
 
+        <style>
+            .faskes-item {
+                padding: 8px 10px;
+                line-height: 1.35;
+                border-bottom: 1px solid #e5e5e5;
+                white-space: normal;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .faskes-title {
+                font-weight: bold;
+                font-size: 13px;
+                color: #222;
+                margin-bottom: 3px;
+            }
+
+            .faskes-code {
+                color: #666;
+                font-weight: normal;
+            }
+
+            .faskes-meta {
+                font-size: 12px;
+                color: #444;
+                margin-bottom: 2px;
+            }
+
+            .faskes-small {
+                font-size: 11px;
+                color: #666;
+                margin-top: 2px;
+            }
+        </style>
+
     </telerik:RadCodeBlock>
     <telerik:RadWindow runat="server" Animation="None" Behavior="Close, Move" ShowContentDuringLoad="False"
         Width="750px" Height="420px" VisibleStatusbar="False" Modal="true" ID="winRujukan"
@@ -257,8 +292,45 @@
                     ID="cboFaskesRujukan"
                     runat="server"
                     Width="300px"
+                    DropDownWidth="300"
+                    Height="300px"
                     Filter="Contains"
-                    MarkFirstMatch="true" />
+                    MarkFirstMatch="true"
+                    EmptyMessage="-- pilih faskes --"
+                    DataTextField="Nmppk"
+                    DataValueField="Kdppk">
+
+                    <ItemTemplate>
+                        <div class="faskes-item">
+                            <div class="faskes-title">
+                                <%# FaskesText(Eval("Nmppk")) %>
+                                <span class="faskes-code">(<%# FaskesText(Eval("Kdppk")) %>)</span>
+                            </div>
+
+                            <div class="faskes-meta">
+                                Kota/Kab: <%# FaskesText(Eval("Nmkc")) %> |
+                                Kelas: <%# FaskesText(Eval("Kelas")) %> |
+                                Strata SS: <%# FaskesText(Eval("StrataSatuSehat")) %>
+                            </div>
+
+                            <div class="faskes-small">
+                                Kode Faskes SS: <%# FaskesText(Eval("KodeFaskesSatuSehat")) %>
+                            </div>
+
+                            <div class="faskes-small">
+                                Alamat: <%# FaskesText(Eval("AlamatPpk")) %>
+                            </div>
+
+                            <div class="faskes-small">
+                                Telp: <%# FaskesText(Eval("TelpPpk")) %> |
+                                Kapasitas: <%# FaskesNumber(Eval("Kapasitas")) %> |
+                                Jumlah Rujuk: <%# FaskesNumber(Eval("JmlRujuk")) %> |
+                                Persentase: <%# FaskesPercent(Eval("Persentase")) %> |
+                                Jarak: <%# FaskesDistance(Eval("Distance")) %>
+                            </div>
+                        </div>
+                    </ItemTemplate>
+                </telerik:RadComboBox>
             </td>
         </tr>
         <tr>

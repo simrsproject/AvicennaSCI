@@ -71,6 +71,27 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                         txtTglRujukan.SelectedDate = sep.TanggalSEP;
                         cboPelayanan.SelectedValue = sep.JenisPelayanan;
 
+                        var reg = new Registration();
+                        reg.Query.Where(reg.Query.BpjsSepNo == txtNoSep.Text);
+
+                        if (reg.Query.Load())
+                        {
+                            var accessToken = string.Empty;
+                            string err;
+
+                            var patSs = EnsurePatientSatuSehatBridging(
+                                reg.PatientID,
+                                ref accessToken,
+                                out err
+                            );
+
+                            if (patSs == null)
+                            {
+                                ShowAlert(err);
+                                return;
+                            };
+                        }
+
                     }
                 }
             }
@@ -148,17 +169,15 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
         protected override void OnMenuDeleteClick(ValidateArgs args)
         {
             var entity = new BpjsRujukanSatuSehat();
-            if (entity.LoadByPrimaryKey(txtNoSep.Text, txtNoRujukan.Text))
-            {
-                entity.MarkAsDeleted();
-                SaveEntity(entity, args);
-            }
-            else
+
+            if (!entity.LoadByPrimaryKey(txtNoSep.Text, txtNoRujukan.Text))
             {
                 args.MessageText = AppConstant.Message.RecordNotExist;
                 args.IsCancel = true;
                 return;
             }
+
+            DeleteRujukan(entity, args);
         }
 
         private void SetEntityValue(BpjsRujukanSatuSehat br)
@@ -341,11 +360,18 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     }
 
                     // PATIENT BRIDGING
-                    var pb = new PatientBridging();
-                    pb.Query.Where(pb.Query.PatientID == reg.PatientID);
-                    if (!pb.Query.Load())
+                    var accessToken = string.Empty;
+                    string patientBridgeError;
+
+                    var pb = EnsurePatientSatuSehatBridging(
+                        reg.PatientID,
+                        ref accessToken,
+                        out patientBridgeError
+                    );
+
+                    if (pb == null || string.IsNullOrWhiteSpace(pb.BridgingID))
                     {
-                        args.MessageText = "Pasien belum bridging SatuSehat";
+                        args.MessageText = patientBridgeError;
                         args.IsCancel = true;
                         return;
                     }
@@ -462,6 +488,12 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
                     var response = svc.PostKunjungan(request);
 
+                    ShowApiResponseAlert(
+                        "Response Post Kunjungan / Insert Rujukan",
+                        response?.MetaData?.Code,
+                        response?.MetaData?.Message
+                    );
+
                     entity.RequestJson = json;
                     entity.ResponseJson = JsonConvert.SerializeObject(response);
                     entity.BpjsResponseCode = response?.MetaData?.Code;
@@ -483,38 +515,193 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                         return;
                     }
                 }
-                else if (entity.es.IsDeleted)
-                {
-                    var request = new DeleteRujukanRequest
-                    {
-                        Request = new DeleteRequestWrapper
-                        {
-                            TRujukan = new DeleteTRujukan
-                            {
-                                NoRujukan = entity.NoRujukan,
-                                User = AppSession.UserLogin.UserID
-                            }
-                        }
-                    };
+                //else if (entity.es.IsDeleted)
+                //{
+                //    if (string.IsNullOrWhiteSpace(entity.NoRujukan))
+                //    {
+                //        args.MessageText = "No Rujukan kosong, tidak bisa delete rujukan.";
+                //        args.IsCancel = true;
+                //        return;
+                //    }
 
-                    var json = JsonConvert.SerializeObject(request);
+                //    var request = new DeleteRujukanRequest
+                //    {
+                //        Request = new DeleteRequestWrapper
+                //        {
+                //            TRujukan = new DeleteTRujukan
+                //            {
+                //                NoRujukan = entity.NoRujukan,
+                //                User = AppSession.UserLogin.UserID,
 
-                    var response = svc.DeleteRujukan(request);
+                //                SatuSehatRujukan = new DeleteSatuSehatRujukan
+                //                {
+                //                    KodeFaskesSatuSehat = entity.KodeFaskesSatuSehat,
+                //                    IdPasienSatuSehat = entity.IdPasienSatuSehat,
 
-                    entity.RequestJson = json;
-                    entity.ResponseJson = JsonConvert.SerializeObject(response);
-                    entity.BpjsResponseCode = response?.MetaData?.Code;
-                    entity.BpjsResponseMessage = response?.MetaData?.Message;
+                //                    KdppkSatuSehatTujuanRujukan =
+                //                        entity.KdppkSatuSehatTujuanRujukan?.Replace("Organization/", ""),
 
-                    if (response.MetaData.Code != "200")
-                    {
-                        args.MessageText = $"{response.MetaData.Code} - {response.MetaData.Message}";
-                        args.IsCancel = true;
-                        return;
-                    }
-                }
+                //                    KdDokterSatuSehat = entity.KdDokterSatuSehat,
+
+                //                    Encounter = new Encounter
+                //                    {
+                //                        Reference = entity.EncounterReference?.Replace("Encounter/", "")
+                //                    },
+
+                //                    PatientInstruction = entity.PatientInstruction,
+                //                    KeteranganRujukan = entity.KeteranganRujukan
+                //                }
+                //            }
+                //        }
+                //    };
+
+                //    var json = JsonConvert.SerializeObject(request, new JsonSerializerSettings
+                //    {
+                //        NullValueHandling = NullValueHandling.Ignore
+                //    });
+
+                //    DeleteRujukanResponse response = null;
+
+                //    try
+                //    {
+                //        response = svc.DeleteRujukan(request);
+                //        ShowApiResponseAlert(
+                //            "Response Delete Rujukan",
+                //            response?.MetaData?.Code,
+                //            response?.MetaData?.Message
+                //        );
+                //    }
+                //    catch (WebException wex)
+                //    {
+                //        args.MessageText = GetWebExceptionMessage(wex);
+                //        args.IsCancel = true;
+                //        return;
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        args.MessageText = ex.Message;
+                //        args.IsCancel = true;
+                //        return;
+                //    }
+
+                //    entity.RequestJson = json;
+                //    entity.ResponseJson = JsonConvert.SerializeObject(response);
+                //    entity.BpjsResponseCode = response?.MetaData?.Code;
+                //    entity.BpjsResponseMessage = response?.MetaData?.Message;
+
+                //    if (response == null || response.MetaData == null)
+                //    {
+                //        args.MessageText = "Response Delete Rujukan kosong.";
+                //        args.IsCancel = true;
+                //        return;
+                //    }
+
+                //    if (response.MetaData.Code != "200")
+                //    {
+                //        args.MessageText = $"{response.MetaData.Code} - {response.MetaData.Message}";
+                //        args.IsCancel = true;
+                //        return;
+                //    }
+                //}
 
                 entity.Save();
+                trans.Complete();
+            }
+        }
+
+        private void DeleteRujukan(BpjsRujukanSatuSehat entity, ValidateArgs args)
+        {
+            if (string.IsNullOrWhiteSpace(entity.NoRujukan))
+            {
+                args.MessageText = "No Rujukan kosong, tidak bisa delete rujukan.";
+                args.IsCancel = true;
+                return;
+            }
+
+            var svc = new Common.BPJS.VClaim.v11.Service();
+
+            using (var trans = new esTransactionScope())
+            {
+                var request = new DeleteRujukanRequest
+                {
+                    Request = new DeleteRequestWrapper
+                    {
+                        TRujukan = new DeleteTRujukan
+                        {
+                            NoRujukan = entity.NoRujukan,
+                            User = AppSession.UserLogin.UserID,
+
+                            SatuSehatRujukan = new DeleteSatuSehatRujukan
+                            {
+                                KodeFaskesSatuSehat = entity.KodeFaskesSatuSehat,
+                                IdPasienSatuSehat = entity.IdPasienSatuSehat,
+
+                                KdppkSatuSehatTujuanRujukan =
+                                    entity.KdppkSatuSehatTujuanRujukan?.Replace("Organization/", ""),
+
+                                KdDokterSatuSehat = entity.KdDokterSatuSehat,
+
+                                Encounter = new Encounter
+                                {
+                                    Reference = entity.EncounterReference?.Replace("Encounter/", "")
+                                },
+
+                                PatientInstruction = entity.PatientInstruction,
+                                KeteranganRujukan = entity.KeteranganRujukan
+                            }
+                        }
+                    }
+                };
+
+                var json = JsonConvert.SerializeObject(
+                    request,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+
+                DeleteRujukanResponse response = null;
+
+                try
+                {
+                    response = svc.DeleteRujukan(request);
+
+                    ShowApiResponseAlert(
+                        "Response Delete Rujukan",
+                        response?.MetaData?.Code,
+                        response?.MetaData?.Message
+                    );
+                }
+                catch (WebException wex)
+                {
+                    args.MessageText = GetWebExceptionMessage(wex);
+                    args.IsCancel = true;
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    args.MessageText = ex.Message;
+                    args.IsCancel = true;
+                    return;
+                }
+
+                if (response == null || response.MetaData == null)
+                {
+                    args.MessageText = "Response Delete Rujukan kosong.";
+                    args.IsCancel = true;
+                    return;
+                }
+
+                if (response.MetaData.Code != "200")
+                {
+                    args.MessageText = $"{response.MetaData.Code} - {response.MetaData.Message}";
+                    args.IsCancel = true;
+                    return;
+                }
+
+                entity.MarkAsDeleted();
+                entity.Save();
+
                 trans.Complete();
             }
         }
@@ -612,36 +799,31 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
             if (!string.IsNullOrEmpty(br.DiagRujukan))
             {
-                cboDiagnosa.Text = br.DiagnosaNama;
-                cboDiagnosa.SelectedValue = br.DiagRujukan;
+                SetComboValue(cboDiagnosa, br.DiagRujukan, br.DiagnosaNama);
             }
 
             if (!string.IsNullOrEmpty(br.PoliRujukan))
             {
-                cboPoliDirujuk.Text = br.NamaPoliRujukan;
-                cboPoliDirujuk.SelectedValue = br.PoliRujukan;
+                SetComboValue(cboPoliDirujuk, br.PoliRujukan, br.NamaPoliRujukan);
             }
 
             if (!string.IsNullOrEmpty(br.PpkDirujuk))
             {
-                cboFaskesRujukan.Text = br.NamaPpkDirujuk;
-                cboFaskesRujukan.SelectedValue = br.PpkDirujuk;
+                SetComboValue(cboFaskesRujukan, br.PpkDirujuk, br.NamaPpkDirujuk);
             }
 
             txtInstruksiPasien.Text = br.PatientInstruction;
             txtKeteranganRujukan.Text = br.KeteranganRujukan;
 
-            if (!string.IsNullOrEmpty(br.KodePropinsi))
-            {
-                cboProvinsi.SelectedValue = br.KodePropinsi;
-                cboProvinsi.Text = br.NamaPropinsi;
-            }
+            var spesKode = !string.IsNullOrWhiteSpace(br.PoliTujuanKode)
+                ? br.PoliTujuanKode
+                : br.PoliRujukan;
 
-            if (!string.IsNullOrEmpty(br.KodeKabupaten))
-            {
-                cboKabupaten.SelectedValue = br.KodeKabupaten;
-                cboKabupaten.Text = br.NamaKabupaten;
-            }
+            var spesNama = !string.IsNullOrWhiteSpace(br.PoliTujuanNama)
+                ? br.PoliTujuanNama
+                : br.NamaPoliRujukan;
+
+            SetComboValue(cboSpesialistik, spesKode, spesNama);
 
             if (!string.IsNullOrEmpty(br.KriteriaRujukanJson))
             {
@@ -649,12 +831,21 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 {
                     LoadKriteriaRujukan(true);
 
-                    var list = JsonConvert.DeserializeObject<List<KriteriaAnswerItem>>(br.KriteriaRujukanJson);
+                    var list = JsonConvert.DeserializeObject<List<KriteriaAnswerItem>>(
+                        br.KriteriaRujukanJson
+                    );
 
                     ApplyKriteriaToUI(list);
                 }
-                catch { }
+                catch
+                {
+                }
             }
+
+            SetComboValue(cboProvinsi, br.KodePropinsi, br.NamaPropinsi);
+
+            BindKabupatenByProvinsi(br.KodePropinsi);
+            SetComboValue(cboKabupaten, br.KodeKabupaten, br.NamaKabupaten);
         }
 
         private void ApplyKriteriaToUI(List<KriteriaAnswerItem> list)
@@ -732,14 +923,12 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         protected void cboDiagnosa_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
         {
-            // 🔥 CLEAR KRITERIA
             rptKriteria.DataSource = null;
             rptKriteria.DataBind();
 
             rptBoolean.DataSource = null;
             rptBoolean.DataBind();
 
-            // 🔥 CLEAR WILAYAH
             cboProvinsi.ClearSelection();
             cboProvinsi.Items.Clear();
             cboProvinsi.Text = "";
@@ -748,20 +937,16 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             cboKabupaten.Items.Clear();
             cboKabupaten.Text = "";
 
-            // 🔥 CLEAR SPESIALISTIK
             cboSpesialistik.ClearSelection();
             cboSpesialistik.Text = "";
 
-            // 🔥 CLEAR FASKES
             cboFaskesRujukan.ClearSelection();
             cboFaskesRujukan.Items.Clear();
             cboFaskesRujukan.Text = "";
 
-            // 🔥 CLEAR SESSION (biar gak nyampah)
             Session["wilayah"] = null;
             Session["faskesList"] = null;
 
-            // 🔥 LOAD ULANG berdasarkan diagnosa baru
             LoadKriteriaRujukan();
         }
 
@@ -867,9 +1052,22 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
             var response = svc.GetFaskesRujukan(request);
 
-            if (response.MetaData.Code == "200" && response.Response != null)
+            ShowApiResponseAlert(
+                "Response Get Faskes Rujukan",
+                response?.MetaData?.Code,
+                response?.MetaData?.Message
+            );
+
+            if (response?.MetaData?.Code == "200" && response.Response != null)
             {
                 BindFaskes(response.Response.List);
+            }
+            else
+            {
+                ShowApiResponseAlert("Response Get Faskes Rujukan",
+                    response?.MetaData?.Code,
+                    response?.MetaData?.Message
+                );
             }
         }
 
@@ -888,18 +1086,78 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             cboFaskesRujukan.DataValueField = "Kdppk";
             cboFaskesRujukan.DataBind();
 
-            cboFaskesRujukan.Items.Insert(0,
-                new RadComboBoxItem("-- pilih faskes --", ""));
+            cboFaskesRujukan.ClearSelection();
+            cboFaskesRujukan.Text = string.Empty;
 
             Session["faskesList"] = list;
         }
 
         protected void cboFaskesRujukan_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
         {
-            var data = (FaskesItem)e.Item.DataItem;
+            var data = e.Item.DataItem as FaskesItem;
             if (data == null) return;
 
-            e.Item.Text = $"{data.Nmppk} - {data.Nmkc} - Kelas: {data.Kelas} - Jumlah Rujuk: {data.JmlRujuk:0} - Kapasitas: {data.Kapasitas:0}";
+            e.Item.Value = data.Kdppk;
+
+            e.Item.Text = $"{data.Nmppk} ({data.Kdppk}) - {data.Nmkc}";
+
+            e.Item.Attributes["KodeFaskesSatuSehat"] = data.KodeFaskesSatuSehat ?? "";
+            e.Item.Attributes["Kdppk"] = data.Kdppk ?? "";
+            e.Item.Attributes["Nmppk"] = data.Nmppk ?? "";
+            e.Item.Attributes["StrataSatuSehat"] = data.StrataSatuSehat ?? "";
+            e.Item.Attributes["AlamatPpk"] = data.AlamatPpk ?? "";
+            e.Item.Attributes["TelpPpk"] = data.TelpPpk ?? "";
+            e.Item.Attributes["Kelas"] = data.Kelas ?? "";
+            e.Item.Attributes["Nmkc"] = data.Nmkc ?? "";
+        }
+
+        protected string FaskesText(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return "-";
+
+            var text = value.ToString();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return "-";
+
+            return HttpUtility.HtmlEncode(text);
+        }
+
+        protected string FaskesNumber(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return "-";
+
+            decimal number;
+            if (decimal.TryParse(value.ToString(), out number))
+                return number.ToString("0.##");
+
+            return "-";
+        }
+
+        protected string FaskesPercent(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return "-";
+
+            decimal number;
+            if (decimal.TryParse(value.ToString(), out number))
+                return number.ToString("0.##") + "%";
+
+            return "-";
+        }
+
+        protected string FaskesDistance(object value)
+        {
+            if (value == null || value == DBNull.Value)
+                return "-";
+
+            decimal number;
+            if (decimal.TryParse(value.ToString(), out number))
+                return number.ToString("0.##") + " km";
+
+            return "-";
         }
 
         private void Alert(string msg)
@@ -964,6 +1222,12 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             {
                 var response = svc.GetKriteriaRujukan(request);
 
+                //ShowApiResponseAlert(
+                //    "Response Get Kriteria Rujukan",
+                //    response?.MetaData?.Code,
+                //    response?.MetaData?.Message
+                //);
+
                 if (response != null && response.MetaData != null && response.MetaData.Code == "200" && response.Response != null)
                 {
                     var all = response.Response.KriteriaRujukan;
@@ -989,7 +1253,10 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     string code = response?.MetaData?.Code ?? "NULL";
                     string message = response?.MetaData?.Message ?? "Response kosong";
 
-                    ShowAlert($"Gagal load Kriteria Rujukan. Code: {code} - {message}");
+                    ShowApiResponseAlert("Gagal load Kriteria Rujukan. Code",
+                        response?.MetaData?.Code,
+                        response?.MetaData?.Message
+                    );
                 }
             }
             catch (WebException wex)
@@ -1039,8 +1306,11 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             //        new RadComboBoxItem("-- pilih kabupaten --", ""));
             //}
 
-            cboProvinsi.ClearSelection();
-            cboKabupaten.ClearSelection();
+            if (!force)
+            {
+                cboProvinsi.ClearSelection();
+                cboKabupaten.ClearSelection();
+            }
         }
 
         private void ShowAlert(string message)
@@ -1190,6 +1460,227 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
             cboKabupaten.Items.Insert(0,
                 new RadComboBoxItem("-- pilih kabupaten --", ""));
+        }
+
+        private string GetWebExceptionMessage(WebException wex)
+        {
+            if (wex == null)
+                return "Terjadi error saat menghubungi API BPJS.";
+
+            if (wex.Response == null)
+                return wex.Message;
+
+            try
+            {
+                using (var reader = new StreamReader(wex.Response.GetResponseStream()))
+                {
+                    var responseText = reader.ReadToEnd();
+
+                    if (string.IsNullOrWhiteSpace(responseText))
+                        return wex.Message;
+
+                    try
+                    {
+                        dynamic errObj = JsonConvert.DeserializeObject<dynamic>(responseText);
+
+                        var msg =
+                            errObj?.metaData?.message ??
+                            errObj?.metadata?.message ??
+                            errObj?.MetaData?.Message ??
+                            errObj?.Metadata?.Message;
+
+                        if (msg != null)
+                            return msg.ToString();
+                    }
+                    catch
+                    {
+
+                    }
+
+                    return responseText;
+                }
+            }
+            catch
+            {
+                return wex.Message;
+            }
+        }
+
+        private PatientBridging EnsurePatientSatuSehatBridging(string patientId, ref string accessToken, out string errorMessage)
+        {
+            errorMessage = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(patientId))
+            {
+                errorMessage = "PatientID kosong";
+                return null;
+            }
+
+            var pat = new Patient();
+            if (!pat.LoadByPrimaryKey(patientId))
+            {
+                errorMessage = "Pasien tidak ditemukan";
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(pat.Ssn))
+            {
+                errorMessage = $"NIK / SSN pasien {pat.PatientName} kosong";
+                return null;
+            }
+
+            var satuSehatBridgingType =
+                AppParameter.GetParameterValue(AppParameter.ParameterItem.SatuSehatBridgingTypeID);
+
+            var patSs = new PatientBridging();
+
+            patSs.Query.Where(
+                patSs.Query.PatientID == pat.PatientID,
+                patSs.Query.SRBridgingType == satuSehatBridgingType
+            );
+
+            patSs.Query.Load();
+
+            if (!string.IsNullOrWhiteSpace(patSs.BridgingID))
+                return patSs;
+
+            var response = new Temiang.Avicenna.Bridging.SatuSehat.Utils()
+                .RestClientGet(
+                    "Patient?identifier=https://fhir.kemkes.go.id/id",
+                    string.Concat("nik|", pat.Ssn),
+                    ref accessToken
+                );
+
+            if (response == null)
+            {
+                errorMessage = "Response SatuSehat kosong";
+                return null;
+            }
+
+            if (response.StatusCode != System.Net.HttpStatusCode.Created &&
+                response.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                errorMessage = $"Pasien tidak ditemukan di SatuSehat. HTTP {(int)response.StatusCode}";
+                return null;
+            }
+
+            var patientSearchResponse =
+                JsonConvert.DeserializeObject<Temiang.Avicenna.Bridging.SatuSehat.BusinessObject.PatientSearch.PatientSearchResponse>(
+                    response.Content
+                );
+
+            if (patientSearchResponse == null || patientSearchResponse.Total <= 0)
+            {
+                errorMessage = $"NIK {pat.Ssn} tidak ditemukan di SatuSehat";
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(patSs.PatientID))
+                patSs.AddNew();
+
+            patSs.PatientID = pat.PatientID;
+            patSs.BridgingID = patientSearchResponse.Entry[0].Resource.Id;
+            patSs.BridgingName = pat.PatientName;
+            patSs.SRBridgingType = satuSehatBridgingType;
+            patSs.IsActive = true;
+            patSs.Save();
+
+            txtNamaPeserta.Text = pat.PatientName;
+
+            return patSs;
+        }
+
+        private void ShowApiResponseAlert(string title, string code, string message)
+        {
+            var msg = message ?? "Response kosong";
+
+            // Biar alert gak kepanjangan kalau response JSON gede
+            if (msg.Length > 500)
+                msg = msg.Substring(0, 500) + "...";
+
+            var text = $"{title}\\nCode: {code ?? "NULL"}\\nMessage: {msg}";
+
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                Guid.NewGuid().ToString(),
+                $"alert('{text.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", "").Replace("\n", "\\n")}');",
+                true
+            );
+        }
+
+        private void SetComboValue(RadComboBox cbo, string value, string text)
+        {
+            if (cbo == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                cbo.ClearSelection();
+                cbo.Text = text ?? string.Empty;
+                return;
+            }
+
+            var item = cbo.FindItemByValue(value);
+
+            if (item == null)
+            {
+                item = new RadComboBoxItem(
+                    string.IsNullOrWhiteSpace(text) ? value : text,
+                    value
+                );
+
+                cbo.Items.Add(item);
+            }
+
+            cbo.ClearSelection();
+            item.Selected = true;
+
+            cbo.SelectedValue = value;
+            cbo.Text = string.IsNullOrWhiteSpace(text) ? item.Text : text;
+        }
+
+        private void BindKabupatenByProvinsi(string kodeProvinsi)
+        {
+            cboKabupaten.ClearSelection();
+            cboKabupaten.Items.Clear();
+
+            if (string.IsNullOrWhiteSpace(kodeProvinsi))
+            {
+                cboKabupaten.Items.Insert(0, new RadComboBoxItem("-- pilih kabupaten --", ""));
+                return;
+            }
+
+            var wilayah = Wilayah;
+            var root = wilayah?.FirstOrDefault();
+
+            var kab = root?
+                .Item
+                .FirstOrDefault(x => x.Text == "Kabupaten/Kota")
+                ?.AnswerOption
+                ?.Where(x =>
+                    x.ValueCoding != null &&
+                    x.ValueCoding.Code.StartsWith(kodeProvinsi))
+                .ToList();
+
+            if (kab == null || kab.Count == 0)
+            {
+                cboKabupaten.Items.Insert(0, new RadComboBoxItem("-- pilih kabupaten --", ""));
+                return;
+            }
+
+            var data = kab.Select(x => new
+            {
+                Code = x.ValueCoding.Code,
+                Display = x.ValueCoding.Display
+            }).ToList();
+
+            cboKabupaten.DataSource = data;
+            cboKabupaten.DataTextField = "Display";
+            cboKabupaten.DataValueField = "Code";
+            cboKabupaten.DataBind();
+
+            cboKabupaten.Items.Insert(0, new RadComboBoxItem("-- pilih kabupaten --", ""));
         }
 
         private List<JejaringWilayah> Wilayah
