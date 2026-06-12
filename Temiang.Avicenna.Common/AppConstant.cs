@@ -1268,7 +1268,7 @@ namespace Temiang.Avicenna.Common
             public const string CetakAmplopOrLabelDiagnostik = "XML.02.0008";
             public const string CetakAmplopAudiometri = "XML.02.0018";
             public const string CetakAmplopSpirometri = "XML.02.0019";
-            public const string CetakanPasienEdukasi = "XML.04.0002";
+            public const string CetakanPasienEdukasi = "XML.04.0001";
 
             public const string JobOrderLabelDiagnostic = "SLP.02.0093";
             public const string PatientDischargePermit = "XML.YBRS.01.015";
