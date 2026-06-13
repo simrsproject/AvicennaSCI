@@ -8,32 +8,32 @@
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnSearchRequestDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchRequestNo">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchSearchFromUnit">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchToUnit">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterSRItemTypePr">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterItemGroupPr">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdListPr">
@@ -43,42 +43,42 @@
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchFilterDateBy">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchTransactionDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchItemType">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterPurchasingUnitID">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchSupplier">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchStatus">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchPO">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchRO">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="cboSRItemType">
@@ -93,7 +93,7 @@
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnSearchItemGroup">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdList">
@@ -103,6 +103,7 @@
             </telerik:AjaxSetting>
         </AjaxSettings>
     </telerik:RadAjaxManagerProxy>
+    <telerik:RadAjaxLoadingPanel ID="fw_ajxLoadingPanel" runat="server" Skin="Default" />
     <telerik:RadCodeBlock ID="RadCodeBlock1" runat="server">
 
         <script type="text/javascript">

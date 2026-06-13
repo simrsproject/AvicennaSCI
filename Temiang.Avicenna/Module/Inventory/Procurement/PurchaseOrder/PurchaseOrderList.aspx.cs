@@ -571,7 +571,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                 if (!string.IsNullOrEmpty(txtRequestNo.Text))
                 {
-                    string searchTextContain = string.Format("%{0}%", txtRequestNo.Text);
+                    string searchTextContain = string.Format("{0}%", txtRequestNo.Text);
                     query.Where(query.TransactionNo.Like(searchTextContain));
                 }
                 if (!txtRequestDate.IsEmpty)
@@ -624,14 +624,15 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 //    query.OrderBy(query.TransactionDate.Ascending, query.TransactionNo.Ascending);
                 //}
 
+                //2026-06-13 Wiliam - tampaknya tidak pernah terpakai
                 // Filter supplier type
-                if (!string.IsNullOrEmpty(Request.QueryString["suptype"]))
-                {
-                    var sup2 = new SupplierQuery("sup2");
-                    query.InnerJoin(sup2)
-                        .On(query.BusinessPartnerID == sup2.SupplierID &&
-                            sup2.SRSupplierType == Request.QueryString["suptype"]);
-                }
+                //if (!string.IsNullOrEmpty(Request.QueryString["suptype"]))
+                //{
+                //    var sup2 = new SupplierQuery("sup2");
+                //    query.InnerJoin(sup2)
+                //        .On(query.BusinessPartnerID == sup2.SupplierID &&
+                //            sup2.SRSupplierType == Request.QueryString["suptype"]);
+                //}
 
                 var dtb = query.LoadDataTable();
                 if (AppSession.Parameter.IsPrOutstandingListBasedOnCalcQtyOrder)

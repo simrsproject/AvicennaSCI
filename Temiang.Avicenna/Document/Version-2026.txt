@@ -270,3 +270,6 @@ Titipan Daniel
 
 --[12-06-2026 - Wiliam] ---
 1. Optimasi tampilan list paramedic fee calculation tanpa mengubah logic dan output yang sudah ada. response lebih cepat 2 detik.
+
+--[13-06-2026 - Wiliam] ---
+1. Menambah loading panel pada ReOrderPoBasedOnPrList.aspx dan PurchaseOrderList.aspx
