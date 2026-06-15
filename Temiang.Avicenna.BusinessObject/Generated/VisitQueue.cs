@@ -3312,29 +3312,44 @@ namespace Temiang.Avicenna.BusinessObject
         }
 
         public static List<object> GetDisplayDoctorListForPoli(
-            string serviceUnitID
+             string serviceUnitID,
+             DateTime? queueDate = null
         )
-                {
-                    var result =
-                        new List<object>();
+        {
+            var result = new List<object>();
 
-                    var entity =
-                        new VisitQueue();
+            var entity = new VisitQueue();
 
-                    var parameters =
-                        new esParameters();
+            var parameters = new esParameters();
 
-                string sql = @"
-                SELECT
-                    SUP.ParamedicID,
-                    P.ParamedicName
+            string sql = @"
+        SELECT
+            VQ.VisitQueueNo,
+            VQ.VisitNo,
+            VQ.RegistrationNo,
+            VQ.QueueDate,
+            VQ.Status,
+            VQ.StageID,
+            SUP.ServiceUnitID,
+            VQ.CategoryID,
+            SU.ServiceUnitName,
+            SUP.ParamedicID,
+            P.ParamedicName
                 FROM ServiceUnitParamedic SUP
                 INNER JOIN Paramedic P
                     ON P.ParamedicID = SUP.ParamedicID
+                LEFT JOIN ServiceUnit SU
+                    ON SU.ServiceUnitID = SUP.ServiceUnitID
+                LEFT JOIN VisitQueue VQ
+                    ON VQ.ServiceUnitID = SUP.ServiceUnitID
+                   AND VQ.ParamedicID = SUP.ParamedicID
+                   AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
                 WHERE
                     SUP.ServiceUnitID = @ServiceUnitID
                     AND SUP.IsDisplayActive = 1
-                ORDER BY P.ParamedicName
+                ORDER BY
+                    P.ParamedicName,
+                    VQ.QueueDate
             ";
 
             parameters.Add(
@@ -3343,6 +3358,14 @@ namespace Temiang.Avicenna.BusinessObject
                 esParameterDirection.Input,
                 DbType.String,
                 50
+            );
+
+            parameters.Add(
+                "QueueDate",
+                queueDate ?? DateTime.Today,
+                esParameterDirection.Input,
+                DbType.DateTime,
+                8
             );
 
             using (
@@ -3358,13 +3381,54 @@ namespace Temiang.Avicenna.BusinessObject
                 {
                     result.Add(new
                     {
+                        VisitQueueNo =
+                            reader["VisitQueueNo"] == DBNull.Value
+                                ? ""
+                                : reader["VisitQueueNo"].ToString(),
+
+                        VisitNo =
+                            reader["VisitNo"] == DBNull.Value
+                                ? ""
+                                : reader["VisitNo"].ToString(),
+
+                        RegistrationNo =
+                            reader["RegistrationNo"] == DBNull.Value
+                                ? ""
+                                : reader["RegistrationNo"].ToString(),
+
+                        QueueDate =
+                            reader["QueueDate"] == DBNull.Value
+                                ? (DateTime?)null
+                                : Convert.ToDateTime(reader["QueueDate"]),
+
+                        Status =
+                            reader["Status"] == DBNull.Value
+                                ? ""
+                                : reader["Status"].ToString(),
+
+                        StageID =
+                            reader["StageID"] == DBNull.Value
+                                ? ""
+                                : reader["StageID"].ToString(),
+
+                        ServiceUnitID =
+                            reader["ServiceUnitID"].ToString(),
+
+                        CategoryID =
+                            reader["CategoryID"] == DBNull.Value
+                                ? ""
+                                : reader["CategoryID"].ToString(),
+
+                        ServiceUnitName =
+                            reader["ServiceUnitName"] == DBNull.Value
+                                ? ""
+                                : reader["ServiceUnitName"].ToString(),
+
                         ParamedicID =
-                            reader["ParamedicID"]
-                            .ToString(),
+                            reader["ParamedicID"].ToString(),
 
                         ParamedicName =
-                            reader["ParamedicName"]
-                            .ToString()
+                            reader["ParamedicName"].ToString()
                     });
                 }
             }

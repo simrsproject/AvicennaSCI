@@ -3978,6 +3978,7 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - ServiceUnitID
+            - QueueDate (Optional)
 
             CONTOH REQUEST:
 
