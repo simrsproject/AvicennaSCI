@@ -430,6 +430,11 @@ case ""deliver"":
                         var tp = new TransPrescription();
                         if (tp.LoadByPrimaryKey(prescriptionNo))
                         {
+                            if (tp.InProgressDateTime == null)
+                            {
+                                tp.InProgressDateTime = DateTime.Now;
+                                tp.InProgressByUserID = AppSession.UserLogin.UserID;
+                            }
                             tp.CompleteDateTime = DateTime.Now;
                             tp.CompleteByUserID = AppSession.UserLogin.UserID;
                             tp.Save();
@@ -444,6 +449,17 @@ case ""deliver"":
                         var tp = new TransPrescription();
                         if (tp.LoadByPrimaryKey(prescriptionNo))
                         {
+                            if (tp.InProgressDateTime == null)
+                            {
+                                tp.InProgressDateTime = DateTime.Now;
+                                tp.InProgressByUserID = AppSession.UserLogin.UserID;
+                            }
+                            if (tp.CompleteDateTime == null)
+                            {
+                                tp.CompleteDateTime = DateTime.Now;
+                                tp.CompleteByUserID = AppSession.UserLogin.UserID;
+                            }
+
                             tp.DeliverDateTime = DateTime.Now;
                             tp.DeliverByUserID = AppSession.UserLogin.UserID;
                             tp.Save();
@@ -3585,6 +3601,9 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             }
                         }
                     }
+
+                    //db:20260617 - add kirim method inprogress resep
+                    UpdatePrescriptionStatus(txtPrescriptionNo.Text, "inprogress");
                 }
 
                 if (AppSession.Parameter.IsAutoPrintPrescriptionReceipt)
