@@ -11,12 +11,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.ComponentModel;
+using System.Data;
+using System.Linq;
 using System.Xml.Serialization;
 using Temiang.Dal.Core;
-using Temiang.Dal.Interfaces;
 using Temiang.Dal.DynamicQuery;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.BusinessObject.Generated
 {
@@ -617,6 +618,52 @@ namespace Temiang.Avicenna.BusinessObject.Generated
                         : prms["VisitQueueNo"].Value.ToString()
             };
         }
+
+        public static object GetSRAutoNumberList(
+            string payerType,
+            string serviceGroup,
+            string channel
+        )
+        {
+            var entity =
+                new AntrianAutoNumberSemantic();
+
+            var q = entity.Query;
+
+            q.Where(q.IsActive == 1);
+
+            if (!string.IsNullOrWhiteSpace(payerType))
+                q.And(q.PayerType == payerType);
+
+            if (!string.IsNullOrWhiteSpace(serviceGroup))
+                q.And(q.ServiceGroup == serviceGroup);
+
+            if (!string.IsNullOrWhiteSpace(channel))
+                q.And(q.Channel == channel);
+
+            q.OrderBy(q.DisplayOrder.Ascending);
+
+            // 🔥 INI KUNCINYA
+            DataTable dt = q.LoadDataTable();
+
+            if (dt == null || dt.Rows.Count == 0)
+                return new List<object>();
+
+            return dt.AsEnumerable()
+                .Select(r => new
+                {
+                    AntrianAutoNumberSemanticNo = r["AntrianAutoNumberSemanticNo"],
+                    SRAutoNumber = r["SRAutoNumber"],
+                    PayerType = r["PayerType"],
+                    ServiceGroup = r["ServiceGroup"],
+                    Channel = r["Channel"],
+                    DisplayOrder = r["DisplayOrder"],
+                    DisplayName = r["DisplayName"],
+                    IsActive = r["IsActive"]
+                })
+                .ToList();
+        }
+
     }
 
     [Serializable]

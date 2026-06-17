@@ -223,9 +223,27 @@ namespace Temiang.Avicenna.WebService
                     $"Total Data Channel {channel} = {collection.Count}"
                 );
 
-                var data = collection
+                var payerTypes = collection
                     .Select(x => x.PayerType)
-                    .Distinct()
+                    .Distinct();
+
+                if (channel == "LOKET_PD")
+                {
+                    payerTypes = payerTypes
+                        .Where(x =>
+                            x == "TUNAI" ||
+                            x == "MITRA");
+                }
+                else if (channel == "LOKET_PM")
+                {
+                    payerTypes = payerTypes
+                        .Where(x =>
+                            x == "TUNAI" ||
+                            x == "BPJS" ||
+                            x == "MITRA");
+                }
+
+                var data = payerTypes
                     .OrderBy(x =>
                         x == "TUNAI" ? 1 :
                         x == "BPJS" ? 2 :
@@ -2271,6 +2289,110 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
+        [WebMethod(Description = @"
+            Digunakan untuk mengatur ulang urutan antrian WAITING
+            berdasarkan prioritas SRAutoNumber.
+
+            PARAMETER:
+            - SRAutoNumber (required)
+            - UserID (required)
+            - QueueDate (optional)
+            
+            EXAMPLE:
+            ReorderBySRAutoNumber?
+            SRAutoNumber=VisitTunaiNo&
+            UserID=240076
+
+            ReorderBySRAutoNumber?
+            SRAutoNumber=VisitBpjsPoliNo&
+            QueueDate=2026-06-17&
+            UserID=240076
+
+            RESPONSE:
+               200 = Berhasil melakukan reorder antrian
+               400 = Parameter request tidak valid
+               500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void ReorderBySRAutoNumber()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string srAutoNumber =
+                    (Context.Request["SRAutoNumber"] ?? "")
+                    .Trim();
+
+                string userID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                DateTime queueDate =
+                    DateTime.Today;
+
+                if (!string.IsNullOrWhiteSpace(
+                    Context.Request["QueueDate"]))
+                {
+                    DateTime.TryParse(
+                        Context.Request["QueueDate"],
+                        out queueDate
+                    );
+                }
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(srAutoNumber))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "SRAutoNumber wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(userID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXECUTE BO
+                // =========================================
+                var result =
+                    VisitQueue.ReorderBySRAutoNumber(
+                        srAutoNumber,
+                        queueDate,
+                        userID
+                    );
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil melakukan reorder antrian"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
         //7. CALL, RECALL, PENDING All Service Unit
         [WebMethod(Description = @"
             Digunakan untuk memanggil antrian pada seluruh Service Unit.
@@ -4071,6 +4193,68 @@ namespace Temiang.Avicenna.WebService
             }
             catch (Exception ex)
             {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Mengambil daftar SRAutoNumber berdasarkan filter.
+
+            PARAMETER (OPTIONAL):
+            - PayerType
+            - ServiceGroup
+            - Channel
+
+            EXAMPLE:
+            GetSRAutoNumberList
+            GetSRAutoNumberList?PayerType=BPJS
+            GetSRAutoNumberList?ServiceGroup=POLI&Channel=LOKET_PD
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetSRAutoNumberList()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE INPUT
+                // =========================================
+                string payerType =
+                    (Context.Request["PayerType"] ?? "").Trim();
+
+                string serviceGroup =
+                    (Context.Request["ServiceGroup"] ?? "").Trim();
+
+                string channel =
+                    (Context.Request["Channel"] ?? "").Trim();
+
+                // =========================================
+                // EXEC BO
+                // =========================================
+                var result =
+                    AntrianAutoNumberSemantic.GetSRAutoNumberList(
+                        payerType,
+                        serviceGroup,
+                        channel
+                    );
+
+                // =========================================
+                // RESPONSE SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil mengambil daftar SRAutoNumber"
+                );
+            }
+            catch (Exception ex)
+            {
+                // =========================================
+                // RESPONSE ERROR
+                // =========================================
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,

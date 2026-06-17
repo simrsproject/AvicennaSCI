@@ -1132,6 +1132,26 @@
                      <td width="20px"></td>
                  </tr>
                 </table>
+                <table id="tblGenerateVisitNo" runat="server" width="100%">
+                    <tr>
+                        <td class="label">Generate Visit No</td>
+                        <td class="entry300">
+                            <table cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <telerik:RadTextBox runat="server" ID="txtGenerateVisitNo" MaxLength="20" Width="283px"></telerik:RadTextBox>
+                                    </td>
+                                    <td width="5px"></td>
+                                    <td>
+                                        <asp:ImageButton ID="btnGetGenerateVisitNo" runat="server" ImageUrl="~/Images/Toolbar/download16.png"
+                                            OnClick="btnGenerateVisitNo_Click" ValidationGroup="Registration" Validation="true" ToolTip="Get Generated Visit No" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="20px"></td>
+                    </tr>
+                </table>
                 <table width="100%">
                     <tr>
                         <td>

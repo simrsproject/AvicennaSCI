@@ -2639,6 +2639,83 @@ namespace Temiang.Avicenna.BusinessObject
             };
         }
 
+        public static object ReorderBySRAutoNumber(
+            string srAutoNumber,
+            DateTime queueDate,
+            string userID
+        )
+        {
+            // =========================================
+            // VALIDASI
+            // =========================================
+            if (string.IsNullOrWhiteSpace(srAutoNumber))
+            {
+                throw new Exception(
+                    "SRAutoNumber wajib diisi"
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(userID))
+            {
+                throw new Exception(
+                    "UserID wajib diisi"
+                );
+            }
+
+            // =========================================
+            // PARAMETERS
+            // =========================================
+            esParameters prms =
+                new esParameters();
+
+            prms.Add(
+                "SRAutoNumber",
+                srAutoNumber,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "QueueDate",
+                queueDate.Date,
+                esParameterDirection.Input,
+                DbType.Date,
+                0
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE PROCEDURE
+            // =========================================
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "AntrianReorderBySRAutoNumber",
+                prms
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+            return new
+            {
+                SRAutoNumber = srAutoNumber,
+                QueueDate = queueDate.Date,
+                UserID = userID,
+                IsSuccess = true
+            };
+        }
+
         public static object CallAntrianAllServiceUnit(
             string visitQueueNo,
             string userID
@@ -3509,6 +3586,130 @@ namespace Temiang.Avicenna.BusinessObject
                 sqlUpdate,
                 parametersUpdate
             );
+        }
+
+        //FOR PASIEN TITIPAN
+        public static string TakeQueueVisitPasienTitipan
+        (
+            string guarantorID,
+            string serviceUnitID,
+            string userID,
+            DateTime transDate
+        )
+        {
+            esParameters prms =
+                new esParameters();
+
+            // =========================================
+            // INPUT
+            // =========================================
+
+            prms.Add(
+                "GuarantorID",
+                guarantorID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "TransDate",
+                transDate.Date,
+                esParameterDirection.Input,
+                DbType.Date,
+                0
+            );
+
+            // =========================================
+            // OUTPUT
+            // =========================================
+
+            prms.Add(
+                "VisitNo",
+                esParameterDirection.Output,
+                DbType.String,
+                50
+            );
+
+            // =========================================
+            // EXECUTE SP
+            // =========================================
+
+            var entity =
+                new VisitQueue();
+
+            entity.ExecuteNonQuery(
+                esQueryType.StoredProcedure,
+                "TakeQueueVisitPasienTitipan",
+                prms
+            );
+
+            // =========================================
+            // RESULT
+            // =========================================
+
+            string visitNo =
+                prms["VisitNo"].Value == null
+                    ? ""
+                    : prms["VisitNo"].Value.ToString();
+
+            return visitNo;
+        }
+
+        public static string GenerateSRAutoNumberPasienTitipan(
+            string guarantorID,
+            string serviceUnitID
+        )
+        {
+            esParameters prms =
+                new esParameters();
+
+            prms.Add(
+                "GuarantorID",
+                guarantorID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "ServiceUnitID",
+                serviceUnitID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (IDataReader dr =
+                new VisitQueue().ExecuteReader(
+                    esQueryType.StoredProcedure,
+                    "GenerateSRAutoNumberPasienTitipan",
+                    prms
+                ))
+            {
+                if (dr.Read())
+                {
+                    return dr["SRAutoNumber"].ToString();
+                }
+            }
+
+            return "";
         }
 
     }

@@ -717,6 +717,7 @@ namespace Temiang.Avicenna.Module.RADT
 
             coll.Query.Where(
                 coll.Query.UpdatedBy == AppSession.UserLogin.UserID,
+                coll.Query.QueueDate == DateTime.Today,
                 coll.Query.Status == "CALLED"
             );
 
@@ -753,6 +754,11 @@ namespace Temiang.Avicenna.Module.RADT
             {
                 txtVisitNo.Text = string.Empty;
             }
+        }
+
+        private string GenerateVisitNo()
+        {
+            return "REG-001";
         }
 
         private void ApplyServiceUnitID(string serviceUnitID)
@@ -4934,36 +4940,65 @@ namespace Temiang.Avicenna.Module.RADT
 
                 //Save Data Visit Queue To Stage (POLI, REHAB, HD)
                 #region Insert VisitQueue
-
-                var lastQueue = new VisitQueue();
-
-                lastQueue.Query.es.Top = 1;
-
-                lastQueue.Query.Where(
-                    lastQueue.Query.VisitNo == txtVisitNo.Text
-                );
-
-                lastQueue.Query.OrderBy(
-                    lastQueue.Query.CreatedDate.Descending
-                );
-
-                string srAutoNumber = "VisitTunaiNo";
-
-                if (lastQueue.Query.Load())
+                if (!string.IsNullOrWhiteSpace(txtVisitNo.Text))
                 {
-                    srAutoNumber = lastQueue.SRAutoNumber;
-                }
+                    var lastQueue = new VisitQueue();
 
-                VisitQueue.InsertVisitQueueStage(
-                    txtVisitNo.Text,
-                    srAutoNumber,
-                    AppSession.UserLogin.UserID,
-                    DateTime.Now.Date,
-                    reg.ServiceUnitID,
-                    reg.ParamedicID,
-                    reg.RegistrationNo,
-                    reg.PatientID
-                );
+                    lastQueue.Query.es.Top = 1;
+
+                    lastQueue.Query.Where(
+                        lastQueue.Query.VisitNo == txtVisitNo.Text
+                    );
+
+                    lastQueue.Query.OrderBy(
+                        lastQueue.Query.CreatedDate.Descending
+                    );
+
+                    string srAutoNumber = "VisitTunaiNo";
+
+                    if (lastQueue.Query.Load())
+                    {
+                        srAutoNumber = lastQueue.SRAutoNumber;
+                    }
+
+                    VisitQueue.InsertVisitQueueStage(
+                        txtVisitNo.Text,
+                        srAutoNumber,
+                        AppSession.UserLogin.UserID,
+                        DateTime.Now.Date,
+                        reg.ServiceUnitID,
+                        reg.ParamedicID,
+                        reg.RegistrationNo,
+                        reg.PatientID
+                    );
+                }
+                else if (!string.IsNullOrWhiteSpace(txtGenerateVisitNo.Text))
+                {
+                    // Pasien Titipan
+                    string srAutoNumber =
+                        VisitQueue.GenerateSRAutoNumberPasienTitipan(
+                            reg.GuarantorID,
+                            reg.ServiceUnitID
+                        );
+
+                    if (string.IsNullOrEmpty(srAutoNumber))
+                    {
+                        throw new Exception(
+                            "SRAutoNumber tidak ditemukan."
+                        );
+                    }
+
+                    VisitQueue.InsertVisitQueueStage(
+                        txtGenerateVisitNo.Text,
+                        srAutoNumber,
+                        AppSession.UserLogin.UserID,
+                        DateTime.Now.Date,
+                        reg.ServiceUnitID,
+                        reg.ParamedicID,
+                        reg.RegistrationNo,
+                        reg.PatientID
+                    );
+                }
 
                 #endregion
 
@@ -10251,6 +10286,25 @@ namespace Temiang.Avicenna.Module.RADT
             {
                 txtExtQueNo.Text = queColl.First().KioskQueueNo;
             }
+        }
+
+        protected void btnGenerateVisitNo_Click(
+            object sender,
+            EventArgs e
+        )
+        {
+            if (!Page.IsValid)
+                return;
+
+            txtVisitNo.Text = string.Empty;
+
+            txtGenerateVisitNo.Text =
+                VisitQueue.TakeQueueVisitPasienTitipan(
+                    cboGuarantorID.SelectedValue,
+                    cboServiceUnitID.SelectedValue,
+                    AppSession.UserLogin.UserID,
+                    DateTime.Today
+                );
         }
 
         protected void cboSRPatientInTypeEr_SelectedIndexChanged(object o, RadComboBoxSelectedIndexChangedEventArgs e)

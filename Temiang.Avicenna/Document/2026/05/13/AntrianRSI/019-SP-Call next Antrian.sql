@@ -1,8 +1,9 @@
 CREATE OR ALTER PROCEDURE AntrianCallNextQueue
 (
-    @CurrentStage       VARCHAR(50),
+    @QueueLocation       VARCHAR(50),
     @UserID             VARCHAR(50),
     @CounterID          VARCHAR(50),
+    @QueueDate          DATE,
 
     @VisitQueueNo       VARCHAR(50) OUTPUT,
     @VisitNo            VARCHAR(50) OUTPUT
@@ -11,63 +12,94 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE 
-        @QueueDate DATE = '2026-04-20';
-
     BEGIN TRAN;
 
     BEGIN TRY
 
-        -- =========================
-        -- 1. AUTO FINISH antrian sebelumnya di counter ini
-        -- =========================
+        -- ==========================================
+        -- VALIDASI PASIEN YANG SEDANG DIPANGGIL
+        -- ==========================================
+        IF EXISTS
+        (
+            SELECT 1
+            FROM VisitQueue VQ
+            WHERE
+                CAST(VQ.QueueDate AS DATE) = @QueueDate
+                AND VQ.CurrentStage = @QueueLocation
+                AND VQ.CalledByCounterID = @CounterID
+                AND VQ.Status = 'CALLED'
+                AND NOT EXISTS
+                (
+                    SELECT 1
+                    FROM VisitQueue VQ2
+                    WHERE
+                        VQ2.VisitNo = VQ.VisitNo
+                        AND CAST(VQ2.QueueDate AS DATE) = CAST(VQ.QueueDate AS DATE)
+                        AND ISNULL(LTRIM(RTRIM(VQ2.RegistrationNo)), '') <> ''
+                )
+        )
+        BEGIN
+            RAISERROR
+            (
+                'Registrasikan Pasien yang di Panggil',
+                16,
+                1
+            );
+
+            ROLLBACK;
+            RETURN;
+        END
+
+        -- ==========================================
+        -- AUTO FINISH ANTRIAN SEBELUMNYA
+        -- ==========================================
         UPDATE VisitQueue
-        SET 
+        SET
             Status      = 'FINISHED',
             UpdatedBy   = @UserID,
             LastUpdated = GETDATE()
-        WHERE 
-			CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @CurrentStage
+        WHERE
+            CAST(QueueDate AS DATE) = @QueueDate
+            AND CurrentStage = @QueueLocation
             AND CalledByCounterID = @CounterID
             AND Status = 'CALLED';
 
-        -- =========================
-        -- Reset output
-        -- =========================
+        -- ==========================================
+        -- RESET OUTPUT
+        -- ==========================================
         SET @VisitQueueNo = NULL;
         SET @VisitNo = NULL;
 
-        -- =========================
-        -- 2. Ambil 1 antrian berikutnya + LOCK
-        -- =========================
+        -- ==========================================
+        -- AMBIL ANTRIAN BERIKUTNYA
+        -- ==========================================
         SELECT TOP 1
             @VisitQueueNo = VisitQueueNo,
             @VisitNo      = VisitNo
         FROM VisitQueue WITH (ROWLOCK, READPAST, UPDLOCK)
-        WHERE 
-            QueueDate = @QueueDate
-            AND CurrentStage = @CurrentStage
+        WHERE
+            CAST(QueueDate AS DATE) = @QueueDate
+            AND CurrentStage = @QueueLocation
             AND Status = 'WAITING'
-        ORDER BY 
+        ORDER BY
             Priority ASC,
             QueueSequence ASC,
             CreatedDate ASC;
 
-        -- =========================
-        -- 3. Jika tidak ada antrian
-        -- =========================
+        -- ==========================================
+        -- TIDAK ADA ANTRIAN
+        -- ==========================================
         IF @VisitQueueNo IS NULL
         BEGIN
             COMMIT;
             RETURN;
         END
 
-        -- =========================
-        -- 4. Update menjadi CALLED
-        -- =========================
+        -- ==========================================
+        -- UPDATE MENJADI CALLED
+        -- ==========================================
         UPDATE VisitQueue
-        SET 
+        SET
             Status            = 'CALLED',
             CalledByCounterID = @CounterID,
             CalledTime        = GETDATE(),
@@ -79,8 +111,12 @@ BEGIN
 
     END TRY
     BEGIN CATCH
-        IF @@TRANCOUNT > 0 ROLLBACK;
+
+        IF @@TRANCOUNT > 0
+            ROLLBACK;
+
         THROW;
+
     END CATCH
 END
 
@@ -89,9 +125,9 @@ DECLARE
     @VisitNo VARCHAR(50);
 
 EXEC AntrianCallNextQueue
-    @CurrentStage = 'LOKET_PD',
-    @UserID = 'admin',
-    @CounterID = 'COUNTER_01',
+    @CurrentStage = 'LOKET',
+    @UserID = '240070',
+    @CounterID = '2',
     @VisitQueueNo = @VisitQueueNo OUTPUT,
     @VisitNo = @VisitNo OUTPUT;
 

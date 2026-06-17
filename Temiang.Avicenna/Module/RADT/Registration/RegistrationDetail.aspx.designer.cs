@@ -1446,6 +1446,33 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::Telerik.Web.UI.RadTextBox txtVisitNo;
 
         /// <summary>
+        /// tblGenerateVisitNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTable tblGenerateVisitNo;
+
+        /// <summary>
+        /// txtGenerateVisitNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtGenerateVisitNo;
+
+        /// <summary>
+        /// btnGetGenerateVisitNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnGetGenerateVisitNo;
+
+        /// <summary>
         /// pcareMemberInfoStatus control.
         /// </summary>
         /// <remarks>
