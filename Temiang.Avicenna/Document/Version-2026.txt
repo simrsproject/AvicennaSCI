@@ -273,3 +273,10 @@ Titipan Daniel
 
 --[13-06-2026 - Wiliam] ---
 1. Menambah loading panel pada ReOrderPoBasedOnPrList.aspx dan PurchaseOrderList.aspx
+
+---[17-06-2026 - Deby]---
+1. odoo task: 1735 --> Perbaikan proses resep untuk send satu sehat
+  - tambah kirim method inprogress resep u/ autoprint etiket (pada saat approval)
+  - tambah coding :
+    -> status complete, auto set InProgressDateTime jika masih null
+    -> status deliver, auto set InProgressDateTime & CompleteDateTime jika masih null
