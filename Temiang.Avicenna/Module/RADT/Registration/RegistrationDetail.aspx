@@ -1139,7 +1139,7 @@
                             <table cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
-                                        <telerik:RadTextBox runat="server" ID="txtGenerateVisitNo" MaxLength="20" Width="283px"></telerik:RadTextBox>
+                                        <telerik:RadTextBox runat="server" ID="txtGenerateVisitNo" MaxLength="20" Width="283px" ReadOnly="true"></telerik:RadTextBox>
                                     </td>
                                     <td width="5px"></td>
                                     <td>
