@@ -1914,6 +1914,7 @@
     <Content Include="Document\2026\05\13\AntrianRSI\041-SP AntrianSetCanceledForPendaftaran.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\042-SP AntrianSetCanceledForAllServiceUnit.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\043-SP GetQueueSoundForAllServiceUnit.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\044-SP AntrianReorderBySRAutoNumber.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\045-SP TakeQueueVisitPasienTititpan.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\046-SP GenerateSRAutoNumberPasienTitipan.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />

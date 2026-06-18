@@ -1,4 +1,4 @@
-/// ------------------------------------------------------------------------------------------------------ ///
+﻿/// ------------------------------------------------------------------------------------------------------ ///
 /// Purpose   : Entry Registration for 
 ///             1. Out Patient
 ///             2. In patient
@@ -754,11 +754,6 @@ namespace Temiang.Avicenna.Module.RADT
             {
                 txtVisitNo.Text = string.Empty;
             }
-        }
-
-        private string GenerateVisitNo()
-        {
-            return "REG-001";
         }
 
         private void ApplyServiceUnitID(string serviceUnitID)
@@ -10295,6 +10290,14 @@ namespace Temiang.Avicenna.Module.RADT
         {
             if (!Page.IsValid)
                 return;
+
+            if (!string.Equals(
+                AppSession.Parameter.HealthcareID,
+                "RSI",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
 
             txtVisitNo.Text = string.Empty;
 

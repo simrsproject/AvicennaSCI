@@ -1,13 +1,14 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Drawing;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Web.Services;
 using System.Web.Script.Services;
+using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.ReportLibrary.RLib_Slip.PatientManagement;
-using DocumentFormat.OpenXml.Drawing;
 using static Temiang.Avicenna.Common.AppConstant;
 
 namespace Temiang.Avicenna.WebService.V1_1
@@ -253,7 +254,74 @@ namespace Temiang.Avicenna.WebService.V1_1
                     .Where(regQuery.RegistrationNo == regno);
                 var tbReg = regQuery.LoadDataTable();
 
-                WriteResponseAndLog(log, JSonRetFormatted(ConvertDataRowtoObject(tbReg.Rows[0])));
+                DataRow reg = tbReg.Rows[0];
+
+                string visitNo = "";
+                string srAutoNumber = "";
+
+                if (string.Equals(
+                    AppSession.Parameter.HealthcareID,
+                    "RSI",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    visitNo =
+                        VisitQueue.TakeQueueVisitPasienTitipan(
+                            GuarantorID,
+                            reg["ServiceUnitID"].ToString(),
+                            UserID,
+                            DateTime.Today
+                        );
+
+                    if (!string.IsNullOrWhiteSpace(visitNo))
+                    {
+                        srAutoNumber =
+                            VisitQueue.GenerateSRAutoNumberPasienTitipan(
+                                GuarantorID,
+                                reg["ServiceUnitID"].ToString()
+                            );
+
+                        if (string.IsNullOrEmpty(srAutoNumber))
+                        {
+                            throw new Exception(
+                                "SRAutoNumber tidak ditemukan."
+                            );
+                        }
+
+                        VisitQueue.InsertVisitQueueStage(
+                            visitNo,
+                            srAutoNumber,
+                            UserID,
+                            DateTime.Today,
+                            reg["ServiceUnitID"].ToString(),
+                            reg["ParamedicID"].ToString(),
+                            reg["RegistrationNo"].ToString(),
+                            reg["PatientID"].ToString()
+                        );
+                    }
+                }
+
+                Dictionary<string, object> result =
+                ConvertDataRowtoObject(tbReg.Rows[0]);
+
+                result.Add(
+                    "VisitNo",
+                    visitNo
+                );
+
+                result.Add(
+                    "SRAutoNumber",
+                    srAutoNumber
+                );
+
+                result["HealthcareID"] =
+                    AppSession.Parameter.HealthcareID;
+
+
+                WriteResponseAndLog(
+                    log,
+                    JSonRetFormatted(result)
+                );
+
             }
             catch (Exception ex)
             {
