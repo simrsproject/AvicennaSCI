@@ -581,15 +581,17 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - QueueDate (optional)
             - QueueLocation (required)
+            - Status (Optional)
 
             CONTOH:
             GetDisplayAntrianPasien?
             QueueDate=2026-05-13&
-            QueueLocation=LOKET_PD
+            QueueLocation=LOKET_PD&Status=WAITING
             
             KETERANGAN:
                - QueueDate : Tanggal antrian (default hari ini jika kosong atau invalid)
                - QueueLocation : Lokasi/channel antrian
+               - Status : Status Antrian Pasien (WAITING, CALLED, PENDING, FINISHED)
 
             RESPONSE:
                200 = Berhasil mengambil display antrian pasien pendaftaran
@@ -611,6 +613,11 @@ namespace Temiang.Avicenna.WebService
 
                 string QueueLocation =
                     (Context.Request["QueueLocation"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string Status =
+                    (Context.Request["Status"] ?? "")
                     .Trim()
                     .ToUpper();
 
@@ -661,13 +668,41 @@ namespace Temiang.Avicenna.WebService
                     return;
                 }
 
+                if (!string.IsNullOrEmpty(Status))
+                {
+                    var allowedStatus = new[]
+                    {
+                        "WAITING",
+                        "CALLED",
+                        "PENDING",
+                        "FINISHED"
+                    };
+
+                    var statusList = Status
+                        .Split(',')
+                        .Select(x => x.Trim().ToUpper())
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .ToList();
+
+                    if (statusList.Any(x => !allowedStatus.Contains(x)))
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            "Status tidak valid",
+                            400
+                        );
+                        return;
+                    }
+                }
+
                 // =========================================
                 // GET DATA FROM BO
                 // =========================================
                 var data =
                     VisitQueue.GetDisplayAntrianPasien(
                         queueDate,
-                        QueueLocation
+                        QueueLocation,
+                        Status
                     );
 
                 // =========================================

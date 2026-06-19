@@ -1106,7 +1106,8 @@ namespace Temiang.Avicenna.BusinessObject
     {
         public static object GetDisplayAntrianPasien(
             DateTime queueDate,
-            string queueLocation
+            string queueLocation,
+            string status = null
         )
         {
             var collection =
@@ -1140,12 +1141,27 @@ namespace Temiang.Avicenna.BusinessObject
                 query.QueueLocation == queueLocation
             );
 
-            query.Where(
-                query.Status.In(
-                    "WAITING",
-                    "CALLED"
-                )
-            );
+            if (!string.IsNullOrEmpty(status))
+            {
+                var statusList = status
+                    .Split(',')
+                    .Select(x => x.Trim().ToUpper())
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToArray();
+
+                query.Where(
+                    query.Status.In(statusList)
+                );
+            }
+            else
+            {
+                query.Where(
+                    query.Status.In(
+                        "WAITING",
+                        "CALLED"
+                    )
+                );
+            }
 
             query.Where(
                 query.QueueDate >= queueDate.Date,

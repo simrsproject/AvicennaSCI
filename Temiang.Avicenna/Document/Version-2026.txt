@@ -194,6 +194,9 @@ Titipan Daniel
    bisa terinput ke tabel VisitQueue.
 7. Menambahkan private void SetCurrentStageVisibility untuk menyembunyikan dropbox dengan parameter RSI (Jika bukan RSI maka sembunyikan)
 8. Menambahkan 1 kolom pada tabel ServiceUnitParamedic yaitu kolom IsDisplayActive
+9. Menambahkan Bussiness Object QueueStage dan Create Tabel QueueStage.
+10.Menambahkan validasi Tombol Generate VisitNo dan txtVisitNo hanya berlaku di RSI.
+11.Menambahkan dan memodifikasi respone API RegistrationCreateFromAppointment supaya dapat masuk ke tabel VisitQueue.
 
 ---- [15-05-2026 - Wiliam] ---
 1. Modifikasi PrescriptionSalesDetail.aspx.cs 
