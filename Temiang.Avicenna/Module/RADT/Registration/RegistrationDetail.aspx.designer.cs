@@ -1473,6 +1473,24 @@ namespace Temiang.Avicenna.Module.RADT
         protected global::System.Web.UI.WebControls.ImageButton btnGetGenerateVisitNo;
 
         /// <summary>
+        /// cvVisitNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator cvVisitNo;
+
+        /// <summary>
+        /// imgVisitNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgVisitNo;
+
+        /// <summary>
         /// pcareMemberInfoStatus control.
         /// </summary>
         /// <remarks>

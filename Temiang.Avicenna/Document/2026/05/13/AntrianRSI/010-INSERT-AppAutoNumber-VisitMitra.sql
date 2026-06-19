@@ -39,7 +39,7 @@ VALUES
     '',
     0,          -- tidak pakai hari
     '',
-    4,          -- format 0001
+    3,          -- format 0001
     0,
     '',
     '',

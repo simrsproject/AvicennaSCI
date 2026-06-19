@@ -145,6 +145,13 @@ namespace Temiang.Avicenna.Module.RADT
             lblSsn.Text = Helper.IsDukcapilIntegration ? "NIK/KTP (DUKCAPIL)" : "SSN";
         }
 
+        protected void cvVisitNo_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid =
+                !string.IsNullOrWhiteSpace(txtVisitNo.Text) ||
+                !string.IsNullOrWhiteSpace(txtGenerateVisitNo.Text);
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);

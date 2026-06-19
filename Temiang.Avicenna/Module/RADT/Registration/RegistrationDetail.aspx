@@ -1149,7 +1149,17 @@
                                 </tr>
                             </table>
                         </td>
-                        <td width="20px"></td>
+                        <td width="20px">
+                            <asp:CustomValidator
+                                ID="cvVisitNo"
+                                runat="server"
+                                ValidationGroup="Registration"
+                                ErrorMessage="Visit No Or Generate Visit No Required."
+                                OnServerValidate="cvVisitNo_ServerValidate"
+                                SetFocusOnError="true">
+                                <asp:Image ID="imgVisitNo" runat="server" SkinID="rfvImage" />
+                            </asp:CustomValidator>
+                        </td>
                     </tr>
                 </table>
                 <table width="100%">
