@@ -280,3 +280,6 @@ Titipan Daniel
   - tambah coding :
     -> status complete, auto set InProgressDateTime jika masih null
     -> status deliver, auto set InProgressDateTime & CompleteDateTime jika masih null
+
+---[18-06-2026 - Wiliam]---
+1. Modifikasi Purchase Order List agar (optimasi query)
