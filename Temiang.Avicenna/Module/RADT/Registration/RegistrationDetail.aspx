@@ -1144,7 +1144,7 @@
                                     <td width="5px"></td>
                                     <td>
                                         <asp:ImageButton ID="btnGetGenerateVisitNo" runat="server" ImageUrl="~/Images/Toolbar/download16.png"
-                                            OnClick="btnGenerateVisitNo_Click" ValidationGroup="Registration" Validation="true" ToolTip="Get Generated Visit No" />
+                                            OnClick="btnGenerateVisitNo_Click" CausesValidation="false" ToolTip="Get Generated Visit No" />
                                     </td>
                                 </tr>
                             </table>

@@ -10295,8 +10295,6 @@ namespace Temiang.Avicenna.Module.RADT
             EventArgs e
         )
         {
-            if (!Page.IsValid)
-                return;
 
             if (!string.Equals(
                 AppSession.Parameter.HealthcareID,

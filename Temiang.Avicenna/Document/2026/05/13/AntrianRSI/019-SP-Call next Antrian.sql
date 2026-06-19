@@ -1,12 +1,12 @@
 CREATE OR ALTER PROCEDURE AntrianCallNextQueue
 (
-    @QueueLocation       VARCHAR(50),
-    @UserID             VARCHAR(50),
-    @CounterID          VARCHAR(50),
-    @QueueDate          DATE,
+    @QueueLocation   VARCHAR(50),
+    @UserID          VARCHAR(50),
+    @CounterID       VARCHAR(50),
+    @QueueDate       DATE,
 
-    @VisitQueueNo       VARCHAR(50) OUTPUT,
-    @VisitNo            VARCHAR(50) OUTPUT
+    @VisitQueueNo    VARCHAR(50) OUTPUT,
+    @VisitNo         VARCHAR(50) OUTPUT
 )
 AS
 BEGIN
@@ -16,27 +16,36 @@ BEGIN
 
     BEGIN TRY
 
-        -- ==========================================
-        -- VALIDASI PASIEN YANG SEDANG DIPANGGIL
-        -- ==========================================
-        IF EXISTS
+        ---------------------------------------------------
+        -- 1. AMBIL PASIEN YANG SEDANG CALLED
+        ---------------------------------------------------
+        DECLARE @CurrentVisitNo VARCHAR(50);
+
+        SELECT TOP 1
+            @VisitQueueNo = VisitQueueNo,
+            @CurrentVisitNo = VisitNo
+        FROM VisitQueue WITH (ROWLOCK, READPAST, UPDLOCK)
+        WHERE
+            CAST(QueueDate AS DATE) = @QueueDate
+            AND CurrentStage = 'LOKET'
+            AND QueueLocation = @QueueLocation
+            AND CalledByCounterID = @CounterID
+            AND Status = 'CALLED'
+        ORDER BY CalledTime DESC;
+
+
+        ---------------------------------------------------
+        -- 2. VALIDASI: HARUS SUDAH ADA ROW REGISTRASI
+        ---------------------------------------------------
+        IF @CurrentVisitNo IS NOT NULL
+        AND NOT EXISTS
         (
             SELECT 1
-            FROM VisitQueue VQ
+            FROM VisitQueue REG
             WHERE
-                CAST(VQ.QueueDate AS DATE) = @QueueDate
-                AND VQ.CurrentStage = @QueueLocation
-                AND VQ.CalledByCounterID = @CounterID
-                AND VQ.Status = 'CALLED'
-                AND NOT EXISTS
-                (
-                    SELECT 1
-                    FROM VisitQueue VQ2
-                    WHERE
-                        VQ2.VisitNo = VQ.VisitNo
-                        AND CAST(VQ2.QueueDate AS DATE) = CAST(VQ.QueueDate AS DATE)
-                        AND ISNULL(LTRIM(RTRIM(VQ2.RegistrationNo)), '') <> ''
-                )
+                REG.VisitNo = @CurrentVisitNo
+                AND REG.QueueDate = @QueueDate
+                AND ISNULL(REG.RegistrationNo, '') <> ''
         )
         BEGIN
             RAISERROR
@@ -50,62 +59,69 @@ BEGIN
             RETURN;
         END
 
-        -- ==========================================
-        -- AUTO FINISH ANTRIAN SEBELUMNYA
-        -- ==========================================
+
+        ---------------------------------------------------
+        -- 3. FINISH CURRENT CALLED
+        ---------------------------------------------------
         UPDATE VisitQueue
         SET
-            Status      = 'FINISHED',
-            UpdatedBy   = @UserID,
+            Status = 'FINISHED',
+            FinishedTime = GETDATE(),
+            UpdatedBy = @UserID,
             LastUpdated = GETDATE()
         WHERE
-            CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @QueueLocation
-            AND CalledByCounterID = @CounterID
+            VisitQueueNo = @VisitQueueNo
             AND Status = 'CALLED';
 
-        -- ==========================================
-        -- RESET OUTPUT
-        -- ==========================================
+
+        ---------------------------------------------------
+        -- 4. RESET OUTPUT
+        ---------------------------------------------------
         SET @VisitQueueNo = NULL;
         SET @VisitNo = NULL;
 
-        -- ==========================================
-        -- AMBIL ANTRIAN BERIKUTNYA
-        -- ==========================================
+
+        ---------------------------------------------------
+        -- 5. AMBIL ANTRIAN BERIKUTNYA
+        ---------------------------------------------------
         SELECT TOP 1
             @VisitQueueNo = VisitQueueNo,
             @VisitNo      = VisitNo
         FROM VisitQueue WITH (ROWLOCK, READPAST, UPDLOCK)
         WHERE
             CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @QueueLocation
+            AND CurrentStage = 'LOKET'
+            AND QueueLocation = @QueueLocation
             AND Status = 'WAITING'
         ORDER BY
             Priority ASC,
             QueueSequence ASC,
             CreatedDate ASC;
 
-        -- ==========================================
-        -- TIDAK ADA ANTRIAN
-        -- ==========================================
+
+        ---------------------------------------------------
+        -- 6. JIKA TIDAK ADA ANTRIAN
+        ---------------------------------------------------
         IF @VisitQueueNo IS NULL
         BEGIN
             COMMIT;
             RETURN;
         END
 
-        -- ==========================================
-        -- UPDATE MENJADI CALLED
-        -- ==========================================
+
+        ---------------------------------------------------
+        -- 7. SET MENJADI CALLED
+        ---------------------------------------------------
         UPDATE VisitQueue
         SET
-            Status            = 'CALLED',
+            Status = 'CALLED',
             CalledByCounterID = @CounterID,
-            CalledTime        = GETDATE(),
-            UpdatedBy         = @UserID,
-            LastUpdated       = GETDATE()
-        WHERE VisitQueueNo = @VisitQueueNo;
+            CalledTime = GETDATE(),
+            UpdatedBy = @UserID,
+            LastUpdated = GETDATE()
+        WHERE
+            VisitQueueNo = @VisitQueueNo;
+
 
         COMMIT;
 
@@ -125,9 +141,10 @@ DECLARE
     @VisitNo VARCHAR(50);
 
 EXEC AntrianCallNextQueue
-    @CurrentStage = 'LOKET',
+    @QueueLocation = 'LOKET_PD',
     @UserID = '240070',
-    @CounterID = '2',
+    @CounterID = '1',
+	@QueueDate = '2026-06-19',
     @VisitQueueNo = @VisitQueueNo OUTPUT,
     @VisitNo = @VisitNo OUTPUT;
 
