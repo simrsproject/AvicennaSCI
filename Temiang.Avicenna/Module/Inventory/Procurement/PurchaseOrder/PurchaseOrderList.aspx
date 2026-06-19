@@ -259,7 +259,7 @@
             <telerik:RadGrid ID="grdListPr" runat="server" OnNeedDataSource="grdListPr_NeedDataSource"
                 OnDetailTableDataBind="grdListPr_DetailTableDataBind" AutoGenerateColumns="false"
                 AllowPaging="true" PageSize="15">
-                <MasterTableView DataKeyNames="TransactionNo,FromLocationID,SRItemType">
+                <MasterTableView AllowCustomPaging="true" DataKeyNames="TransactionNo,FromLocationID,SRItemType">
                     <Columns>
                         <telerik:GridHyperLinkColumn HeaderStyle-Width="150px" DataTextField="TransactionNo"
                             DataNavigateUrlFields="PoUrl" HeaderText="Request No" UniqueName="TransactionNo"

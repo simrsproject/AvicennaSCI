@@ -409,7 +409,7 @@ function idrg_diagnosa_get2($request, $response, $args) {
 	
 	$json = '{
 	"metadata":{
-		"method":"idrg_diagnosa_set"
+		"method":"idrg_diagnosa_get"
 	},
 	"data":{
 		"nomor_sep":"'.$nomor_sep.'"
@@ -470,7 +470,7 @@ function idrg_procedure_get2($request, $response, $args) {
 	
 	$json = '{
 	"metadata":{
-		"method":"idrg_procedure_set"
+		"method":"idrg_procedure_get"
 	},
 	"data":{
 		"nomor_sep":"'.$nomor_sep.'"

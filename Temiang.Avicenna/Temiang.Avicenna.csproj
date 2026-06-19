@@ -15998,7 +15998,6 @@
     </Compile>
     <Compile Include="Module\Inventory\Procurement\PurchaseOrder\PurchaseOrderList.aspx.cs">
       <DependentUpon>PurchaseOrderList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Inventory\Procurement\PurchaseOrder\PurchaseOrderList.aspx.designer.cs">
       <DependentUpon>PurchaseOrderList.aspx</DependentUpon>
