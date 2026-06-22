@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-05-07 10:59:43 AM
+                    Date Generated       : 2026-06-22 02:53:51 PM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -13,14 +13,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Xml.Serialization;
-using Temiang.Avicenna.BusinessObject.Common.Inacbg;
 using Temiang.Avicenna.BusinessObject.Generated;
 using Temiang.Dal.Core;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
+
 namespace Temiang.Avicenna.BusinessObject
 {
     [Serializable]
@@ -643,7 +642,7 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
         /// <summary>
-        /// Maps to VisitQueue.IsRecall
+        /// Maps to VisitQueue.RecallCount
         /// </summary>
         virtual public System.Int32? RecallCount
         {
@@ -2093,7 +2092,7 @@ namespace Temiang.Avicenna.BusinessObject
                             ?.ServiceUnitName,
 
                     x.ParamedicID,
-                    
+
 
                     ParamedicName =
                         paramedics
@@ -3426,34 +3425,34 @@ namespace Temiang.Avicenna.BusinessObject
             var parameters = new esParameters();
 
             string sql = @"
-        SELECT
-            VQ.VisitQueueNo,
-            VQ.VisitNo,
-            VQ.RegistrationNo,
-            VQ.QueueDate,
-            VQ.Status,
-            VQ.StageID,
-            SUP.ServiceUnitID,
-            VQ.CategoryID,
-            SU.ServiceUnitName,
-            SUP.ParamedicID,
-            P.ParamedicName
-                FROM ServiceUnitParamedic SUP
-                INNER JOIN Paramedic P
-                    ON P.ParamedicID = SUP.ParamedicID
-                LEFT JOIN ServiceUnit SU
-                    ON SU.ServiceUnitID = SUP.ServiceUnitID
-                LEFT JOIN VisitQueue VQ
-                    ON VQ.ServiceUnitID = SUP.ServiceUnitID
-                   AND VQ.ParamedicID = SUP.ParamedicID
-                   AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
-                WHERE
-                    SUP.ServiceUnitID = @ServiceUnitID
-                    AND SUP.IsDisplayActive = 1
-                ORDER BY
-                    P.ParamedicName,
-                    VQ.QueueDate
-            ";
+    SELECT
+        VQ.VisitQueueNo,
+        VQ.VisitNo,
+        VQ.RegistrationNo,
+        VQ.QueueDate,
+        VQ.Status,
+        VQ.StageID,
+        SUP.ServiceUnitID,
+        VQ.CategoryID,
+        SU.ServiceUnitName,
+        SUP.ParamedicID,
+        P.ParamedicName
+            FROM ServiceUnitParamedic SUP
+            INNER JOIN Paramedic P
+                ON P.ParamedicID = SUP.ParamedicID
+            LEFT JOIN ServiceUnit SU
+                ON SU.ServiceUnitID = SUP.ServiceUnitID
+            LEFT JOIN VisitQueue VQ
+                ON VQ.ServiceUnitID = SUP.ServiceUnitID
+               AND VQ.ParamedicID = SUP.ParamedicID
+               AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
+            WHERE
+                SUP.ServiceUnitID = @ServiceUnitID
+                AND SUP.IsDisplayActive = 1
+            ORDER BY
+                P.ParamedicName,
+                VQ.QueueDate
+        ";
 
             parameters.Add(
                 "ServiceUnitID",
@@ -3550,10 +3549,10 @@ namespace Temiang.Avicenna.BusinessObject
 
             // Matikan semua dokter pada poli tersebut
             string sqlReset = @"
-                UPDATE ServiceUnitParamedic
-                SET IsDisplayActive = 0
-                WHERE ServiceUnitID = @ServiceUnitID
-            ";
+            UPDATE ServiceUnitParamedic
+            SET IsDisplayActive = 0
+            WHERE ServiceUnitID = @ServiceUnitID
+        ";
 
             parameters.Add(
                 "ServiceUnitID",
@@ -3590,11 +3589,11 @@ namespace Temiang.Avicenna.BusinessObject
                 "'";
 
             string sqlUpdate = $@"
-                UPDATE ServiceUnitParamedic
-                SET IsDisplayActive = 1
-                WHERE ServiceUnitID = @ServiceUnitID
-                AND ParamedicID IN ({inClause})
-            ";
+            UPDATE ServiceUnitParamedic
+            SET IsDisplayActive = 1
+            WHERE ServiceUnitID = @ServiceUnitID
+            AND ParamedicID IN ({inClause})
+        ";
 
             var parametersUpdate =
                 new esParameters();

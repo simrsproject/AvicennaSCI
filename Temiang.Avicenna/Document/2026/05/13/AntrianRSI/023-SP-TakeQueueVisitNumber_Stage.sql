@@ -152,7 +152,7 @@ BEGIN
             Priority,
             QueueKey,
             IsManualOverride,
-            IsRecall,
+            RecallCount,
             CreatedBy,
             CreatedDate,
             LastUpdated,
