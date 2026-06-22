@@ -1122,6 +1122,7 @@ namespace Temiang.Avicenna.BusinessObject
             query.es.WithNoLock = true;
 
             query.Select(
+                query.VisitQueueNo,
                 query.VisitNo,
                 query.Status,
                 query.QueueLocation,
@@ -1180,6 +1181,8 @@ namespace Temiang.Avicenna.BusinessObject
             return collection
              .Select(x => new
              {
+                 VisitQueueNo = x.VisitQueueNo,
+
                  VisitNo = x.VisitNo,
 
                  Status = x.Status,
@@ -1217,6 +1220,7 @@ namespace Temiang.Avicenna.BusinessObject
                          Queues = counterGroup
                              .Select(q => new
                              {
+                                 q.VisitQueueNo,
                                  q.VisitNo,
                                  q.DisplayName,
                                  q.QueueLocation,
