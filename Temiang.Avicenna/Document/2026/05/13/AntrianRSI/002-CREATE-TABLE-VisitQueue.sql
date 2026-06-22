@@ -18,6 +18,12 @@
     ServiceUnitID     VARCHAR(50) NULL,          -- poli/unit
     ParamedicID       VARCHAR(50) NULL,          -- dokter
 
+	 -- Tambahan grouping/routing antrian
+    StageID           VARCHAR(50) NULL,
+    CategoryID        VARCHAR(50) NULL,
+    QueueKey          VARCHAR(200) NULL,
+    QueueLocation     VARCHAR(50) NULL,
+
     CalledByCounterID VARCHAR(50) NULL,
     CalledTime        DATETIME NULL,
 
@@ -44,5 +50,5 @@
 
     LastUpdated       DATETIME NULL,
     UpdatedBy         VARCHAR(50) NULL,
-	IsRecall          INT NULL
+	RecallCount       INT NULL
 );
