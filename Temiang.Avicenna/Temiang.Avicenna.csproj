@@ -1917,6 +1917,7 @@
     <Content Include="Document\2026\05\13\AntrianRSI\044-SP AntrianReorderBySRAutoNumber.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\045-SP TakeQueueVisitPasienTititpan.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\046-SP GenerateSRAutoNumberPasienTitipan.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\047-UPDATE Query Field IsDisplayActive Tabel ServiceUnitParamedic.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />

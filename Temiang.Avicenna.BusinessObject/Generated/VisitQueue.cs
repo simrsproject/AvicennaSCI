@@ -1127,7 +1127,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.QueueLocation,
                 semantic.DisplayName,
                 query.CalledByCounterID,
-                query.QueueSequence
+                query.QueueSequence,
+                query.IsRecall
             );
 
             query.LeftJoin(semantic)
@@ -1187,6 +1188,8 @@ namespace Temiang.Avicenna.BusinessObject
 
                  QueueSequence = x.QueueSequence,
 
+                 IsRecall = x.IsRecall,
+
                  DisplayName =
                      x.GetColumn("DisplayName") == null
                          ? ""
@@ -1217,7 +1220,8 @@ namespace Temiang.Avicenna.BusinessObject
                                  q.VisitNo,
                                  q.DisplayName,
                                  q.QueueLocation,
-                                 q.QueueSequence
+                                 q.QueueSequence,
+                                 q.IsRecall,
                              })
                              .ToList()
                      })
@@ -1255,7 +1259,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.QueueLocation,
                 query.QueueSequence,
                 query.CalledByCounterID,
-                payerType.PayerType
+                payerType.PayerType,
+                query.IsRecall
             );
 
             query.LeftJoin(payerType)
@@ -1329,7 +1334,8 @@ namespace Temiang.Avicenna.BusinessObject
                     CurrentStage = x.CurrentStage,
                     QueueLocation = x.QueueLocation,
                     QueueSequence = x.QueueSequence,
-                    CalledByCounterID = x.CalledByCounterID
+                    CalledByCounterID = x.CalledByCounterID,
+                    IsRecall = x.IsRecall,
                 })
                 .ToList();
         }
