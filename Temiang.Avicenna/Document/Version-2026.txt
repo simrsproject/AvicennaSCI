@@ -283,3 +283,6 @@ Titipan Daniel
 
 ---[18-06-2026 - Wiliam]---
 1. Modifikasi Purchase Order List agar (optimasi query)
+
+---[22-06-2026 - Wiliam]---
+1. Menghilangkan text "Hasil Test Isihara" pada SOAP. CR Number : 0000030
