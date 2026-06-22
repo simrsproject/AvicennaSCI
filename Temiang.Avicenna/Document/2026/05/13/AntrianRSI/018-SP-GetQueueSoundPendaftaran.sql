@@ -54,7 +54,7 @@ BEGIN
     -- =========================
     -- 4. Awalan
     -- =========================
-    INSERT INTO @SoundOrder VALUES ('nomor'), ('antrian');
+    INSERT INTO @SoundOrder VALUES ('nomor-urut');
 
     -- 🔥 PREFIX (BA → B + A)
     DECLARE @iPrefix INT = 1;
@@ -127,7 +127,7 @@ BEGIN
     -- =========================
     -- 🔥 KE KONTER
     -- =========================
-    INSERT INTO @SoundOrder VALUES ('ke konter');
+    INSERT INTO @SoundOrder VALUES ('konter');
 
     DECLARE @i INT = 1;
     WHILE @i <= LEN(@CounterID)
@@ -138,17 +138,23 @@ BEGIN
         SET @i += 1;
     END
 
+   
     -- =========================
-    -- 5. Join ke sound table
-    -- =========================
-    SELECT 
-        s.Seq,
-        s.SoundCode,
-        ISNULL(q.FilePath, 'kosong.mp3') AS FilePath,
-        @VisitNo AS VisitNo
-    FROM @SoundOrder s
-    LEFT JOIN QueueingSound q
-        ON LOWER(q.Name) = LOWER(s.SoundCode)
-    ORDER BY s.Seq;
+	-- 5. Join ke sound table
+	-- =========================
+	SELECT 
+		ROW_NUMBER() OVER (ORDER BY s.Seq) AS Seq,
+		s.SoundCode,
+		q.FilePath,
+		@VisitNo AS VisitNo
+	FROM @SoundOrder s
+	INNER JOIN QueueingSound q
+		ON LOWER(q.Name) = LOWER(s.SoundCode)
+	WHERE s.SoundCode <> '0'
+	  AND ISNULL(q.FilePath, '') <> ''
+	ORDER BY s.Seq;
 
-END
+	END
+
+EXEC GetQueueSoundPendaftaran
+@VisitQueueNo = 'VQUE-260515-0003'

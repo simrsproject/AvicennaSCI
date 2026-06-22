@@ -194,7 +194,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "CategoryID": this.str.CategoryID = (string)value; break;
                         case "QueueKey": this.str.QueueKey = (string)value; break;
                         case "QueueLocation": this.str.QueueLocation = (string)value; break;
-                        case "IsRecall": this.str.IsRecall = (string)value; break;
+                        case "RecallCount": this.str.RecallCount = (string)value; break;
                     }
                 }
                 else
@@ -246,10 +246,10 @@ namespace Temiang.Avicenna.BusinessObject
                             if (value == null || value is System.DateTime)
                                 this.LastUpdated = (System.DateTime?)value;
                             break;
-                        case "IsRecall":
+                        case "RecallCount":
 
                             if (value == null || value is System.Int32)
-                                this.IsRecall = (System.Int32?)value;
+                                this.RecallCount = (System.Int32?)value;
                             break;
 
                         default:
@@ -645,16 +645,16 @@ namespace Temiang.Avicenna.BusinessObject
         /// <summary>
         /// Maps to VisitQueue.IsRecall
         /// </summary>
-        virtual public System.Int32? IsRecall
+        virtual public System.Int32? RecallCount
         {
             get
             {
-                return base.GetSystemInt32(VisitQueueMetadata.ColumnNames.IsRecall);
+                return base.GetSystemInt32(VisitQueueMetadata.ColumnNames.RecallCount);
             }
 
             set
             {
-                base.SetSystemInt32(VisitQueueMetadata.ColumnNames.IsRecall, value);
+                base.SetSystemInt32(VisitQueueMetadata.ColumnNames.RecallCount, value);
             }
         }
 
@@ -1057,18 +1057,18 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.QueueLocation = Convert.ToString(value);
                 }
             }
-            public System.String IsRecall
+            public System.String RecallCount
             {
                 get
                 {
-                    System.Int32? data = entity.IsRecall;
+                    System.Int32? data = entity.RecallCount;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.IsRecall = null;
-                    else entity.IsRecall = Convert.ToInt32(value);
+                    if (value == null || value.Length == 0) entity.RecallCount = null;
+                    else entity.RecallCount = Convert.ToInt32(value);
                 }
             }
 
@@ -1129,7 +1129,7 @@ namespace Temiang.Avicenna.BusinessObject
                 semantic.DisplayName,
                 query.CalledByCounterID,
                 query.QueueSequence,
-                query.IsRecall
+                query.RecallCount
             );
 
             query.LeftJoin(semantic)
@@ -1191,7 +1191,7 @@ namespace Temiang.Avicenna.BusinessObject
 
                  QueueSequence = x.QueueSequence,
 
-                 IsRecall = x.IsRecall,
+                 RecallCount = x.RecallCount,
 
                  DisplayName =
                      x.GetColumn("DisplayName") == null
@@ -1225,7 +1225,7 @@ namespace Temiang.Avicenna.BusinessObject
                                  q.DisplayName,
                                  q.QueueLocation,
                                  q.QueueSequence,
-                                 q.IsRecall,
+                                 q.RecallCount,
                              })
                              .ToList()
                      })
@@ -1264,7 +1264,7 @@ namespace Temiang.Avicenna.BusinessObject
                 query.QueueSequence,
                 query.CalledByCounterID,
                 payerType.PayerType,
-                query.IsRecall
+                query.RecallCount
             );
 
             query.LeftJoin(payerType)
@@ -1339,7 +1339,7 @@ namespace Temiang.Avicenna.BusinessObject
                     QueueLocation = x.QueueLocation,
                     QueueSequence = x.QueueSequence,
                     CalledByCounterID = x.CalledByCounterID,
-                    IsRecall = x.IsRecall,
+                    RecallCount = x.RecallCount,
                 })
                 .ToList();
         }
@@ -3927,11 +3927,11 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, VisitQueueMetadata.ColumnNames.QueueLocation, esSystemType.String);
             }
         }
-        public esQueryItem IsRecall
+        public esQueryItem RecallCount
         {
             get
             {
-                return new esQueryItem(this, VisitQueueMetadata.ColumnNames.IsRecall, esSystemType.Int32);
+                return new esQueryItem(this, VisitQueueMetadata.ColumnNames.RecallCount, esSystemType.Int32);
             }
         }
     }
@@ -4459,8 +4459,8 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(VisitQueueMetadata.ColumnNames.IsRecall, 25, typeof(System.Int32), esSystemType.Int32);
-            c.PropertyName = VisitQueueMetadata.PropertyNames.IsRecall;
+            c = new esColumnMetadata(VisitQueueMetadata.ColumnNames.RecallCount, 25, typeof(System.Int32), esSystemType.Int32);
+            c.PropertyName = VisitQueueMetadata.PropertyNames.RecallCount;
             c.NumericPrecision = 10;
             c.HasDefault = true;
             c.Default = @"((0))";
@@ -4516,7 +4516,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string CategoryID = "CategoryID";
             public const string QueueKey = "QueueKey";
             public const string QueueLocation = "QueueLocation";
-            public const string IsRecall = "IsRecall";
+            public const string RecallCount = "RecallCount";
         }
         #endregion
 
@@ -4548,7 +4548,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string CategoryID = "CategoryID";
             public const string QueueKey = "QueueKey";
             public const string QueueLocation = "QueueLocation";
-            public const string IsRecall = "IsRecall";
+            public const string RecallCount = "RecallCount";
         }
         #endregion
 
@@ -4617,7 +4617,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("CategoryID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("QueueKey", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("QueueLocation", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("IsRecall", new esTypeMap("int", "System.Int32"));
+                meta.AddTypeMap("RecallCount", new esTypeMap("int", "System.Int32"));
 
 
                 meta.Source = "VisitQueue";

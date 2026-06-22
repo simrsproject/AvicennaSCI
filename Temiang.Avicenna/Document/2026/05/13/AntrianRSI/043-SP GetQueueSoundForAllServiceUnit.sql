@@ -199,28 +199,34 @@ BEGIN
         1
     );
 
+   
     -- ==================================
-    -- Result
-    -- ==================================
-    SELECT
-        s.Seq,
-        s.SoundCode,
-        CASE
-            WHEN s.IsDirectFile = 1
-                THEN s.SoundCode
-            ELSE
-                ISNULL(q.FilePath,'kosong.mp3')
-        END AS FilePath,
-        @VisitNo AS VisitNo,
-        @CurrentStage AS CurrentStage,
-        @ServiceUnitID AS ServiceUnitID,
+	-- Result
+	-- ==================================
+	SELECT
+		ROW_NUMBER() OVER (ORDER BY s.Seq) AS Seq,
+		s.SoundCode,
+		CASE
+			WHEN s.IsDirectFile = 1
+				THEN s.SoundCode
+			ELSE q.FilePath
+		END AS FilePath,
+		@VisitNo AS VisitNo,
+		@CurrentStage AS CurrentStage,
+		@ServiceUnitID AS ServiceUnitID,
 		@ServiceUnitName AS ServiceUnitName
-    FROM @SoundOrder s
-    LEFT JOIN QueueingSound q
-        ON LOWER(q.Name) = LOWER(s.SoundCode)
-    ORDER BY s.Seq;
+	FROM @SoundOrder s
+	LEFT JOIN QueueingSound q
+		ON LOWER(q.Name) = LOWER(s.SoundCode)
+	WHERE
+	(
+		s.IsDirectFile = 1
+		OR ISNULL(q.FilePath,'') <> ''
+	)
+	AND s.SoundCode <> '0'
+	ORDER BY s.Seq;
 
-END
+	END
 GO
 
 Exec GetQueueSoundForAllServiceUnit
