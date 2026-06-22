@@ -64,7 +64,7 @@ BEGIN
             UpdatedBy       = @UserID,
             LastUpdated     = GETDATE(),
             IsManualOverride = 1,
-            IsRecall        = ISNULL(IsRecall, 0) + 1
+            RecallCount        = ISNULL(RecallCount, 0) + 1
         WHERE 
             VisitQueueNo = @VisitQueueNo
             AND CAST(QueueDate AS DATE) = @QueueDate
@@ -89,7 +89,7 @@ BEGIN
             CalledTime,
             LastUpdated,
             UpdatedBy,
-            IsRecall
+            RecallCount
         FROM VisitQueue
         WHERE VisitQueueNo = @VisitQueueNo;
 

@@ -2969,7 +2969,7 @@ namespace Temiang.Avicenna.BusinessObject
                 CalledTime = result.CalledTime,
                 LastUpdated = result.LastUpdated,
                 UpdatedBy = result.UpdatedBy,
-                IsRecall = result.GetColumn("IsRecall")
+                RecallCount = result.GetColumn("RecallCount")
             };
         }
 
