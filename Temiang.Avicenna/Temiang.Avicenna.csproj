@@ -1918,6 +1918,7 @@
     <Content Include="Document\2026\05\13\AntrianRSI\045-SP TakeQueueVisitPasienTititpan.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\046-SP GenerateSRAutoNumberPasienTitipan.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\047-UPDATE Query Field IsDisplayActive Tabel ServiceUnitParamedic.sql" />
+    <Content Include="Document\2026\06\11\create_view_Vw_POPreComputeQtyFinished.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
@@ -16092,7 +16093,6 @@
     </Compile>
     <Compile Include="Module\Inventory\Procurement\PurchaseOrder\PurchaseOrderList.aspx.cs">
       <DependentUpon>PurchaseOrderList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Module\Inventory\Procurement\PurchaseOrder\PurchaseOrderList.aspx.designer.cs">
       <DependentUpon>PurchaseOrderList.aspx</DependentUpon>

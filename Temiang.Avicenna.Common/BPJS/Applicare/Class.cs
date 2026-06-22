@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace Temiang.Avicenna.Common.BPJS.Applicare
 {
@@ -146,5 +147,15 @@ namespace Temiang.Avicenna.Common.BPJS.Applicare
             [JsonProperty("response")]
             public Response Response { get; set; }
         }
+
+    }
+
+    public class HealthCheckResult
+    {
+        public bool IsHealthy { get; set; }
+        public HttpStatusCode? StatusCode { get; set; }
+        public string Message { get; set; }
+
+        public string Url { get; set; }
     }
 }

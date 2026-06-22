@@ -260,8 +260,14 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
                 }
 
             }
-            strBuilder.AppendFormat("• Hasil Tes Ishihara: {0} : {1}", pe.Ishihara.IsAbNormal == null ? "Tidak diperiksa": pe.Ishihara.IsAbNormal == true ? "Buta Warna" : "Normal", pe.Ishihara.Notes);
-            strBuilder.AppendLine(string.Empty);
+
+            //modified by wiliam 2026-06-22
+            //CR Number : 0000030
+            if (AppSession.Parameter.HealthcareID.ToUpper() != "RSBK")
+            {
+                strBuilder.AppendFormat("• Hasil Tes Ishihara: {0} : {1}", pe.Ishihara.IsAbNormal == null ? "Tidak diperiksa" : pe.Ishihara.IsAbNormal == true ? "Buta Warna" : "Normal", pe.Ishihara.Notes);
+                strBuilder.AppendLine(string.Empty);
+            }
 
             if (!string.IsNullOrEmpty(pe.Notes))
             {

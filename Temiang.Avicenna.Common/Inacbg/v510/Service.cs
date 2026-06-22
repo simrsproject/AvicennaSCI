@@ -351,6 +351,45 @@ namespace Temiang.Avicenna.Common.Inacbg.v510
             }
         }
 
+        public Gruoper.IdrgGrouper1.Result IdrgGrouper1(Gruoper.IdrgGrouper1.Data tsep)
+        {
+            var param = string.Concat(new string[]
+                {
+                    "nomor_sep=",tsep.nomor_sep
+                });
+
+            var sb = new StringBuilder();
+            sb.Append(param);
+
+            using (HttpWebResponse response = Inacbg.Helper.PopulateWebRequest("grouper1idrg2", Helper.WebRequestMethod.POST, Helper.WebRequestContentType.FORM, param).GetResponse() as HttpWebResponse)
+            {
+                if (response.StatusCode != HttpStatusCode.OK) throw new Exception(String.Format("Server error (HTTP {0}: {1}).", response.StatusCode, response.StatusDescription));
+
+                var sr = new StreamReader(response.GetResponseStream());
+                return JsonConvert.DeserializeObject<Gruoper.IdrgGrouper1.Result>(sr.ReadToEnd());
+            }
+        }
+
+        public Gruoper.IdrgGrouper2.Result IdrgGrouper2(Gruoper.IdrgGrouper2.Data tsep)
+        {
+            var param = string.Concat(new string[]
+                {
+                    "nomor_sep=",tsep.nomor_sep,
+                    "&topup_codes=",tsep.topup_codes
+                });
+
+            var sb = new StringBuilder();
+            sb.Append(param);
+
+            using (HttpWebResponse response = Inacbg.Helper.PopulateWebRequest("grouper2idrg2", Helper.WebRequestMethod.POST, Helper.WebRequestContentType.FORM, param).GetResponse() as HttpWebResponse)
+            {
+                if (response.StatusCode != HttpStatusCode.OK) throw new Exception(String.Format("Server error (HTTP {0}: {1}).", response.StatusCode, response.StatusDescription));
+
+                var sr = new StreamReader(response.GetResponseStream());
+                return JsonConvert.DeserializeObject<Gruoper.IdrgGrouper2.Result>(sr.ReadToEnd());
+            }
+        }
+
         public Gruoper.IdrgGrouper.Result FinalIdrgGrouper(Gruoper.IdrgGrouper.Data tsep)
         {
             var param = string.Concat(new string[]

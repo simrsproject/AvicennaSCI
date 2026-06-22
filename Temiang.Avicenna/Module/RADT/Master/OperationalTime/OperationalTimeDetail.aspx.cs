@@ -1,17 +1,24 @@
 using System;
 using System.Drawing;
-using Temiang.Dal.Core;
-using Temiang.Dal.Interfaces;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using Temiang.Dal.Core;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
     public partial class OperationalTimeDetail : BasePageDetail
     {
+        private AppAutoNumberLast _autoNumber;
+        private bool IsUsedAutoNumber => AppParameter.GetParameterValue(AppParameter.ParameterItem.HealthcareInitial).ToUpper() == "RSI";
+
         private void SetEntityValue(OperationalTime entity)
         {
+
+            if (entity.es.IsAdded)
+                txtOperationalTimeID.Text = GetNewCode();
+
             entity.OperationalTimeID = txtOperationalTimeID.Text;
             entity.OperationalTimeName = txtOperationalTimeName.Text;
             entity.StartTime1 = GetHourMinute(txtStartTime1.SelectedDate);
@@ -109,6 +116,7 @@ namespace Temiang.Avicenna.Module.RADT.Master
         protected override void OnMenuNewClick()
         {
             OnPopulateEntryControl(new OperationalTime());
+            txtOperationalTimeID.Text = GetNewCode();
         }
 
         protected override void OnMenuMoveNextClick(ValidateArgs args)
@@ -142,6 +150,10 @@ namespace Temiang.Avicenna.Module.RADT.Master
             UrlPageList = "OperationalTimeList.aspx";
 
             ProgramID = AppConstant.Program.OperationalTime;
+
+            if(IsUsedAutoNumber)
+                txtOperationalTimeID.ReadOnly = true;
+
         }
 
         protected override void OnMenuDeleteClick(ValidateArgs args)
@@ -166,6 +178,9 @@ namespace Temiang.Avicenna.Module.RADT.Master
             {
                 entity.Save();
 
+                if (DataModeCurrent == AppEnum.DataMode.New && IsUsedAutoNumber)
+                    _autoNumber.Save();
+
                 //Commit if success, Rollback if failed
                 trans.Complete();
             }
@@ -182,5 +197,15 @@ namespace Temiang.Avicenna.Module.RADT.Master
         }
 
         #endregion
+
+        private string GetNewCode()
+        {
+            if(!IsUsedAutoNumber) return string.Empty;
+
+            _autoNumber = Helper.GetNewAutoNumber((new DateTime()).NowAtSqlServer().Date,
+                AppEnum.AutoNumber.OperationalTimeID);
+            return _autoNumber.LastCompleteNumber;
+        }
+
     }
 }

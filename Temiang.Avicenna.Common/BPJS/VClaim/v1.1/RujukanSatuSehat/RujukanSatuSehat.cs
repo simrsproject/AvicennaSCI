@@ -467,6 +467,33 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11.RujukanSatuSehat
 
         [JsonProperty("user")]
         public string User { get; set; }
+
+        [JsonProperty("satuSehatRujukan")]
+        public DeleteSatuSehatRujukan SatuSehatRujukan { get; set; }
+    }
+
+    public class DeleteSatuSehatRujukan
+    {
+        [JsonProperty("kodeFaskesSatuSehat")]
+        public string KodeFaskesSatuSehat { get; set; }
+
+        [JsonProperty("idPasienSatuSehat")]
+        public string IdPasienSatuSehat { get; set; }
+
+        [JsonProperty("kdppkSatuSehatTujuanRujukan")]
+        public string KdppkSatuSehatTujuanRujukan { get; set; }
+
+        [JsonProperty("kdDokterSatuSehat")]
+        public string KdDokterSatuSehat { get; set; }
+
+        [JsonProperty("encounter")]
+        public Encounter Encounter { get; set; }
+
+        [JsonProperty("patientInstruction")]
+        public string PatientInstruction { get; set; }
+
+        [JsonProperty("keteranganRujukan")]
+        public string KeteranganRujukan { get; set; }
     }
 
     public class DeleteRujukanResponse

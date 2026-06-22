@@ -651,7 +651,7 @@
                     <td style="width: 50%; vertical-align: top">
                         <fieldset>
                             <legend>OPERATING NOTES </legend>
-                            <div style="height: 35px; vertical-align: top; padding-top: 4px; padding-left: 4px;">
+                            <div style="height: 35px; vertical-align: top; padding-top: 4px; padding-left: 4px;" id="divOperatingNotesToolbar" runat="server">
                                 <%= ScriptCopyTemplate("OPR") %>&nbsp;&nbsp;<%= ScriptNewTemplate("OPR") %>
                             </div>
                             <telerik:RadTextBox ID="txtOperatingNotes" runat="server" Width="100%" Height="330px" Resize="Vertical"
@@ -661,7 +661,7 @@
                     <td style="width: 50%; vertical-align: top">
                         <fieldset>
                             <legend>POST SURGERY INSTRUCTIONS</legend>
-                            <div style="height: 35px; vertical-align: top; padding-top: 4px; padding-left: 4px;">
+                            <div style="height: 35px; vertical-align: top; padding-top: 4px; padding-left: 4px;" id="divPostSurgeryInstructionToolbar" runat="server">
                                 <%= ScriptCopyTemplate("PSI") %>&nbsp;&nbsp;<%= ScriptNewTemplate("PSI") %>
                             </div>
                             <telerik:RadTextBox ID="txtPostSurgeryInstructions" runat="server" Width="100%" Height="330px" Resize="Vertical"

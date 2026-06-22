@@ -123,5 +123,59 @@ namespace Temiang.Avicenna.Common.BPJS.Applicare
                 return fastJSON.JSON.ToObject<Applicare.ReferensiKelas.Kelas>(sr.ReadToEnd());
             }
         }
+
+        public HealthCheckResult HealthCheck()
+        {
+            string healthUrl = ConfigurationManager.AppSettings["ApplicareServiceUrlLocation"];
+
+            try
+            {
+                Helper.IgnoreBadCertificates();
+
+                var request = (HttpWebRequest)WebRequest.Create(healthUrl);
+                request.Method = "GET";
+                request.Timeout = 10000;          // 10 detik
+                request.ReadWriteTimeout = 10000;
+
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    return new HealthCheckResult
+                    {
+                        IsHealthy = response.StatusCode == HttpStatusCode.OK,
+                        StatusCode = response.StatusCode,
+                        Message = response.StatusDescription,
+                        Url = healthUrl
+                    };
+                }
+            }
+            catch (WebException ex)
+            {
+                HttpStatusCode? statusCode = null;
+                string message = ex.Message;
+
+                if (ex.Response is HttpWebResponse errorResponse)
+                {
+                    statusCode = errorResponse.StatusCode;
+                    message = errorResponse.StatusDescription;
+                }
+
+                return new HealthCheckResult
+                {
+                    IsHealthy = false,
+                    StatusCode = statusCode,
+                    Message = message,
+                    Url = healthUrl
+                };
+            }
+            catch (Exception ex)
+            {
+                return new HealthCheckResult
+                {
+                    IsHealthy = false,
+                    Message = ex.Message,
+                    Url = healthUrl
+                };
+            }
+        }
     }
 }

@@ -113,11 +113,19 @@ namespace Temiang.Avicenna.BusinessObject.Common
                 var userdctr = user.UserID;
                 var url = "https://app.rsimmanuel.net:9099/checkAbsent";
 
-                var client = new RestClient(url);
-                var request = new RestRequest();
-                request.Method = Method.GET;
-                request.AddParameter("user_id", userdctr, ParameterType.QueryString);
+                // Upgrade RestSharp to v113.1.0.0, the way to create RestClient and RestRequest has changed (Handono 260526)
+                //var client = new RestClient(url);
+                //var request = new RestRequest();
+                //request.Method = Method.GET;
+                //request.AddParameter("user_id", userdctr, ParameterType.QueryString);
+                //request.AddHeader("AccessKey", "SimRSI25");
 
+                var client = new RestClient(url);
+                var request = new RestSharp.RestRequest();
+                request.Method = Method.Get;
+                var timeOutInSecond = AppParameter.GetParameterValue(AppParameter.ParameterItem.PCareTimeOutInSecond);
+                request.Timeout = TimeSpan.FromSeconds(Convert.ToInt16(timeOutInSecond));
+                request.AddParameter("user_id", userdctr, ParameterType.QueryString);
                 request.AddHeader("AccessKey", "SimRSI25");
 
                 var response = client.Execute(request);

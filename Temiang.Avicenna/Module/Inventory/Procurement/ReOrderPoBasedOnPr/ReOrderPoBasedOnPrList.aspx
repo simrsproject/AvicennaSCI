@@ -42,49 +42,49 @@
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="cboToServiceUnitID">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="cboSRItemType" />
-                    <telerik:AjaxUpdatedControl ControlID="cboItemGroupID" />
+                    <telerik:AjaxUpdatedControl ControlID="cboSRItemType"/>
+                    <telerik:AjaxUpdatedControl ControlID="cboItemGroupID"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="cboSRItemType">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="cboItemGroupID" />
+                    <telerik:AjaxUpdatedControl ControlID="cboItemGroupID"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
-                    <telerik:AjaxUpdatedControl ControlID="grdListPo" />
-                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
+                    <telerik:AjaxUpdatedControl ControlID="grdListPo" LoadingPanelID="fw_ajxLoadingPanel"/>
+                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterPlanningDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
-                    <telerik:AjaxUpdatedControl ControlID="grdListPo" />
-                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
+                    <telerik:AjaxUpdatedControl ControlID="grdListPo" LoadingPanelID="fw_ajxLoadingPanel"/>
+                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterFromServiceUnitID">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterToServiceUnit">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" />
-                    <telerik:AjaxUpdatedControl ControlID="grdListPo" />
-                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel"/>
+                    <telerik:AjaxUpdatedControl ControlID="grdListPo" LoadingPanelID="fw_ajxLoadingPanel"/>
+                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterPurcOrderDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPo" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPo" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterPqrDate">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListPqr" LoadingPanelID="fw_ajxLoadingPanel"/>
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdList">
@@ -96,6 +96,8 @@
                     <telerik:AjaxUpdatedControl ControlID="lblInfo" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
+
+
             <telerik:AjaxSetting AjaxControlID="grdListPo">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdListPo" />
@@ -108,6 +110,7 @@
             </telerik:AjaxSetting>
         </AjaxSettings>
     </telerik:RadAjaxManagerProxy>
+
     <telerik:RadToolBar ID="RadToolBar2" runat="server" Width="100%" OnClientButtonClicking="OnClientButtonClicking">
         <Items>
             <telerik:RadToolBarButton runat="server" Text="Calculation" Value="calc" ImageUrl="~/Images/Toolbar/refresh16.png"

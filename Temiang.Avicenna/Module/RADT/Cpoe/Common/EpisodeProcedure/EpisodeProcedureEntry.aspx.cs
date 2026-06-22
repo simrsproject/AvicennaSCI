@@ -105,12 +105,35 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
 
                 BookingNo = Request.QueryString["bno"];
                 SeqNo = Request.QueryString["seqno"];
+
+                if (Request.QueryString["md"] == "view" 
+                    && Request.QueryString["source"] == "procedureentryview")
+                {
+                    ToolBar.EditVisible = false;
+                    DisableControls(this);
+                }
             }
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
+        }
 
+        //khusus view dari procedure entry dari surgical history semua command disabled
+        //2026-06-02 Wiliam Decosta
+        private void DisableControls(Control parent)
+        {
+            grdEpisodeProcedure.MasterTableView.CommandItemDisplay = GridCommandItemDisplay.None;
+            grdImplantInstallation.MasterTableView.CommandItemDisplay = GridCommandItemDisplay.None;
+
+            grdEpisodeProcedure.MasterTableView.GetColumn("EditCommandColumn").Visible = false;
+            grdEpisodeProcedure.MasterTableView.GetColumn("DeleteColumn").Visible = false;
+
+            grdImplantInstallation.MasterTableView.GetColumn("EditCommandColumn").Visible = false;
+            grdImplantInstallation.MasterTableView.GetColumn("DeleteColumn").Visible = false;
+
+            divOperatingNotesToolbar.Visible = false;
+            divPostSurgeryInstructionToolbar.Visible = false;
         }
 
         #region override method

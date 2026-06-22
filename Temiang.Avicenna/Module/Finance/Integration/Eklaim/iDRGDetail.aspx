@@ -622,6 +622,7 @@
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFnliDRG">
                 <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="pnlIdrgResult" />
                     <telerik:AjaxUpdatedControl ControlID="btnFnliDRG" />
                     <telerik:AjaxUpdatedControl ControlID="btnImprtIdrg" />
                     <telerik:AjaxUpdatedControl ControlID="btnInacbgGroup" />
@@ -634,6 +635,11 @@
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="pnlIdrgResult" />
                     <telerik:AjaxUpdatedControl ControlID="btnFnliDRG" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="cboIdrgTopup">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="pnlIdrgResult" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnInacbgGroup">
@@ -2305,73 +2311,102 @@
             <tr>
                 <td width="10%"></td>
                 <td width="80%" align="center">
-                    <table>
+                    <table cellpadding="2" cellspacing="0">
                         <asp:HiddenField ID="hfIdrgIsUngroup" runat="server" />
                         <tr>
                             <td class="label">Info</td>
                             <td colspan="3">
-                                <telerik:RadTextBox ID="txtIDRGInfo" runat="server" Width="718px" ReadOnly="true" />
+                                <telerik:RadTextBox ID="txtIDRGInfo" runat="server" Width="620px" ReadOnly="true" />
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Jenis Rawat</td>
                             <td colspan="3">
-                                <telerik:RadTextBox ID="txtIDRGJenisRawat" runat="server" Width="718px" ReadOnly="true" />
+                                <telerik:RadTextBox ID="txtIDRGJenisRawat" runat="server" Width="620px" ReadOnly="true" />
                             </td>
                         </tr>
                         <tr>
                             <td class="label">MDC</td>
                             <td>
-                                <telerik:RadTextBox ID="txtIDRGMDC" runat="server" Width="500px" ReadOnly="true" EnableViewState="false" />
+                                <telerik:RadTextBox ID="txtIDRGMDC" runat="server" Width="420px" ReadOnly="true" EnableViewState="false" />
                             </td>
-                            <td colspan="2">
-                                <telerik:RadTextBox ID="txtIDRGMDCCode" runat="server" Width="100px" ReadOnly="true" EnableViewState="false" />
+                            <td>
+                                <telerik:RadTextBox ID="txtIDRGMDCCode" runat="server" Width="80px" ReadOnly="true" EnableViewState="false" />
                             </td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td class="label">DRG</td>
                             <td>
-                                <telerik:RadTextBox ID="txtIDRGDRG" runat="server" Width="500px" ReadOnly="true" EnableViewState="false" />
-                            </td>
-                            <td colspan="2">
-                                <telerik:RadTextBox ID="txtIDRGDRGCode" runat="server" Width="100px" ReadOnly="true" EnableViewState="false" />
-                            </td>
-                        </tr>
-                        <tr id="rowCostWeight" runat="server" visible="false">
-                            <td class="label" style="white-space: nowrap;">Cost Weight <span style="color: #1e88e5; font-style: italic;"><b>** )</b></span>
+                                <telerik:RadTextBox ID="txtIDRGDRG" runat="server" Width="420px" ReadOnly="true" EnableViewState="false" />
                             </td>
                             <td>
-                                <telerik:RadTextBox ID="txtCostWeight" runat="server" Width="500px" ReadOnly="true" />
+                                <telerik:RadTextBox ID="txtIDRGDRGCode" runat="server" Width="80px" ReadOnly="true" EnableViewState="false" />
+                            </td>
+                            <td>
+                                <telerik:RadTextBox ID="txtCostWeight" runat="server" Width="100px" ReadOnly="true" Style="text-align:right;" />
+                            </td>
+                        </tr>
+                        <tr id="rowIdrgTopup" runat="server" visible="false">
+                            <td class="label">Top Up</td>
+                            <td>
+                                <telerik:RadComboBox ID="cboIdrgTopup"
+                                    runat="server"
+                                    Width="420px"
+                                    AutoPostBack="true"
+                                    EmptyMessage="None"
+                                    OnSelectedIndexChanged="cboIdrgTopup_SelectedIndexChanged">
+                                </telerik:RadComboBox>
+                            </td>
+                            <td>
+                                <telerik:RadTextBox ID="txtTopupcode" runat="server" Width="80px" ReadOnly="true" EnableViewState="false" />
+                            </td>
+                            <td>
+                                <telerik:RadTextBox ID="txtTopupcw" runat="server" Width="100px" ReadOnly="true" Style="text-align:right;" />
                             </td>
                         </tr>
 
                         <tr id="rowNBR" runat="server" visible="false">
-                            <td class="label" style="white-space: nowrap;">NBR <span style="color: #1e88e5; font-style: italic;"><b>** )</b></span>
+                            <td class="label">NBR</td>
+                            <td>
+                                <telerik:RadTextBox ID="txtNBR" runat="server" Width="420px" ReadOnly="true" />
                             </td>
                             <td>
-                                <telerik:RadTextBox ID="txtNBR" runat="server" Width="500px" ReadOnly="true" />
+                                Total Cost Weight :
+                            </td>
+                            <td>
+                                <telerik:RadTextBox ID="txtTotalcw" runat="server" Width="100px" ReadOnly="true" Style="text-align:right;" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" align="right">Total Klaim :</td>
+                            <td>
+                                <telerik:RadNumericTextBox ID="txtTotalKlaimIdrg" runat="server" Width="100px" ReadOnly="true">
+                                    <NumberFormat DecimalDigits="0" GroupSeparator="." GroupSizes="3" PositivePattern="Rp n" />
+                                </telerik:RadNumericTextBox>
                             </td>
                         </tr>
                         <tr>
                             <td class="label">Status IDRG</td>
                             <td colspan="3">
-                                <telerik:RadTextBox ID="txtIDRGStatus" runat="server" Width="718px" ReadOnly="true" />
+                                <telerik:RadTextBox ID="txtIDRGStatus" runat="server" Width="620px" ReadOnly="true" />
                             </td>
                         </tr>
                         <tr id="rowNoteBelumFinal" runat="server" visible="false">
                             <td></td>
                             <td colspan="3">
                                 <asp:Label ID="lblCatatanBelumFinal" runat="server"
-                                    Text="** ) Catatan: Nilai belum final, sewaktu-waktu bisa berubah"
+                                    Text="Catatan: Nilai belum final, sewaktu-waktu bisa berubah"
                                     Style="color: #1e88e5; font-style: italic;" />
                             </td>
                         </tr>
                         <tr>
-                            <td width="4px"></td>
-                            <td width="100px">
+                            <td></td>
+                            <td>
                                 <asp:Button ID="btnFnliDRG" runat="server" Text="Final iDRG" OnClick="btnFnliDRG_Click"
                                     Width="100px" Enabled="false" />
                             </td>
+                            <td colspan="2"></td>
                         </tr>
                     </table>
                 </td>

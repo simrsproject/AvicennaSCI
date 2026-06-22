@@ -2418,6 +2418,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 DischargePlan = ConvertDataTabletoObject(DischargePlanning(asses.RegistrationInfoMedicID)),
                 //SignImgUrl = asses.SignImg,
                 SignImgUrl = !string.IsNullOrEmpty(Convert.ToString(au.SignatureImage)) ? Encoding.UTF8.GetBytes(Convert.ToString(au.SignatureImage)) : asses.SignImg,
+                SignImageByte = au.SignatureImage != null ? (byte[])au.SignatureImage : (byte[])asses.SignImg,
                 PatientSignImg = asses.PatientSignImg,
                 Kesadaran = new
                 {

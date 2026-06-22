@@ -1058,6 +1058,8 @@ namespace Temiang.Avicenna.Common
             ComplianceWasteDisposalNo,
             ManagementSharpsWasteNo,
             LinenHandlingNo,
+            //OperationalTime
+            OperationalTimeID
         }
 
         public enum RoundingType

@@ -113,6 +113,230 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             return ViewState["supplier"] as DataTable;
         }
 
+        //        private DataTable ItemBalances()
+        //        {
+        //            var su = new ServiceUnit();
+        //            var floc = su.GetMainLocationId(cboFromServiceUnitID.SelectedValue);
+        //            var tloc = su.GetMainLocationId(cboToServiceUnitID.SelectedValue);
+
+        //            if (string.IsNullOrEmpty(floc))
+        //                floc = "xxx";
+        //            if (string.IsNullOrEmpty(tloc))
+        //                tloc = "xxx";
+
+        //            var query = new ItemTransactionItemQuery("a");
+        //            var qhd = new ItemTransactionQuery("b");
+        //            var qfunit = new ServiceUnitQuery("c");
+        //            var qtunit = new ServiceUnitQuery("d");
+        //            var qfib = new ItemBalanceQuery("e");
+        //            var qtib = new ItemBalanceQuery("f");
+        //            var qi = new ItemQuery("g");
+
+        //            if (AppSession.Parameter.IsPoBasedOnPr)
+        //            {
+        //                query.Select(
+        //                qhd.IsInventoryItem,
+        //                qhd.IsNonMasterOrder,
+        //                qhd.IsAssets,
+        //                qhd.TransactionNo,
+        //                qhd.SRPurchaseCategorization,
+        //                @"<ISNULL(b.SRItemCategory, '') AS SRItemCategory>",
+        //                qfunit.ServiceUnitName.As("FromUnit"),
+        //                qhd.Notes,
+        //                query.SequenceNo,
+        //                query.ItemID,
+        //                    //qi.ItemName,
+        //                @"<ISNULL(g.ItemName, a.Description) AS ItemName>",
+        //                query.Quantity,
+        //                query.QuantityFinishInBaseUnit,
+        //                query.Price,
+        //                query.IsDiscountInPercent.Coalesce("0").Cast(Dal.DynamicQuery.esCastType.Boolean),
+        //                query.Discount1Percentage,
+        //                query.Discount2Percentage,
+        //                query.Discount,//mk
+        //                    //@"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit) / a.ConversionFactor AS QtyOrder>",
+        //                @"<ISNULL(e.Balance, 0) AS FromBalance>",
+        //                @"<ISNULL(f.Balance, 0) AS ToBalance>",
+        //                @"<a.SRItemUnit + '/' + CAST(a.ConversionFactor AS VARCHAR(MAX)) AS Unit>",
+        //                @"<a.ConversionFactor AS ConversionFactor>",
+        //                @"<a.SRItemUnit AS SRItemUnit>",
+        //                @"<ISNULL((SELECT TOP 1 si.SupplierID FROM SupplierItem si WHERE si.ItemID = a.ItemID ORDER BY si.LastUpdateDateTime DESC), '') AS SupplierID>",
+        //                @"<ISNULL(a.Specification, '') AS Specification>"
+        //                );
+        //                //query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
+        //                //                        qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
+        //                //                        qhd.SRItemType == cboSRItemType.SelectedValue && qhd.IsClosed == false && query.IsClosed == false);
+        //                query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
+        //                                        qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
+        //                                        qhd.SRItemType == cboSRItemType.SelectedValue && query.IsClosed == false);
+        //                query.InnerJoin(qfunit).On(qhd.FromServiceUnitID == qfunit.ServiceUnitID);
+        //                query.InnerJoin(qtunit).On(qhd.ToServiceUnitID == qtunit.ServiceUnitID);
+        //                query.LeftJoin(qfib).On(query.ItemID == qfib.ItemID && qfib.LocationID == floc);
+        //                query.LeftJoin(qtib).On(query.ItemID == qtib.ItemID && qtib.LocationID == tloc);
+        //                query.LeftJoin(qi).On(query.ItemID == qi.ItemID);
+
+        //                if (AppSession.Parameter.IsUsingApprovalPurchaseRequest)
+        //                {
+        //                    query.Select(
+        //                        @"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
+        //FROM ItemTransactionItem AS iti
+        //INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
+        //WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0))) / a.ConversionFactor AS QtyOrder>");
+        //                    query.Where(query.RequestQty.IsNotNull(), query.Quantity > 0);
+        //                    query.Where(@"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
+        //FROM ItemTransactionItem AS iti
+        //INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
+        //WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0))) > 0>");
+
+        //                }
+        //                else
+        //                {
+        //                    query.Select(
+        //                        @"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
+        //FROM ItemTransactionItem AS iti
+        //INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
+        //WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0)))/a.ConversionFactor AS QtyOrder>");
+        //                    query.Where(@"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
+        //FROM ItemTransactionItem AS iti
+        //INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
+        //WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0))) > 0>");
+
+        //                }
+        //            }
+        //            else
+        //            {
+        //                query.Select(
+        //                qhd.IsInventoryItem,
+        //                qhd.IsNonMasterOrder,
+        //                qhd.IsAssets,
+        //                qhd.TransactionNo,
+        //                qhd.SRPurchaseCategorization,
+        //                @"<ISNULL(b.SRItemCategory, '') AS SRItemCategory>",
+        //                qfunit.ServiceUnitName.As("FromUnit"),
+        //                qhd.Notes,
+        //                query.SequenceNo,
+        //                query.ItemID,
+        //                    //qi.ItemName,
+        //                @"<ISNULL(g.ItemName, a.Description) AS ItemName>",
+        //                query.Quantity,
+        //                query.QuantityFinishInBaseUnit,
+        //                query.Price,
+        //                query.IsDiscountInPercent.Coalesce("0").Cast(Dal.DynamicQuery.esCastType.Boolean),
+        //                query.Discount1Percentage,
+        //                query.Discount2Percentage,
+        //                query.Discount,
+        //                    //@"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit)/x.ConversionFactor AS QtyOrder>",
+        //                @"<ISNULL(e.Balance, 0) AS FromBalance>",
+        //                @"<ISNULL(f.Balance, 0) AS ToBalance>",
+        //                @"<ISNULL(x.SRPurchaseUnit, a.SRItemUnit) + '/' + CAST(ISNULL(x.ConversionFactor, a.ConversionFactor) AS VARCHAR(MAX)) AS Unit>",
+        //                @"<ISNULL(x.ConversionFactor, a.ConversionFactor) AS ConversionFactor>",
+        //                @"<ISNULL(x.SRPurchaseUnit, a.SRItemUnit) AS SRItemUnit>",
+        //                @"<ISNULL((SELECT TOP 1 si.SupplierID FROM SupplierItem si WHERE si.ItemID = a.ItemID ORDER BY si.LastUpdateDateTime DESC), '') AS SupplierID>",
+        //                @"<ISNULL(a.Specification, '') AS Specification>"
+        //                );
+        //                //query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
+        //                //                        qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
+        //                //                        qhd.SRItemType == cboSRItemType.SelectedValue && qhd.IsClosed == false && query.IsClosed == false);
+        //                query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
+        //                                        qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
+        //                                        qhd.SRItemType == cboSRItemType.SelectedValue && query.IsClosed == false);
+        //                query.InnerJoin(qfunit).On(qhd.FromServiceUnitID == qfunit.ServiceUnitID);
+        //                query.InnerJoin(qtunit).On(qhd.ToServiceUnitID == qtunit.ServiceUnitID);
+        //                query.LeftJoin(qfib).On(query.ItemID == qfib.ItemID && qfib.LocationID == floc);
+        //                query.LeftJoin(qtib).On(query.ItemID == qtib.ItemID && qtib.LocationID == tloc);
+        //                query.LeftJoin(qi).On(query.ItemID == qi.ItemID);
+
+        //                if (AppSession.Parameter.IsUsingApprovalPurchaseRequest)
+        //                {
+        //                    query.Select(
+        //                        @"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit)/ISNULL(x.ConversionFactor, a.ConversionFactor) AS QtyOrder>");
+        //                    query.Where(query.Or(query.RequestQty.IsNotNull(), query.RequestQty != 0));
+        //                    query.Where("<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit) > 0>");
+
+        //                }
+        //                else
+        //                {
+        //                    query.Select(
+        //                        @"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit)/ISNULL(x.ConversionFactor, a.ConversionFactor) AS QtyOrder>");
+        //                    query.Where("<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit) > 0>");
+        //                }
+        //            }
+
+        //            if (AppSession.Parameter.IsReOrderPoBasedOnPrWithSeparatePurchasingUnit)
+        //                query.Where(qhd.ToServiceUnitID == cboToServiceUnitID.SelectedValue);
+
+        //            query.Where(qhd.SRItemType == cboSRItemType.SelectedValue, qhd.Or(qhd.IsConsignment.IsNull(), qhd.IsConsignment == false));
+
+        //            if (cboSRItemType.SelectedValue == ItemType.Medical)
+        //            {
+        //                var qipm = new ItemProductMedicQuery("x");
+        //                query.LeftJoin(qipm).On(query.ItemID == qipm.ItemID);
+
+        //                if (AppSession.Parameter.IsUsingFactoryInTheItemProcurementProcess)
+        //                    query.Select(@"<ISNULL(x.FabricID, '') AS 'FabricID'>");
+        //                else query.Select(@"<'' AS 'FabricID'>");
+        //            }
+        //            else if (cboSRItemType.SelectedValue == ItemType.NonMedical)
+        //            {
+        //                var qipm = new ItemProductNonMedicQuery("x");
+        //                query.LeftJoin(qipm).On(query.ItemID == qipm.ItemID);
+        //                if (AppSession.Parameter.IsUsingFactoryInTheItemProcurementProcess)
+        //                    query.Select(@"<ISNULL(x.FabricID, '') AS 'FabricID'>");
+        //                else query.Select(@"<'' AS 'FabricID'>");
+        //            }
+        //            else
+        //            {
+        //                var qipm = new ItemKitchenQuery("x");
+        //                query.LeftJoin(qipm).On(query.ItemID == qipm.ItemID);
+        //                query.Select(@"<'' AS 'FabricID'>");
+        //            }
+
+        //            if (!txtDate.IsEmpty && !txtDate2.IsEmpty)
+        //            {
+        //                query.Where(qhd.TransactionDate >= txtDate.SelectedDate.Value, qhd.TransactionDate < txtDate2.SelectedDate.Value.AddDays(1));
+        //            }
+        //            if (!txtPlanningDate.IsEmpty && !txtPlanningDate2.IsEmpty)
+        //            {
+        //                query.Where(qhd.PlanningDate >= txtPlanningDate.SelectedDate.Value, qhd.PlanningDate < txtPlanningDate2.SelectedDate.Value.AddDays(1));
+        //            }
+        //            if (!string.IsNullOrEmpty(cboFromServiceUnitID.SelectedValue))
+        //            {
+        //                query.Where(qhd.FromServiceUnitID == cboFromServiceUnitID.SelectedValue);
+        //            }
+        //            if (!string.IsNullOrEmpty(cboToServiceUnitID.SelectedValue))
+        //            {
+        //                query.Where(qhd.ToServiceUnitID == cboToServiceUnitID.SelectedValue);
+        //            }
+        //            if (AppSession.Parameter.IsPurchaseRequestBasedOnItemCategory && !string.IsNullOrEmpty(cboSRItemCategory.SelectedValue))
+        //            {
+        //                query.Where(qhd.SRItemCategory == cboSRItemCategory.SelectedValue);
+        //            }
+        //            if (!string.IsNullOrEmpty(cboItemGroupID.SelectedValue))
+        //            {
+        //                query.Where(qi.ItemGroupID == cboItemGroupID.SelectedValue);
+        //            }
+
+        //            query.OrderBy(qi.ItemName.Ascending);
+
+        //            var tbl = query.LoadDataTable();
+
+        //            if (!string.IsNullOrEmpty(cboSupplierID.SelectedValue) && tbl.Rows.Count > 0)
+        //            {
+        //                // filter pembelian terakhir ke supplier tsb
+        //                var tb = (new SupplierItemCollection()).GetLastData(cboSupplierID.SelectedValue);
+        //                var newtb = tbl.AsEnumerable().Where(x => (tb.AsEnumerable().Select(y => y["ItemID"].ToString())).Contains(x["ItemID"].ToString()));
+        //                if (newtb.Count() > 0)
+        //                {
+        //                    tbl = newtb.CopyToDataTable();
+        //                }
+        //                else {
+        //                    tbl.Clear();
+        //                }
+        //            }
+
+        //            return tbl;
+        //        }
+
         private DataTable ItemBalances()
         {
             var su = new ServiceUnit();
@@ -123,6 +347,19 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 floc = "xxx";
             if (string.IsNullOrEmpty(tloc))
                 tloc = "xxx";
+
+            // ===========================================================
+            // OPTIMASI 1: Pre-load supplier item IDs untuk filter di SQL
+            // ===========================================================
+            HashSet<string> supplierItemIds = null;
+            bool hasSupplierFilter = !string.IsNullOrEmpty(cboSupplierID.SelectedValue);
+            if (hasSupplierFilter)
+            {
+                var tbSupplier = (new SupplierItemCollection()).GetLastData(cboSupplierID.SelectedValue);
+                supplierItemIds = new HashSet<string>(
+                    tbSupplier.AsEnumerable().Select(y => y["ItemID"].ToString())
+                );
+            }
 
             var query = new ItemTransactionItemQuery("a");
             var qhd = new ItemTransactionQuery("b");
@@ -145,7 +382,6 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 qhd.Notes,
                 query.SequenceNo,
                 query.ItemID,
-                    //qi.ItemName,
                 @"<ISNULL(g.ItemName, a.Description) AS ItemName>",
                 query.Quantity,
                 query.QuantityFinishInBaseUnit,
@@ -153,8 +389,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 query.IsDiscountInPercent.Coalesce("0").Cast(Dal.DynamicQuery.esCastType.Boolean),
                 query.Discount1Percentage,
                 query.Discount2Percentage,
-                query.Discount,//mk
-                    //@"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit) / a.ConversionFactor AS QtyOrder>",
+                query.Discount,
                 @"<ISNULL(e.Balance, 0) AS FromBalance>",
                 @"<ISNULL(f.Balance, 0) AS ToBalance>",
                 @"<a.SRItemUnit + '/' + CAST(a.ConversionFactor AS VARCHAR(MAX)) AS Unit>",
@@ -163,9 +398,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 @"<ISNULL((SELECT TOP 1 si.SupplierID FROM SupplierItem si WHERE si.ItemID = a.ItemID ORDER BY si.LastUpdateDateTime DESC), '') AS SupplierID>",
                 @"<ISNULL(a.Specification, '') AS Specification>"
                 );
-                //query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
-                //                        qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
-                //                        qhd.SRItemType == cboSRItemType.SelectedValue && qhd.IsClosed == false && query.IsClosed == false);
+
                 query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
                                         qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
                                         qhd.SRItemType == cboSRItemType.SelectedValue && query.IsClosed == false);
@@ -175,32 +408,12 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 query.LeftJoin(qtib).On(query.ItemID == qtib.ItemID && qtib.LocationID == tloc);
                 query.LeftJoin(qi).On(query.ItemID == qi.ItemID);
 
+                // OPTIMASI: Placeholder QtyOrder — dihitung di C# setelah LoadDataTable
+                query.Select(@"<CAST(0 AS DECIMAL(38,6)) AS QtyOrder>");
+
                 if (AppSession.Parameter.IsUsingApprovalPurchaseRequest)
                 {
-                    query.Select(
-                        @"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
-FROM ItemTransactionItem AS iti
-INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
-WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0))) / a.ConversionFactor AS QtyOrder>");
                     query.Where(query.RequestQty.IsNotNull(), query.Quantity > 0);
-                    query.Where(@"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
-FROM ItemTransactionItem AS iti
-INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
-WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0))) > 0>");
-
-                }
-                else
-                {
-                    query.Select(
-                        @"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
-FROM ItemTransactionItem AS iti
-INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
-WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0)))/a.ConversionFactor AS QtyOrder>");
-                    query.Where(@"<((a.Quantity * a.ConversionFactor) - (ISNULL((SELECT SUM((iti.Quantity * iti.ConversionFactor)) AS QtyFinished 
-FROM ItemTransactionItem AS iti
-INNER JOIN ItemTransaction AS it ON it.TransactionNo = iti.TransactionNo
-WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSequenceNo = a.SequenceNo), 0))) > 0>");
-
                 }
             }
             else
@@ -216,7 +429,6 @@ WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSeque
                 qhd.Notes,
                 query.SequenceNo,
                 query.ItemID,
-                    //qi.ItemName,
                 @"<ISNULL(g.ItemName, a.Description) AS ItemName>",
                 query.Quantity,
                 query.QuantityFinishInBaseUnit,
@@ -225,7 +437,6 @@ WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSeque
                 query.Discount1Percentage,
                 query.Discount2Percentage,
                 query.Discount,
-                    //@"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit)/x.ConversionFactor AS QtyOrder>",
                 @"<ISNULL(e.Balance, 0) AS FromBalance>",
                 @"<ISNULL(f.Balance, 0) AS ToBalance>",
                 @"<ISNULL(x.SRPurchaseUnit, a.SRItemUnit) + '/' + CAST(ISNULL(x.ConversionFactor, a.ConversionFactor) AS VARCHAR(MAX)) AS Unit>",
@@ -234,9 +445,7 @@ WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSeque
                 @"<ISNULL((SELECT TOP 1 si.SupplierID FROM SupplierItem si WHERE si.ItemID = a.ItemID ORDER BY si.LastUpdateDateTime DESC), '') AS SupplierID>",
                 @"<ISNULL(a.Specification, '') AS Specification>"
                 );
-                //query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
-                //                        qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
-                //                        qhd.SRItemType == cboSRItemType.SelectedValue && qhd.IsClosed == false && query.IsClosed == false);
+
                 query.InnerJoin(qhd).On(query.TransactionNo == qhd.TransactionNo &&
                                         qhd.TransactionCode == TransactionCode.PurchaseRequest && qhd.IsApproved == true &&
                                         qhd.SRItemType == cboSRItemType.SelectedValue && query.IsClosed == false);
@@ -252,7 +461,6 @@ WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSeque
                         @"<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit)/ISNULL(x.ConversionFactor, a.ConversionFactor) AS QtyOrder>");
                     query.Where(query.Or(query.RequestQty.IsNotNull(), query.RequestQty != 0));
                     query.Where("<((a.Quantity * a.ConversionFactor) - a.QuantityFinishInBaseUnit) > 0>");
-
                 }
                 else
                 {
@@ -290,7 +498,7 @@ WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSeque
                 query.LeftJoin(qipm).On(query.ItemID == qipm.ItemID);
                 query.Select(@"<'' AS 'FabricID'>");
             }
-            
+
             if (!txtDate.IsEmpty && !txtDate2.IsEmpty)
             {
                 query.Where(qhd.TransactionDate >= txtDate.SelectedDate.Value, qhd.TransactionDate < txtDate2.SelectedDate.Value.AddDays(1));
@@ -316,22 +524,93 @@ WHERE it.IsVoid = 0 AND iti.ReferenceNo = a.TransactionNo AND iti.ReferenceSeque
                 query.Where(qi.ItemGroupID == cboItemGroupID.SelectedValue);
             }
 
+            // ===========================================================
+            // OPTIMASI 2: Filter supplier
+            // ===========================================================
+            if (hasSupplierFilter)
+            {
+                if (supplierItemIds != null && supplierItemIds.Count > 0)
+                {
+                    var inList = string.Join("','",
+                        supplierItemIds.Select(s => s.Replace("'", "''")));
+                    query.Where($"<a.ItemID IN ('{inList}')>");
+                }
+                else
+                {
+                    query.Where("<1 = 0>");
+                }
+            }
+
             query.OrderBy(qi.ItemName.Ascending);
 
             var tbl = query.LoadDataTable();
 
-            if (!string.IsNullOrEmpty(cboSupplierID.SelectedValue) && tbl.Rows.Count > 0)
+            // ===========================================================
+            // OPTIMASI 3: Post-process QtyOrder dari pre-computed dictionary
+            // Dipanggil SETELAH LoadDataTable agar bisa filter view
+            // hanya untuk TransactionNo yang ada di hasil query
+            // ===========================================================
+            if (AppSession.Parameter.IsPoBasedOnPr)
             {
-                // filter pembelian terakhir ke supplier tsb
-                var tb = (new SupplierItemCollection()).GetLastData(cboSupplierID.SelectedValue);
-                var newtb = tbl.AsEnumerable().Where(x => (tb.AsEnumerable().Select(y => y["ItemID"].ToString())).Contains(x["ItemID"].ToString()));
-                if (newtb.Count() > 0)
+                // Ambil distinct TransactionNo dari hasil query
+                var transNos = new HashSet<string>(
+                    tbl.AsEnumerable()
+                       .Select(r => r["TransactionNo"].ToString())
+                       .Where(x => !string.IsNullOrEmpty(x))
+                );
+
+                var qtyFinishedMap = new Dictionary<string, decimal>();
+
+                if (transNos.Count > 0)
                 {
-                    tbl = newtb.CopyToDataTable();
+                    var viewPreComputeQty = new VwPOPreComputeQtyFinishedQuery("x");
+
+                    viewPreComputeQty.Where(
+                        viewPreComputeQty.ReferenceNo.In(transNos)
+                    );
+
+                    viewPreComputeQty.Select(
+                        viewPreComputeQty.ReferenceNo,
+                        viewPreComputeQty.ReferenceSequenceNo,
+                        viewPreComputeQty.QtyFinished
+                    );
+
+                    var dtbView = viewPreComputeQty.LoadDataTable();
+
+                    qtyFinishedMap = dtbView.AsEnumerable()
+                        .ToDictionary(
+                            row => $"{row.Field<string>("ReferenceNo")}|{row.Field<string>("ReferenceSequenceNo")}",
+                            row => row.Field<decimal>("QtyFinished")
+                        );
                 }
-                else {
-                    tbl.Clear();
+
+                var rowsToRemove = new List<DataRow>();
+                foreach (DataRow row in tbl.Rows)
+                {
+                    string key = row["TransactionNo"].ToString() + "|" + row["SequenceNo"].ToString();
+
+                    decimal qtyFinished;
+                    if (!qtyFinishedMap.TryGetValue(key, out qtyFinished))
+                        qtyFinished = 0m;
+
+                    decimal qty = Convert.ToDecimal(row["Quantity"]);
+                    decimal convFactor = Convert.ToDecimal(row["ConversionFactor"]);
+                    decimal remainingBase = (qty * convFactor) - qtyFinished;
+
+                    if (remainingBase <= 0m)
+                    {
+                        rowsToRemove.Add(row);
+                    }
+                    else
+                    {
+                        row["QtyOrder"] = remainingBase / convFactor;
+                    }
                 }
+
+                foreach (var row in rowsToRemove)
+                    tbl.Rows.Remove(row);
+
+                tbl.AcceptChanges();
             }
 
             return tbl;

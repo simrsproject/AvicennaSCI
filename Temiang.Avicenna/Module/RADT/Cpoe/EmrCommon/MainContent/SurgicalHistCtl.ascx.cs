@@ -144,6 +144,40 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                 grdEpisodeProcedure.Rebind();
             }
         }
+
+        protected void grdEpisodeProcedureDetail_ItemCommand(object sender, GridCommandEventArgs e)
+        {
+            if (e.CommandName == "Void")
+            {
+                string[] args = e.CommandArgument.ToString().Split('|');
+
+                string bookingNo = args[0];
+                string sequenceNo = args[1];
+
+                if(string.IsNullOrEmpty(bookingNo) || string.IsNullOrEmpty(sequenceNo))
+                    return;
+
+                var entity = new ServiceUnitBookingOperatingNotes();
+                if (entity.LoadByPrimaryKey(bookingNo, sequenceNo) && entity.ParamedicID == ParamedicID)
+                {
+                    entity.IsVoid = true;
+                    entity.Save();
+
+                    var epColl = new EpisodeProcedureCollection();
+                    epColl.Query.Where(epColl.Query.BookingNo == bookingNo);
+                    epColl.LoadAll();
+                    foreach (var ep in epColl)
+                    {
+                        ep.IsVoid = true;
+                    }
+                    epColl.Save();
+                }
+
+                grdEpisodeProcedure.DataSource = null;
+                grdEpisodeProcedure.Rebind();
+            }
+        }
+
         protected void grdEpisodeProcedure_DeleteCommand(object source, GridCommandEventArgs e)
         {
             var item = e.Item as GridDataItem;
@@ -213,10 +247,10 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
             var par = new ParamedicQuery("c");
             query.InnerJoin(sub).On(sub.BookingNo == query.BookingNo);
             query.InnerJoin(par).On(par.ParamedicID == query.ParamedicID);
-            query.Select(sub.RegistrationNo, query.BookingNo, query.OpNotesSeqNo.As("SequenceNo"), query.ParamedicID,
+            query.Select(sub.RegistrationNo, query.BookingNo, query.OpNotesSeqNo.As("SequenceNo"), query.ParamedicID, query.IsVoid,
                 par.ParamedicName, query.Regio, "<'' AS ProcedureName>",
                 query.OperatingNotes, query.PostSurgeryInstructions, "<CAST(0 AS BIT) as IsEditable>", query.CreatedByUserID, query.OpNotesSeqNo);
-            query.Where(query.BookingNo == bookingNo, query.IsVoid == false);
+            query.Where(query.BookingNo == bookingNo);
             query.OrderBy(par.ParamedicName.Ascending, query.OpNotesSeqNo.Ascending);
 
             DataTable dtb = query.LoadDataTable();
@@ -229,7 +263,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
 
                 var epcoll = new EpisodeProcedureCollection();
                 epcoll.Query.Where(epcoll.Query.BookingNo == _bookingNo,
-                    epcoll.Query.OpNotesSeqNo == row["SequenceNo"].ToString(), epcoll.Query.IsVoid == false);
+                    epcoll.Query.OpNotesSeqNo == row["SequenceNo"].ToString());
                 epcoll.LoadAll();
                 var procedureName = string.Empty;
                 foreach (var ep in epcoll)

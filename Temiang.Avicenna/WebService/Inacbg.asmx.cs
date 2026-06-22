@@ -635,7 +635,7 @@ namespace Temiang.Avicenna.WebService
             {
                 log.Response = "Data SEP tidak ditemukan";
                 log.Save();
-                return "not ok";
+                return "not ok - sep tidak ditemukan";
             }
 
             var mds = new MedicalDischargeSummary();
@@ -643,7 +643,7 @@ namespace Temiang.Avicenna.WebService
             {
                 log.Response = "Data MDS tidak ditemukan";
                 log.Save();
-                return "not ok";
+                return "not ok -  data mds tidak ditemukan";
             }
 
             var discharge = string.Empty;
@@ -657,7 +657,7 @@ namespace Temiang.Avicenna.WebService
             {
                 log.Response = "Data MDS DischargeMethod tidak ditemukan : " + mds.SRDischargeMethod;
                 log.Save();
-                return "not ok";
+                return "not ok - data mds dischargemethod tidak ditemukan";
             }
 
             var bill = new IntermBillCollection();
@@ -666,7 +666,7 @@ namespace Temiang.Avicenna.WebService
             {
                 log.Response = "Data Interm Bill tidak ditemukan";
                 log.Save();
-                return "not ok";
+                return "not ok - data intermbill tidak ditemukan";
             }
 
             var admin = bill.Select(b => b.AdministrationAmount + b.GuarantorAdministrationAmount).Sum();
@@ -684,7 +684,7 @@ namespace Temiang.Avicenna.WebService
             {
                 log.Response = "Data Billing tidak ditemukan";
                 log.Save();
-                return "not ok";
+                return "not ok - data billing tidak ditemukan";
             }
 
             var total = tbl.AsEnumerable().Sum(t => t.Field<decimal?>("Amount")) ?? 0;
@@ -738,7 +738,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(param51);
                 log.Response = JsonConvert.SerializeObject(response51);
                 log.Save();
-                return "not ok";
+                return "not ok - duplikat nomor SEP";
             }
 
             var ncc = new NccInacbg();
@@ -997,7 +997,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(params54);
                 log.Response = JsonConvert.SerializeObject(response54);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - insert params54 {0}", log.Response);
             }
 
             svc54 = new Common.Inacbg.v510.Service();
@@ -1013,7 +1013,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramDiag54);
                 log.Response = JsonConvert.SerializeObject(responseDiag54);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1009 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "IdrgDiagnosaSet", paramDiag54, responseDiag54);
@@ -1027,7 +1027,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramGetDiag54);
                 log.Response = JsonConvert.SerializeObject(responseGetDiag54);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1023 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "IdrgDiagnosaGet", paramGetDiag54, responseGetDiag54);
@@ -1045,7 +1045,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramProc54);
                 log.Response = JsonConvert.SerializeObject(responseProc54);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1041 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "IdrgProcedureSet", paramProc54, responseProc54);
@@ -1059,7 +1059,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramGetProc54);
                 log.Response = JsonConvert.SerializeObject(responseGetProc54);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1055 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "IdrgProcedureGet", paramGetProc54, responseGetProc54);
@@ -1073,7 +1073,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramIdrgGroup);
                 log.Response = JsonConvert.SerializeObject(responseIdrgGroup);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1069 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "IdrgGroup", paramIdrgGroup, responseIdrgGroup);
@@ -1087,7 +1087,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramIdrgFinal);
                 log.Response = JsonConvert.SerializeObject(responseIdrgFinal);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1083 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "IdrgFinal", paramIdrgFinal, responseIdrgFinal);
@@ -1103,7 +1103,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramImport54);
                 log.Response = JsonConvert.SerializeObject(responseImport54);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1100 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "ImportIdrgToInacbg", paramImport54, responseImport54);
@@ -1116,7 +1116,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramGetDiag);
                 log.Response = JsonConvert.SerializeObject(responseGetDiag);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1113 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "InacbgDiagnosaGet", paramGetDiag, responseGetDiag);
@@ -1155,7 +1155,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramGetProc);
                 log.Response = JsonConvert.SerializeObject(responseGetProc);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1152 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "InacbgProcedureGet", paramGetProc, responseGetProc);
@@ -1210,7 +1210,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramsGrouper);
                 log.Response = JsonConvert.SerializeObject(responseGrouper);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1207 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "InacbgStage1", paramsGrouper, responseGrouper);
@@ -1220,13 +1220,13 @@ namespace Temiang.Avicenna.WebService
             {
                 log.Response = "Data NCC tidak ditemukan";
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1218 {0}", log.Response);
             }
             if (responseGrouper.ResponseInacbg == null)
             {
                 log.Response = "Response Inacbg null";
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1225 {0}", log.Response);
             }
 
             ncc.AddPaymentAmt = string.IsNullOrEmpty(responseGrouper.ResponseInacbg.AddPaymentAmt) ? 0 : Convert.ToDecimal(responseGrouper.ResponseInacbg.AddPaymentAmt);
@@ -1252,7 +1252,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramsFinal);
                 log.Response = JsonConvert.SerializeObject(responseFinal);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1249 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "InacbgFinal", paramsFinal, responseFinal);
@@ -1269,7 +1269,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramsFinalClaim);
                 log.Response = JsonConvert.SerializeObject(responseFinalClaim);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1266 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "ClaimFinal", paramsFinalClaim, responseFinalClaim);
@@ -1285,7 +1285,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramsKirim);
                 log.Response = JsonConvert.SerializeObject(responseKirim);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1282 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "ClaimSend", paramsKirim, responseKirim);
@@ -1301,7 +1301,7 @@ namespace Temiang.Avicenna.WebService
                 log.Params = JsonConvert.SerializeObject(paramDetail);
                 log.Response = JsonConvert.SerializeObject(responseDetail);
                 log.Save();
-                return "not ok";
+                return string.Format("not ok - 1298 {0}", log.Response);
             }
 
             SaveNccIdrg(registrationNo, "GetClaimData", paramDetail, responseDetail);

@@ -480,7 +480,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     HealthcareLogo = hc != null && hc.HealthcareLogo != null ? Convert.ToBase64String(hc.HealthcareLogo) : String.Empty,
                     SignDescription = p_IsForEsign == "Yes" ? "* Dokumen ini telah ditandatangani secara elektronik menggunakan sertifikat elektronik yang diterbitkan oleh BSrE BSSN" : "* Dokumen dicetak secara komputerisasi dan tidak memerlukan tandatangan",
                     //SignatureImage = hc != null && signimg.SignatureImage != null ? Convert.ToBase64String(signimg.SignatureImage) : string.Empty,
-                    SignatureImage = hc != null && signImg != null ? (byte[])signImg : null,
+                    SignatureImage = imgDpjp != null ? imgDpjp : null,
                     UserSign = usersign,
                     ReferExternal = ConvertDataTabletoObject(ReferExternal(medsum.RegistrationNo, p_IsForCasemix)),
                     homecare = medsum.HomeCare,
