@@ -10,30 +10,34 @@ BEGIN
     SET NOCOUNT ON;
 
     SELECT
-        vq.VisitQueueNo,
-        vq.VisitNo,
-        vq.QueueDate,
-        vq.CreatedDate,
+		vq.VisitQueueNo,
+		vq.VisitNo,
+		vq.QueueDate,
+		vq.CreatedDate,
 
-        aans.PayerType,
-        aans.Channel,
+		aans.PayerType,
+		aans.Channel,
 
-        CASE
-            WHEN aans.PayerType = 'BPJS'
-                THEN aans.ServiceGroup
-            ELSE NULL
-        END AS ServiceGroup,
+		CASE
+			WHEN aans.PayerType = 'BPJS'
+				THEN aans.ServiceGroup
+			ELSE NULL
+		END AS ServiceGroup,
 
 		@IPAdress AS IPAdress,
-        @UserID  AS UserID,
-		@BarcodeImage AS BarcodeImage
+		@UserID AS UserID,
 
-    FROM VisitQueue vq
-    LEFT JOIN AntrianAutoNumberSemantic aans
-        ON  aans.SRAutoNumber = vq.SRAutoNumber
-        AND aans.Channel      = vq.QueueLocation
+		vqb.BarcodeImage
+	FROM VisitQueue vq
+	LEFT JOIN AntrianAutoNumberSemantic aans
+		ON aans.SRAutoNumber = vq.SRAutoNumber
+	   AND aans.Channel      = vq.QueueLocation
 
-    WHERE vq.VisitQueueNo = @VisitQueueNo;
+	LEFT JOIN VisitQueueBarcode vqb
+		ON vqb.VisitQueueNo = vq.VisitQueueNo
+
+	WHERE vq.VisitQueueNo = @VisitQueueNo;
+
 END
 GO
 

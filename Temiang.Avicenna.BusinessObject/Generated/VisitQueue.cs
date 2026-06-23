@@ -1321,6 +1321,38 @@ namespace Temiang.Avicenna.BusinessObject
 
             collection.Load(query);
 
+            var registeredCollection =
+                 new VisitQueueCollection();
+
+            var registeredQuery =
+                new VisitQueueQuery();
+
+            registeredQuery.es.WithNoLock = true;
+
+            registeredQuery.Select(
+                registeredQuery.VisitNo,
+                registeredQuery.RegistrationNo
+            );
+
+            registeredQuery.Where(
+                registeredQuery.QueueDate >= queueDate.Date,
+                registeredQuery.QueueDate < queueDate.Date.AddDays(1),
+                registeredQuery.RegistrationNo.IsNotNull()
+            );
+
+            registeredCollection.Load(registeredQuery);
+
+            var registeredVisitNos =
+            registeredCollection
+                .Where(x =>
+                    !string.IsNullOrEmpty(x.VisitNo) &&
+                    !string.IsNullOrEmpty(x.RegistrationNo))
+                .GroupBy(x => x.VisitNo)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First().RegistrationNo
+                );
+
             return collection
                 .Select(x => new
                 {
@@ -1339,7 +1371,14 @@ namespace Temiang.Avicenna.BusinessObject
                     QueueSequence = x.QueueSequence,
                     CalledByCounterID = x.CalledByCounterID,
                     RecallCount = x.RecallCount,
-                })
+                    IsRegistered =
+                    registeredVisitNos.ContainsKey(x.VisitNo),
+
+                            RegistrationNo =
+                    registeredVisitNos.ContainsKey(x.VisitNo)
+                        ? registeredVisitNos[x.VisitNo]
+                        : null
+                        })
                 .ToList();
         }
 
