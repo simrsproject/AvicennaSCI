@@ -147,6 +147,15 @@ namespace Temiang.Avicenna.Module.RADT
 
         protected void cvVisitNo_ServerValidate(object source, ServerValidateEventArgs args)
         {
+            if (string.Equals(
+                Request.QueryString["rt"],
+                "IPR",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                args.IsValid = true;
+                return;
+            }
+
             args.IsValid =
                 !string.IsNullOrWhiteSpace(txtVisitNo.Text) ||
                 !string.IsNullOrWhiteSpace(txtGenerateVisitNo.Text);
@@ -754,12 +763,25 @@ namespace Temiang.Avicenna.Module.RADT
                 StringComparison.OrdinalIgnoreCase
             );
 
+            // Hide jika IPR
+            if (string.Equals(
+                Request.QueryString["rt"],
+                "IPR",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                isEnable = false;
+            }
+
             tblVisitNo.Visible = isEnable;
+            tblGenerateVisitNo.Visible = isEnable;
+
             txtVisitNo.Enabled = isEnable;
+            txtGenerateVisitNo.Enabled = isEnable;
 
             if (!isEnable)
             {
                 txtVisitNo.Text = string.Empty;
+                txtGenerateVisitNo.Text = string.Empty;
             }
         }
 
@@ -4942,66 +4964,71 @@ namespace Temiang.Avicenna.Module.RADT
 
                 //Save Data Visit Queue To Stage (POLI, REHAB, HD)
                 #region Insert VisitQueue
-                if (!string.IsNullOrWhiteSpace(txtVisitNo.Text))
+                if (!string.Equals(
+                    Request.QueryString["rt"],
+                    "IPR",
+                    StringComparison.OrdinalIgnoreCase))
                 {
-                    var lastQueue = new VisitQueue();
-
-                    lastQueue.Query.es.Top = 1;
-
-                    lastQueue.Query.Where(
-                        lastQueue.Query.VisitNo == txtVisitNo.Text
-                    );
-
-                    lastQueue.Query.OrderBy(
-                        lastQueue.Query.CreatedDate.Descending
-                    );
-
-                    string srAutoNumber = "VisitTunaiNo";
-
-                    if (lastQueue.Query.Load())
+                    if (!string.IsNullOrWhiteSpace(txtVisitNo.Text))
                     {
-                        srAutoNumber = lastQueue.SRAutoNumber;
-                    }
+                        var lastQueue = new VisitQueue();
 
-                    VisitQueue.InsertVisitQueueStage(
-                        txtVisitNo.Text,
-                        srAutoNumber,
-                        AppSession.UserLogin.UserID,
-                        DateTime.Now.Date,
-                        reg.ServiceUnitID,
-                        reg.ParamedicID,
-                        reg.RegistrationNo,
-                        reg.PatientID
-                    );
-                }
-                else if (!string.IsNullOrWhiteSpace(txtGenerateVisitNo.Text))
-                {
-                    // Pasien Titipan
-                    string srAutoNumber =
-                        VisitQueue.GenerateSRAutoNumberPasienTitipan(
-                            reg.GuarantorID,
-                            reg.ServiceUnitID
+                        lastQueue.Query.es.Top = 1;
+
+                        lastQueue.Query.Where(
+                            lastQueue.Query.VisitNo == txtVisitNo.Text
                         );
 
-                    if (string.IsNullOrEmpty(srAutoNumber))
-                    {
-                        throw new Exception(
-                            "SRAutoNumber tidak ditemukan."
+                        lastQueue.Query.OrderBy(
+                            lastQueue.Query.CreatedDate.Descending
+                        );
+
+                        string srAutoNumber = "VisitTunaiNo";
+
+                        if (lastQueue.Query.Load())
+                        {
+                            srAutoNumber = lastQueue.SRAutoNumber;
+                        }
+
+                        VisitQueue.InsertVisitQueueStage(
+                            txtVisitNo.Text,
+                            srAutoNumber,
+                            AppSession.UserLogin.UserID,
+                            DateTime.Now.Date,
+                            reg.ServiceUnitID,
+                            reg.ParamedicID,
+                            reg.RegistrationNo,
+                            reg.PatientID
                         );
                     }
+                    else if (!string.IsNullOrWhiteSpace(txtGenerateVisitNo.Text))
+                    {
+                        // Pasien Titipan
+                        string srAutoNumber =
+                            VisitQueue.GenerateSRAutoNumberPasienTitipan(
+                                reg.GuarantorID,
+                                reg.ServiceUnitID
+                            );
 
-                    VisitQueue.InsertVisitQueueStage(
-                        txtGenerateVisitNo.Text,
-                        srAutoNumber,
-                        AppSession.UserLogin.UserID,
-                        DateTime.Now.Date,
-                        reg.ServiceUnitID,
-                        reg.ParamedicID,
-                        reg.RegistrationNo,
-                        reg.PatientID
-                    );
+                        if (string.IsNullOrEmpty(srAutoNumber))
+                        {
+                            throw new Exception(
+                                "SRAutoNumber tidak ditemukan."
+                            );
+                        }
+
+                        VisitQueue.InsertVisitQueueStage(
+                            txtGenerateVisitNo.Text,
+                            srAutoNumber,
+                            AppSession.UserLogin.UserID,
+                            DateTime.Now.Date,
+                            reg.ServiceUnitID,
+                            reg.ParamedicID,
+                            reg.RegistrationNo,
+                            reg.PatientID
+                        );
+                    }
                 }
-
                 #endregion
 
                 //AutoNumber

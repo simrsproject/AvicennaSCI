@@ -1131,6 +1131,20 @@ namespace Temiang.Avicenna.Module.RADT.Master
         //Dropbox Current Stage
         private void PopulateCurrentStage()
         {
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            bool isEnable = string.Equals(
+                healthCareId,
+                "RSI",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            if (!isEnable)
+            {
+                cboSRCurrentStage.Visible = false;
+                return;
+            }
+
             var query = new QueueStageQuery();
 
             query.Select(query.ServiceGroup);
