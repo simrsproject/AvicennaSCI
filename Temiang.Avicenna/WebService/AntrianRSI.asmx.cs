@@ -109,18 +109,16 @@ namespace Temiang.Avicenna.WebService
         }
 
         //1. Pasien Ambil Antrian
-        [WebMethod(EnableSession = true, Description = @"
+        [WebMethod(EnableSession = false, Description = @"
            Ambil Data List PayerType untuk pasien memilih type TUNAI, MITRA DAN BPJS
 
            PARAMETER:
-           - UserID (required)
+           - UserID (optional)
 
            RESPONSE:
             200 = Berhasil mendapatkan data payer type
             404 = Data payer type tidak ditemukan
             500 = Terjadi kesalahan pada server
-
-            
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetPayerType()
@@ -131,63 +129,50 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["UserID"] ?? "")
                     .Trim();
 
-                if (string.IsNullOrEmpty(UserID))
-                {
-                    ApiResponeForAntrian.Error(
-                        Context,
-                        "UserID wajib diisi",
-                        400
-                    );
-                    return;
-                }
-
-                AppUserServiceUnitCollection userSU =
-                    new AppUserServiceUnitCollection();
-
-                userSU.Query.Where(
-                    userSU.Query.UserID == UserID
-                );
-
-                userSU.Query.Load();
-
                 System.Diagnostics.Debug.WriteLine("===== GET PAYER TYPE =====");
                 System.Diagnostics.Debug.WriteLine("UserID : " + UserID);
-                System.Diagnostics.Debug.WriteLine("Total Service Unit : " + userSU.Count);
-
-                for (int i = 0; i < userSU.Count; i++)
-                {
-                    System.Diagnostics.Debug.WriteLine(
-                        $"ServiceUnitID[{i}] = {userSU[i].ServiceUnitID}"
-                    );
-                }
-
-                if (userSU.Count == 0)
-                {
-                    ApiResponeForAntrian.Error(
-                        Context,
-                        "Service Unit user tidak ditemukan",
-                        404
-                    );
-                    return;
-                }
 
                 string serviceUnitID = "";
                 string channel = "";
 
-                foreach (AppUserServiceUnit item in userSU)
+                // Jika UserID dikirim, coba cari channel
+                if (!string.IsNullOrEmpty(UserID))
                 {
-                    string tempChannel =
-                        GetChannelByServiceUnit(item.ServiceUnitID);
+                    AppUserServiceUnitCollection userSU =
+                        new AppUserServiceUnitCollection();
 
-                    System.Diagnostics.Debug.WriteLine(
-                        $"Check ServiceUnitID = {item.ServiceUnitID}, Channel = {tempChannel}"
+                    userSU.Query.Where(
+                        userSU.Query.UserID == UserID
                     );
 
-                    if (!string.IsNullOrEmpty(tempChannel))
+                    userSU.Query.Load();
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "Total Service Unit : " + userSU.Count
+                    );
+
+                    for (int i = 0; i < userSU.Count; i++)
                     {
-                        serviceUnitID = item.ServiceUnitID;
-                        channel = tempChannel;
-                        break;
+                        System.Diagnostics.Debug.WriteLine(
+                            $"ServiceUnitID[{i}] = {userSU[i].ServiceUnitID}"
+                        );
+                    }
+
+                    foreach (AppUserServiceUnit item in userSU)
+                    {
+                        string tempChannel =
+                            GetChannelByServiceUnit(item.ServiceUnitID);
+
+                        System.Diagnostics.Debug.WriteLine(
+                            $"Check ServiceUnitID = {item.ServiceUnitID}, Channel = {tempChannel}"
+                        );
+
+                        if (!string.IsNullOrEmpty(tempChannel))
+                        {
+                            serviceUnitID = item.ServiceUnitID;
+                            channel = tempChannel;
+                            break;
+                        }
                     }
                 }
 
@@ -199,34 +184,36 @@ namespace Temiang.Avicenna.WebService
                     $"Channel = {channel}"
                 );
 
-                if (string.IsNullOrEmpty(channel))
-                {
-                    ApiResponeForAntrian.Error(
-                        Context,
-                        "User tidak memiliki akses ke Rawat Jalan PD atau Rawat Jalan PM",
-                        404
-                    );
-                    return;
-                }
-
                 var collection =
                     new AntrianAutoNumberSemanticCollection();
 
-                collection.Query.Where(
-                    collection.Query.Channel == channel,
-                    collection.Query.IsActive == true
-                );
+                // Jika ada channel gunakan filter channel
+                if (!string.IsNullOrEmpty(channel))
+                {
+                    collection.Query.Where(
+                        collection.Query.Channel == channel,
+                        collection.Query.IsActive == true
+                    );
+                }
+                else
+                {
+                    // Fallback: ambil semua data aktif
+                    collection.Query.Where(
+                        collection.Query.IsActive == true
+                    );
+                }
 
                 collection.Query.Load();
 
                 System.Diagnostics.Debug.WriteLine(
-                    $"Total Data Channel {channel} = {collection.Count}"
+                    $"Total Data = {collection.Count}"
                 );
 
                 var payerTypes = collection
                     .Select(x => x.PayerType)
                     .Distinct();
 
+                // Filter khusus berdasarkan channel
                 if (channel == "LOKET_PD")
                 {
                     payerTypes = payerTypes
@@ -3798,16 +3785,18 @@ namespace Temiang.Avicenna.WebService
                 }
 
                 // =========================================
-                // SESSION LOGIN
+                // SESSION LOGIN DUMMY ATAU PALSU
                 // =========================================
 
-                if (HttpContext.Current.Session["_UserLogin"] == null)
+                if (HttpContext.Current != null &&
+                    HttpContext.Current.Session != null &&
+                    HttpContext.Current.Session["_UserLogin"] == null)
                 {
                     HttpContext.Current.Session["_UserLogin"] =
                         new UserLogin()
                         {
-                            UserID = UserID,
-                            UserName = UserID
+                            UserID = "WEBSERVICE",
+                            UserName = "WEBSERVICE"
                         };
                 }
 
