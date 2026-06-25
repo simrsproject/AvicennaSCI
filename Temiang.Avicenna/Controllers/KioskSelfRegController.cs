@@ -276,7 +276,7 @@ namespace Temiang.Avicenna.Controllers
             PrintManager.CreatePrintJob(AppSession.Parameter.RegistrationSlipKioskRpt, parametersSlipKiosk, AppSession.UserLogin.UserID);
 
             if (WithTracer)
-            {
+            { 
                 RegistrationDetail.PrintTracer(reg);
             }
         }
@@ -809,18 +809,64 @@ namespace Temiang.Avicenna.Controllers
                         mrFileStatus, _autoNumberReg, _autoNumberLastPID);
 
                     reg = entity;
+
+                    // =========================================
+                    // GENERATE VISIT NO
+                    // =========================================
+
+                    var healthCareId = AppSession.Parameter.HealthcareID;
+
+                    bool isEnable = string.Equals(
+                        healthCareId,
+                        "RSI",
+                        StringComparison.OrdinalIgnoreCase
+                    );
+
+                    if (isEnable)
+                    {
+                        string visitNo =
+                            VisitQueue.TakeQueueVisitPasienTitipan(
+                                reg.GuarantorID,
+                                reg.ServiceUnitID,
+                                AppSession.UserLogin.UserID,
+                                DateTime.Now.Date
+                            );
+
+                        if (!string.IsNullOrEmpty(visitNo))
+                        {
+                            string srAutoNumber =
+                                VisitQueue.GenerateSRAutoNumberPasienTitipan(
+                                    reg.GuarantorID,
+                                    reg.ServiceUnitID
+                                );
+
+                            if (!string.IsNullOrEmpty(srAutoNumber))
+                            {
+                                VisitQueue.InsertVisitQueueStage(
+                                    visitNo,
+                                    srAutoNumber,
+                                    AppSession.UserLogin.UserID,
+                                    DateTime.Now.Date,
+                                    reg.ServiceUnitID,
+                                    reg.ParamedicID,
+                                    reg.RegistrationNo,
+                                    reg.PatientID
+                                );
+                            }
+                        }
+                    }
                 }
 
-                // print slip di bagian pendaftaran, mengikuti setting registrasi rawat jalan
-                //if (AppSession.Parameter.IsRegistrationPrintSlip == "Yes")
-                //{
-                //    var parametersSlip = new PrintJobParameterCollection();
-                //    parametersSlip.AddNew("p_RegistrationNo", reg.RegistrationNo, null, null);
-                //    PrintManager.CreatePrintJob(AppSession.Parameter.RegistrationSlipRpt, parametersSlip, AppSession.UserLogin.UserID);
-                //}
+                    // print slip di bagian pendaftaran, mengikuti setting registrasi rawat jalan
+                    //if (AppSession.Parameter.IsRegistrationPrintSlip == "Yes")
+                    //{
+                    //    var parametersSlip = new PrintJobParameterCollection();
+                    //    parametersSlip.AddNew("p_RegistrationNo", reg.RegistrationNo, null, null);
+                    //    PrintManager.CreatePrintJob(AppSession.Parameter.RegistrationSlipRpt, parametersSlip, AppSession.UserLogin.UserID);
+                    //}
 
-                // print slip di counter kiosk
-                PrintSlip(reg, true);
+                    // print slip di counter kiosk
+                    PrintSlip(reg, true);
 
                 return Json(JSonRetFormatted((lang == "en") ? "Thank you for using self-registration service" : "Terima kasih sudah menggunakan layanan pendaftaran mandiri"));
             }

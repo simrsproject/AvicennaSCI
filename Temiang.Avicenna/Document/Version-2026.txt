@@ -200,6 +200,8 @@ Titipan Daniel
 9. Menambahkan Bussiness Object QueueStage dan Create Tabel QueueStage.
 10.Menambahkan validasi Tombol Generate VisitNo dan txtVisitNo hanya berlaku di RSI.
 11.Menambahkan dan memodifikasi respone API RegistrationCreateFromAppointment supaya dapat masuk ke tabel VisitQueue.
+12.Menambahkan Validasi IPR pada RegistrationDetail.aspx.cs untuk hide field VisitNo dan GenerateVisitNo jika RegistrationType = IPR
+13.Menambahkan Statement untuk InsertVisitQueue pada KioskselfregController.cs pada void Register untuk dapat masuk ke tabel VisitQueue
 
 ---- [15-05-2026 - Wiliam] ---
 1. Modifikasi PrescriptionSalesDetail.aspx.cs 
