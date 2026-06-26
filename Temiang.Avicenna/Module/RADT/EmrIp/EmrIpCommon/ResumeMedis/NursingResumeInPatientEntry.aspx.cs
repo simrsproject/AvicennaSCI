@@ -746,14 +746,129 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                         }
                     }
 
-                    if (AppSession.Parameter.HealthcareInitial != "RSI")
-                    {
+                    //if (AppSession.Parameter.HealthcareInitial != "RSI")
+                    //{
 
-                        if (string.IsNullOrEmpty(appointmentNo))
+                    //    if (string.IsNullOrEmpty(appointmentNo))
+                    //    {
+                    //        var qSchedule = new ParamedicScheduleDate();
+                    //        if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID,
+                    //                planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
+                    //        {
+                    //            try
+                    //            {
+                    //                // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
+                    //                var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
+                    //                    .AppointmentPostRanapSetEntityValue(string.Empty, planItem.ServiceUnitID,
+                    //                        planItem.ParamedicID,
+                    //                        planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
+                    //                        PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                    //                        pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
+                    //                        pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
+                    //                        pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, pat.Notes,
+                    //                        AppSession.Parameter.AppointmentStatusOpen,
+                    //                        pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                    //                        AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+
+                    //                planItem.AppointmentTime = slot["AppointmentTime"].ToString();
+                    //                planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
+                    //                planItem.AppointmentNo = slot["AppointmentNo"].ToString();
+
+                    //                if (appointmentNos == string.Empty)
+                    //                    appointmentNos = planItem.AppointmentNo;
+                    //                else
+                    //                    appointmentNos = ";" + planItem.AppointmentNo;
+                    //            }
+                    //            catch (Exception ex)
+                    //            {
+                    //                args.MessageText = ex.Message;
+                    //                args.IsCancel = true;
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            var qSlot = new ServiceUnitParamedic();
+                    //            if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) &&
+                    //                qSlot.IsUsingQue == true)
+                    //            {
+                    //                try
+                    //                {
+                    //                    // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
+                    //                    var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
+                    //                        .AppointmentPostRanapSetEntityValue(string.Empty, planItem.ServiceUnitID,
+                    //                            planItem.ParamedicID,
+                    //                            planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO",
+                    //                            string.Empty,
+                    //                            PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                    //                            pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth,
+                    //                            pat.Sex,
+                    //                            pat.StreetName, pat.District, pat.City, pat.County, pat.State,
+                    //                            pat.ZipCode,
+                    //                            pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, pat.Notes,
+                    //                            AppSession.Parameter.AppointmentStatusOpen,
+                    //                            pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                    //                            AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+
+                    //                    planItem.AppointmentTime = slot["AppointmentTime"].ToString();
+                    //                    planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
+                    //                    planItem.AppointmentNo = slot["AppointmentNo"].ToString();
+
+                    //                    if (appointmentNos == string.Empty)
+                    //                        appointmentNos = planItem.AppointmentNo;
+                    //                    else
+                    //                        appointmentNos = ";" + planItem.AppointmentNo;
+                    //                }
+                    //                catch (Exception ex)
+                    //                {
+                    //                    args.MessageText = ex.Message;
+                    //                    args.IsCancel = true;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
+
+                    if (string.IsNullOrEmpty(appointmentNo))
+                    {
+                        var qSchedule = new ParamedicScheduleDate();
+                        if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID,
+                                planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
                         {
-                            var qSchedule = new ParamedicScheduleDate();
-                            if (qSchedule.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID,
-                                    planItem.ControlPlanDateTime.Year.ToString(), planItem.ControlPlanDateTime.Date))
+                            try
+                            {
+                                // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
+                                var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
+                                    .AppointmentPostRanapSetEntityValue(string.Empty, planItem.ServiceUnitID,
+                                        planItem.ParamedicID,
+                                        planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
+                                        PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
+                                        pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
+                                        pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
+                                        pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, pat.Notes,
+                                        AppSession.Parameter.AppointmentStatusOpen,
+                                        pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
+                                        AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
+
+                                planItem.AppointmentTime = slot["AppointmentTime"].ToString();
+                                planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
+                                planItem.AppointmentNo = slot["AppointmentNo"].ToString();
+
+                                if (appointmentNos == string.Empty)
+                                    appointmentNos = planItem.AppointmentNo;
+                                else
+                                    appointmentNos = ";" + planItem.AppointmentNo;
+                            }
+                            catch (Exception ex)
+                            {
+                                args.MessageText = ex.Message;
+                                args.IsCancel = true;
+                            }
+                        }
+                        else
+                        {
+                            var qSlot = new ServiceUnitParamedic();
+                            if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) &&
+                                qSlot.IsUsingQue == true)
                             {
                                 try
                                 {
@@ -761,10 +876,13 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                                     var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
                                         .AppointmentPostRanapSetEntityValue(string.Empty, planItem.ServiceUnitID,
                                             planItem.ParamedicID,
-                                            planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO", string.Empty,
+                                            planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO",
+                                            string.Empty,
                                             PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
-                                            pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth, pat.Sex,
-                                            pat.StreetName, pat.District, pat.City, pat.County, pat.State, pat.ZipCode,
+                                            pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth,
+                                            pat.Sex,
+                                            pat.StreetName, pat.District, pat.City, pat.County, pat.State,
+                                            pat.ZipCode,
                                             pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, pat.Notes,
                                             AppSession.Parameter.AppointmentStatusOpen,
                                             pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
@@ -783,46 +901,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                                 {
                                     args.MessageText = ex.Message;
                                     args.IsCancel = true;
-                                }
-                            }
-                            else
-                            {
-                                var qSlot = new ServiceUnitParamedic();
-                                if (qSlot.LoadByPrimaryKey(planItem.ServiceUnitID, planItem.ParamedicID) &&
-                                    qSlot.IsUsingQue == true)
-                                {
-                                    try
-                                    {
-                                        // Parameter fromRegistrationNo diisi null supaya tidak terjadi merge billing di reg dari appt nya (Handono 231110 req by Imel)
-                                        var slot = Temiang.Avicenna.WebService.V1_1.AppointmentWS
-                                            .AppointmentPostRanapSetEntityValue(string.Empty, planItem.ServiceUnitID,
-                                                planItem.ParamedicID,
-                                                planItem.ControlPlanDateTime.Date.ToShortDateString(), "AUTO",
-                                                string.Empty,
-                                                PatientID, pat.FirstName, pat.MiddleName, pat.LastName,
-                                                pat.DateOfBirth.Value.Date.ToShortDateString(), pat.CityOfBirth,
-                                                pat.Sex,
-                                                pat.StreetName, pat.District, pat.City, pat.County, pat.State,
-                                                pat.ZipCode,
-                                                pat.PhoneNo, pat.Email, pat.Ssn, pat.GuarantorID, pat.Notes,
-                                                AppSession.Parameter.AppointmentStatusOpen,
-                                                pat.MobilePhoneNo, "", "", 0, AppSession.UserLogin.UserID,
-                                                AppSession.Parameter.AppointmentTypeControlPlan, null, RegistrationNo);
-
-                                        planItem.AppointmentTime = slot["AppointmentTime"].ToString();
-                                        planItem.AppointmentQue = slot["AppointmentQue"].ToInt();
-                                        planItem.AppointmentNo = slot["AppointmentNo"].ToString();
-
-                                        if (appointmentNos == string.Empty)
-                                            appointmentNos = planItem.AppointmentNo;
-                                        else
-                                            appointmentNos = ";" + planItem.AppointmentNo;
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        args.MessageText = ex.Message;
-                                        args.IsCancel = true;
-                                    }
                                 }
                             }
                         }
