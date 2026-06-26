@@ -304,3 +304,10 @@ Titipan Daniel
 ---[22-06-2026 - Wiliam]---
 1. Menghilangkan text "Hasil Test Isihara" pada SOAP. CR Number : 0000030
 2. Modifikasi index.php (eklaim api)
+
+---[26-06-2026 - Wiliam]---
+1. Permintaan RSI untuk Next Control Plan yang Guarantor Pribadi, tetap membuat Appointment. File-file yang dimodifikasi sebagai berikut :
+   - ResumeMedisRichTextOutPatientEntry.aspx.cs
+   - ResumeMedisRichTextInPatientEntry.aspx.cs
+   - FollowUpPlanOprCtl.ascx.cs
+   - NursingResumeInPatientEntry.aspx.cs
