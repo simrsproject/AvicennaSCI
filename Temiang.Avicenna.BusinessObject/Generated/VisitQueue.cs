@@ -2050,7 +2050,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.ParamedicID,
                 query.QueueSequence,
                 query.StageID,
-                query.CategoryID
+                query.CategoryID,
+                query.RecallCount
             );
 
             // =========================================
@@ -2122,6 +2123,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.StageID,
                     x.ServiceUnitID,
                     x.CategoryID,
+                    x.RecallCount,
 
                     ServiceUnitName =
                         serviceUnits
@@ -2168,7 +2170,8 @@ namespace Temiang.Avicenna.BusinessObject
                 query.ParamedicID,
                 query.QueueSequence,
                 query.StageID,
-                query.CategoryID
+                query.CategoryID,
+                query.RecallCount
             );
 
             // =========================================
@@ -2288,6 +2291,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.QueueSequence,
                     x.StageID,
                     x.CategoryID,
+                    x.RecallCount,
 
                     x.ServiceUnitID,
                     ServiceUnitName =
