@@ -314,3 +314,6 @@ Titipan Daniel
 
 ---[29-06-2026 - Wiliam] ---
 1. Fixing Menghilangkan text "Hasil Tes Ishihara". CR Number : 0000030
+
+---[30-06-2026 - Wiliam]---]
+1. Rollback DistributionList.aspx.cs
