@@ -317,3 +317,4 @@ Titipan Daniel
 
 ---[30-06-2026 - Wiliam]---]
 1. Rollback DistributionList.aspx.cs
+2. CR mantis 0000032 : pada mode edit, item dibuat tidak unik. sebelumnya meminta unik.
