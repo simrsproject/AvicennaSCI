@@ -322,3 +322,10 @@ Titipan Daniel
 ---[01-07-2026 - Wiliam]---
 1. Modifikasi file ServiceUnitItemServiceCompDetail.ascx.cs untuk optimalisasi 
 2. Menambahkan file create_sp_GetTariffComponentByItemID.sql pada Document yang terkait dengan optimalisasi
+
+---[03-07-2026 - Wiliam]---
+1. Modifikasi file ReportViewer.aspx.cs untuk mengakomodasi jika report *.trdx dengan dua source. dimana source utama adalah database dan source sekunder adalah webservice.
+   selama ini rulesnya :
+   - source utama : webservice
+   - source sekunder : database
+
