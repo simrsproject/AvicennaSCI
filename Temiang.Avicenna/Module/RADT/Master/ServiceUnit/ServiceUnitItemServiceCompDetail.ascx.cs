@@ -6,6 +6,7 @@ using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using System.Data;
 using System.Linq;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.RADT.Master
 {
@@ -116,24 +117,44 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     cboTariffComponentID.Items.Add(new RadComboBoxItem(row["TariffComponentName"].ToString(), row["TariffComponentID"].ToString()));
                 }
 
-                var tci = new TransChargesItemQuery("tci");
-                var tcic = new TransChargesItemCompQuery("tcic");
-                tci.InnerJoin(tcic).On(tci.TransactionNo == tcic.TransactionNo)
-                    .Where(tci.ItemID == TxtItemId.Text)
-                    .Select(tcic.TariffComponentID);
-                tci.es.Distinct = true;
-                var tbl = tci.LoadDataTable();
+                //optimization by Wiliam 2026-07-01
+                var pars = new esParameters();
+                pars.Add("ItemID", TxtItemId.Text);
+                var tbl = BusinessObject.Common.Utils.LoadDataTableFromStoreProcedure("sp_GetTariffComponentByItemID", pars, 0);
+
                 var tcColl = new TariffComponentCollection();
                 tcColl.LoadAll();
 
                 foreach (System.Data.DataRow row in tbl.AsEnumerable()
                     .Where(x => !dtb.AsEnumerable()
                                 .Select(y => y["TariffComponentID"].ToString())
-                                .Contains(x[0].ToString()))) {
+                                .Contains(x[0].ToString())))
+                {
                     cboTariffComponentID.Items.Add(new RadComboBoxItem(
                         tcColl.Where(x => x.TariffComponentID == row[0].ToString()).Select(x => x.TariffComponentName).FirstOrDefault(),
                         row[0].ToString()));
                 }
+                //end optimization
+
+                //---- commented for backup by Wiliam 2026-07-01
+                //var tci = new TransChargesItemQuery("tci");
+                //var tcic = new TransChargesItemCompQuery("tcic");
+                //tci.InnerJoin(tcic).On(tci.TransactionNo == tcic.TransactionNo)
+                //    .Where(tci.ItemID == TxtItemId.Text)
+                //    .Select(tcic.TariffComponentID);
+                //tci.es.Distinct = true;
+                //var tbl = tci.LoadDataTable();
+                //var tcColl = new TariffComponentCollection();
+                //tcColl.LoadAll();
+
+                //foreach (System.Data.DataRow row in tbl.AsEnumerable()
+                //    .Where(x => !dtb.AsEnumerable()
+                //                .Select(y => y["TariffComponentID"].ToString())
+                //                .Contains(x[0].ToString()))) {
+                //    cboTariffComponentID.Items.Add(new RadComboBoxItem(
+                //        tcColl.Where(x => x.TariffComponentID == row[0].ToString()).Select(x => x.TariffComponentName).FirstOrDefault(),
+                //        row[0].ToString()));
+                //}
             }
             else
             {
