@@ -329,3 +329,6 @@ Titipan Daniel
    - source utama : webservice
    - source sekunder : database
 
+---[06-07-2026 - Wiliam]---
+1. Modifikasi AntrolController.cs untuk menangani duplikasi MedicalNo pada table Patient.
+
