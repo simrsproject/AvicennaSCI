@@ -147,173 +147,173 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             e.DetailTableView.DataSource = dtb;
         }
 
-        //private DataTable ItemTransactions
-        //{
-        //    get
-        //    {
-        //        var isEmptyFilter = txtFromDate.IsEmpty && txtToDate.IsEmpty && string.IsNullOrEmpty(txtDistributionNo.Text) && string.IsNullOrEmpty(txtDistRequestNo.Text) && string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue) && string.IsNullOrEmpty(cboSearchToUnit.SelectedValue) && string.IsNullOrEmpty(cboSRItemType.SelectedValue) && string.IsNullOrEmpty(cboSearchStatus.SelectedValue);
-        //        if (!ValidateSearch(isEmptyFilter, "Distribution")) return null;
-
-
-        //        var query = new ItemTransactionQuery("a");
-        //        var qryserviceunit = new ServiceUnitQuery("c");
-        //        var qryserviceunitto = new ServiceUnitQuery("e");
-        //        var itemtype = new AppStandardReferenceItemQuery("d");
-        //        var qusr = new AppUserServiceUnitQuery("u");
-        //        var qcostunit = new ServiceUnitQuery("f");
-        //        var locreq = new LocationQuery("g");
-        //        var locTo = new LocationQuery("h");
-
-        //        query.InnerJoin(qryserviceunit).On(qryserviceunit.ServiceUnitID == query.FromServiceUnitID);
-        //        query.InnerJoin(qryserviceunitto).On(qryserviceunitto.ServiceUnitID == query.ToServiceUnitID);
-        //        query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType && itemtype.StandardReferenceID == "ItemType");
-        //        query.InnerJoin(locreq).On(locreq.LocationID == query.FromLocationID);
-        //        query.InnerJoin(locTo).On(locTo.LocationID == query.ToLocationID);
-        //        query.Where(query.TransactionCode == BusinessObject.Reference.TransactionCode.Distribution);
-        //        query.InnerJoin(qusr).On(query.FromServiceUnitID == qusr.ServiceUnitID &&
-        //                                 qusr.UserID == AppSession.UserLogin.UserID);
-        //        query.LeftJoin(qcostunit).On(query.ServiceUnitCostID == qcostunit.ServiceUnitID);
-
-        //        query.Select(
-        //               query.TransactionNo,
-        //               query.TransactionDate,
-        //               query.ReferenceNo,
-        //               qryserviceunit.ServiceUnitName.As("FServiceUnitID"),
-        //               locreq.LocationName.As("FLocationID"),
-        //               qryserviceunitto.ServiceUnitName.As("TServiceUnitID"),
-        //               locTo.LocationName.As("TLocationID"),
-        //               qcostunit.ServiceUnitName.As("CostForServiceUnit"),
-        //               itemtype.ItemName,
-        //               query.IsApproved,
-        //               query.ReferenceNo,
-        //               query.Notes,
-        //               query.IsVoid,
-        //               "<'DistributionDetail.aspx?md=view&id=' + a.TransactionNo + '&drn=&rod=' as DoUrl>",
-        //               query.IsClosed,
-        //               query.LastUpdateByUserID
-        //           ) ;
-
-        //        if (!txtFromDate.IsEmpty && !txtToDate.IsEmpty)
-        //            query.Where(query.TransactionDate.Between(txtFromDate.SelectedDate, txtToDate.SelectedDate));
-        //        if (!string.IsNullOrEmpty(cboSearchToUnit.SelectedValue))
-        //            query.Where(query.ToServiceUnitID == cboSearchToUnit.SelectedValue);
-        //        if (cboSearchStatus.SelectedValue == "0")
-        //            query.Where(query.IsApproved == false);
-        //        if (cboSearchStatus.SelectedValue == "1")
-        //            query.Where(query.IsApproved == true);
-        //        if (cboSearchStatus.SelectedValue == "2")
-        //            query.Where(query.IsClosed == false);
-        //        if (cboSearchStatus.SelectedValue == "3")
-        //            query.Where(query.IsClosed == true);
-        //        if (cboSearchStatus.SelectedValue == "4")
-        //            query.Where(query.IsVoid == true);
-        //        if (!string.IsNullOrEmpty(cboSRItemType.SelectedValue))
-        //            query.Where(query.SRItemType == cboSRItemType.SelectedValue);
-        //        if (!string.IsNullOrEmpty(txtDistributionNo.Text))
-        //            query.Where(query.TransactionNo == txtDistributionNo.Text);
-        //        if (!string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue))
-        //            query.Where(query.FromServiceUnitID == cboSearchFromUnitDist.SelectedValue);
-        //        if (!string.IsNullOrEmpty(txtDistRequestNo.Text))
-        //            query.Where(query.ReferenceNo == txtDistRequestNo.Text);
-
-        //        query.es.Top = AppSession.Parameter.MaxResultRecord;
-        //        query.OrderBy(query.TransactionDate.Descending, query.TransactionNo.Descending);
-        //        DataTable dtb = query.LoadDataTable();
-        //        return dtb;
-        //    }
-        //}
         private DataTable ItemTransactions
         {
             get
             {
-                var isEmptyFilter = txtFromDate.IsEmpty
-                    && txtToDate.IsEmpty
-                    && string.IsNullOrEmpty(txtDistributionNo.Text)
-                    && string.IsNullOrEmpty(txtDistRequestNo.Text)
-                    && string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue)
-                    && string.IsNullOrEmpty(cboSearchToUnit.SelectedValue)
-                    && string.IsNullOrEmpty(cboSRItemType.SelectedValue)
-                    && string.IsNullOrEmpty(cboSearchStatus.SelectedValue);
-
+                var isEmptyFilter = txtFromDate.IsEmpty && txtToDate.IsEmpty && string.IsNullOrEmpty(txtDistributionNo.Text) && string.IsNullOrEmpty(txtDistRequestNo.Text) && string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue) && string.IsNullOrEmpty(cboSearchToUnit.SelectedValue) && string.IsNullOrEmpty(cboSRItemType.SelectedValue) && string.IsNullOrEmpty(cboSearchStatus.SelectedValue);
                 if (!ValidateSearch(isEmptyFilter, "Distribution")) return null;
 
+
                 var query = new ItemTransactionQuery("a");
-                var qFromUnit = new ServiceUnitQuery("c");
-                var qToUnit = new ServiceUnitQuery("e");
+                var qryserviceunit = new ServiceUnitQuery("c");
+                var qryserviceunitto = new ServiceUnitQuery("e");
                 var itemtype = new AppStandardReferenceItemQuery("d");
                 var qusr = new AppUserServiceUnitQuery("u");
                 var qcostunit = new ServiceUnitQuery("f");
-                var locFrom = new LocationQuery("g");
+                var locreq = new LocationQuery("g");
                 var locTo = new LocationQuery("h");
 
-                // --- Joins ---
-                // User-access filter: move first so SQL Server can use it early
-                query.InnerJoin(qusr).On(query.FromServiceUnitID == qusr.ServiceUnitID
-                                         && qusr.UserID == AppSession.UserLogin.UserID);
-
-                query.InnerJoin(qFromUnit).On(qFromUnit.ServiceUnitID == query.FromServiceUnitID);
-                query.InnerJoin(qToUnit).On(qToUnit.ServiceUnitID == query.ToServiceUnitID);
-                query.InnerJoin(locFrom).On(locFrom.LocationID == query.FromLocationID);
+                query.InnerJoin(qryserviceunit).On(qryserviceunit.ServiceUnitID == query.FromServiceUnitID);
+                query.InnerJoin(qryserviceunitto).On(qryserviceunitto.ServiceUnitID == query.ToServiceUnitID);
+                query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType && itemtype.StandardReferenceID == "ItemType");
+                query.InnerJoin(locreq).On(locreq.LocationID == query.FromLocationID);
                 query.InnerJoin(locTo).On(locTo.LocationID == query.ToLocationID);
-
-                // Optional lookups – LeftJoin so missing refs don't drop rows
-                query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType
-                                            && itemtype.StandardReferenceID == "ItemType");
-                query.LeftJoin(qcostunit).On(qcostunit.ServiceUnitID == query.ServiceUnitCostID);
-
-                // --- Hard filters first (most selective → SQL Server prunes early) ---
                 query.Where(query.TransactionCode == BusinessObject.Reference.TransactionCode.Distribution);
+                query.InnerJoin(qusr).On(query.FromServiceUnitID == qusr.ServiceUnitID &&
+                                         qusr.UserID == AppSession.UserLogin.UserID);
+                query.LeftJoin(qcostunit).On(query.ServiceUnitCostID == qcostunit.ServiceUnitID);
 
-                // Apply date range – default to today if no filter is selected so we
-                // never do a full table scan on TransactionCode alone.
+                query.Select(
+                       query.TransactionNo,
+                       query.TransactionDate,
+                       query.ReferenceNo,
+                       qryserviceunit.ServiceUnitName.As("FServiceUnitID"),
+                       locreq.LocationName.As("FLocationID"),
+                       qryserviceunitto.ServiceUnitName.As("TServiceUnitID"),
+                       locTo.LocationName.As("TLocationID"),
+                       qcostunit.ServiceUnitName.As("CostForServiceUnit"),
+                       itemtype.ItemName,
+                       query.IsApproved,
+                       query.ReferenceNo,
+                       query.Notes,
+                       query.IsVoid,
+                       "<'DistributionDetail.aspx?md=view&id=' + a.TransactionNo + '&drn=&rod=' as DoUrl>",
+                       query.IsClosed,
+                       query.LastUpdateByUserID
+                   );
+
                 if (!txtFromDate.IsEmpty && !txtToDate.IsEmpty)
                     query.Where(query.TransactionDate.Between(txtFromDate.SelectedDate, txtToDate.SelectedDate));
-                else if (string.IsNullOrEmpty(txtDistributionNo.Text))
-                    query.Where(query.TransactionDate.Between(DateTime.Today.AddDays(-30), DateTime.Today));
-
-                // Optional filters
-                if (!string.IsNullOrEmpty(txtDistributionNo.Text))
-                    query.Where(query.TransactionNo == txtDistributionNo.Text);
-                if (!string.IsNullOrEmpty(txtDistRequestNo.Text))
-                    query.Where(query.ReferenceNo == txtDistRequestNo.Text);
-                if (!string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue))
-                    query.Where(query.FromServiceUnitID == cboSearchFromUnitDist.SelectedValue);
                 if (!string.IsNullOrEmpty(cboSearchToUnit.SelectedValue))
                     query.Where(query.ToServiceUnitID == cboSearchToUnit.SelectedValue);
+                if (cboSearchStatus.SelectedValue == "0")
+                    query.Where(query.IsApproved == false);
+                if (cboSearchStatus.SelectedValue == "1")
+                    query.Where(query.IsApproved == true);
+                if (cboSearchStatus.SelectedValue == "2")
+                    query.Where(query.IsClosed == false);
+                if (cboSearchStatus.SelectedValue == "3")
+                    query.Where(query.IsClosed == true);
+                if (cboSearchStatus.SelectedValue == "4")
+                    query.Where(query.IsVoid == true);
                 if (!string.IsNullOrEmpty(cboSRItemType.SelectedValue))
                     query.Where(query.SRItemType == cboSRItemType.SelectedValue);
-
-                // Status flags
-                if (cboSearchStatus.SelectedValue == "0") query.Where(query.IsApproved == false);
-                if (cboSearchStatus.SelectedValue == "1") query.Where(query.IsApproved == true);
-                if (cboSearchStatus.SelectedValue == "2") query.Where(query.IsClosed == false);
-                if (cboSearchStatus.SelectedValue == "3") query.Where(query.IsClosed == true);
-                if (cboSearchStatus.SelectedValue == "4") query.Where(query.IsVoid == true);
-
-                // --- Projection – ReferenceNo was duplicated, removed the duplicate ---
-                query.Select(
-                    query.TransactionNo,
-                    query.TransactionDate,
-                    query.ReferenceNo,
-                    qFromUnit.ServiceUnitName.As("FServiceUnitID"),
-                    locFrom.LocationName.As("FLocationID"),
-                    qToUnit.ServiceUnitName.As("TServiceUnitID"),
-                    locTo.LocationName.As("TLocationID"),
-                    qcostunit.ServiceUnitName.As("CostForServiceUnit"),
-                    itemtype.ItemName,
-                    query.IsApproved,
-                    query.Notes,
-                    query.IsVoid,
-                    "<'DistributionDetail.aspx?md=view&id=' + a.TransactionNo + '&drn=&rod=' as DoUrl>",
-                    query.IsClosed,
-                    query.LastUpdateByUserID);
+                if (!string.IsNullOrEmpty(txtDistributionNo.Text))
+                    query.Where(query.TransactionNo == txtDistributionNo.Text);
+                if (!string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue))
+                    query.Where(query.FromServiceUnitID == cboSearchFromUnitDist.SelectedValue);
+                if (!string.IsNullOrEmpty(txtDistRequestNo.Text))
+                    query.Where(query.ReferenceNo == txtDistRequestNo.Text);
 
                 query.es.Top = AppSession.Parameter.MaxResultRecord;
                 query.OrderBy(query.TransactionDate.Descending, query.TransactionNo.Descending);
-
-                return query.LoadDataTable();
+                DataTable dtb = query.LoadDataTable();
+                return dtb;
             }
         }
+        //private DataTable ItemTransactions
+        //{
+        //    get
+        //    {
+        //        var isEmptyFilter = txtFromDate.IsEmpty
+        //            && txtToDate.IsEmpty
+        //            && string.IsNullOrEmpty(txtDistributionNo.Text)
+        //            && string.IsNullOrEmpty(txtDistRequestNo.Text)
+        //            && string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue)
+        //            && string.IsNullOrEmpty(cboSearchToUnit.SelectedValue)
+        //            && string.IsNullOrEmpty(cboSRItemType.SelectedValue)
+        //            && string.IsNullOrEmpty(cboSearchStatus.SelectedValue);
+
+        //        if (!ValidateSearch(isEmptyFilter, "Distribution")) return null;
+
+        //        var query = new ItemTransactionQuery("a");
+        //        var qFromUnit = new ServiceUnitQuery("c");
+        //        var qToUnit = new ServiceUnitQuery("e");
+        //        var itemtype = new AppStandardReferenceItemQuery("d");
+        //        var qusr = new AppUserServiceUnitQuery("u");
+        //        var qcostunit = new ServiceUnitQuery("f");
+        //        var locFrom = new LocationQuery("g");
+        //        var locTo = new LocationQuery("h");
+
+        //        // --- Joins ---
+        //        // User-access filter: move first so SQL Server can use it early
+        //        query.InnerJoin(qusr).On(query.FromServiceUnitID == qusr.ServiceUnitID
+        //                                 && qusr.UserID == AppSession.UserLogin.UserID);
+
+        //        query.InnerJoin(qFromUnit).On(qFromUnit.ServiceUnitID == query.FromServiceUnitID);
+        //        query.InnerJoin(qToUnit).On(qToUnit.ServiceUnitID == query.ToServiceUnitID);
+        //        query.InnerJoin(locFrom).On(locFrom.LocationID == query.FromLocationID);
+        //        query.InnerJoin(locTo).On(locTo.LocationID == query.ToLocationID);
+
+        //        // Optional lookups – LeftJoin so missing refs don't drop rows
+        //        query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType
+        //                                    && itemtype.StandardReferenceID == "ItemType");
+        //        query.LeftJoin(qcostunit).On(qcostunit.ServiceUnitID == query.ServiceUnitCostID);
+
+        //        // --- Hard filters first (most selective → SQL Server prunes early) ---
+        //        query.Where(query.TransactionCode == BusinessObject.Reference.TransactionCode.Distribution);
+
+        //        // Apply date range – default to today if no filter is selected so we
+        //        // never do a full table scan on TransactionCode alone.
+        //        if (!txtFromDate.IsEmpty && !txtToDate.IsEmpty)
+        //            query.Where(query.TransactionDate.Between(txtFromDate.SelectedDate, txtToDate.SelectedDate));
+        //        else if (string.IsNullOrEmpty(txtDistributionNo.Text))
+        //            query.Where(query.TransactionDate.Between(DateTime.Today.AddDays(-30), DateTime.Today));
+
+        //        // Optional filters
+        //        if (!string.IsNullOrEmpty(txtDistributionNo.Text))
+        //            query.Where(query.TransactionNo == txtDistributionNo.Text);
+        //        if (!string.IsNullOrEmpty(txtDistRequestNo.Text))
+        //            query.Where(query.ReferenceNo == txtDistRequestNo.Text);
+        //        if (!string.IsNullOrEmpty(cboSearchFromUnitDist.SelectedValue))
+        //            query.Where(query.FromServiceUnitID == cboSearchFromUnitDist.SelectedValue);
+        //        if (!string.IsNullOrEmpty(cboSearchToUnit.SelectedValue))
+        //            query.Where(query.ToServiceUnitID == cboSearchToUnit.SelectedValue);
+        //        if (!string.IsNullOrEmpty(cboSRItemType.SelectedValue))
+        //            query.Where(query.SRItemType == cboSRItemType.SelectedValue);
+
+        //        // Status flags
+        //        if (cboSearchStatus.SelectedValue == "0") query.Where(query.IsApproved == false);
+        //        if (cboSearchStatus.SelectedValue == "1") query.Where(query.IsApproved == true);
+        //        if (cboSearchStatus.SelectedValue == "2") query.Where(query.IsClosed == false);
+        //        if (cboSearchStatus.SelectedValue == "3") query.Where(query.IsClosed == true);
+        //        if (cboSearchStatus.SelectedValue == "4") query.Where(query.IsVoid == true);
+
+        //        // --- Projection – ReferenceNo was duplicated, removed the duplicate ---
+        //        query.Select(
+        //            query.TransactionNo,
+        //            query.TransactionDate,
+        //            query.ReferenceNo,
+        //            qFromUnit.ServiceUnitName.As("FServiceUnitID"),
+        //            locFrom.LocationName.As("FLocationID"),
+        //            qToUnit.ServiceUnitName.As("TServiceUnitID"),
+        //            locTo.LocationName.As("TLocationID"),
+        //            qcostunit.ServiceUnitName.As("CostForServiceUnit"),
+        //            itemtype.ItemName,
+        //            query.IsApproved,
+        //            query.Notes,
+        //            query.IsVoid,
+        //            "<'DistributionDetail.aspx?md=view&id=' + a.TransactionNo + '&drn=&rod=' as DoUrl>",
+        //            query.IsClosed,
+        //            query.LastUpdateByUserID);
+
+        //        query.es.Top = AppSession.Parameter.MaxResultRecord;
+        //        query.OrderBy(query.TransactionDate.Descending, query.TransactionNo.Descending);
+
+        //        return query.LoadDataTable();
+        //    }
+        //}
 
         protected void grdListReq_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
         {
@@ -338,227 +338,102 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             e.DetailTableView.DataSource = DistributionRequestItemPendings(e.DetailTableView.ParentItem.GetDataKeyValue("TransactionNo").ToString());
         }
 
-        //private DataTable DistributionRequestPendings
-        //{
-        //    get
-        //    {
-        //        var isEmptyFilter = txtRequestDate.IsEmpty && string.IsNullOrEmpty(txtRequestNo.Text) && string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue) && string.IsNullOrEmpty(cboToUnit.SelectedValue) && string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue);
-        //        if (!ValidateSearch(isEmptyFilter, "Distribution")) return null;
-
-        //        var query = new ItemTransactionQuery("a");
-        //        var qryserviceunit = new ServiceUnitQuery("b");
-        //        var qrItem = new ItemTransactionItemQuery("d");
-        //        var qusr = new AppUserServiceUnitQuery("u");
-        //        var qtounit = new ServiceUnitQuery("c");
-        //        var itemtype = new AppStandardReferenceItemQuery("e");
-        //        var qcostunit = new ServiceUnitQuery("f");
-
-        //        query.InnerJoin(qryserviceunit).On(qryserviceunit.ServiceUnitID == query.FromServiceUnitID);
-        //        query.InnerJoin(qrItem).On(query.TransactionNo == qrItem.TransactionNo);
-        //        query.InnerJoin(qusr).On(query.ToServiceUnitID == qusr.ServiceUnitID &&
-        //                                 qusr.UserID == AppSession.UserLogin.UserID);
-        //        query.InnerJoin(qtounit).On(query.ToServiceUnitID == qtounit.ServiceUnitID);
-        //        query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType && itemtype.StandardReferenceID == "ItemType");
-        //        query.LeftJoin(qcostunit).On(query.ServiceUnitCostID == qcostunit.ServiceUnitID);
-
-        //        query.Select
-        //            (
-        //                query.TransactionNo,
-        //                query.TransactionDate,
-        //                query.FromServiceUnitID,
-        //                qryserviceunit.ServiceUnitName.As("FromServiceUnit"),
-        //                qtounit.ServiceUnitName.As("ToServiceUnit"),
-        //                qcostunit.ServiceUnitName.As("CostForServiceUnit"),
-        //                itemtype.ItemName.As("ItemType"),
-        //                query.Notes,
-        //                "<'DistributionDetail.aspx?md=new&id=&drn=' + a.TransactionNo as DoUrl>",
-        //                query.ApprovedByUserID,
-        //                query.ApprovedDate
-        //            );
-
-        //        query.Where
-        //            (
-        //                query.TransactionCode == BusinessObject.Reference.TransactionCode.DistributionRequest,
-        //                query.IsApproved == true,
-        //                qrItem.IsClosed == false
-        //            );
-
-        //        var isFilter = false;
-        //        if (!txtRequestDate.IsEmpty)
-        //        {
-        //            query.Where(query.TransactionDate == txtRequestDate.SelectedDate);
-        //            isFilter = true;
-        //        }
-        //        //else
-        //        //{
-        //        //    query.Where(query.TransactionDate >= DateTime.Today.AddDays(-15).Date, query.TransactionDate <= DateTime.Today.Date);
-        //        //}
-        //        if (!string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue))
-        //            query.Where(query.FromServiceUnitID == cboSearchFromUnit.SelectedValue);
-        //        if (!string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue))
-        //            query.Where(query.SRItemType == cboSRItemTypeReq.SelectedValue);
-        //        if (!string.IsNullOrEmpty(txtRequestNo.Text))
-        //        {
-        //            query.Where(query.TransactionNo == txtRequestNo.Text);
-        //            isFilter = true;
-        //        }
-        //        if (!string.IsNullOrEmpty(cboToUnit.SelectedValue))
-        //            query.Where(query.ToServiceUnitID == cboToUnit.SelectedValue);
-
-        //        if (!isFilter)
-        //        {
-        //            query.es.Top = AppSession.Parameter.MaxResultRecord;
-        //            //query.Where(query.TransactionDate >= DateTime.Today.AddDays(-15).Date, query.TransactionDate <= DateTime.Today.Date);
-        //        }
-
-        //        query.GroupBy(query.TransactionNo,
-        //                query.TransactionDate,
-        //                query.FromServiceUnitID,
-        //                qryserviceunit.ServiceUnitName,
-        //                qtounit.ServiceUnitName,
-        //                qcostunit.ServiceUnitName,
-        //                itemtype.ItemName,
-        //                query.Notes,
-        //                query.ApprovedByUserID,
-        //                query.ApprovedDate);
-
-        //        query.OrderBy(query.TransactionDate.Descending, query.TransactionNo.Descending);
-        //        //query.es.Distinct = true;
-        //        //query.es.Top = AppSession.Parameter.MaxResultRecord;
-
-        //        var dtb = query.LoadDataTable();
-
-        //        //foreach (DataRow row in dtb.Rows.Cast<DataRow>().Where(row => DistributionRequestItemPendings(row["TransactionNo"].ToString()).Rows.Count == 0))
-        //        //{
-        //        //    row.Delete();
-        //        //}
-
-        //        return dtb;
-        //    }
-        //}
-
-        //private DataTable DistributionRequestItemPendings(string transactionNo)
-        //{
-        //    var query = new ItemTransactionItemQuery("a");
-        //    var hq = new ItemTransactionQuery("b");
-        //    var bal = new ItemBalanceQuery("c");
-        //    var su = new ServiceUnitQuery("d");
-        //    var iq = new ItemQuery("e");
-
-        //    query.InnerJoin(hq).On(query.TransactionNo == hq.TransactionNo);
-        //    query.InnerJoin(su).On(hq.FromServiceUnitID == su.ServiceUnitID);
-        //    query.LeftJoin(bal).On(query.ItemID == bal.ItemID && hq.FromLocationID == bal.LocationID);
-        //    query.InnerJoin(iq).On(query.ItemID == iq.ItemID);
-
-        //    query.Where
-        //        (
-        //        query.TransactionNo == transactionNo,
-        //        query.IsClosed == false);
-        //    query.OrderBy
-        //        (
-        //            query.ItemID.Ascending
-        //        );
-
-        //    query.Select
-        //        (
-        //            query.TransactionNo,
-        //            query.SequenceNo,
-        //            hq.FromServiceUnitID,
-        //            query.ItemID,
-        //            query.SRItemUnit,
-        //            query.Quantity,
-        //            query.QuantityFinishInBaseUnit,
-        //            ((query.Quantity * query.ConversionFactor) - query.QuantityFinishInBaseUnit).As("QtyInput"),
-        //            iq.ItemName,
-        //            hq.SRItemType,
-        //            query.CostPrice,
-        //            query.ConversionFactor,
-        //            @"<ISNULL(c.Balance, 0) AS 'Balance'>",
-        //            @"<ISNULL(c.Minimum, 0) AS 'Minimum'>",
-        //            @"<ISNULL(c.Maximum, 0) AS 'Maximum'>"
-        //        );
-        //    query.es.Top = AppSession.Parameter.MaxResultRecord;
-
-        //    var dtb = query.LoadDataTable();
-        //    return dtb;
-        //}
-
         private DataTable DistributionRequestPendings
         {
             get
             {
-                var isEmptyFilter = txtRequestDate.IsEmpty
-                    && string.IsNullOrEmpty(txtRequestNo.Text)
-                    && string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue)
-                    && string.IsNullOrEmpty(cboToUnit.SelectedValue)
-                    && string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue);
-
+                var isEmptyFilter = txtRequestDate.IsEmpty && string.IsNullOrEmpty(txtRequestNo.Text) && string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue) && string.IsNullOrEmpty(cboToUnit.SelectedValue) && string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue);
                 if (!ValidateSearch(isEmptyFilter, "Distribution")) return null;
 
                 var query = new ItemTransactionQuery("a");
-                var qFromUnit = new ServiceUnitQuery("b");
-                var qToUnit = new ServiceUnitQuery("c");
+                var qryserviceunit = new ServiceUnitQuery("b");
+                var qrItem = new ItemTransactionItemQuery("d");
                 var qusr = new AppUserServiceUnitQuery("u");
+                var qtounit = new ServiceUnitQuery("c");
                 var itemtype = new AppStandardReferenceItemQuery("e");
                 var qcostunit = new ServiceUnitQuery("f");
 
-                // --- Joins ---
-                // User-access filter first – most selective, lets SQL Server shrink rows early
-                query.InnerJoin(qusr).On(query.ToServiceUnitID == qusr.ServiceUnitID
-                                         && qusr.UserID == AppSession.UserLogin.UserID);
-                query.InnerJoin(qFromUnit).On(qFromUnit.ServiceUnitID == query.FromServiceUnitID);
-                query.InnerJoin(qToUnit).On(qToUnit.ServiceUnitID == query.ToServiceUnitID);
-                query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType
-                                            && itemtype.StandardReferenceID == "ItemType");
-                query.LeftJoin(qcostunit).On(qcostunit.ServiceUnitID == query.ServiceUnitCostID);
+                query.InnerJoin(qryserviceunit).On(qryserviceunit.ServiceUnitID == query.FromServiceUnitID);
+                query.InnerJoin(qrItem).On(query.TransactionNo == qrItem.TransactionNo);
+                query.InnerJoin(qusr).On(query.ToServiceUnitID == qusr.ServiceUnitID &&
+                                         qusr.UserID == AppSession.UserLogin.UserID);
+                query.InnerJoin(qtounit).On(query.ToServiceUnitID == qtounit.ServiceUnitID);
+                query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType && itemtype.StandardReferenceID == "ItemType");
+                query.LeftJoin(qcostunit).On(query.ServiceUnitCostID == qcostunit.ServiceUnitID);
 
-                // --- Hard filters ---
-                query.Where(
-                    query.TransactionCode == BusinessObject.Reference.TransactionCode.DistributionRequest,
-                    query.IsApproved == true);
+                query.Select
+                    (
+                        query.TransactionNo,
+                        query.TransactionDate,
+                        query.FromServiceUnitID,
+                        qryserviceunit.ServiceUnitName.As("FromServiceUnit"),
+                        qtounit.ServiceUnitName.As("ToServiceUnit"),
+                        qcostunit.ServiceUnitName.As("CostForServiceUnit"),
+                        itemtype.ItemName.As("ItemType"),
+                        query.Notes,
+                        "<'DistributionDetail.aspx?md=new&id=&drn=' + a.TransactionNo as DoUrl>",
+                        query.ApprovedByUserID,
+                        query.ApprovedDate
+                    );
 
-                // Replace the INNER JOIN ItemTransactionItem + GROUP BY pattern with EXISTS.
-                // This avoids row fanout (1 header × N items) and eliminates the 10-column GROUP BY.
-                // EXISTS stops scanning as soon as it finds one matching row.
-                query.Where("<EXISTS (SELECT 1 FROM ItemTransactionItem d " +
-                            "WHERE d.TransactionNo = a.TransactionNo AND d.IsClosed = 0)>");
+                query.Where
+                    (
+                        query.TransactionCode == BusinessObject.Reference.TransactionCode.DistributionRequest,
+                        query.IsApproved == true,
+                        qrItem.IsClosed == false
+                    );
 
-                // Date range – default 15-day window prevents full table scan
+                var isFilter = false;
                 if (!txtRequestDate.IsEmpty)
+                {
                     query.Where(query.TransactionDate == txtRequestDate.SelectedDate);
-                else if (string.IsNullOrEmpty(txtRequestNo.Text))
-                    query.Where(
-                        query.TransactionDate >= DateTime.Today.AddDays(-15).Date,
-                        query.TransactionDate <= DateTime.Today.Date);
-
-                // Optional filters
-                if (!string.IsNullOrEmpty(txtRequestNo.Text))
-                    query.Where(query.TransactionNo == txtRequestNo.Text);
+                    isFilter = true;
+                }
+                //else
+                //{
+                //    query.Where(query.TransactionDate >= DateTime.Today.AddDays(-15).Date, query.TransactionDate <= DateTime.Today.Date);
+                //}
                 if (!string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue))
                     query.Where(query.FromServiceUnitID == cboSearchFromUnit.SelectedValue);
                 if (!string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue))
                     query.Where(query.SRItemType == cboSRItemTypeReq.SelectedValue);
+                if (!string.IsNullOrEmpty(txtRequestNo.Text))
+                {
+                    query.Where(query.TransactionNo == txtRequestNo.Text);
+                    isFilter = true;
+                }
                 if (!string.IsNullOrEmpty(cboToUnit.SelectedValue))
                     query.Where(query.ToServiceUnitID == cboToUnit.SelectedValue);
 
-                // --- Projection (no GROUP BY needed anymore) ---
-                query.Select(
-                    query.TransactionNo,
-                    query.TransactionDate,
-                    query.FromServiceUnitID,
-                    qFromUnit.ServiceUnitName.As("FromServiceUnit"),
-                    qToUnit.ServiceUnitName.As("ToServiceUnit"),
-                    qcostunit.ServiceUnitName.As("CostForServiceUnit"),
-                    itemtype.ItemName.As("ItemType"),
-                    query.Notes,
-                    "<'DistributionDetail.aspx?md=new&id=&drn=' + a.TransactionNo as DoUrl>",
-                    query.ApprovedByUserID,
-                    query.ApprovedDate);
+                if (!isFilter)
+                {
+                    query.es.Top = AppSession.Parameter.MaxResultRecord;
+                    //query.Where(query.TransactionDate >= DateTime.Today.AddDays(-15).Date, query.TransactionDate <= DateTime.Today.Date);
+                }
 
-                query.es.Top = AppSession.Parameter.MaxResultRecord;
+                query.GroupBy(query.TransactionNo,
+                        query.TransactionDate,
+                        query.FromServiceUnitID,
+                        qryserviceunit.ServiceUnitName,
+                        qtounit.ServiceUnitName,
+                        qcostunit.ServiceUnitName,
+                        itemtype.ItemName,
+                        query.Notes,
+                        query.ApprovedByUserID,
+                        query.ApprovedDate);
+
                 query.OrderBy(query.TransactionDate.Descending, query.TransactionNo.Descending);
+                //query.es.Distinct = true;
+                //query.es.Top = AppSession.Parameter.MaxResultRecord;
 
-                return query.LoadDataTable();
+                var dtb = query.LoadDataTable();
+
+                //foreach (DataRow row in dtb.Rows.Cast<DataRow>().Where(row => DistributionRequestItemPendings(row["TransactionNo"].ToString()).Rows.Count == 0))
+                //{
+                //    row.Delete();
+                //}
+
+                return dtb;
             }
         }
 
@@ -567,41 +442,166 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             var query = new ItemTransactionItemQuery("a");
             var hq = new ItemTransactionQuery("b");
             var bal = new ItemBalanceQuery("c");
+            var su = new ServiceUnitQuery("d");
             var iq = new ItemQuery("e");
 
-            // ServiceUnit (alias "d") was joined here but none of its columns were
-            // projected – removed to eliminate the unnecessary join entirely.
-
             query.InnerJoin(hq).On(query.TransactionNo == hq.TransactionNo);
+            query.InnerJoin(su).On(hq.FromServiceUnitID == su.ServiceUnitID);
             query.LeftJoin(bal).On(query.ItemID == bal.ItemID && hq.FromLocationID == bal.LocationID);
             query.InnerJoin(iq).On(query.ItemID == iq.ItemID);
 
-            query.Where(
+            query.Where
+                (
                 query.TransactionNo == transactionNo,
                 query.IsClosed == false);
+            query.OrderBy
+                (
+                    query.ItemID.Ascending
+                );
 
-            query.Select(
-                query.TransactionNo,
-                query.SequenceNo,
-                hq.FromServiceUnitID,
-                query.ItemID,
-                query.SRItemUnit,
-                query.Quantity,
-                query.QuantityFinishInBaseUnit,
-                ((query.Quantity * query.ConversionFactor) - query.QuantityFinishInBaseUnit).As("QtyInput"),
-                iq.ItemName,
-                hq.SRItemType,
-                query.CostPrice,
-                query.ConversionFactor,
-                @"<ISNULL(c.Balance, 0) AS 'Balance'>",
-                @"<ISNULL(c.Minimum, 0) AS 'Minimum'>",
-                @"<ISNULL(c.Maximum, 0) AS 'Maximum'>");
-
-            query.OrderBy(query.ItemID.Ascending);
+            query.Select
+                (
+                    query.TransactionNo,
+                    query.SequenceNo,
+                    hq.FromServiceUnitID,
+                    query.ItemID,
+                    query.SRItemUnit,
+                    query.Quantity,
+                    query.QuantityFinishInBaseUnit,
+                    ((query.Quantity * query.ConversionFactor) - query.QuantityFinishInBaseUnit).As("QtyInput"),
+                    iq.ItemName,
+                    hq.SRItemType,
+                    query.CostPrice,
+                    query.ConversionFactor,
+                    @"<ISNULL(c.Balance, 0) AS 'Balance'>",
+                    @"<ISNULL(c.Minimum, 0) AS 'Minimum'>",
+                    @"<ISNULL(c.Maximum, 0) AS 'Maximum'>"
+                );
             query.es.Top = AppSession.Parameter.MaxResultRecord;
 
-            return query.LoadDataTable();
+            var dtb = query.LoadDataTable();
+            return dtb;
         }
+
+        //private DataTable DistributionRequestPendings
+        //{
+        //    get
+        //    {
+        //        var isEmptyFilter = txtRequestDate.IsEmpty
+        //            && string.IsNullOrEmpty(txtRequestNo.Text)
+        //            && string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue)
+        //            && string.IsNullOrEmpty(cboToUnit.SelectedValue)
+        //            && string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue);
+
+        //        if (!ValidateSearch(isEmptyFilter, "Distribution")) return null;
+
+        //        var query = new ItemTransactionQuery("a");
+        //        var qFromUnit = new ServiceUnitQuery("b");
+        //        var qToUnit = new ServiceUnitQuery("c");
+        //        var qusr = new AppUserServiceUnitQuery("u");
+        //        var itemtype = new AppStandardReferenceItemQuery("e");
+        //        var qcostunit = new ServiceUnitQuery("f");
+
+        //        // --- Joins ---
+        //        // User-access filter first – most selective, lets SQL Server shrink rows early
+        //        query.InnerJoin(qusr).On(query.ToServiceUnitID == qusr.ServiceUnitID
+        //                                 && qusr.UserID == AppSession.UserLogin.UserID);
+        //        query.InnerJoin(qFromUnit).On(qFromUnit.ServiceUnitID == query.FromServiceUnitID);
+        //        query.InnerJoin(qToUnit).On(qToUnit.ServiceUnitID == query.ToServiceUnitID);
+        //        query.LeftJoin(itemtype).On(itemtype.ItemID == query.SRItemType
+        //                                    && itemtype.StandardReferenceID == "ItemType");
+        //        query.LeftJoin(qcostunit).On(qcostunit.ServiceUnitID == query.ServiceUnitCostID);
+
+        //        // --- Hard filters ---
+        //        query.Where(
+        //            query.TransactionCode == BusinessObject.Reference.TransactionCode.DistributionRequest,
+        //            query.IsApproved == true);
+
+        //        // Replace the INNER JOIN ItemTransactionItem + GROUP BY pattern with EXISTS.
+        //        // This avoids row fanout (1 header × N items) and eliminates the 10-column GROUP BY.
+        //        // EXISTS stops scanning as soon as it finds one matching row.
+        //        query.Where("<EXISTS (SELECT 1 FROM ItemTransactionItem d " +
+        //                    "WHERE d.TransactionNo = a.TransactionNo AND d.IsClosed = 0)>");
+
+        //        // Date range – default 15-day window prevents full table scan
+        //        if (!txtRequestDate.IsEmpty)
+        //            query.Where(query.TransactionDate == txtRequestDate.SelectedDate);
+        //        else if (string.IsNullOrEmpty(txtRequestNo.Text))
+        //            query.Where(
+        //                query.TransactionDate >= DateTime.Today.AddDays(-15).Date,
+        //                query.TransactionDate <= DateTime.Today.Date);
+
+        //        // Optional filters
+        //        if (!string.IsNullOrEmpty(txtRequestNo.Text))
+        //            query.Where(query.TransactionNo == txtRequestNo.Text);
+        //        if (!string.IsNullOrEmpty(cboSearchFromUnit.SelectedValue))
+        //            query.Where(query.FromServiceUnitID == cboSearchFromUnit.SelectedValue);
+        //        if (!string.IsNullOrEmpty(cboSRItemTypeReq.SelectedValue))
+        //            query.Where(query.SRItemType == cboSRItemTypeReq.SelectedValue);
+        //        if (!string.IsNullOrEmpty(cboToUnit.SelectedValue))
+        //            query.Where(query.ToServiceUnitID == cboToUnit.SelectedValue);
+
+        //        // --- Projection (no GROUP BY needed anymore) ---
+        //        query.Select(
+        //            query.TransactionNo,
+        //            query.TransactionDate,
+        //            query.FromServiceUnitID,
+        //            qFromUnit.ServiceUnitName.As("FromServiceUnit"),
+        //            qToUnit.ServiceUnitName.As("ToServiceUnit"),
+        //            qcostunit.ServiceUnitName.As("CostForServiceUnit"),
+        //            itemtype.ItemName.As("ItemType"),
+        //            query.Notes,
+        //            "<'DistributionDetail.aspx?md=new&id=&drn=' + a.TransactionNo as DoUrl>",
+        //            query.ApprovedByUserID,
+        //            query.ApprovedDate);
+
+        //        query.es.Top = AppSession.Parameter.MaxResultRecord;
+        //        query.OrderBy(query.TransactionDate.Descending, query.TransactionNo.Descending);
+
+        //        return query.LoadDataTable();
+        //    }
+        //}
+
+        //private DataTable DistributionRequestItemPendings(string transactionNo)
+        //{
+        //    var query = new ItemTransactionItemQuery("a");
+        //    var hq = new ItemTransactionQuery("b");
+        //    var bal = new ItemBalanceQuery("c");
+        //    var iq = new ItemQuery("e");
+
+        //    // ServiceUnit (alias "d") was joined here but none of its columns were
+        //    // projected – removed to eliminate the unnecessary join entirely.
+
+        //    query.InnerJoin(hq).On(query.TransactionNo == hq.TransactionNo);
+        //    query.LeftJoin(bal).On(query.ItemID == bal.ItemID && hq.FromLocationID == bal.LocationID);
+        //    query.InnerJoin(iq).On(query.ItemID == iq.ItemID);
+
+        //    query.Where(
+        //        query.TransactionNo == transactionNo,
+        //        query.IsClosed == false);
+
+        //    query.Select(
+        //        query.TransactionNo,
+        //        query.SequenceNo,
+        //        hq.FromServiceUnitID,
+        //        query.ItemID,
+        //        query.SRItemUnit,
+        //        query.Quantity,
+        //        query.QuantityFinishInBaseUnit,
+        //        ((query.Quantity * query.ConversionFactor) - query.QuantityFinishInBaseUnit).As("QtyInput"),
+        //        iq.ItemName,
+        //        hq.SRItemType,
+        //        query.CostPrice,
+        //        query.ConversionFactor,
+        //        @"<ISNULL(c.Balance, 0) AS 'Balance'>",
+        //        @"<ISNULL(c.Minimum, 0) AS 'Minimum'>",
+        //        @"<ISNULL(c.Maximum, 0) AS 'Maximum'>");
+
+        //    query.OrderBy(query.ItemID.Ascending);
+        //    query.es.Top = AppSession.Parameter.MaxResultRecord;
+
+        //    return query.LoadDataTable();
+        //}
 
         protected void btnFilterDO_Click(object sender, ImageClickEventArgs e)
         {

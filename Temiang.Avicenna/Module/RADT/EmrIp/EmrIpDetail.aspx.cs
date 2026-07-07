@@ -1661,6 +1661,19 @@ ORDER BY pth.[DateOfEntry] DESC,pth.[TimeOfEntry] DESC),x.ServiceUnitID) AS Serv
 
                             info2 = AuditLogLinkMenu(rim, "Info2", info2);
 
+                            //Permintaan RSBK tidak ada Hasil Test Ishihara (CR : 0000030 - mantis) - Wiliam (2026-06-29)
+                            if(AppSession.Parameter.HealthcareID.ToUpper() == "RSBK")
+                            {
+                                if (info2.Contains("Hasil Tes Ishihara"))
+                                {
+                                        info2 = Regex.Replace(
+                                        info2,
+                                        @"•\s*Hasil Tes Ishihara:.*?(?=<br />|$)",
+                                        ""
+                                    );
+                                }
+                            }
+
                             sbNote.AppendFormat(
                                 "<tr><td class='label' valign='top' style='font-weight: bold;width:{2}px; padding-left:2px'>{0}:</td><td valign='top'>{1}</td></tr>",
                                 label.Substring(1, 1), info2, col1Width);
