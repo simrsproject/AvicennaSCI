@@ -3475,6 +3475,7 @@ namespace Temiang.Avicenna.BusinessObject
         VQ.QueueDate,
         VQ.Status,
         VQ.StageID,
+        VQ.RecallCount,  
         SUP.ServiceUnitID,
         VQ.CategoryID,
         SU.ServiceUnitName,
@@ -3555,6 +3556,11 @@ namespace Temiang.Avicenna.BusinessObject
                             reader["StageID"] == DBNull.Value
                                 ? ""
                                 : reader["StageID"].ToString(),
+
+                        RecallCount =
+                            reader["RecallCount"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(reader["RecallCount"]),
 
                         ServiceUnitID =
                             reader["ServiceUnitID"].ToString(),
