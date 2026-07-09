@@ -332,3 +332,7 @@ Titipan Daniel
 ---[06-07-2026 - Wiliam]---
 1. Modifikasi AntrolController.cs untuk menangani duplikasi MedicalNo pada table Patient.
 
+---[09-07-2026 - Wiliam]---
+1. Modifikasi Inacbg.asmx.cs line 1621 
+   reg.save --> regis.save();
+

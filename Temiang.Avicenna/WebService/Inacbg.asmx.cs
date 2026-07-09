@@ -1618,7 +1618,8 @@ namespace Temiang.Avicenna.WebService
 
                         reg.IsHoldTransactionEntry = true;
 
-                        reg.Save();
+                        //reg.Save();
+                        regis.Save();
 
                         successCount++;
                     }
