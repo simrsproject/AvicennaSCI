@@ -571,7 +571,7 @@ namespace Temiang.Avicenna.Module.Charges
                             var result = SatuSehatHelper.SendServiceRequestToRis(charges.TransactionNo, charges.RegistrationNo);
 
                             // Cek apakah result mengandung error
-                            if (!string.IsNullOrEmpty(result) && result.Contains("\"severity\":\"error\""))
+                            if (!string.IsNullOrEmpty(result) && (result.Contains("\"severity\":\"error\"") || result.StartsWith("error:")))
                             {
                                 ScriptManager.RegisterStartupScript(
                                     this,
@@ -612,10 +612,10 @@ namespace Temiang.Avicenna.Module.Charges
             public static string SendServiceRequestToRis(string transactionNo, string registrationNo)
             {
                 var tc = new TransCharges();
-                if (!tc.LoadByPrimaryKey(transactionNo)) return "error: \"Transaction not found\"";
+                if (!tc.LoadByPrimaryKey(transactionNo)) return "error: Transaction not found";
 
                 var reg = new Registration();
-                if (!reg.LoadByPrimaryKey(registrationNo)) return "error: \"Registration not found\"";
+                if (!reg.LoadByPrimaryKey(registrationNo)) return "error: Registration not found";
 
                 var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
                 var result = util.OrderRadRealization(transactionNo);
