@@ -1,0 +1,8 @@
+CREATE TABLE ListKamarForAntrian
+(
+    KamarID INT NOT NULL PRIMARY KEY,
+    KamarCode VARCHAR(20) NOT NULL,
+    KamarName VARCHAR(100) NOT NULL,
+    IsActive BIT NOT NULL DEFAULT (1),
+    CreatedDate DATETIME NOT NULL DEFAULT (GETDATE())
+);

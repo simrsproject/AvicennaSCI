@@ -2538,11 +2538,12 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - VisitQueueNo (required)
+            - Kamar (Optional)
 
             EXAMPLE:
 
             GetQueueSoundForAllServiceUnit?
-            VisitQueueNo=VQUE-260603-0006
+            VisitQueueNo=VQUE-260603-0006&Kamar=1
 
             RESPONSE:
                200 = Sound antrian All Service Unit berhasil diambil
@@ -2560,6 +2561,11 @@ namespace Temiang.Avicenna.WebService
 
                 string VisitQueueNo =
                     (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string Kamar =
+                    (Context.Request["Kamar"] ?? "")
                     .Trim()
                     .ToUpper();
 
@@ -2584,7 +2590,8 @@ namespace Temiang.Avicenna.WebService
 
                 var data =
                     QueueingSound.GetQueueSoundForAllServiceUnit(
-                        VisitQueueNo
+                        VisitQueueNo,
+                        Kamar
                     );
 
                 // =========================
@@ -4279,6 +4286,82 @@ namespace Temiang.Avicenna.WebService
                 // =========================================
                 // RESPONSE ERROR
                 // =========================================
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = false, Description = @"
+            Mendapatkan daftar kamar untuk antrian.
+
+            PARAMETER:
+            - Tidak ada
+
+            RESPONSE:
+             200 = Berhasil mendapatkan data kamar
+             404 = Data kamar tidak ditemukan
+             500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetListKamarForPoli()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("===== GET ROOM LIST =====");
+
+                ListKamarForAntrianCollection collection =
+                    new ListKamarForAntrianCollection();
+
+                collection.Query.Where(
+                    collection.Query.IsActive == true
+                );
+
+                collection.Query.OrderBy(
+                    collection.Query.KamarID.Ascending
+                );
+
+                collection.Query.Load();
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Total Room = {collection.Count}"
+                );
+
+                if (collection.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data kamar tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                var data = collection
+                    .Select(x => new
+                    {
+                        KamarID = x.KamarID,
+                        KamarCode = x.KamarCode,
+                        KamarName = x.KamarName
+                    })
+                    .ToList();
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        Rooms = data
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "ERROR : " + ex.ToString()
+                );
+
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,

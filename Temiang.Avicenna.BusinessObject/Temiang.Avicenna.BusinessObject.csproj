@@ -808,6 +808,7 @@
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />
     <Compile Include="Generated\ItemImmunization.cs" />
     <Compile Include="Generated\JsonBridgingRujukBalikValueTemp.cs" />
+    <Compile Include="Generated\ListKamarForAntrian.cs" />
     <Compile Include="Generated\LoincItem.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryBodyDiagramCmx.cs" />
     <Compile Include="Generated\NccIDRG.cs" />
