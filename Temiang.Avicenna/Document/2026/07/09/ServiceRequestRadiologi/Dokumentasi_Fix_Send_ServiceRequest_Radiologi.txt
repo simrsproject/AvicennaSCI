@@ -1,0 +1,382 @@
+/*
+================================================================================
+ DOKUMENTASI FIX - SEND SERVICE REQUEST RADIOLOGI DARI MENU REALISASI
+================================================================================
+ Nama Modul      : Job Order Realisation - Send Service Request Radiologi
+ Form            : JobOrderRealisationList / JobOrderRealisationDetail
+ Dibuat Untuk    : Fix tombol send service radiologi di menu realisasi yang
+                   kadang bisa kadang tidak, dan muncul "Success" tapi data
+                   tidak terkirim ke SatuSehat.
+ Dibuat Oleh     : yayasan
+ Tanggal         : 2026-07-06
+ Catatan         :
+   1. Dokumentasi ini mencatat perubahan kodingan di 3 file.
+   2. Tidak ada script SQL yang perlu dijalankan.
+   3. Perubahan murni di sisi C# (code-behind).
+================================================================================
+*/
+
+-- DAFTAR FILE YANG DIMODIFIKASI
+-- 01. Temiang.Avicenna.Bridging.SatuSehat/Utils.cs
+--     Fungsi: OrderRadRealization()
+-- 02. Temiang.Avicenna/Module/Charges/ServiceUnit/JobOrderRealisation/JobOrderRealisationList.aspx.cs
+--     Fungsi: RaisePostBackEvent() dan class SatuSehatHelper
+-- 03. Temiang.Avicenna/Module/Charges/ServiceUnit/JobOrderRealisation/JobOrderRealisationDetail.aspx.cs
+--     Fungsi: SatusehatServiceRequestPostAndLogToRis() dan btnRisSatusehat_Click()
+
+/*
+================================================================================
+ LATAR BELAKANG MASALAH
+================================================================================
+
+ 1. Tombol send service radiologi di menu realisasi kadang bisa kadang tidak.
+ 2. Petugas radiologi harus workaround ke menu "Send Outpatient" untuk kirim ulang.
+ 3. Muncul pesan "Success" tapi data tidak terkirim ke SatuSehat.
+
+================================================================================
+ PENYEBAB (ROOT CAUSE)
+================================================================================
+
+ A. Validasi parameter yang tidak diperlukan:
+    - Sebelum kirim, sistem mengecek AppParameter ServiceUnitRadiologyID dan
+      ServiceUnitRadiologyIdArray. Jika salah satu kosong -> langsung gagal.
+    - Padahal parameter ini hanya dipakai sebagai filter internal di
+      PostServiceRequestRad(), bukan prasyarat untuk proses pengiriman.
+
+ B. PostServiceRequestRad() tidak dipanggil jika EncounterID sudah ada:
+    - Fungsi OrderRadRealization() hanya memanggil PostServiceRequestRad()
+      via EncounterAndRadOrderPost() (ketika EncounterID belum ada).
+    - Jika EncounterID sudah ada (karena pernah diproses dari menu lain),
+      fungsi langsung return "success" TANPA mengirim ServiceRequest radiologi.
+
+ C. Return value OrderRadRealization() tidak dicek:
+    - Fungsi SendServiceRequestToRis() dan SatusehatServiceRequestPostAndLogToRis()
+      bertipe void dan tidak menangkap response dari OrderRadRealization().
+    - Akibatnya pesan selalu "Success" meskipun gagal.
+
+================================================================================
+*/
+
+
+/*
+================================================================================
+ MODIFIKASI 01 - Utils.cs (Temiang.Avicenna.Bridging.SatuSehat)
+================================================================================
+ Fungsi : OrderRadRealization(string radOrderNo)
+ Lokasi : region RAD (sekitar baris 17640)
+ Tujuan : 
+   1. Tambah validasi RegistrationNo
+   2. Selalu panggil PostServiceRequestRad() meskipun EncounterID sudah ada
+================================================================================
+*/
+
+-- SEBELUM (KODE LAMA):
+-- =====================
+/*
+    public string OrderRadRealization(string radOrderNo)
+    {
+        var org = new AppParameter();
+        if (!org.LoadByPrimaryKey("SatuSehatOrganizationID")) return OrderRadInfVal("error", "10", "SatuSehatOrganizationID empty");
+
+        var tc = new TransCharges();
+        if (!tc.LoadByPrimaryKey(radOrderNo)) return OrderRadInfVal("error", "10", "Rad Order not found");
+
+        var encounterId = string.Empty;
+        var satuSehatLog = new SatuSehatKunjungan();
+        if (satuSehatLog.LoadByPrimaryKey(tc.RegistrationNo))
+        {
+            if (satuSehatLog.EncounterID != null)
+            {
+                encounterId = satuSehatLog.EncounterID.ToString();
+            }
+            else
+                encounterId = EncounterAndRadOrderPost(tc.RegistrationNo);
+        }
+        else
+        {
+            encounterId = EncounterAndRadOrderPost(tc.RegistrationNo);
+        }
+
+        if (!string.IsNullOrEmpty(encounterId))
+        {
+            var reg = new Registration();
+            reg.LoadByPrimaryKey(tc.RegistrationNo);
+
+            ...
+
+            // MASALAH: Langsung return tanpa kirim ServiceRequest!
+            return OrderRadInfVal("success", ...);
+        }
+
+        ...
+        return OrderRadInfVal("error", "10", "Please contact IT Support");
+    }
+*/
+
+-- SESUDAH (KODE BARU):
+-- =====================
+/*
+    public string OrderRadRealization(string radOrderNo)
+    {
+        var org = new AppParameter();
+        if (!org.LoadByPrimaryKey("SatuSehatOrganizationID")) return OrderRadInfVal("error", "10", "SatuSehatOrganizationID empty");
+
+        var tc = new TransCharges();
+        if (!tc.LoadByPrimaryKey(radOrderNo)) return OrderRadInfVal("error", "10", "Rad Order not found");
+
+        // DITAMBAHKAN: Validasi RegistrationNo
+        if (string.IsNullOrWhiteSpace(tc.RegistrationNo)) return OrderRadInfVal("error", "10", "RegistrationNo is empty for order " + radOrderNo);
+
+        var reg2 = new Registration();
+        if (!reg2.LoadByPrimaryKey(tc.RegistrationNo)) return OrderRadInfVal("error", "10", "Registration not found: " + tc.RegistrationNo);
+
+        var encounterId = string.Empty;
+        var satuSehatLog = new SatuSehatKunjungan();
+        if (satuSehatLog.LoadByPrimaryKey(tc.RegistrationNo))
+        {
+            if (satuSehatLog.EncounterID != null)
+            {
+                encounterId = satuSehatLog.EncounterID.ToString();
+            }
+            else
+                encounterId = EncounterAndRadOrderPost(tc.RegistrationNo);
+        }
+        else
+        {
+            encounterId = EncounterAndRadOrderPost(tc.RegistrationNo);
+        }
+
+        if (!string.IsNullOrEmpty(encounterId))
+        {
+            var reg = new Registration();
+            reg.LoadByPrimaryKey(tc.RegistrationNo);
+
+            ...
+
+            // DITAMBAHKAN: Selalu panggil PostServiceRequestRad()
+            // PostServiceRequestRad internal sudah cek duplikasi (ResultID != null -> skip)
+            string accessToken = string.Empty;
+            PostServiceRequestRad(reg, patSs, parMedicSs, encounterId, ref accessToken);
+
+            return OrderRadInfVal("success", ...);
+        }
+
+        ...
+        return OrderRadInfVal("error", "10", "Please contact IT Support");
+    }
+*/
+
+-- CATATAN:
+-- PostServiceRequestRad() -> PostServiceRequestItemRad() sudah punya pengecekan:
+--   var ssResult = LoadSatuSehatResult(encounterId, "ServiceRequest", transactionNo, sequenceNo);
+--   if (ssResult != null && ssResult.ResultID != null) return;
+-- Jadi AMAN dipanggil berulang, tidak akan kirim duplikat.
+
+
+/*
+================================================================================
+ MODIFIKASI 02 - JobOrderRealisationList.aspx.cs
+================================================================================
+ Fungsi : RaisePostBackEvent() -> blok "resendSRSS"
+          class SatuSehatHelper -> SendServiceRequestToRis()
+ Lokasi : sekitar baris 555-620
+ Tujuan :
+   1. Hapus validasi parameter ServiceUnitRadiologyID yang tidak diperlukan
+   2. Ubah return type SendServiceRequestToRis dari void ke string
+   3. Cek response apakah error atau success sebelum tampilkan pesan
+================================================================================
+*/
+
+-- SEBELUM (KODE LAMA):
+-- =====================
+/*
+    // Di RaisePostBackEvent:
+    var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
+    var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
+
+    if (!string.IsNullOrWhiteSpace(serviceUnitRadiologyIdArray) &&
+        !string.IsNullOrWhiteSpace(serviceUnitRadiologyID))
+    {
+        SatuSehatHelper.SendServiceRequestToRis(charges.TransactionNo, charges.RegistrationNo);
+        alert("Success...");  // SELALU success meski gagal!
+    }
+    else
+    {
+        alert("Failed To Send Service Request, Check For Post Data Or Already Sent To SatuSehat");
+    }
+
+    // Helper class:
+    public static void SendServiceRequestToRis(string transactionNo, string registrationNo)
+    {
+        ...
+        util.OrderRadRealization(transactionNo);  // Return value DIBUANG
+        ...
+    }
+*/
+
+-- SESUDAH (KODE BARU):
+-- =====================
+/*
+    // Di RaisePostBackEvent:
+    var charges = new TransCharges();
+    if (!charges.LoadByPrimaryKey(transNo))
+    {
+        alert("Failed To Send Service Request: Transaction not found");
+        return;
+    }
+
+    var result = SatuSehatHelper.SendServiceRequestToRis(charges.TransactionNo, charges.RegistrationNo);
+
+    // Cek response
+    if (!string.IsNullOrEmpty(result) && result.Contains("\"severity\":\"error\""))
+    {
+        alert("Failed Send Service Request: " + result);
+    }
+    else
+    {
+        alert("Success Send Service Request To SatuSehat (TRX: ...)");
+    }
+
+    // Helper class:
+    public static string SendServiceRequestToRis(string transactionNo, string registrationNo)
+    {
+        var tc = new TransCharges();
+        if (!tc.LoadByPrimaryKey(transactionNo)) return "error: Transaction not found";
+
+        var reg = new Registration();
+        if (!reg.LoadByPrimaryKey(registrationNo)) return "error: Registration not found";
+
+        var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
+        var result = util.OrderRadRealization(transactionNo);
+        return result;  // Return value DITANGKAP
+    }
+*/
+
+
+/*
+================================================================================
+ MODIFIKASI 03 - JobOrderRealisationDetail.aspx.cs
+================================================================================
+ Fungsi : SatusehatServiceRequestPostAndLogToRis()
+          btnRisSatusehat_Click()
+ Lokasi : sekitar baris 4520-4565
+ Tujuan : Sama dengan modifikasi 02 (konsistensi)
+   1. Hapus validasi parameter yang tidak diperlukan
+   2. Ubah return type dari void ke string
+   3. Cek response sebelum tampilkan pesan
+================================================================================
+*/
+
+-- SEBELUM (KODE LAMA):
+-- =====================
+/*
+    private void SatusehatServiceRequestPostAndLogToRis(Registration reg, string transactionNo)
+    {
+        var tc = new TransCharges();
+        if (!tc.LoadByPrimaryKey(transactionNo)) return;
+        var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
+        util.OrderRadRealization(transactionNo);  // Return value DIBUANG
+        var satuSehatLog = new SatuSehatKunjungan();
+        if (!satuSehatLog.LoadByPrimaryKey(reg.RegistrationNo)) return;
+        if (!satuSehatLog.EncounterID.HasValue) return;
+    }
+
+    protected void btnRisSatusehat_Click(...)
+    {
+        ...
+        if (!string.IsNullOrWhiteSpace(serviceUnitRadiologyIdArray) &&
+            !string.IsNullOrWhiteSpace(serviceUnitRadiologyID))
+        {
+            SatusehatServiceRequestPostAndLogToRis(reg, charges.TransactionNo);
+            ShowInformationHeader("Success...");  // SELALU success
+        }
+        else
+        {
+            ShowInformationHeader("Failed To Send Service Request, Check For Post Data");
+        }
+    }
+*/
+
+-- SESUDAH (KODE BARU):
+-- =====================
+/*
+    private string SatusehatServiceRequestPostAndLogToRis(Registration reg, string transactionNo)
+    {
+        var tc = new TransCharges();
+        if (!tc.LoadByPrimaryKey(transactionNo)) return "Transaction not found";
+        var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
+        var result = util.OrderRadRealization(transactionNo);
+        return result;  // Return value DITANGKAP
+    }
+
+    protected void btnRisSatusehat_Click(...)
+    {
+        var charges = new TransCharges();
+        if (!charges.LoadByPrimaryKey(Request.QueryString["joNo"]))
+        {
+            ShowInformationHeader("Failed To Send Service Request: Transaction not found");
+            return;
+        }
+
+        var reg = new Registration();
+        if (!reg.LoadByPrimaryKey(charges.RegistrationNo))
+        {
+            ShowInformationHeader("Failed To Send Service Request: Registration not found");
+            return;
+        }
+
+        var result = SatusehatServiceRequestPostAndLogToRis(reg, charges.TransactionNo);
+
+        if (!string.IsNullOrEmpty(result) && result.Contains("\"severity\":\"error\""))
+        {
+            ShowInformationHeader("Failed Send Service Request: " + result);
+        }
+        else
+        {
+            ShowInformationHeader("Success Send Service Request To SatuSehat (TRX: ...)");
+        }
+    }
+*/
+
+
+/*
+================================================================================
+ DAFTAR VALIDASI ERROR YANG SEKARANG DITAMPILKAN
+================================================================================
+
+ | Kondisi                                    | Pesan Error                                          |
+ |--------------------------------------------|------------------------------------------------------|
+ | TransactionNo (JO) tidak ditemukan         | "Rad Order not found"                                |
+ | RegistrationNo kosong di TransCharges      | "RegistrationNo is empty for order JOxxxxxx"         |
+ | RegistrationNo tidak ada di tbl Registration| "Registration not found: REG/EM/xxxxxx"             |
+ | OrganizationID belum diset                 | "SatuSehatOrganizationID empty"                      |
+ | Patient belum mapping SatuSehat            | "Patient bridging not found"                         |
+ | Dokter belum mapping SatuSehat             | "Requester bridging not found"                       |
+ | Service Unit belum mapping SatuSehat       | "BridgingID for Service Unit xxx still empty"        |
+ | Gagal buat Encounter (error lain)          | "Please contact IT Support"                          |
+
+================================================================================
+*/
+
+
+/*
+================================================================================
+ CATATAN TAMBAHAN
+================================================================================
+
+ Untuk kasus JO260708-00567:
+ - Error: "BridgingID for Service Unit ENDOSCOPY still empty"
+ - Artinya: Service Unit ENDOSCOPY belum di-mapping Location ID SatuSehat
+   di tabel ServiceUnitBridging.
+ - Solusi: Insert mapping Location ID SatuSehat untuk unit ENDOSCOPY.
+
+ Contoh query cek:
+   SELECT * FROM ServiceUnitBridging
+   WHERE ServiceUnitID = (SELECT ServiceUnitID FROM ServiceUnit WHERE ServiceUnitName LIKE '%ENDOSCOPY%')
+
+ Contoh query insert (sesuaikan value):
+   INSERT INTO ServiceUnitBridging (ServiceUnitID, BridgingID, SRBridgingType)
+   VALUES ('<ServiceUnitID>', '<Location ID SatuSehat>', '<SatuSehatBridgingTypeID>')
+
+================================================================================
+*/

@@ -4518,15 +4518,13 @@ namespace Temiang.Avicenna.Module.Charges
 
 
         //satusehat
-        private void SatusehatServiceRequestPostAndLogToRis(Registration reg, string transactionNo)
+        private string SatusehatServiceRequestPostAndLogToRis(Registration reg, string transactionNo)
         {
             var tc = new TransCharges();
-            if (!tc.LoadByPrimaryKey(transactionNo)) return;
+            if (!tc.LoadByPrimaryKey(transactionNo)) return "Transaction not found";
             var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
-            util.OrderRadRealization(transactionNo);
-            var satuSehatLog = new SatuSehatKunjungan();
-            if (!satuSehatLog.LoadByPrimaryKey(reg.RegistrationNo)) return;
-            if (!satuSehatLog.EncounterID.HasValue) return;
+            var result = util.OrderRadRealization(transactionNo);
+            return result;
         }
 
 
@@ -4535,23 +4533,29 @@ namespace Temiang.Avicenna.Module.Charges
             try
             {
                 var charges = new TransCharges();
-                charges.LoadByPrimaryKey(Request.QueryString["joNo"]);
+                if (!charges.LoadByPrimaryKey(Request.QueryString["joNo"]))
+                {
+                    ShowInformationHeader("Failed To Send Service Request: Transaction not found");
+                    return;
+                }
 
                 var reg = new Registration();
-                reg.LoadByPrimaryKey(charges.RegistrationNo);
-
-                var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
-                var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
-
-                if (!string.IsNullOrWhiteSpace(serviceUnitRadiologyIdArray) &&
-                    !string.IsNullOrWhiteSpace(serviceUnitRadiologyID))
+                if (!reg.LoadByPrimaryKey(charges.RegistrationNo))
                 {
-                    SatusehatServiceRequestPostAndLogToRis(reg, charges.TransactionNo);
-                    ShowInformationHeader($"Success Send Service Request To SatuSehat (TRX: {charges.TransactionNo})");
+                    ShowInformationHeader("Failed To Send Service Request: Registration not found");
+                    return;
+                }
+
+                var result = SatusehatServiceRequestPostAndLogToRis(reg, charges.TransactionNo);
+
+                // Cek apakah result mengandung error
+                if (!string.IsNullOrEmpty(result) && result.Contains("\"severity\":\"error\""))
+                {
+                    ShowInformationHeader($"Failed Send Service Request: {result}");
                 }
                 else
                 {
-                    ShowInformationHeader("Failed To Send Service Request, Check For Post Data");
+                    ShowInformationHeader($"Success Send Service Request To SatuSehat (TRX: {charges.TransactionNo})");
                 }
             }
             catch (Exception ex)

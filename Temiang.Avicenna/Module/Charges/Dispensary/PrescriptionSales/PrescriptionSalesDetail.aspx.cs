@@ -1729,6 +1729,11 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     printJobParameters.AddNew("p_PrescriptionNo", txtPrescriptionNo.Text);
 
                     break;
+                case AppConstant.Report.RSSA_PrescriptionSlipTanggalRujukan:
+                    printJobParameters.AddNew("p_HealthcareID", AppSession.Parameter.HealthcareID);
+                    printJobParameters.AddNew("p_PrescriptionNo", txtPrescriptionNo.Text);
+
+                    break;
                 default:
                     printJobParameters.AddNew("p_PrescriptionNo", txtPrescriptionNo.Text);
                     printJobParameters.AddNew("p_SequenceNo", string.Empty);

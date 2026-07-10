@@ -17678,6 +17678,11 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 parMedicSs = new ParamedicBridging();
                 if (!parMedicSs.Load((pbQr))) return OrderRadInfVal("error", "10", "Requester bridging not found");
 
+                // Selalu post ServiceRequest radiologi, baik encounter baru maupun yang sudah ada
+                // PostServiceRequestRad internal sudah cek apakah item sudah pernah dikirim (ResultID != null)
+                string accessToken = string.Empty;
+                PostServiceRequestRad(reg, patSs, parMedicSs, encounterId, ref accessToken);
+
                 return OrderRadInfVal("success", "", "", encounterId, patSs.BridgingID, patSs.BridgingName, parMedicSs.BridgingID, parMedicSs.BridgingName, org.ParameterValue);
             }
 
