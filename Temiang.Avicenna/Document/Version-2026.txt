@@ -302,7 +302,7 @@ Titipan Daniel
 1. Modifikasi Purchase Order List agar (optimasi query)
 
 ---[22-06-2026 - Wiliam]---
-1. Menghilangkan text "Hasil Test Isihara" pada SOAP. CR Number : 0000030
+1. Menghilangkan text "Hasil Tes Ishihara" pada SOAP. CR Number : 0000030
 2. Modifikasi index.php (eklaim api)
 
 ---[26-06-2026 - Wiliam]---
@@ -311,3 +311,24 @@ Titipan Daniel
    - ResumeMedisRichTextInPatientEntry.aspx.cs
    - FollowUpPlanOprCtl.ascx.cs
    - NursingResumeInPatientEntry.aspx.cs
+
+---[29-06-2026 - Wiliam] ---
+1. Fixing Menghilangkan text "Hasil Tes Ishihara". CR Number : 0000030
+
+---[30-06-2026 - Wiliam]---
+1. Rollback DistributionList.aspx.cs
+2. CR mantis 0000032 : pada mode edit, item dibuat tidak unik. sebelumnya meminta unik.
+
+---[01-07-2026 - Wiliam]---
+1. Modifikasi file ServiceUnitItemServiceCompDetail.ascx.cs untuk optimalisasi 
+2. Menambahkan file create_sp_GetTariffComponentByItemID.sql pada Document yang terkait dengan optimalisasi
+
+---[03-07-2026 - Wiliam]---
+1. Modifikasi file ReportViewer.aspx.cs & ReportViewerHandler.ashx.cs untuk mengakomodasi jika report *.trdx dengan dua source. dimana source utama adalah database dan source sekunder adalah webservice.
+   selama ini rulesnya :
+   - source utama : webservice
+   - source sekunder : database
+
+---[06-07-2026 - Wiliam]---
+1. Modifikasi AntrolController.cs untuk menangani duplikasi MedicalNo pada table Patient.
+

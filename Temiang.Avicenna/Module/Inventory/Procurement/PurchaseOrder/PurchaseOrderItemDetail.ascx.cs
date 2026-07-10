@@ -494,67 +494,71 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             {
                 var transactionNo = TxtTransactionNo.Text.Trim();
                 //modif 2026-05-20 validasi ketika edit
-                if (ChkIsInventoryItem.Checked)
-                {
-                    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+                //Koreksi --> CR 0000032 tidak perlu ada validasi double item di PO.
+                //"mohon maaf, sebelumnya ad permintaan untuk tidak bs ad item yg sama jika dlm 1 PO (dlu ngtest ny bkin PO tanpa PR)
+                //ternyata untuk kasus reorder PO bs item yg sama dlm 1 PO"
 
-                    var isExist = false;
-                    foreach (BusinessObject.ItemTransactionItem entity in coll)
-                    {
-                        if (entity.ItemID == cboItemID.SelectedValue 
-                            && entity.SequenceNo != txtSequenceNo.Text
-                            )
-                        {
-                            isExist = true;
-                            break;
-                        }
-                    }
+                //if (ChkIsInventoryItem.Checked)
+                //{
+                //    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
 
-                    if (isExist)
-                    {
-                        args.IsValid = false;
-                        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} has exist", cboItemID.SelectedValue);
-                        return;
-                    }
-                }
-                if (!chkIsNonMasterOrder.Checked)
-                {
-                    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
+                //    var isExist = false;
+                //    foreach (BusinessObject.ItemTransactionItem entity in coll)
+                //    {
+                //        if (entity.ItemID == cboItemID.SelectedValue 
+                //            && entity.SequenceNo != txtSequenceNo.Text
+                //            )
+                //        {
+                //            isExist = true;
+                //            break;
+                //        }
+                //    }
+
+                //    if (isExist)
+                //    {
+                //        args.IsValid = false;
+                //        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} has exist", cboItemID.SelectedValue);
+                //        return;
+                //    }
+                //}
+                //if (!chkIsNonMasterOrder.Checked)
+                //{
+                //    var coll = (ItemTransactionItemCollection)Session["PurchaseOrderItems" + Request.UserHostName];
                     
-                    var isExist = false;
-                    foreach (BusinessObject.ItemTransactionItem entity in coll)
-                    {
-                        if (entity.ItemID == cboItemID.SelectedValue
-                            && entity.SequenceNo != txtSequenceNo.Text
-                            )
-                        {
-                            isExist = true;
-                            break;
-                        }
-                    }
+                //    var isExist = false;
+                //    foreach (BusinessObject.ItemTransactionItem entity in coll)
+                //    {
+                //        if (entity.ItemID == cboItemID.SelectedValue
+                //            && entity.SequenceNo != txtSequenceNo.Text
+                //            )
+                //        {
+                //            isExist = true;
+                //            break;
+                //        }
+                //    }
 
-                    if (isExist)
-                    {
-                        args.IsValid = false;
-                        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} with same spesification has exist", cboItemID.SelectedValue);
-                        return;
-                    }
+                //    if (isExist)
+                //    {
+                //        args.IsValid = false;
+                //        ((CustomValidator)source).ErrorMessage = string.Format("ID: {0} with same spesification has exist", cboItemID.SelectedValue);
+                //        return;
+                //    }
 
-                    if (string.IsNullOrEmpty(cboItemID.SelectedValue))
-                    {
-                        args.IsValid = false;
-                        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
-                        return;
-                    }
+                //    if (string.IsNullOrEmpty(cboItemID.SelectedValue))
+                //    {
+                //        args.IsValid = false;
+                //        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
+                //        return;
+                //    }
 
-                    var item = new Item();
-                    if (!item.LoadByPrimaryKey(cboItemID.SelectedValue))
-                    {
-                        args.IsValid = false;
-                        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
-                        return;
-                    }
-                }
+                //    var item = new Item();
+                //    if (!item.LoadByPrimaryKey(cboItemID.SelectedValue))
+                //    {
+                //        args.IsValid = false;
+                //        ((CustomValidator)source).ErrorMessage = string.Format("The selected item is invalid");
+                //        return;
+                //    }
+                //}
 
             }
 

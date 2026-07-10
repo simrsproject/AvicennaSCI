@@ -2713,5 +2713,41 @@ namespace Temiang.Avicenna.WebService
             return comboData;
         }
 
+        [WebMethod]
+        public RadComboBoxData Nurses(RadComboBoxContext context)
+        {
+            var searching = string.Format("%{0}%", context.Text);
+            var qr = new ParamedicQuery("p");
+            qr.Select(qr.ParamedicID.As("ValueField"), qr.ParamedicName.As("TextField"));
+            qr.Where(
+                qr.IsActive == true,
+                qr.SRParamedicType == "ParamedicType-006",
+                qr.Or(qr.ParamedicID == context.Text, qr.ParamedicName.Like(searching))
+            );
+            qr.OrderBy(qr.ParamedicName.Ascending);
+            qr.es.Top = MaxQueryRecord;
+
+            var comboData = PopulateComboBoxDataItems(context, qr);
+            return comboData;
+        }
+
+        [WebMethod]
+        public RadComboBoxData Doctors(RadComboBoxContext context)
+        {
+            var searching = string.Format("%{0}%", context.Text);
+            var qr = new ParamedicQuery("p");
+            qr.Select(qr.ParamedicID.As("ValueField"), qr.ParamedicName.As("TextField"));
+            qr.Where(
+                qr.IsActive == true,
+                qr.SRParamedicType.In(AppSession.Parameter.ParamedicTypeDoctors),
+                qr.Or(qr.ParamedicID == context.Text, qr.ParamedicName.Like(searching))
+            );
+            qr.OrderBy(qr.ParamedicName.Ascending);
+            qr.es.Top = MaxQueryRecord;
+
+            var comboData = PopulateComboBoxDataItems(context, qr);
+            return comboData;
+        }
+
     }
 }

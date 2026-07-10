@@ -115,14 +115,14 @@ namespace Temiang.Avicenna.Module.Reports
             }
             else if (programType == "XML")
             {
-                return LoadReportXML(navigateUrl, isUsingReportHeader, storeProcedureName);
+                return LoadReportXML(navigateUrl, isUsingReportHeader, storeProcedureName, appProgram, appProgramHC);
             }
 
 
             return null;
         }
 
-        private static IReportDocument LoadReportXML(string navigateUrl, bool isUsingReportHeader, string storeProcedureName)
+        private static IReportDocument LoadReportXML(string navigateUrl, bool isUsingReportHeader, string storeProcedureName, AppProgram appProgram, AppProgramHealthcare appProgramHC)
         {
             using (var xmlRptReader =
                 XmlReader.Create(ConfigurationManager.AppSettings.Get("ReportUrlLocation") + navigateUrl,
@@ -174,7 +174,7 @@ namespace Temiang.Avicenna.Module.Reports
                     if (!string.IsNullOrWhiteSpace(storeProcedureName))
                     {
                         conn.SelectCommandType = SqlDataSourceCommandType.StoredProcedure;
-                        conn.SelectCommand = storeProcedureName;
+                        conn.SelectCommand = appProgram.StoreProcedureName;
                     }
 
                     foreach (var param in conn.Parameters)
@@ -204,6 +204,72 @@ namespace Temiang.Avicenna.Module.Reports
                             case DbType.Single:
                                 param.Value = par.ValueNumeric;
                                 break;
+                        }
+                    }
+
+                    // ============================================================
+                    // Update semua WebServiceDataSource yang dipakai oleh Table dalam sebuah report *.trdx
+                    // Modified by Wiliam 2026-07-03 (in case datasource utama adalah database, dan secondary adalah webservice)
+                    // ============================================================
+
+                    string webServiceEndpoint = appProgramHC?.StoreProcedureName;
+                    foreach (var dataSource in report.GetDataSources())
+                    {
+                        if (!(dataSource is WebServiceDataSource ds))
+                            continue;
+
+                        if (string.IsNullOrWhiteSpace(webServiceEndpoint))
+                            continue;
+
+                        if (!Helper.IsJson(webServiceEndpoint))
+                        {
+                            ds.ServiceUrl = string.Format("{0}/{1}",
+                                ConfigurationManager.AppSettings["WebServiceDataSourceUrlRoot"].TrimEnd('/'),
+                                webServiceEndpoint.TrimStart('/'));
+
+                            foreach (WebServiceParameter wsPar in ds.Parameters)
+                            {
+                                var par = AppSession.PrintJobParameters.FirstOrDefault(p =>
+                                    p.Name.Trim().Equals(wsPar.Name.Trim(),
+                                        StringComparison.OrdinalIgnoreCase));
+
+                                if (par == null)
+                                    continue;
+
+                                if (!string.IsNullOrEmpty(par.ValueString))
+                                    wsPar.Value = par.ValueString;
+                                else if (par.ValueNumeric != null)
+                                    wsPar.Value = par.ValueNumeric;
+                                else if (par.ValueDateTime != null)
+                                    wsPar.Value = par.ValueDateTime;
+                            }
+                        }
+                        else
+                        {
+                            var jArray = Helper.JsonStrToArray(webServiceEndpoint);
+
+                            ds.ServiceUrl = string.Format("{0}/{1}",
+                                ConfigurationManager.AppSettings["WebServiceDataSourceUrlRoot"].TrimEnd('/'),
+                                jArray["serviceurl"].ToString().TrimStart('/'));
+
+                            foreach (WebServiceParameter wsPar in ds.Parameters)
+                            {
+                                if (wsPar.Name.Equals("accesskey", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    wsPar.Value = "sciadmin88";
+                                }
+                                else if (wsPar.Name.Equals("jsonqueryandparam", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    var json = webServiceEndpoint;
+
+                                    foreach (var p in AppSession.PrintJobParameters)
+                                    {
+                                        json = json.Replace("@" + p.Name, p.ValueString);
+                                    }
+
+                                    wsPar.Value = json;
+                                }
+                            }
                         }
                     }
                 }
