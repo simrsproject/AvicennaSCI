@@ -3331,6 +3331,7 @@
     <Content Include="Module\Reports\OptionControl\PermissionTypeCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\ProcurementTypeCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\OutstandingCtl.ascx" />
+    <Content Include="Module\Reports\OptionControl\RegistrationNoCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\YearSemesterCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\pJasmedPeriodCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\PurchaseCategorizationCtl.ascx" />
@@ -22243,6 +22244,13 @@
     </Compile>
     <Compile Include="Module\Reports\OptionControl\OutstandingCtl.ascx.designer.cs">
       <DependentUpon>OutstandingCtl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\RegistrationNoCtl.ascx.cs">
+      <DependentUpon>RegistrationNoCtl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\RegistrationNoCtl.ascx.designer.cs">
+      <DependentUpon>RegistrationNoCtl.ascx</DependentUpon>
     </Compile>
     <Compile Include="Module\Reports\OptionControl\YearSemesterCtl.ascx.cs">
       <DependentUpon>YearSemesterCtl.ascx</DependentUpon>
