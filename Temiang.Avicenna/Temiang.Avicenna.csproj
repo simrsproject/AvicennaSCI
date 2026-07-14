@@ -1924,6 +1924,8 @@
     <Content Include="Document\2026\05\13\AntrianRSI\051-Query CREATE Tabel ListKamarForAntrian.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\052-Query INSERT Tabel ListKamarForAntrian.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\053-Query INSERT %27Kamar%27 Tabel QueueingSound.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\054-SP AntrianMoveNextStage.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\055-Alter Tabel ServiceUnitParamedic Add KamarForAntrianID.sql" />
     <Content Include="Document\2026\06\11\create_view_Vw_POPreComputeQtyFinished.sql" />
     <Content Include="Document\2026\07\create_sp_GetTariffComponentByItemID.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />

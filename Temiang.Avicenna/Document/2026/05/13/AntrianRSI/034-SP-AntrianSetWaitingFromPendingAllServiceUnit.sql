@@ -64,7 +64,7 @@ BEGIN
         FROM VisitQueue WITH (UPDLOCK, HOLDLOCK)
         WHERE
             CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @StageID
+            AND StageID = @StageID
             AND ServiceUnitID = @ServiceUnitID
             AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
 			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '')
@@ -85,7 +85,7 @@ BEGIN
         WHERE
             VisitQueueNo = @VisitQueueNo
             AND CAST(QueueDate AS DATE) = @QueueDate
-            AND CurrentStage = @StageID
+            AND StageID = @StageID
             AND ServiceUnitID = @ServiceUnitID
             AND ISNULL(ParamedicID, '') = ISNULL(@ParamedicID, '')
 			AND ISNULL(CategoryID, '') = ISNULL(@CategoryID, '');

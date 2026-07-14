@@ -2786,7 +2786,8 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static object CallAntrianAllServiceUnit(
             string visitQueueNo,
-            string userID
+            string userID,
+            string kamar = null
         )
         {
             object result = null;
@@ -2810,6 +2811,17 @@ namespace Temiang.Avicenna.BusinessObject
                 DbType.String,
                 50
             );
+
+            parameters.Add(
+                "Kamar",
+                string.IsNullOrWhiteSpace(kamar)
+                    ? (object)DBNull.Value
+                    : kamar,
+                esParameterDirection.Input,
+                DbType.String,
+                10
+            );
+
 
             using (
                 var reader =
@@ -2854,6 +2866,11 @@ namespace Temiang.Avicenna.BusinessObject
                                 ? ""
                                 : reader["ParamedicID"].ToString(),
 
+                        QueueLocation =
+                            reader["QueueLocation"] == DBNull.Value
+                                ? ""
+                                : reader["QueueLocation"].ToString(),
+
                         CalledTime =
                             reader["CalledTime"] == DBNull.Value
                                 ? null
@@ -2875,7 +2892,8 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static object CallNextQueueAllServiceUnit(
             string visitQueueNo,
-            string userID
+            string userID,
+            string kamar = null
         )
         {
             object result = null;
@@ -2898,6 +2916,16 @@ namespace Temiang.Avicenna.BusinessObject
                 esParameterDirection.Input,
                 DbType.String,
                 50
+            );
+
+            parameters.Add(
+                "Kamar",
+                string.IsNullOrWhiteSpace(kamar)
+                    ? (object)DBNull.Value
+                    : kamar,
+                esParameterDirection.Input,
+                DbType.String,
+                10
             );
 
             using (
@@ -2946,7 +2974,12 @@ namespace Temiang.Avicenna.BusinessObject
                         StageID =
                             reader["StageID"] == DBNull.Value
                                 ? ""
-                                : reader["StageID"].ToString()
+                                : reader["StageID"].ToString(),
+
+                        Kamar =
+                            reader["QueueLocation"] == DBNull.Value
+                                ? ""
+                                : reader["QueueLocation"].ToString()
                     };
                 }
             }
@@ -2956,7 +2989,8 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static object RecallAntrianAllServiceUnit(
             string visitQueueNo,
-            string userID
+            string userID,
+            string kamar = null
         )
         {
             var entity = new VisitQueue();
@@ -2974,6 +3008,14 @@ namespace Temiang.Avicenna.BusinessObject
             parameters.Add(
                 "UserID",
                 userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "Kamar",
+                string.IsNullOrWhiteSpace(kamar) ? (object)DBNull.Value : kamar,
                 esParameterDirection.Input,
                 DbType.String,
                 50
@@ -3011,7 +3053,8 @@ namespace Temiang.Avicenna.BusinessObject
                 CalledTime = result.CalledTime,
                 LastUpdated = result.LastUpdated,
                 UpdatedBy = result.UpdatedBy,
-                RecallCount = result.GetColumn("RecallCount")
+                RecallCount = result.GetColumn("RecallCount"),
+                Kamar = result.QueueLocation == null ? "" : result.QueueLocation
             };
         }
 
@@ -3468,35 +3511,36 @@ namespace Temiang.Avicenna.BusinessObject
             var parameters = new esParameters();
 
             string sql = @"
-    SELECT
-        VQ.VisitQueueNo,
-        VQ.VisitNo,
-        VQ.RegistrationNo,
-        VQ.QueueDate,
-        VQ.Status,
-        VQ.StageID,
-        VQ.RecallCount,  
-        SUP.ServiceUnitID,
-        VQ.CategoryID,
-        SU.ServiceUnitName,
-        SUP.ParamedicID,
-        P.ParamedicName
-            FROM ServiceUnitParamedic SUP
-            INNER JOIN Paramedic P
-                ON P.ParamedicID = SUP.ParamedicID
-            LEFT JOIN ServiceUnit SU
-                ON SU.ServiceUnitID = SUP.ServiceUnitID
-            LEFT JOIN VisitQueue VQ
-                ON VQ.ServiceUnitID = SUP.ServiceUnitID
-               AND VQ.ParamedicID = SUP.ParamedicID
-               AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
-            WHERE
-                SUP.ServiceUnitID = @ServiceUnitID
-                AND SUP.IsDisplayActive = 1
-            ORDER BY
-                P.ParamedicName,
-                VQ.QueueDate
-        ";
+            SELECT
+                VQ.VisitQueueNo,
+                VQ.VisitNo,
+                VQ.RegistrationNo,
+                VQ.QueueDate,
+                VQ.Status,
+                VQ.StageID,
+                VQ.RecallCount,  
+                SUP.ServiceUnitID,
+                VQ.CategoryID,
+                SU.ServiceUnitName,
+                SUP.ParamedicID,
+                SUP.KamarForAntrianID,
+                P.ParamedicName
+                    FROM ServiceUnitParamedic SUP
+                    INNER JOIN Paramedic P
+                        ON P.ParamedicID = SUP.ParamedicID
+                    LEFT JOIN ServiceUnit SU
+                        ON SU.ServiceUnitID = SUP.ServiceUnitID
+                    LEFT JOIN VisitQueue VQ
+                        ON VQ.ServiceUnitID = SUP.ServiceUnitID
+                       AND VQ.ParamedicID = SUP.ParamedicID
+                       AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
+                    WHERE
+                        SUP.ServiceUnitID = @ServiceUnitID
+                        AND SUP.IsDisplayActive = 1
+                    ORDER BY
+                        P.ParamedicName,
+                        VQ.QueueDate
+                ";
 
             parameters.Add(
                 "ServiceUnitID",
@@ -3579,7 +3623,11 @@ namespace Temiang.Avicenna.BusinessObject
                             reader["ParamedicID"].ToString(),
 
                         ParamedicName =
-                            reader["ParamedicName"].ToString()
+                            reader["ParamedicName"].ToString(),
+                        Kamar =
+                            reader["KamarForAntrianID"] == DBNull.Value
+                                ? ""
+                                : reader["KamarForAntrianID"].ToString()
                     });
                 }
             }
@@ -3589,7 +3637,8 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static void UpdateDisplayDoctorList(
             string serviceUnitID,
-            string paramedicIDs
+            string paramedicIDs,
+            string kamar = null
         )
         {
             var entity = new VisitQueue();
@@ -3598,10 +3647,12 @@ namespace Temiang.Avicenna.BusinessObject
 
             // Matikan semua dokter pada poli tersebut
             string sqlReset = @"
-            UPDATE ServiceUnitParamedic
-            SET IsDisplayActive = 0
-            WHERE ServiceUnitID = @ServiceUnitID
-        ";
+                UPDATE ServiceUnitParamedic
+                SET
+                    IsDisplayActive = 0,
+                    KamarForAntrianID = NULL
+                WHERE ServiceUnitID = @ServiceUnitID
+            ";
 
             parameters.Add(
                 "ServiceUnitID",
@@ -3621,9 +3672,7 @@ namespace Temiang.Avicenna.BusinessObject
             if (string.IsNullOrWhiteSpace(paramedicIDs))
                 return;
 
-            // Hindari spasi
-            string[] dokterList =
-                paramedicIDs
+            string[] dokterList = paramedicIDs
                 .Split(',')
                 .Select(x => x.Trim())
                 .Where(x => !string.IsNullOrEmpty(x))
@@ -3632,34 +3681,74 @@ namespace Temiang.Avicenna.BusinessObject
             if (dokterList.Length == 0)
                 return;
 
-            string inClause =
-                "'" +
-                string.Join("','", dokterList) +
-                "'";
+            // List kamar (optional)
+            string[] kamarList = string.IsNullOrWhiteSpace(kamar)
+                ? new string[0]
+                : kamar
+                    .Split(',')
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToArray();
 
-            string sqlUpdate = $@"
-            UPDATE ServiceUnitParamedic
-            SET IsDisplayActive = 1
-            WHERE ServiceUnitID = @ServiceUnitID
-            AND ParamedicID IN ({inClause})
-        ";
+            // Validasi jumlah kamar
+            if (kamarList.Length > 0 && kamarList.Length != dokterList.Length)
+            {
+                throw new Exception("Jumlah ParamedicID dan Kamar harus sama.");
+            }
 
-            var parametersUpdate =
-                new esParameters();
+            string sqlUpdate = @"
+                UPDATE ServiceUnitParamedic
+                SET
+                    IsDisplayActive = 1,
+                    KamarForAntrianID = @Kamar
+                WHERE
+                    ServiceUnitID = @ServiceUnitID
+                    AND ParamedicID = @ParamedicID
+            ";
 
-            parametersUpdate.Add(
-                "ServiceUnitID",
-                serviceUnitID,
-                esParameterDirection.Input,
-                DbType.String,
-                50
-            );
+            for (int i = 0; i < dokterList.Length; i++)
+            {
+                string kamarValue = null;
 
-            entity.ExecuteNonQuery(
-                esQueryType.Text,
-                sqlUpdate,
-                parametersUpdate
-            );
+                if (kamarList.Length > 0)
+                {
+                    kamarValue = "Kamar_" + kamarList[i];
+                }
+
+                var parametersUpdate = new esParameters();
+
+                parametersUpdate.Add(
+                    "ServiceUnitID",
+                    serviceUnitID,
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+
+                parametersUpdate.Add(
+                    "ParamedicID",
+                    dokterList[i],
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+
+                parametersUpdate.Add(
+                    "Kamar",
+                    string.IsNullOrWhiteSpace(kamarValue)
+                        ? (object)DBNull.Value
+                        : kamarValue,
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+
+                entity.ExecuteNonQuery(
+                    esQueryType.Text,
+                    sqlUpdate,
+                    parametersUpdate
+                );
+            }
         }
 
         //FOR PASIEN TITIPAN
@@ -3784,6 +3873,107 @@ namespace Temiang.Avicenna.BusinessObject
             }
 
             return "";
+        }
+
+        public static object MoveNextStage(
+            string visitQueueNo,
+            string userID
+        )
+        {
+            object result = null;
+
+            var entity = new VisitQueue();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            parameters.Add(
+                "UserID",
+                userID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            using (
+                var reader =
+                    entity.ExecuteReader(
+                        esQueryType.StoredProcedure,
+                        "AntrianMoveNextStage",
+                        parameters
+                    )
+            )
+            {
+                if (reader.Read())
+                {
+                    result = new
+                    {
+                        VisitQueueNo =
+                            reader["VisitQueueNo"].ToString(),
+
+                        VisitNo =
+                            reader["VisitNo"].ToString(),
+
+                        RegistrationNo =
+                            reader["RegistrationNo"].ToString(),
+
+                        Status =
+                            reader["Status"].ToString(),
+
+                        CurrentStage =
+                            reader["CurrentStage"] == DBNull.Value
+                                ? ""
+                                : reader["CurrentStage"].ToString(),
+
+                        StageID =
+                            reader["StageID"].ToString(),
+
+                        QueueKey =
+                            reader["QueueKey"] == DBNull.Value
+                                ? ""
+                                : reader["QueueKey"].ToString(),
+
+                        QueueSequence =
+                            reader["QueueSequence"] == DBNull.Value
+                                ? 0
+                                : Convert.ToInt32(reader["QueueSequence"]),
+
+                        ServiceUnitID =
+                            reader["ServiceUnitID"] == DBNull.Value
+                                ? ""
+                                : reader["ServiceUnitID"].ToString(),
+
+                        ParamedicID =
+                            reader["ParamedicID"] == DBNull.Value
+                                ? ""
+                                : reader["ParamedicID"].ToString(),
+
+                        CategoryID =
+                            reader["CategoryID"] == DBNull.Value
+                                ? ""
+                                : reader["CategoryID"].ToString(),
+
+                        UpdatedBy =
+                            reader["UpdatedBy"] == DBNull.Value
+                                ? ""
+                                : reader["UpdatedBy"].ToString(),
+
+                        LastUpdated =
+                            reader["LastUpdated"] == DBNull.Value
+                                ? null
+                                : reader["LastUpdated"]
+                    };
+                }
+            }
+
+            return result;
         }
 
     }

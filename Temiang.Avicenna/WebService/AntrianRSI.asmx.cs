@@ -23,7 +23,7 @@ namespace Temiang.Avicenna.WebService
     /// </summary>
     public class ApiResponeForAntrian
     {
-        public static void Success(System.Web.HttpContext context, object data, string message = "OK")
+        public static void Success(HttpContext context, object data, string message = "OK")
         {
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
             {
@@ -36,10 +36,11 @@ namespace Temiang.Avicenna.WebService
 
             context.Response.Clear();
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = 200;   // <-- Tambahkan
             context.Response.Write(json);
         }
 
-        public static void Error(System.Web.HttpContext context, string message, int code = 500)
+        public static void Error(HttpContext context, string message, int code = 500)
         {
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
             {
@@ -52,6 +53,7 @@ namespace Temiang.Avicenna.WebService
 
             context.Response.Clear();
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = code;   // <-- Tambahkan
             context.Response.Write(json);
         }
     }
@@ -2422,11 +2424,12 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
+            - Kamar (optional)
 
             EXAMPLE:
             CallAntrianAllServiceUnit?
             VisitQueueNo=VQUE-260516-0015&
-            UserID=Admin
+            UserID=Admin&Kamar=5
 
             RESPONSE:
                200 = Berhasil memanggil antrian
@@ -2448,6 +2451,10 @@ namespace Temiang.Avicenna.WebService
 
                 string UserID =
                     (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string Kamar =
+                    (Context.Request["Kamar"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2483,7 +2490,8 @@ namespace Temiang.Avicenna.WebService
                     result =
                         VisitQueue.CallAntrianAllServiceUnit(
                             VisitQueueNo,
-                            UserID
+                            UserID,
+                            Kamar
                         );
 
                     if (result == null)
@@ -2620,11 +2628,12 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
+            - Kamar (optional)
 
             EXAMPLE:
             RecallAntrianAllServiceUnit?
             VisitQueueNo=VQUE-260516-0015&
-            UserID=Admin
+            UserID=Admin&Kamar=5
 
             RESPONSE:
                200 = Berhasil recall antrian
@@ -2646,6 +2655,10 @@ namespace Temiang.Avicenna.WebService
 
                 string UserID =
                     (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string Kamar =
+                    (Context.Request["Kamar"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2681,7 +2694,8 @@ namespace Temiang.Avicenna.WebService
                     result =
                         VisitQueue.RecallAntrianAllServiceUnit(
                             VisitQueueNo,
-                            UserID
+                            UserID,
+                            Kamar
                         );
                 }
                 catch (Exception ex)
@@ -2740,11 +2754,12 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
+            - Kamar (optional)
 
             EXAMPLE:
             CallNextQueueAllServiceUnit?
             VisitQueueNo=VQUE-260520-0020&
-            UserID=240076
+            UserID=240076&Kamar=5
 
             RESPONSE:
                200 = Berhasil memanggil antrian berikutnya
@@ -2766,6 +2781,10 @@ namespace Temiang.Avicenna.WebService
 
                 string UserID =
                     (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string Kamar =
+                    (Context.Request["Kamar"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2801,7 +2820,8 @@ namespace Temiang.Avicenna.WebService
                     result =
                         VisitQueue.CallNextQueueAllServiceUnit(
                             VisitQueueNo,
-                            UserID
+                            UserID,
+                            Kamar
                         );
                 }
                 catch (Exception ex)
@@ -4182,12 +4202,14 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - ServiceUnitID
             - ParamedicID
+            - Kamar (Optional)
 
             CONTOH REQUEST:
 
-            UpdateDisplayDoctorList?
+            UpdateDisplayDoctorListForPoli?
             ServiceUnitID=D2.2.41.1&
-            ParamedicID=MD-00170,MD-00145,MD-00023
+            ParamedicID=MD-00170,MD-00145,MD-00023&
+            Kamar=1,2,3
 
             RESPONSE:
             200 = Berhasil update dokter display
@@ -4206,9 +4228,14 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["ParamedicID"] ?? "")
                     .Trim();
 
+                string kamar =
+                    (Context.Request["Kamar"] ?? "")
+                    .Trim();
+
                 VisitQueue.UpdateDisplayDoctorList(
                     serviceUnitID,
-                    paramedicIDs
+                    paramedicIDs,
+                    kamar
                 );
 
                 var data =
@@ -4362,6 +4389,127 @@ namespace Temiang.Avicenna.WebService
                     "ERROR : " + ex.ToString()
                 );
 
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan antrian ke Stage berikutnya.
+            Data antrian lama akan diubah menjadi FINISHED
+            dan otomatis membuat antrian baru pada Stage berikutnya.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveNextStageAllServiceUnit?
+            VisitQueueNo=VQUE-260713-0010&
+            UserID=240092
+
+            RESPONSE:
+               200 = Berhasil memindahkan antrian ke stage berikutnya
+               400 = Parameter tidak valid
+               404 = Data antrian tidak ditemukan
+               500 = Error server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveNextStageAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXEC BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.MoveNextStage(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // NOT FOUND
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan antrian ke stage berikutnya"
+                );
+            }
+            catch (Exception ex)
+            {
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,
