@@ -337,3 +337,5 @@ Titipan Daniel
 1. Modifikasi Inacbg.asmx.cs line 1621 
    reg.save --> regis.save();
 
+---[13-07-2026 - Wiliam]---
+1. Modifikasi EmrIpDetail.aspx.cs untuk IPR tidak perlu ada informasi Tgl Rujukan dan Poli Rujukan.
