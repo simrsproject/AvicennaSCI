@@ -3319,6 +3319,7 @@
     <Content Include="Module\Reports\OptionControl\CssdMachineCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\ItemGroupGenericNonGenericCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\ItemBinLocationCtl.ascx" />
+    <Content Include="Module\Reports\OptionControl\InvoiceNoCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\StandardReferenceChkBoxCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\StandardReferenceCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\DepartmentCtl.ascx" />
@@ -22057,6 +22058,13 @@
     </Compile>
     <Compile Include="Module\Reports\OptionControl\ItemBinLocationCtl.ascx.designer.cs">
       <DependentUpon>ItemBinLocationCtl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\InvoiceNoCtl.ascx.cs">
+      <DependentUpon>InvoiceNoCtl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\InvoiceNoCtl.ascx.designer.cs">
+      <DependentUpon>InvoiceNoCtl.ascx</DependentUpon>
     </Compile>
     <Compile Include="Module\Reports\OptionControl\StandardReferenceChkBoxCtl.ascx.cs">
       <DependentUpon>StandardReferenceChkBoxCtl.ascx</DependentUpon>
