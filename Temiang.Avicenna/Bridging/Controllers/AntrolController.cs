@@ -6284,6 +6284,54 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     trans.Complete();
                 }
 
+                // =============================
+                // GENERATE VISIT QUEUE UNTUK CHECK IN MANDIRI
+                // =============================
+
+                const string userID = "KIOSKBPJS";
+
+                var healthCareId = AppSession.Parameter.HealthcareID;
+
+                bool isEnable = string.Equals(
+                    healthCareId,
+                    "RSI",
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+                if (isEnable)
+                {
+                    string visitNo =
+                        VisitQueue.TakeQueueVisitPasienTitipan(
+                            reg.GuarantorID,
+                            reg.ServiceUnitID,
+                            userID,
+                            DateTime.Now.Date
+                        );
+
+                    if (!string.IsNullOrEmpty(visitNo))
+                    {
+                        string srAutoNumber =
+                            VisitQueue.GenerateSRAutoNumberPasienTitipan(
+                                reg.GuarantorID,
+                                reg.ServiceUnitID
+                            );
+
+                        if (!string.IsNullOrEmpty(srAutoNumber))
+                        {
+                            VisitQueue.InsertVisitQueueStage(
+                                visitNo,
+                                srAutoNumber,
+                                userID,
+                                DateTime.Now.Date,
+                                reg.ServiceUnitID,
+                                reg.ParamedicID,
+                                reg.RegistrationNo,
+                                reg.PatientID
+                            );
+                        }
+                    }
+                }
+
                 // update task id antrol
                 if (Helper.IsBpjsAntrolIntegration)
                 {

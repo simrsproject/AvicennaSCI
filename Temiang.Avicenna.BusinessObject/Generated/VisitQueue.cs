@@ -2866,7 +2866,7 @@ namespace Temiang.Avicenna.BusinessObject
                                 ? ""
                                 : reader["ParamedicID"].ToString(),
 
-                        QueueLocation =
+                        KamarID =
                             reader["QueueLocation"] == DBNull.Value
                                 ? ""
                                 : reader["QueueLocation"].ToString(),
@@ -2976,7 +2976,7 @@ namespace Temiang.Avicenna.BusinessObject
                                 ? ""
                                 : reader["StageID"].ToString(),
 
-                        Kamar =
+                        KamarID =
                             reader["QueueLocation"] == DBNull.Value
                                 ? ""
                                 : reader["QueueLocation"].ToString()
@@ -3054,7 +3054,7 @@ namespace Temiang.Avicenna.BusinessObject
                 LastUpdated = result.LastUpdated,
                 UpdatedBy = result.UpdatedBy,
                 RecallCount = result.GetColumn("RecallCount"),
-                Kamar = result.QueueLocation == null ? "" : result.QueueLocation
+                KamarID = result.QueueLocation == null ? "" : result.QueueLocation
             };
         }
 
@@ -3624,9 +3624,10 @@ namespace Temiang.Avicenna.BusinessObject
 
                         ParamedicName =
                             reader["ParamedicName"].ToString(),
-                        Kamar =
+
+                        KamarID =
                             reader["KamarForAntrianID"] == DBNull.Value
-                                ? ""
+                                ? (string)null
                                 : reader["KamarForAntrianID"].ToString()
                     });
                 }
@@ -3734,7 +3735,7 @@ namespace Temiang.Avicenna.BusinessObject
                 );
 
                 parametersUpdate.Add(
-                    "Kamar",
+                    "KamarID",
                     string.IsNullOrWhiteSpace(kamarValue)
                         ? (object)DBNull.Value
                         : kamarValue,
