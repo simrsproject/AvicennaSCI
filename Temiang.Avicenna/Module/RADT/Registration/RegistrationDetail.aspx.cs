@@ -248,8 +248,20 @@ namespace Temiang.Avicenna.Module.RADT
         {
             pnlInfoReg.Visible = !_isNewRecord || pnlBtnPrint.Visible == true;
             hdnSRPatientRiskStatus.Value = string.Empty;
-            PopulateVisitNo();
-            SetVisitNoVisibility(); // Hide label VisitNo jika bukan RSI
+
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            bool isEnable = string.Equals(
+                healthCareId,
+                "RSI",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            if (isEnable)
+            {
+                PopulateVisitNo();
+                SetVisitNoVisibility(); // Tampilkan VisitNo untuk RSI
+            }
 
             //Service Unit & Paramedic
             var suColl = new ServiceUnitCollection();
