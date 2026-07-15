@@ -4224,6 +4224,10 @@ namespace Temiang.Avicenna.WebService
                 {
                     ""ParamedicID"":""MD-00145"",
                     ""KamarID"":2
+                },
+{
+                    ""ParamedicID"":""MD-00216"",
+                    ""KamarID"":null
                 }
             ]
 
