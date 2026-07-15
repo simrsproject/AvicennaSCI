@@ -1,4 +1,5 @@
 ﻿using DevExpress.XtraRichEdit.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,6 +16,7 @@ using Temiang.Avicenna.Common;
 using Temiang.Dal;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
+using static Temiang.Avicenna.BusinessObject.VisitQueue;
 
 namespace Temiang.Avicenna.WebService
 {
@@ -108,6 +110,13 @@ namespace Temiang.Avicenna.WebService
             return GetCounterList()
                 .Select(x => x.CounterID)
                 .ToList();
+        }
+
+        public class UpdateDisplayDoctorRequest
+        {
+            public string ServiceUnitID { get; set; }
+
+            public List<DisplayDoctorItem> Doctors { get; set; }
         }
 
         //1. Pasien Ambil Antrian
@@ -4201,15 +4210,26 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - ServiceUnitID
-            - ParamedicID
-            - Kamar (Optional)
+            - Doctors (JSON Array)
 
             CONTOH REQUEST:
 
             UpdateDisplayDoctorListForPoli?
             ServiceUnitID=D2.2.41.1&
-            ParamedicID=MD-00170,MD-00145,MD-00023&
-            Kamar=1,2,3
+            Doctors=[
+                {
+                    ""ParamedicID"":""MD-00170"",
+                    ""KamarID"":1
+                },
+                {
+                    ""ParamedicID"":""MD-00145"",
+                    ""KamarID"":2
+                },
+{
+                    ""ParamedicID"":""MD-00216"",
+                    ""KamarID"":null
+                }
+            ]
 
             RESPONSE:
             200 = Berhasil update dokter display
@@ -4224,19 +4244,20 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["ServiceUnitID"] ?? "")
                     .Trim();
 
-                string paramedicIDs =
-                    (Context.Request["ParamedicID"] ?? "")
+                string doctorsJson =
+                    (Context.Request["Doctors"] ?? "")
                     .Trim();
 
-                string kamar =
-                    (Context.Request["Kamar"] ?? "")
-                    .Trim();
+                List<DisplayDoctorItem> doctors =
+                    string.IsNullOrWhiteSpace(doctorsJson)
+                        ? new List<DisplayDoctorItem>()
+                        : JsonConvert.DeserializeObject<List<DisplayDoctorItem>>(doctorsJson);
 
                 VisitQueue.UpdateDisplayDoctorList(
                     serviceUnitID,
-                    paramedicIDs,
-                    kamar
+                    doctors
                 );
+
 
                 var data =
                     VisitQueue.GetDisplayDoctorListForPoli(

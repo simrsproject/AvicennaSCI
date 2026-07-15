@@ -1103,6 +1103,13 @@ namespace Temiang.Avicenna.BusinessObject
 
     public partial class VisitQueue : esVisitQueue
     {
+        public class DisplayDoctorItem
+        {
+            public string ParamedicID { get; set; }
+
+            public int? KamarID { get; set; }
+        }
+
         public static object GetDisplayAntrianPasien(
             DateTime queueDate,
             string queueLocation,
@@ -3638,8 +3645,7 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static void UpdateDisplayDoctorList(
             string serviceUnitID,
-            string paramedicIDs,
-            string kamar = null
+            List<DisplayDoctorItem> doctors
         )
         {
             var entity = new VisitQueue();
@@ -3669,52 +3675,25 @@ namespace Temiang.Avicenna.BusinessObject
                 parameters
             );
 
-            // Jika tidak ada dokter dipilih selesai
-            if (string.IsNullOrWhiteSpace(paramedicIDs))
+            // Tidak ada data dokter
+            if (doctors == null || doctors.Count == 0)
                 return;
-
-            string[] dokterList = paramedicIDs
-                .Split(',')
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrEmpty(x))
-                .ToArray();
-
-            if (dokterList.Length == 0)
-                return;
-
-            // List kamar (optional)
-            string[] kamarList = string.IsNullOrWhiteSpace(kamar)
-                ? new string[0]
-                : kamar
-                    .Split(',')
-                    .Select(x => x.Trim())
-                    .Where(x => !string.IsNullOrEmpty(x))
-                    .ToArray();
-
-            // Validasi jumlah kamar
-            if (kamarList.Length > 0 && kamarList.Length != dokterList.Length)
-            {
-                throw new Exception("Jumlah ParamedicID dan Kamar harus sama.");
-            }
 
             string sqlUpdate = @"
                 UPDATE ServiceUnitParamedic
                 SET
                     IsDisplayActive = 1,
-                    KamarForAntrianID = @Kamar
+                    KamarForAntrianID = @KamarID
                 WHERE
                     ServiceUnitID = @ServiceUnitID
                     AND ParamedicID = @ParamedicID
             ";
 
-            for (int i = 0; i < dokterList.Length; i++)
+            foreach (var doctor in doctors)
             {
-                string kamarValue = null;
-
-                if (kamarList.Length > 0)
-                {
-                    kamarValue = "Kamar_" + kamarList[i];
-                }
+                string kamarValue = doctor.KamarID.HasValue
+                    ? "Kamar_" + doctor.KamarID.Value
+                    : null;
 
                 var parametersUpdate = new esParameters();
 
@@ -3728,7 +3707,7 @@ namespace Temiang.Avicenna.BusinessObject
 
                 parametersUpdate.Add(
                     "ParamedicID",
-                    dokterList[i],
+                    doctor.ParamedicID,
                     esParameterDirection.Input,
                     DbType.String,
                     50
