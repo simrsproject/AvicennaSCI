@@ -8,6 +8,7 @@
 ===============================================================================
 */
 
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -1108,6 +1109,8 @@ namespace Temiang.Avicenna.BusinessObject
             public string ParamedicID { get; set; }
 
             public int? KamarID { get; set; }
+
+            public string Kamar { get; set; }
         }
 
         public static object GetDisplayAntrianPasien(
@@ -3691,6 +3694,12 @@ namespace Temiang.Avicenna.BusinessObject
 
             foreach (var doctor in doctors)
             {
+                if (!doctor.KamarID.HasValue &&
+                    !string.IsNullOrWhiteSpace(doctor.Kamar))
+                {
+                    doctor.KamarID = Convert.ToInt32(doctor.Kamar);
+                }
+
                 string kamarValue = doctor.KamarID.HasValue
                     ? "Kamar_" + doctor.KamarID.Value
                     : null;

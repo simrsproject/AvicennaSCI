@@ -4211,40 +4211,19 @@ namespace Temiang.Avicenna.WebService
 
         [WebMethod(Description = @"
             Digunakan untuk mengatur dokter yang akan ditampilkan pada display antrian.
-
-            PARAMETER:
-            - ServiceUnitID
-            - Doctors (JSON Array)
-
-            CONTOH REQUEST:
-
-            UpdateDisplayDoctorListForPoli?
-            ServiceUnitID=D2.2.41.1&
-            Doctors=[
-                {
-                    ""ParamedicID"":""MD-00170"",
-                    ""KamarID"":1
-                },
-                {
-                    ""ParamedicID"":""MD-00145"",
-                    ""KamarID"":2
-                },
-{
-                    ""ParamedicID"":""MD-00216"",
-                    ""KamarID"":null
-                }
-            ]
-
-            RESPONSE:
-            200 = Berhasil update dokter display
-            500 = Terjadi kesalahan pada server
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void UpdateDisplayDoctorListForPoli()
         {
             try
             {
-                string serviceUnitID =
+                string serviceUnitID = "";
+                List<DisplayDoctorItem> doctors = new List<DisplayDoctorItem>();
+
+                // ===========================
+                // PRIORITAS 1 : FORM / QUERY
+                // ===========================
+                serviceUnitID =
                     (Context.Request["ServiceUnitID"] ?? "")
                     .Trim();
 
@@ -4252,16 +4231,40 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["Doctors"] ?? "")
                     .Trim();
 
-                List<DisplayDoctorItem> doctors =
-                    string.IsNullOrWhiteSpace(doctorsJson)
-                        ? new List<DisplayDoctorItem>()
-                        : JsonConvert.DeserializeObject<List<DisplayDoctorItem>>(doctorsJson);
+                if (!string.IsNullOrWhiteSpace(doctorsJson))
+                {
+                    doctors =
+                        JsonConvert.DeserializeObject<List<DisplayDoctorItem>>(doctorsJson);
+                }
+                else
+                {
+                    // ===========================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ===========================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!string.IsNullOrWhiteSpace(body))
+                        {
+                            var request =
+                                JsonConvert.DeserializeObject<UpdateDisplayDoctorRequest>(body);
+
+                            if (request != null)
+                            {
+                                serviceUnitID = request.ServiceUnitID;
+                                doctors = request.Doctors ?? new List<DisplayDoctorItem>();
+                            }
+                        }
+                    }
+                }
 
                 VisitQueue.UpdateDisplayDoctorList(
                     serviceUnitID,
                     doctors
                 );
-
 
                 var data =
                     VisitQueue.GetDisplayDoctorListForPoli(
@@ -4273,8 +4276,6 @@ namespace Temiang.Avicenna.WebService
                     data,
                     "Berhasil update dokter display"
                 );
-
-                return;
             }
             catch (Exception ex)
             {
