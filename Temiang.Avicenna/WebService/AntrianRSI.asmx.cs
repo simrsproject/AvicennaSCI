@@ -27,7 +27,7 @@ namespace Temiang.Avicenna.WebService
     {
         public static void Success(HttpContext context, object data, string message = "OK")
         {
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+            var json = JsonConvert.SerializeObject(new
             {
                 success = true,
                 code = 200,
@@ -38,13 +38,15 @@ namespace Temiang.Avicenna.WebService
 
             context.Response.Clear();
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = 200;   // <-- Tambahkan
+            context.Response.StatusCode = 200;
             context.Response.Write(json);
+
+            context.ApplicationInstance.CompleteRequest();
         }
 
         public static void Error(HttpContext context, string message, int code = 500)
         {
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+            var json = JsonConvert.SerializeObject(new
             {
                 success = false,
                 code = code,
@@ -55,8 +57,10 @@ namespace Temiang.Avicenna.WebService
 
             context.Response.Clear();
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = code;   // <-- Tambahkan
+            context.Response.StatusCode = code;
             context.Response.Write(json);
+
+            context.ApplicationInstance.CompleteRequest();
         }
     }
 
