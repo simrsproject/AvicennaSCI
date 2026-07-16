@@ -4273,6 +4273,8 @@ namespace Temiang.Avicenna.WebService
                     data,
                     "Berhasil update dokter display"
                 );
+
+                return;
             }
             catch (Exception ex)
             {
