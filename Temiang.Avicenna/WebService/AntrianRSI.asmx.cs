@@ -4546,5 +4546,93 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
+        [WebMethod(EnableSession = false, Description = @"
+            Mendapatkan daftar Service Unit Farmasi.
+
+            PARAMETER:
+            - ServiceUnitID (Optional)
+
+            RESPONSE:
+             200 = Berhasil mendapatkan data Service Unit Farmasi
+             404 = Data Service Unit Farmasi tidak ditemukan
+             500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetListServiceUnitFarmasi()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("===== GET SERVICE UNIT FARMASI =====");
+
+                string serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                ServiceUnitCollection collection =
+                    new ServiceUnitCollection();
+
+                collection.Query.Where(
+                    collection.Query.ShortName.Like("%FAR%")
+                );
+
+                if (!string.IsNullOrWhiteSpace(serviceUnitID))
+                {
+                    collection.Query.Where(
+                        collection.Query.ServiceUnitID == serviceUnitID
+                    );
+                }
+
+                collection.Query.OrderBy(
+                    collection.Query.ServiceUnitName.Ascending
+                );
+
+                collection.Query.Load();
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Total Farmasi = {collection.Count}"
+                );
+
+                if (collection.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data Service Unit Farmasi tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                var data = collection
+                    .Select(x => new
+                    {
+                        ServiceUnitCode = x.DepartmentID,
+                        ServiceUnitID = x.ServiceUnitID,
+                        ServiceUnitName = x.ServiceUnitName,
+                        ShortName = x.ShortName
+                    })
+                    .ToList();
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        ServiceUnits = data
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "ERROR : " + ex.ToString()
+                );
+
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
     }
 }
