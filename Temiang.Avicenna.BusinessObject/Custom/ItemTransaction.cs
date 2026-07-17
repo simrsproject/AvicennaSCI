@@ -4142,7 +4142,10 @@ namespace Temiang.Avicenna.BusinessObject
                     refQ.TransactionNo == currentQ.ReferenceNo &&
                     refQ.SequenceNo == currentQ.ReferenceSequenceNo
                     );
-                refQ.LeftJoin(currenthQ).On(currenthQ.TransactionNo == currentQ.TransactionNo);
+                //refQ.LeftJoin(currenthQ).On(currenthQ.TransactionNo == currentQ.TransactionNo);
+                //modified by: Wiliam 2026-07-17
+                refQ.LeftJoin(currenthQ).On(currenthQ.TransactionNo == currentQ.TransactionNo 
+                    && currenthQ.IsVoid == false);
                 refQ.LeftJoin(nowQ).On(
                     refQ.TransactionNo == nowQ.ReferenceNo &&
                     refQ.SequenceNo == nowQ.ReferenceSequenceNo && 
@@ -4159,7 +4162,9 @@ namespace Temiang.Avicenna.BusinessObject
                     (currentQ.ConversionFactor * currentQ.Quantity).Sum().As("QtyUsed"),
                     (nowQ.ConversionFactor * nowQ.Quantity).As("QtyNow")
                     );
-                refQ.Where(refQ.TransactionNo == referenceNo, currenthQ.IsVoid == false);
+                //refQ.Where(refQ.TransactionNo == referenceNo, currenthQ.IsVoid == false);
+                //modified by: Wiliam 2026-07-17
+                refQ.Where(refQ.TransactionNo == referenceNo);
                 refQ.GroupBy(refQ.TransactionNo,
                              refQ.SequenceNo,
                              //currentQ.TransactionNo,
