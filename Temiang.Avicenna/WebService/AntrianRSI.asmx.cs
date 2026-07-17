@@ -126,7 +126,7 @@ namespace Temiang.Avicenna.WebService
 
         public class GetDisplayDoctorListRequest
         {
-            public List<string> ServiceUnitIDs { get; set; }
+            public List<string> ServiceUnitID { get; set; }
 
             public DateTime? QueueDate { get; set; }
         }
@@ -4173,19 +4173,19 @@ namespace Temiang.Avicenna.WebService
         {
             try
             {
-                List<string> serviceUnitIDs = new List<string>();
+                List<string> serviceUnitID = new List<string>();
                 DateTime? queueDate = null;
 
                 // ===========================
                 // PRIORITAS 1 : FORM / QUERY
                 // ===========================
                 string serviceUnitIDsText =
-                    (Context.Request["ServiceUnitIDs"] ?? "")
+                    (Context.Request["ServiceUnitID"] ?? "")
                     .Trim();
 
                 if (!string.IsNullOrWhiteSpace(serviceUnitIDsText))
                 {
-                    serviceUnitIDs = serviceUnitIDsText
+                    serviceUnitID = serviceUnitIDsText
                         .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(x => x.Trim())
                         .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -4215,14 +4215,14 @@ namespace Temiang.Avicenna.WebService
 
                             if (request != null)
                             {
-                                serviceUnitIDs = request.ServiceUnitIDs ?? new List<string>();
+                                serviceUnitID = request.ServiceUnitID ?? new List<string>();
                                 queueDate = request.QueueDate;
                             }
                         }
                     }
                 }
 
-                if (serviceUnitIDs.Count == 0)
+                if (serviceUnitID.Count == 0)
                 {
                     ApiResponeForAntrian.Error(
                         Context,
@@ -4234,7 +4234,7 @@ namespace Temiang.Avicenna.WebService
 
                 var data =
                     VisitQueue.GetDisplayDoctorListForPoli(
-                        serviceUnitIDs,
+                        serviceUnitID,
                         queueDate
                     );
 

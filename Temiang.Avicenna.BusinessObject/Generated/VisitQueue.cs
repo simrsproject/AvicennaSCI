@@ -3512,7 +3512,7 @@ namespace Temiang.Avicenna.BusinessObject
         }
 
         public static List<object> GetDisplayDoctorListForPoli(
-             List<string> serviceUnitIDs,
+             List<string> serviceUnitID,
              DateTime? queueDate = null
         )
         {
@@ -3556,7 +3556,7 @@ namespace Temiang.Avicenna.BusinessObject
 
             var ids = new List<string>();
 
-            for (int i = 0; i < serviceUnitIDs.Count; i++)
+            for (int i = 0; i < serviceUnitID.Count; i++)
             {
                 string param = "@ServiceUnitID" + i;
 
@@ -3564,7 +3564,7 @@ namespace Temiang.Avicenna.BusinessObject
 
                 parameters.Add(
                     "ServiceUnitID" + i,
-                    serviceUnitIDs[i],
+                    serviceUnitID[i],
                     esParameterDirection.Input,
                     DbType.String,
                     50
