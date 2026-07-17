@@ -40,7 +40,8 @@ namespace Temiang.Avicenna.WebService
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200;
             context.Response.Write(json);
-
+            context.Response.Flush();
+            context.Response.SuppressContent = true;
             context.ApplicationInstance.CompleteRequest();
         }
 
@@ -2437,12 +2438,13 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
-            - Kamar (optional)
+            - KamarCode (optional)
 
             EXAMPLE:
             CallAntrianAllServiceUnit?
             VisitQueueNo=VQUE-260516-0015&
-            UserID=Admin&Kamar=5
+            UserID=Admin&
+            KamarCode=Kamar_5
 
             RESPONSE:
                200 = Berhasil memanggil antrian
@@ -2466,8 +2468,8 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["UserID"] ?? "")
                     .Trim();
 
-                string Kamar =
-                    (Context.Request["Kamar"] ?? "")
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2504,7 +2506,7 @@ namespace Temiang.Avicenna.WebService
                         VisitQueue.CallAntrianAllServiceUnit(
                             VisitQueueNo,
                             UserID,
-                            Kamar
+                            KamarCode
                         );
 
                     if (result == null)
@@ -2519,9 +2521,7 @@ namespace Temiang.Avicenna.WebService
                 }
                 catch (Exception ex)
                 {
-                    if (
-                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
-                    )
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
                     {
                         ApiResponeForAntrian.Error(
                             Context,
@@ -2559,12 +2559,13 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - VisitQueueNo (required)
-            - Kamar (Optional)
+            - KamarCode (optional)
 
             EXAMPLE:
 
             GetQueueSoundForAllServiceUnit?
-            VisitQueueNo=VQUE-260603-0006&Kamar=1
+            VisitQueueNo=VQUE-260603-0006&
+            KamarCode=Kamar_1
 
             RESPONSE:
                200 = Sound antrian All Service Unit berhasil diambil
@@ -2585,8 +2586,8 @@ namespace Temiang.Avicenna.WebService
                     .Trim()
                     .ToUpper();
 
-                string Kamar =
-                    (Context.Request["Kamar"] ?? "")
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim()
                     .ToUpper();
 
@@ -2612,7 +2613,7 @@ namespace Temiang.Avicenna.WebService
                 var data =
                     QueueingSound.GetQueueSoundForAllServiceUnit(
                         VisitQueueNo,
-                        Kamar
+                        KamarCode
                     );
 
                 // =========================
@@ -2641,12 +2642,13 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
-            - Kamar (optional)
+            - KamarCode (optional)
 
             EXAMPLE:
             RecallAntrianAllServiceUnit?
             VisitQueueNo=VQUE-260516-0015&
-            UserID=Admin&Kamar=5
+            UserID=Admin&
+            KamarCode=Kamar_5
 
             RESPONSE:
                200 = Berhasil recall antrian
@@ -2670,8 +2672,8 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["UserID"] ?? "")
                     .Trim();
 
-                string Kamar =
-                    (Context.Request["Kamar"] ?? "")
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2708,14 +2710,12 @@ namespace Temiang.Avicenna.WebService
                         VisitQueue.RecallAntrianAllServiceUnit(
                             VisitQueueNo,
                             UserID,
-                            Kamar
+                            KamarCode
                         );
                 }
                 catch (Exception ex)
                 {
-                    if (
-                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
-                    )
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
                     {
                         ApiResponeForAntrian.Error(
                             Context,
@@ -2767,12 +2767,13 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
-            - Kamar (optional)
+            - KamarCode (optional)
 
             EXAMPLE:
             CallNextQueueAllServiceUnit?
             VisitQueueNo=VQUE-260520-0020&
-            UserID=240076&Kamar=5
+            UserID=240076&
+            KamarCode=Kamar_5
 
             RESPONSE:
                200 = Berhasil memanggil antrian berikutnya
@@ -2796,8 +2797,8 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["UserID"] ?? "")
                     .Trim();
 
-                string Kamar =
-                    (Context.Request["Kamar"] ?? "")
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2834,14 +2835,12 @@ namespace Temiang.Avicenna.WebService
                         VisitQueue.CallNextQueueAllServiceUnit(
                             VisitQueueNo,
                             UserID,
-                            Kamar
+                            KamarCode
                         );
                 }
                 catch (Exception ex)
                 {
-                    if (
-                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
-                    )
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
                     {
                         ApiResponeForAntrian.Error(
                             Context,
@@ -4210,84 +4209,6 @@ namespace Temiang.Avicenna.WebService
         }
 
         [WebMethod(Description = @"
-            Digunakan untuk mengatur dokter yang akan ditampilkan pada display antrian.
-        ")]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void UpdateDisplayDoctorListForPoli()
-        {
-            try
-            {
-                string serviceUnitID = "";
-                List<DisplayDoctorItem> doctors = new List<DisplayDoctorItem>();
-
-                // ===========================
-                // PRIORITAS 1 : FORM / QUERY
-                // ===========================
-                serviceUnitID =
-                    (Context.Request["ServiceUnitID"] ?? "")
-                    .Trim();
-
-                string doctorsJson =
-                    (Context.Request["Doctors"] ?? "")
-                    .Trim();
-
-                if (!string.IsNullOrWhiteSpace(doctorsJson))
-                {
-                    doctors =
-                        JsonConvert.DeserializeObject<List<DisplayDoctorItem>>(doctorsJson);
-                }
-                else
-                {
-                    // ===========================
-                    // PRIORITAS 2 : RAW JSON BODY
-                    // ===========================
-                    Context.Request.InputStream.Position = 0;
-
-                    using (var reader = new StreamReader(Context.Request.InputStream))
-                    {
-                        string body = reader.ReadToEnd();
-
-                        if (!string.IsNullOrWhiteSpace(body))
-                        {
-                            var request =
-                                JsonConvert.DeserializeObject<UpdateDisplayDoctorRequest>(body);
-
-                            if (request != null)
-                            {
-                                serviceUnitID = request.ServiceUnitID;
-                                doctors = request.Doctors ?? new List<DisplayDoctorItem>();
-                            }
-                        }
-                    }
-                }
-
-                VisitQueue.UpdateDisplayDoctorList(
-                    serviceUnitID,
-                    doctors
-                );
-
-                var data =
-                    VisitQueue.GetDisplayDoctorListForPoli(
-                        serviceUnitID
-                    );
-
-                ApiResponeForAntrian.Success(
-                    Context,
-                    data,
-                    "Berhasil update dokter display"
-                );
-            }
-            catch (Exception ex)
-            {
-                ApiResponeForAntrian.Error(
-                    Context,
-                    ex.Message,
-                    500
-                );
-            }
-        }
-
-        [WebMethod(Description = @"
             Mengambil daftar SRAutoNumber berdasarkan filter.
 
             PARAMETER (OPTIONAL):
@@ -4535,6 +4456,85 @@ namespace Temiang.Avicenna.WebService
                     result,
                     "Berhasil memindahkan antrian ke stage berikutnya"
                 );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengatur dokter yang akan ditampilkan pada display antrian.
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void UpdateDisplayDoctorListForPoli()
+        {
+            try
+            {
+                string serviceUnitID = "";
+                List<DisplayDoctorItem> doctors = new List<DisplayDoctorItem>();
+
+                // ===========================
+                // PRIORITAS 1 : FORM / QUERY
+                // ===========================
+                serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                string doctorsJson =
+                    (Context.Request["Doctors"] ?? "")
+                    .Trim();
+
+                if (!string.IsNullOrWhiteSpace(doctorsJson))
+                {
+                    doctors =
+                        JsonConvert.DeserializeObject<List<DisplayDoctorItem>>(doctorsJson);
+                }
+                else
+                {
+                    // ===========================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ===========================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!string.IsNullOrWhiteSpace(body))
+                        {
+                            var request =
+                                JsonConvert.DeserializeObject<UpdateDisplayDoctorRequest>(body);
+
+                            if (request != null)
+                            {
+                                serviceUnitID = request.ServiceUnitID;
+                                doctors = request.Doctors ?? new List<DisplayDoctorItem>();
+                            }
+                        }
+                    }
+                }
+
+                VisitQueue.UpdateDisplayDoctorList(
+                    serviceUnitID,
+                    doctors
+                );
+
+                var data =
+                    VisitQueue.GetDisplayDoctorListForPoli(
+                        serviceUnitID
+                    );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Berhasil update dokter display"
+                );
+                return;
             }
             catch (Exception ex)
             {

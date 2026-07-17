@@ -1108,9 +1108,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             public string ParamedicID { get; set; }
 
-            public int? KamarID { get; set; }
-
-            public string Kamar { get; set; }
+            public string KamarCode { get; set; }
         }
 
         public static object GetDisplayAntrianPasien(
@@ -2797,7 +2795,7 @@ namespace Temiang.Avicenna.BusinessObject
         public static object CallAntrianAllServiceUnit(
             string visitQueueNo,
             string userID,
-            string kamar = null
+            string kamarCode = null
         )
         {
             object result = null;
@@ -2823,13 +2821,13 @@ namespace Temiang.Avicenna.BusinessObject
             );
 
             parameters.Add(
-                "Kamar",
-                string.IsNullOrWhiteSpace(kamar)
+                "KamarCode",
+                string.IsNullOrWhiteSpace(kamarCode)
                     ? (object)DBNull.Value
-                    : kamar,
+                    : kamarCode,
                 esParameterDirection.Input,
                 DbType.String,
-                10
+                50
             );
 
 
@@ -2876,7 +2874,7 @@ namespace Temiang.Avicenna.BusinessObject
                                 ? ""
                                 : reader["ParamedicID"].ToString(),
 
-                        KamarID =
+                        KamarCode =
                             reader["QueueLocation"] == DBNull.Value
                                 ? ""
                                 : reader["QueueLocation"].ToString(),
@@ -2903,7 +2901,7 @@ namespace Temiang.Avicenna.BusinessObject
         public static object CallNextQueueAllServiceUnit(
             string visitQueueNo,
             string userID,
-            string kamar = null
+            string kamarCode = null
         )
         {
             object result = null;
@@ -2929,14 +2927,14 @@ namespace Temiang.Avicenna.BusinessObject
             );
 
             parameters.Add(
-                "Kamar",
-                string.IsNullOrWhiteSpace(kamar)
-                    ? (object)DBNull.Value
-                    : kamar,
-                esParameterDirection.Input,
-                DbType.String,
-                10
-            );
+                 "KamarCode",
+                 string.IsNullOrWhiteSpace(kamarCode)
+                     ? (object)DBNull.Value
+                     : kamarCode,
+                 esParameterDirection.Input,
+                 DbType.String,
+                 50
+             );
 
             using (
                 var reader =
@@ -2986,7 +2984,7 @@ namespace Temiang.Avicenna.BusinessObject
                                 ? ""
                                 : reader["StageID"].ToString(),
 
-                        KamarID =
+                        KamarCode =
                             reader["QueueLocation"] == DBNull.Value
                                 ? ""
                                 : reader["QueueLocation"].ToString()
@@ -3000,7 +2998,7 @@ namespace Temiang.Avicenna.BusinessObject
         public static object RecallAntrianAllServiceUnit(
             string visitQueueNo,
             string userID,
-            string kamar = null
+            string kamarCode = null
         )
         {
             var entity = new VisitQueue();
@@ -3024,8 +3022,10 @@ namespace Temiang.Avicenna.BusinessObject
             );
 
             parameters.Add(
-                "Kamar",
-                string.IsNullOrWhiteSpace(kamar) ? (object)DBNull.Value : kamar,
+                "KamarCode",
+                string.IsNullOrWhiteSpace(kamarCode)
+                    ? (object)DBNull.Value
+                    : kamarCode,
                 esParameterDirection.Input,
                 DbType.String,
                 50
@@ -3064,8 +3064,10 @@ namespace Temiang.Avicenna.BusinessObject
                 LastUpdated = result.LastUpdated,
                 UpdatedBy = result.UpdatedBy,
                 RecallCount = result.GetColumn("RecallCount"),
-                KamarID = result.QueueLocation == null ? "" : result.QueueLocation
-            };
+                KamarCode = result.QueueLocation == null
+                    ? ""
+                    : result.QueueLocation
+                    };
         }
 
         public static object SetPendingAllServiceUnit(
@@ -3635,7 +3637,7 @@ namespace Temiang.Avicenna.BusinessObject
                         ParamedicName =
                             reader["ParamedicName"].ToString(),
 
-                        KamarID =
+                        KamarCode =
                             reader["KamarForAntrianID"] == DBNull.Value
                                 ? (string)null
                                 : reader["KamarForAntrianID"].ToString()
@@ -3678,7 +3680,6 @@ namespace Temiang.Avicenna.BusinessObject
                 parameters
             );
 
-            // Tidak ada data dokter
             if (doctors == null || doctors.Count == 0)
                 return;
 
@@ -3686,7 +3687,7 @@ namespace Temiang.Avicenna.BusinessObject
                 UPDATE ServiceUnitParamedic
                 SET
                     IsDisplayActive = 1,
-                    KamarForAntrianID = @KamarID
+                    KamarForAntrianID = @KamarCode
                 WHERE
                     ServiceUnitID = @ServiceUnitID
                     AND ParamedicID = @ParamedicID
@@ -3694,16 +3695,6 @@ namespace Temiang.Avicenna.BusinessObject
 
             foreach (var doctor in doctors)
             {
-                if (!doctor.KamarID.HasValue &&
-                    !string.IsNullOrWhiteSpace(doctor.Kamar))
-                {
-                    doctor.KamarID = Convert.ToInt32(doctor.Kamar);
-                }
-
-                string kamarValue = doctor.KamarID.HasValue
-                    ? "Kamar_" + doctor.KamarID.Value
-                    : null;
-
                 var parametersUpdate = new esParameters();
 
                 parametersUpdate.Add(
@@ -3723,10 +3714,10 @@ namespace Temiang.Avicenna.BusinessObject
                 );
 
                 parametersUpdate.Add(
-                    "KamarID",
-                    string.IsNullOrWhiteSpace(kamarValue)
+                    "KamarCode",
+                    string.IsNullOrWhiteSpace(doctor.KamarCode)
                         ? (object)DBNull.Value
-                        : kamarValue,
+                        : doctor.KamarCode,
                     esParameterDirection.Input,
                     DbType.String,
                     50

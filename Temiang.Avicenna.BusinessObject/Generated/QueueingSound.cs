@@ -596,7 +596,7 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static object GetQueueSoundForAllServiceUnit(
 			string visitQueueNo,
-			string kamar = null)
+			string kamarCode = null)
         {
             var entity = new QueueingSound();
 
@@ -610,13 +610,13 @@ namespace Temiang.Avicenna.BusinessObject
                 50);
 
             parameters.Add(
-                "Kamar",
-                string.IsNullOrWhiteSpace(kamar)
+                "KamarCode",
+                string.IsNullOrWhiteSpace(kamarCode)
                     ? (object)DBNull.Value
-                    : kamar,
+                    : kamarCode,
                 esParameterDirection.Input,
                 DbType.String,
-                20);
+                50);
 
             var reader = entity.ExecuteReader(
                 esQueryType.StoredProcedure,

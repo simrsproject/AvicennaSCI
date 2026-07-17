@@ -2,7 +2,7 @@
 (
     @VisitQueueNo VARCHAR(50),
     @UserID       VARCHAR(50),
-	@Kamar        VARCHAR(10) = NULL
+	@KamarCode    VARCHAR(50) = NULL
 )
 AS
 BEGIN
@@ -57,21 +57,10 @@ BEGIN
         END
 
 		-- =========================================
-		-- MAPPING KAMAR (OPTIONAL)
-		-- =========================================
-		IF ISNULL(@Kamar,'') <> ''
-		BEGIN
-			SELECT
-				@QueueLocation = KamarCode
-			FROM ListKamarForAntrian
-			WHERE
-				KamarID = TRY_CAST(@Kamar AS INT)
-				AND IsActive = 1;
-		END
-		ELSE
-		BEGIN
-			SET @QueueLocation = NULL;
-		END
+        -- SET QUEUE LOCATION (OPTIONAL)
+        -- =========================================
+        SET @QueueLocation =
+            NULLIF(LTRIM(RTRIM(@KamarCode)), '');
 
         -- =========================================
         -- 2. TURUNKAN CALLED → PENDING
@@ -143,8 +132,8 @@ GO
 DECLARE @VisitNo VARCHAR(50);
 
 EXEC AntrianCallNowAllServiceUnit
-    @VisitQueueNo = 'VQUE-260713-0114',
+    @VisitQueueNo = 'VQUE-260707-0190',
     @UserID       = '240076',
-	@Kamar        = 2
+	@KamarCode        = 'Kamar_2'
 
 SELECT @VisitNo;

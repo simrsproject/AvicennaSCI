@@ -1,7 +1,7 @@
 CREATE OR ALTER PROCEDURE GetQueueSoundForAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
-	@Kamar VARCHAR(20) = NULL
+	@KamarCode VARCHAR(50) = NULL
 )
 AS
 BEGIN
@@ -326,15 +326,20 @@ BEGIN
 	-- ==================================
 	-- Tambahan Suara Kamar (Optional)
 	-- ==================================
-	IF TRY_CAST(@Kamar AS INT) IS NOT NULL
-	BEGIN
-		DECLARE @NoKamar INT = CAST(@Kamar AS INT);
+	DECLARE @NoKamar INT;
 
-		-- "di kamar"
+	SET @NoKamar =
+		TRY_CAST(
+			REPLACE(@KamarCode, 'Kamar_', '')
+			AS INT
+		);
+
+	IF @NoKamar IS NOT NULL
+	BEGIN
+		-- "kamar"
 		INSERT INTO @SoundOrder (SoundCode)
 		VALUES ('kamar');
 
-		-- nomor kamar
 		IF @NoKamar < 10
 		BEGIN
 			INSERT INTO @SoundOrder (SoundCode)

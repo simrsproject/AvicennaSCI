@@ -2,7 +2,7 @@ CREATE OR ALTER PROCEDURE AntrianRecallAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
     @UserID       VARCHAR(50),
-	@Kamar        VARCHAR(10) = NULL
+	@KamarCode    VARCHAR(50) = NULL
 )
 AS
 BEGIN
@@ -58,21 +58,10 @@ BEGIN
         END
 
 		-- =========================================
-		-- MAPPING KAMAR (OPTIONAL)
+		-- SET QUEUE LOCATION (OPTIONAL)
 		-- =========================================
-		IF ISNULL(@Kamar,'') <> ''
-		BEGIN
-			SELECT
-				@QueueLocation = KamarCode
-			FROM ListKamarForAntrian
-			WHERE
-				KamarID = TRY_CAST(@Kamar AS INT)
-				AND IsActive = 1;
-		END
-		ELSE
-		BEGIN
-			SET @QueueLocation = NULL;
-		END
+		SET @QueueLocation =
+			NULLIF(LTRIM(RTRIM(@KamarCode)), '');
 
         -- =========================================
         -- 2. UPDATE RECALL
@@ -129,6 +118,6 @@ END
 GO
 
 EXEC AntrianRecallAllServiceUnit
-    @VisitQueueNo = 'VQUE-260713-0114',
+    @VisitQueueNo = 'VQUE-260707-0190',
     @UserID       = 'Admin',
-	@Kamar        = 2
+	@KamarCode        = 'Kamar_3'

@@ -2,7 +2,7 @@
 (
     @VisitQueueNo VARCHAR(50),
     @UserID       VARCHAR(50),
-	@Kamar        VARCHAR(10) = NULL
+	@KamarCode	  VARCHAR(50) = NULL 
 )
 AS
 BEGIN
@@ -51,21 +51,10 @@ BEGIN
             THROW 50002, 'Hanya antrian CALLED yang bisa di-next', 1;
 
 		-- =========================================
-		-- MAPPING KAMAR (OPTIONAL)
+		-- SET QUEUE LOCATION (OPTIONAL)
 		-- =========================================
-		IF ISNULL(@Kamar,'') <> ''
-		BEGIN
-			SELECT
-				@QueueLocation = KamarCode
-			FROM ListKamarForAntrian
-			WHERE
-				KamarID = TRY_CAST(@Kamar AS INT)
-				AND IsActive = 1;
-		END
-		ELSE
-		BEGIN
-			SET @QueueLocation = NULL;
-		END
+		SET @QueueLocation =
+			NULLIF(LTRIM(RTRIM(@KamarCode)), '');
 
         -- =========================================
         -- FINISH CURRENT
@@ -150,4 +139,4 @@ END
 EXEC AntrianCallNextQueueAllServiceUnit
     @VisitQueueNo = 'VQUE-260713-0114',
     @UserID       = '240076',
-	@Kamar        = 1
+	@KamarCode        = 'Kamar_3'

@@ -22656,7 +22656,6 @@
     </Compile>
     <Compile Include="WebService\MembershipExecutiveRSI.asmx.cs">
       <DependentUpon>MembershipExecutiveRSI.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebService\MobileWS2.asmx.cs">
       <DependentUpon>MobileWS2.asmx</DependentUpon>
