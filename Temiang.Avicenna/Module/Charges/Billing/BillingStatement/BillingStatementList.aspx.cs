@@ -478,7 +478,7 @@ namespace Temiang.Avicenna.Module.Charges.Billing
                                 parSelfGuarantor.Name = "SelfGuarantor";
                                 parSelfGuarantor.ValueString = AppSession.Parameter.SelfGuarantor;
 
-                                AppSession.PrintJobReportID = AppSession.Parameter.HealthcareInitialAppsVersion == "RSI" ? AppConstant .Report.BillingStatementDetail2 : AppConstant.Report.BillingIntermStatementPatientDetail;
+                                AppSession.PrintJobReportID = AppSession.Parameter.HealthcareInitial == "RSI" ? AppConstant .Report.BillingStatementDetail2 : AppConstant.Report.BillingIntermStatementPatientDetail;
 
                                 parameterName = "IntermBillNoList";
                                 parameterValue = ibParameter.ValueString;
