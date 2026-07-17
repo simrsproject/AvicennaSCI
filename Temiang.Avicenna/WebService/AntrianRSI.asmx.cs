@@ -124,6 +124,13 @@ namespace Temiang.Avicenna.WebService
             public List<DisplayDoctorItem> Doctors { get; set; }
         }
 
+        public class GetDisplayDoctorListRequest
+        {
+            public List<string> ServiceUnitIDs { get; set; }
+
+            public DateTime? QueueDate { get; set; }
+        }
+
         //1. Pasien Ambil Antrian
         [WebMethod(EnableSession = false, Description = @"
            Ambil Data List PayerType untuk pasien memilih type TUNAI, MITRA DAN BPJS
@@ -4159,37 +4166,76 @@ namespace Temiang.Avicenna.WebService
 
         [WebMethod(Description = @"
             Digunakan untuk mengambil daftar dokter yang aktif ditampilkan
-            pada display antrian berdasarkan Service Unit.
-
-            PARAMETER:
-            - ServiceUnitID
-            - QueueDate (Optional)
-
-            CONTOH REQUEST:
-
-            GetListUpdateDisplayDokterForPoli?
-            ServiceUnitID=D2.2.41.1
-
-            KETERANGAN:
-               - ServiceUnitID :
-                 Kode poli/unit pelayanan yang akan ditampilkan.
-
-            RESPONSE:
-               200 = Berhasil mengambil daftar dokter display
-               500 = Terjadi kesalahan pada server 
+            pada display antrian berdasarkan satu atau beberapa Service Unit.
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetListUpdateDisplayDokterForPoli()
         {
             try
             {
-                string serviceUnitID =
-                    (Context.Request["ServiceUnitID"] ?? "")
+                List<string> serviceUnitIDs = new List<string>();
+                DateTime? queueDate = null;
+
+                // ===========================
+                // PRIORITAS 1 : FORM / QUERY
+                // ===========================
+                string serviceUnitIDsText =
+                    (Context.Request["ServiceUnitIDs"] ?? "")
                     .Trim();
+
+                if (!string.IsNullOrWhiteSpace(serviceUnitIDsText))
+                {
+                    serviceUnitIDs = serviceUnitIDsText
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => x.Trim())
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    DateTime dt;
+                    if (DateTime.TryParse(Context.Request["QueueDate"], out dt))
+                    {
+                        queueDate = dt;
+                    }
+                }
+                else
+                {
+                    // ===========================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ===========================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!string.IsNullOrWhiteSpace(body))
+                        {
+                            var request =
+                                JsonConvert.DeserializeObject<GetDisplayDoctorListRequest>(body);
+
+                            if (request != null)
+                            {
+                                serviceUnitIDs = request.ServiceUnitIDs ?? new List<string>();
+                                queueDate = request.QueueDate;
+                            }
+                        }
+                    }
+                }
+
+                if (serviceUnitIDs.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "ServiceUnitIDs wajib diisi",
+                        400
+                    );
+                    return;
+                }
 
                 var data =
                     VisitQueue.GetDisplayDoctorListForPoli(
-                        serviceUnitID
+                        serviceUnitIDs,
+                        queueDate
                     );
 
                 ApiResponeForAntrian.Success(
@@ -4526,7 +4572,10 @@ namespace Temiang.Avicenna.WebService
 
                 var data =
                     VisitQueue.GetDisplayDoctorListForPoli(
+                        new List<string>
+                        {
                         serviceUnitID
+                        }
                     );
 
                 ApiResponeForAntrian.Success(

@@ -3512,7 +3512,7 @@ namespace Temiang.Avicenna.BusinessObject
         }
 
         public static List<object> GetDisplayDoctorListForPoli(
-             string serviceUnitID,
+             List<string> serviceUnitIDs,
              DateTime? queueDate = null
         )
         {
@@ -3522,7 +3522,7 @@ namespace Temiang.Avicenna.BusinessObject
 
             var parameters = new esParameters();
 
-            string sql = @"
+            var sql = @"
             SELECT
                 VQ.VisitQueueNo,
                 VQ.VisitNo,
@@ -3530,37 +3530,48 @@ namespace Temiang.Avicenna.BusinessObject
                 VQ.QueueDate,
                 VQ.Status,
                 VQ.StageID,
-                VQ.RecallCount,  
+                VQ.RecallCount,
                 SUP.ServiceUnitID,
                 VQ.CategoryID,
                 SU.ServiceUnitName,
                 SUP.ParamedicID,
                 SUP.KamarForAntrianID,
                 P.ParamedicName
-                    FROM ServiceUnitParamedic SUP
-                    INNER JOIN Paramedic P
-                        ON P.ParamedicID = SUP.ParamedicID
-                    LEFT JOIN ServiceUnit SU
-                        ON SU.ServiceUnitID = SUP.ServiceUnitID
-                    LEFT JOIN VisitQueue VQ
-                        ON VQ.ServiceUnitID = SUP.ServiceUnitID
-                       AND VQ.ParamedicID = SUP.ParamedicID
-                       AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
-                    WHERE
-                        SUP.ServiceUnitID = @ServiceUnitID
-                        AND SUP.IsDisplayActive = 1
-                    ORDER BY
-                        P.ParamedicName,
-                        VQ.QueueDate
-                ";
+            FROM ServiceUnitParamedic SUP
+            INNER JOIN Paramedic P
+                ON P.ParamedicID = SUP.ParamedicID
+            LEFT JOIN ServiceUnit SU
+                ON SU.ServiceUnitID = SUP.ServiceUnitID
+            LEFT JOIN VisitQueue VQ
+                ON VQ.ServiceUnitID = SUP.ServiceUnitID
+               AND VQ.ParamedicID = SUP.ParamedicID
+               AND CONVERT(DATE, VQ.QueueDate) = CONVERT(DATE, @QueueDate)
+            WHERE
+                SUP.IsDisplayActive = 1
+                AND SUP.ServiceUnitID IN ({0})
+            ORDER BY
+                SU.ServiceUnitName,
+                P.ParamedicName,
+                VQ.QueueDate";
 
-            parameters.Add(
-                "ServiceUnitID",
-                serviceUnitID,
-                esParameterDirection.Input,
-                DbType.String,
-                50
-            );
+            var ids = new List<string>();
+
+            for (int i = 0; i < serviceUnitIDs.Count; i++)
+            {
+                string param = "@ServiceUnitID" + i;
+
+                ids.Add(param);
+
+                parameters.Add(
+                    "ServiceUnitID" + i,
+                    serviceUnitIDs[i],
+                    esParameterDirection.Input,
+                    DbType.String,
+                    50
+                );
+            }
+
+            sql = string.Format(sql, string.Join(",", ids));
 
             parameters.Add(
                 "QueueDate",
