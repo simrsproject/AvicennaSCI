@@ -351,3 +351,6 @@ Titipan Daniel
 1. modifikasi PurchaseOrderDetail.aspx.cs agar ketika Print Preview tidak usah update :
    LastPrintedDateTime
    LastPrintedByUserID
+
+---[20-07-2026 - Wiliam]---
+1. Modifikasi Temiang.Avicenna.ReportDataSource\RSMM\Emr\Assessment.asmx.cs method InPatientStd() untuk menambahkan field response SignImgByte agar INEUR.trdx muncul tanda tangan.
