@@ -26,6 +26,7 @@ namespace Temiang.Avicenna.WebService
             });
 
             context.Response.Clear();
+            context.Response.TrySkipIisCustomErrors = true;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = 200;
             context.Response.Write(json);
@@ -46,6 +47,7 @@ namespace Temiang.Avicenna.WebService
             });
 
             context.Response.Clear();
+            context.Response.TrySkipIisCustomErrors = true;
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = code;
             context.Response.Write(json);
