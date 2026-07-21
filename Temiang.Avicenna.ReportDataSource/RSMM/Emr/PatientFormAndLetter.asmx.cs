@@ -383,6 +383,17 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 if (p_IsForCasemix == "1") //Harus dikembalikan karena kalau tidak akan selalu menggunakan setingan terakhir
                     plan.Query.es.QuerySource = "MedicalDischargeSummaryByNurse";
 
+                DateTime? lastUpdateDateTime;
+
+                if (p_IsForCasemix == "1")
+                {
+                    lastUpdateDateTime = medsum.LastUpdateDateTime;
+                }
+                else
+                {
+                    lastUpdateDateTime = plan.LastUpdateDateTime;
+                }
+
                 // Healthcare
                 var hc = new Healthcare();
                 hc.LoadByPrimaryKey(AppSession.Parameter.HealthcareID);
@@ -492,8 +503,8 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     InitialDiagnose = medsum.InitialDiagnose,
                     ExternalCause = ConvertDataTabletoObject(ExternalCause(registrationNo)),
                     DpjpName = par.ParamedicName,
-                    DpjpSign = Convert.ToBase64String(imgDpjp)
-
+                    DpjpSign = Convert.ToBase64String(imgDpjp),
+                    LastUpdateDateTime = lastUpdateDateTime
                 };
 
                 var retField = MergeJsonData(HeaderField(pat, reg, null), additionalField);
