@@ -680,8 +680,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             }
             else
             {
-                //query.OrderBy(query.RegistrationDate.Descending, query.RegistrationNo.Descending);
-                query.OrderBy(query.RegistrationDate.Descending);
+                query.OrderBy(query.RegistrationDate.Descending, query.RegistrationNo.Descending);
             }
             
             DataTable dtbl;
