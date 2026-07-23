@@ -801,6 +801,8 @@
     <Compile Include="Generated\BpjsApolDetail.cs" />
     <Compile Include="Generated\BpjsRujukanSatuSehat.cs" />
     <Compile Include="Generated\BridgingTemplate.cs" />
+    <Compile Include="Generated\DashboardClinicConfig.cs" />
+    <Compile Include="Generated\DashboardClinicConfigDetail.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
     <Compile Include="Generated\DietBridging.cs" />
     <Compile Include="Generated\ImmunizationBridging.cs" />
