@@ -3401,6 +3401,7 @@
     <Content Include="WebService\Antrol.asmx" />
     <Content Include="WebService\Attendance.asmx" />
     <Content Include="WebService\AutoBillOnSchedule.asmx" />
+    <Content Include="WebService\ExecutiveMembershipRSI.asmx" />
     <Content Include="WebService\MobileWS2.asmx" />
     <Content Include="WebService\PCareService.asmx" />
     <Content Include="WebService\Disdukcapil.asmx" />
@@ -22652,6 +22653,9 @@
     <Compile Include="WebService\BillingChargeService.asmx.cs">
       <DependentUpon>BillingChargeService.asmx</DependentUpon>
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebService\ExecutiveMembershipRSI.asmx.cs">
+      <DependentUpon>ExecutiveMembershipRSI.asmx</DependentUpon>
     </Compile>
     <Compile Include="WebService\MobileWS2.asmx.cs">
       <DependentUpon>MobileWS2.asmx</DependentUpon>

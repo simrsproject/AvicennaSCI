@@ -675,7 +675,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
             if (isHistory && IsNewDisplayCasemixCenterSetting)
             {
-                query.OrderBy(query.BpjsSepNo.Descending,query.RegistrationDate.Descending, query.RegistrationNo.Descending);
+                //query.OrderBy(query.BpjsSepNo.Descending,query.RegistrationDate.Descending, query.RegistrationNo.Descending);
+                query.OrderBy(query.RegistrationDate.Descending);
             }
             else
             {
