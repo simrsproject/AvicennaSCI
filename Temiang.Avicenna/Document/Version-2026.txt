@@ -354,3 +354,6 @@ Titipan Daniel
 
 ---[20-07-2026 - Wiliam]---
 1. Modifikasi Temiang.Avicenna.ReportDataSource\RSMM\Emr\Assessment.asmx.cs method InPatientStd() untuk menambahkan field response SignImgByte agar INEUR.trdx muncul tanda tangan.
+
+---[23-07-2026 - Wiliam]---
+1. Modifikasi CasemixList.cs agar List History berdasarkan RegistrationDate DESC.
