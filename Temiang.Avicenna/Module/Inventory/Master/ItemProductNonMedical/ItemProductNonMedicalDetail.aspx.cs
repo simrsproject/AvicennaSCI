@@ -608,6 +608,8 @@ namespace Temiang.Avicenna.Module.Inventory.Master
                 args.IsCancel = true;
                 return;
             }
+
+            if (AppParameter.GetParameterValue(AppParameter.ParameterItem.IsCreateItemIdProductAutomatic) == "Yes")
             {
                 if (AppParameter.IsYes(AppParameter.ParameterItem.IsCreateItemIdProductAutomaticUseGroupInitial))
                     txtItemID.Text = Helper.GetItemProductIDUseGroupInitial(cboItemGroupID.SelectedValue);
