@@ -164,7 +164,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                     entity.Save();
 
                     var epColl = new EpisodeProcedureCollection();
-                    epColl.Query.Where(epColl.Query.BookingNo == bookingNo);
+                    //perlu ditambahkan sequenceNo juga agar tidak memvoid semua procedure
+                    //modified by Wiliam 2026-07-24
+                    epColl.Query.Where(epColl.Query.BookingNo == bookingNo && epColl.Query.SequenceNo == sequenceNo);
                     epColl.LoadAll();
                     foreach (var ep in epColl)
                     {

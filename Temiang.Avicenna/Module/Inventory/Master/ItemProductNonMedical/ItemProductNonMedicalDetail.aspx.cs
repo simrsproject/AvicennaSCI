@@ -34,7 +34,14 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             entity.IsAsset = chkIsAsset.Checked;
             entity.AssetGroupID = cboAssetGroupID.SelectedValue;
             entity.IsNewUpload = false;
-            entity.EconomicLifeInYear = Convert.ToInt32(txtEconomicLifeInYear.Value);
+
+            // CR: Economic Life > 1 Year - sync checkbox with EconomicLifeInYear
+            if (chkIsEconomicLifeMoreThanOneYear.Checked && Convert.ToInt32(txtEconomicLifeInYear.Value) <= 1)
+                entity.EconomicLifeInYear = 2;
+            else if (!chkIsEconomicLifeMoreThanOneYear.Checked)
+                entity.EconomicLifeInYear = 0;
+            else
+                entity.EconomicLifeInYear = Convert.ToInt32(txtEconomicLifeInYear.Value);
 
             //Last Update Status
             if (entity.es.IsAdded || entity.es.IsModified)
@@ -333,7 +340,11 @@ namespace Temiang.Avicenna.Module.Inventory.Master
 
             cboSREklaimGroup.SelectedValue = item.SREklaimTariffGroup;
             chkIsAsset.Checked = item.IsAsset ?? false;
-            txtEconomicLifeInYear.Value = Convert.ToDouble(txtEconomicLifeInYear.Value);
+            txtEconomicLifeInYear.Value = Convert.ToDouble(item.EconomicLifeInYear ?? 0);
+
+            // CR: Economic Life > 1 Year - auto-check based on EconomicLifeInYear
+            var economicLifeLimit = Convert.ToInt32(AppParameter.GetParameterValue(AppParameter.ParameterItem.acc_EconomicLifeInYearLimit));
+            chkIsEconomicLifeMoreThanOneYear.Checked = (item.EconomicLifeInYear ?? 0) >= economicLifeLimit;
             if (!string.IsNullOrEmpty(item.AssetGroupID))
             {
                 var ag = new AssetGroupQuery();
@@ -584,6 +595,20 @@ namespace Temiang.Avicenna.Module.Inventory.Master
                     args.IsCancel = true;
                     return;
                 }
+                if (!chkIsEconomicLifeMoreThanOneYear.Checked)
+                {
+                    args.MessageText = "Asset item must have Economic Life more than 1 year (Masa Pakai > 1 Tahun harus dicentang).";
+                    args.IsCancel = true;
+                    return;
+                }
+            }
+
+            // CR: Inventory item must not have Economic Life > 1 Year
+            if (chkIsInventoryItem.Checked && chkIsEconomicLifeMoreThanOneYear.Checked)
+            {
+                args.MessageText = "Inventory item should not have Economic Life more than 1 year (Masa Pakai > 1 Tahun tidak boleh dicentang untuk Inventory).";
+                args.IsCancel = true;
+                return;
             }
 
             if (AppParameter.GetParameterValue(AppParameter.ParameterItem.IsCreateItemIdProductAutomatic) == "Yes")
@@ -690,6 +715,20 @@ namespace Temiang.Avicenna.Module.Inventory.Master
                     args.IsCancel = true;
                     return;
                 }
+                if (!chkIsEconomicLifeMoreThanOneYear.Checked)
+                {
+                    args.MessageText = "Asset item must have Economic Life more than 1 year (Masa Pakai > 1 Tahun harus dicentang).";
+                    args.IsCancel = true;
+                    return;
+                }
+            }
+
+            // CR: Inventory item must not have Economic Life > 1 Year
+            if (chkIsInventoryItem.Checked && chkIsEconomicLifeMoreThanOneYear.Checked)
+            {
+                args.MessageText = "Inventory item should not have Economic Life more than 1 year (Masa Pakai > 1 Tahun tidak boleh dicentang untuk Inventory).";
+                args.IsCancel = true;
+                return;
             }
 
             if (IsBarcodeUsedByOtherItem(args, txtItemID.Text, txtBarcode.Text))
