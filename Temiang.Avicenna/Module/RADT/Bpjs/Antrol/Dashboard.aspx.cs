@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Data;
 using System.Linq;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -16,6 +17,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.Antrol
         protected void Page_Init(object sender, EventArgs e)
         {
             ProgramID = AppConstant.Program.AntrianOnlineDashboard;
+            ScriptManager.GetCurrent(Page)?.RegisterPostBackControl(btnExportAntreanPerTanggal);
 
             if (!IsPostBack)
             {
@@ -523,16 +525,26 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.Antrol
 
         protected void btnAntreanPerTanggal_Click(object sender, EventArgs e)
         {
+            grdAntreanPerTanggal.DataSource = GetAntreanPerTanggal();
+            grdAntreanPerTanggal.DataBind();
+        }
+
+        protected void btnExportAntreanPerTanggal_Click(object sender, ImageClickEventArgs e)
+        {
+            CreateExcelFile.CreateExcelDocument(GetAntreanPerTanggal(), $"AntreanPerTanggal-{txtAntreanPerTanggal.SelectedDate?.ToString("yyyyMMdd")}.xlsx", Response);
+        }
+
+        private List<Common.BPJS.Antrian.List.Antrean.PerTanggal.List> GetAntreanPerTanggal()
+        {
             var svc = new Common.BPJS.Antrian.Service();
             var response = svc.GetAntreanPerTanggal(txtAntreanPerTanggal.SelectedDate?.ToString("yyyy-MM-dd"));
-            if (response.Metadata.IsAntrolValid)
-            {
-                var list = response.Response.List;
-                if (!string.IsNullOrWhiteSpace(cboPoliAntreanPerTanggal.SelectedValue)) list = list.Where(l => l.Kodepoli == cboPoliAntreanPerTanggal.SelectedValue).ToList();
-                if (!string.IsNullOrWhiteSpace(cboDokterAntreanPerTanggal.SelectedValue)) list = list.Where(l => l.Kodedokter == cboDokterAntreanPerTanggal.SelectedValue.ToInt()).ToList();
-                grdAntreanPerTanggal.DataSource = list;
-                grdAntreanPerTanggal.DataBind();
-            }
+            if (response == null || response.Metadata == null || !response.Metadata.IsAntrolValid || response.Response == null || response.Response.List == null) return new List<Common.BPJS.Antrian.List.Antrean.PerTanggal.List>();
+
+            var list = response.Response.List;
+            if (!string.IsNullOrWhiteSpace(cboPoliAntreanPerTanggal.SelectedValue)) list = list.Where(l => l.Kodepoli == cboPoliAntreanPerTanggal.SelectedValue).ToList();
+            if (!string.IsNullOrWhiteSpace(cboDokterAntreanPerTanggal.SelectedValue)) list = list.Where(l => l.Kodedokter == cboDokterAntreanPerTanggal.SelectedValue.ToInt()).ToList();
+
+            return list;
         }
     }
 }
