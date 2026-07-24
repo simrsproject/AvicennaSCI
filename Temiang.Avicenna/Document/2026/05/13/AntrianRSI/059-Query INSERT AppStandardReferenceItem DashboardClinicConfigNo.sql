@@ -1,0 +1,36 @@
+INSERT INTO AppStandardReferenceItem
+(
+    StandardReferenceID,
+    ItemID,
+    ItemName,
+    Note,
+    IsUsedBySystem,
+    IsActive,
+    LastUpdateDateTime,
+    LastUpdateByUserID,
+    ReferenceID,
+    coaID,
+    subledgerID,
+    CustomField,
+    LineNumber,
+    NumericValue,
+    CustomField2
+)
+VALUES
+(
+    'AutoNumber',
+    'DashboardClinicConfigNo',
+    'Dashboard Clinic Config No',
+    '',
+    1,
+    1,
+    GETDATE(),
+    'andika',
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+);
