@@ -1,5 +1,6 @@
 ﻿using DevExpress.XtraRichEdit.Model;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -5089,6 +5090,87 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
+
+        [WebMethod(EnableSession = true, Description = @"
+        Digunakan untuk menghapus konfigurasi Dashboard Clinic.
+
+        Request Body (JSON)
+
+        {
+            ""ConfigID"": ""CFG-260723-0001""
+        }
+
+        Keterangan Parameter :
+
+        ConfigID : ID konfigurasi Dashboard Clinic yang akan dihapus.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""message"": ""Dashboard clinic configuration berhasil dihapus.""
+        }
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void DeleteDashboardClinicConfig()
+        {
+            try
+            {
+                if (AppSession.UserLogin == null)
+                {
+                    AppSession.UserLogin = new UserLogin
+                    {
+                        UserID = "WEBSERVICE",
+                        UserName = "WEBSERVICE"
+                    };
+                }
+
+                string configID = (Context.Request["ConfigID"] ?? "").Trim();
+
+                // =============================
+                // Support Raw JSON
+                // =============================
+                if (String.IsNullOrEmpty(configID))
+                {
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!String.IsNullOrWhiteSpace(body))
+                        {
+                            JObject obj = JsonConvert.DeserializeObject<JObject>(body);
+
+                            configID = (obj["ConfigID"] ?? "").ToString();
+                        }
+                    }
+                }
+
+                if (String.IsNullOrWhiteSpace(configID))
+                    throw new Exception("ConfigID tidak boleh kosong.");
+
+                DashboardClinicConfig.DeleteConfig(configID);
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        ConfigID = configID
+                    },
+                    "Dashboard clinic configuration berhasil dihapus."
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
 
     }
 }

@@ -767,6 +767,26 @@ namespace Temiang.Avicenna.BusinessObject
 
             return result;
         }
+
+        public static void DeleteConfig(string configID)
+        {
+            if (String.IsNullOrWhiteSpace(configID))
+                throw new Exception("ConfigID tidak boleh kosong.");
+
+            DashboardClinicConfig config = new DashboardClinicConfig();
+
+            if (!config.LoadByPrimaryKey(configID))
+                throw new Exception("Dashboard clinic configuration tidak ditemukan.");
+
+            // Hapus detail terlebih dahulu
+            DashboardClinicConfigDetail.DeleteByConfigID(configID);
+
+            // Hapus header
+            config.MarkAsDeleted();
+            config.Save();
+        }
+
+
     }
 
 	[Serializable]
