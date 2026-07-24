@@ -16,6 +16,7 @@ using Temiang.Avicenna.Common;
 using Temiang.Dal;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
+using static Temiang.Avicenna.BusinessObject.DashboardClinicConfig;
 using static Temiang.Avicenna.BusinessObject.VisitQueue;
 
 namespace Temiang.Avicenna.WebService
@@ -129,6 +130,26 @@ namespace Temiang.Avicenna.WebService
             public List<string> ServiceUnitID { get; set; }
 
             public DateTime? QueueDate { get; set; }
+        }
+
+        public class DashboardClinicConfigRequest
+        {
+            public string ConfigID { get; set; }
+
+            public string UserID { get; set; }
+
+            public string ConfigName { get; set; }
+
+            public DashboardClinicSetting Settings { get; set; }
+
+            public List<DashboardClinicRoomItem> Rooms { get; set; }
+        }
+
+        public class DashboardClinicSetting
+        {
+            public bool AutoRefresh { get; set; }
+
+            public int RefreshIntervalSec { get; set; }
         }
 
         //1. Pasien Ambil Antrian
@@ -4682,6 +4703,392 @@ namespace Temiang.Avicenna.WebService
                 );
             }
         }
+
+        [WebMethod(EnableSession = true, Description = @"
+        Digunakan untuk menyimpan konfigurasi Dashboard Clinic.
+
+        Method : POST
+
+        Request Body (JSON)
+
+        {
+            ""ConfigID"": ""CFG-260723-0001"", // Optional. Kosongkan untuk membuat konfigurasi baru.
+            ""UserID"": ""240092"",
+            ""ConfigName"": ""Display Poli Anak Lantai 1"",
+            ""Settings"": {
+                ""AutoRefresh"": true,
+                ""RefreshIntervalSec"": 5
+            },
+            ""Rooms"": [
+                {
+                    ""ServiceUnitID"": ""D2.2.03.2"",
+                    ""StageID"": ""POLI"",
+                    ""ParamedicID"": ""DR001"",
+                    ""KamarID"": 1
+                },
+                {
+                    ""ServiceUnitID"": ""D2.2.03.2"",
+                    ""StageID"": ""POLI"",
+                    ""ParamedicID"": ""DR002"",
+                    ""KamarID"": 2
+                }
+            ]
+        }
+
+        Keterangan Parameter :
+
+        ConfigID            : ID konfigurasi Dashboard Clinic.
+                              - Kosong = Tambah konfigurasi baru.
+                              - Diisi = Update konfigurasi yang sudah ada.
+
+        UserID              : ID User pemilik konfigurasi.
+
+        ConfigName          : Nama konfigurasi Dashboard Clinic.
+
+        Settings.AutoRefresh
+                            : Mengaktifkan atau menonaktifkan auto refresh dashboard.
+
+        Settings.RefreshIntervalSec
+                            : Interval refresh dashboard dalam satuan detik.
+
+        Rooms               : Daftar konfigurasi room yang akan ditampilkan.
+
+        Rooms.ServiceUnitID : ID Service Unit.
+
+        Rooms.StageID       : ID Tahapan Antrian.
+
+        Rooms.ParamedicID   : ID Dokter.
+
+        Rooms.KamarID       : ID Kamar Display.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""message"": ""Dashboard clinic configuration berhasil disimpan."",
+            ""data"": {
+                ""ConfigID"": ""CFG-260723-0001""
+            }
+        }
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void SaveDashboardClinicConfig()
+        {
+            try
+            {
+                if (AppSession.UserLogin == null)
+                {
+                    AppSession.UserLogin = new UserLogin
+                    {
+                        UserID = "WEBSERVICE",
+                        UserName = "WEBSERVICE"
+                    };
+                }
+
+                DashboardClinicConfigRequest request = null;
+
+                // ==================================
+                // PRIORITAS 1 : FORM / QUERY STRING
+                // ==================================
+                string userID = (Context.Request["UserID"] ?? "").Trim();
+
+                if (!String.IsNullOrEmpty(userID))
+                {
+                    request = new DashboardClinicConfigRequest();
+
+                    request.ConfigID = (Context.Request["ConfigID"] ?? "").Trim();
+                    request.UserID = userID;
+                    request.ConfigName = (Context.Request["ConfigName"] ?? "").Trim();
+
+                    request.Settings = new DashboardClinicSetting
+                    {
+                        AutoRefresh = Convert.ToBoolean(Context.Request["AutoRefresh"] ?? "false"),
+                        RefreshIntervalSec = Convert.ToInt32(Context.Request["RefreshIntervalSec"] ?? "0")
+                    };
+
+                    string roomsJson = (Context.Request["Rooms"] ?? "").Trim();
+
+                    request.Rooms = String.IsNullOrWhiteSpace(roomsJson)
+                        ? new List<DashboardClinicConfig.DashboardClinicRoomItem>()
+                        : JsonConvert.DeserializeObject<List<DashboardClinicConfig.DashboardClinicRoomItem>>(roomsJson);
+                }
+                else
+                {
+                    // ==================================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ==================================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!String.IsNullOrWhiteSpace(body))
+                        {
+                            request =
+                                JsonConvert.DeserializeObject<DashboardClinicConfigRequest>(body);
+                        }
+                    }
+                }
+
+                if (request == null)
+                    throw new Exception("Request tidak valid.");
+
+                if (String.IsNullOrEmpty(request.UserID))
+                    throw new Exception("UserID tidak boleh kosong.");
+
+                if (request.Settings == null)
+                    throw new Exception("Settings tidak boleh kosong.");
+
+                if (request.Rooms == null || request.Rooms.Count == 0)
+                    throw new Exception("Room minimal satu.");
+
+                bool isNew = String.IsNullOrEmpty(request.ConfigID);
+
+                string configID = request.ConfigID;
+
+                if (isNew)
+                {
+                    var autoNumber = Helper.GetNewAutoNumber(
+                        (new DateTime()).NowAtSqlServer().Date,
+                        AppEnum.AutoNumber.DashboardClinicConfigNo
+                    );
+
+                    configID = autoNumber.LastCompleteNumber;
+
+                    // jangan lupa simpan LastNumber
+                    autoNumber.Save();
+                }
+
+                configID = DashboardClinicConfig.SaveConfig(
+                    configID,
+                    isNew,
+                    request.UserID,
+                    request.ConfigName,
+                    request.Settings.AutoRefresh,
+                    request.Settings.RefreshIntervalSec,
+                    request.Rooms
+                );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        ConfigID = configID,
+                        ConfigName = request.ConfigName,
+                        UserID = request.UserID,
+
+                        Settings = new
+                        {
+                            AutoRefresh = request.Settings.AutoRefresh,
+                            RefreshIntervalSec = request.Settings.RefreshIntervalSec
+                        },
+
+                        RoomCount = request.Rooms.Count,
+
+                        Rooms = request.Rooms,
+
+                        LastUpdateDateTime = (new DateTime()).NowAtSqlServer()
+                    },
+                    "Dashboard poliklinik configuration berhasil disimpan."
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.ToString(),
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = false, Description = @"
+        Digunakan untuk mendapatkan daftar konfigurasi Dashboard Clinic.
+
+        Request Body (JSON)
+
+        {
+            ""UserID"": ""240092"" // Optional
+        }
+
+        Keterangan Parameter :
+
+        UserID : (Optional)
+                 - Kosong = Menampilkan seluruh konfigurasi Dashboard Clinic.
+                 - Diisi  = Menampilkan konfigurasi Dashboard Clinic milik User tersebut.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""errorCode"": null,
+            ""message"": ""Dashboard config ditemukan"",
+            ""data"": {
+                ""Configs"": [
+                    {
+                        ""ConfigID"": ""CFG-001"",
+                        ""ConfigName"": ""Display Poli Anak Lantai 1"",
+                        ""RoomCount"": 2,
+                        ""UpdatedAt"": ""2026-07-23T10:30:00+07:00""
+                    },
+                    {
+                        ""ConfigID"": ""CFG-002"",
+                        ""ConfigName"": ""Dashboard Poli Penyakit Dalam"",
+                        ""RoomCount"": 3,
+                        ""UpdatedAt"": ""2026-07-23T11:00:00+07:00""
+                    }
+                ]
+            }
+        }
+        ")]         
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetDashboardClinicConfigList()
+        {
+            try
+            {
+                string userID = (Context.Request["UserID"] ?? "").Trim();
+
+                if (String.IsNullOrWhiteSpace(userID))
+                {
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!String.IsNullOrWhiteSpace(body))
+                        {
+                            dynamic request = JsonConvert.DeserializeObject(body);
+
+                            if (request != null && request.UserID != null)
+                                userID = request.UserID.ToString();
+                        }
+                    }
+                }
+
+                var configs = DashboardClinicConfig.GetConfigList(userID);
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        Configs = configs
+                    },
+                    "Dashboard config ditemukan"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.ToString(),
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = true, Description = @"
+        Digunakan untuk mengambil detail konfigurasi Dashboard Clinic berdasarkan UserID dan ConfigID.
+
+        Parameter :
+
+        ConfigID = ID konfigurasi Dashboard Clinic.
+        UserID   = ID User pemilik konfigurasi.
+
+        Contoh Request :
+
+        GetDashboardClinicConfigDetail?
+        ConfigID=CFG-260723-0007&
+        UserID=240092
+
+        Keterangan Parameter :
+
+        ConfigID
+            : Wajib.
+              ID konfigurasi Dashboard Clinic yang akan diambil.
+
+        UserID
+            : Wajib.
+              User pemilik konfigurasi. Digunakan untuk memastikan
+              bahwa konfigurasi yang diminta memang milik User tersebut.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""errorCode"": null,
+            ""message"": ""Dashboard clinic configuration found"",
+            ""data"": {
+                ""ConfigID"": ""CFG-260723-0001"",
+                ""ConfigName"": ""Display Executive Klinik"",
+                ""UserID"": ""240092"",
+                ""Rooms"": [
+                    {
+                        ""ServiceUnitID"": ""D2.2.03.2"",
+                        ""ServiceUnitName"": ""Poliklinik Anak"",
+                        ""StageID"": ""POLI"",
+                        ""StageName"": ""Poliklinik"",
+                        ""ParamedicID"": ""MD-00005"",
+                        ""ParamedicName"": ""dr. Budi"",
+                        ""KamarID"": ""1"",
+                        ""KamarCode"": ""Kamar_1"",
+                        ""KamarName"": ""Kamar 1""
+                    }
+                ],
+                ""Settings"": {
+                    ""AutoRefresh"": true,
+                    ""RefreshIntervalSec"": 5
+                },
+                ""UpdatedAt"": ""2026-07-23T21:17:39+07:00""
+            }
+        }
+
+        Response Error :
+
+        {
+            ""success"": false,
+            ""code"": 500,
+            ""errorCode"": ""ERR"",
+            ""message"": ""Dashboard clinic configuration tidak ditemukan."",
+            ""data"": null
+        }
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetDashboardClinicConfigDetail()
+        {
+            try
+            {
+                string configID = (Context.Request["ConfigID"] ?? "").Trim();
+                string userID = (Context.Request["UserID"] ?? "").Trim();
+
+                if (String.IsNullOrEmpty(configID))
+                    throw new Exception("ConfigID tidak boleh kosong.");
+
+                if (String.IsNullOrEmpty(userID))
+                    throw new Exception("UserID tidak boleh kosong.");
+
+                var data = DashboardClinicConfig.GetConfigDetail(
+                    configID,
+                    userID);
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Dashboard clinic detail ditemukan");
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500);
+            }
+        }
+
 
     }
 }
