@@ -38,6 +38,8 @@ namespace Temiang.Avicenna.Module.Inventory.Master
             // CR: Economic Life > 1 Year - sync checkbox with EconomicLifeInYear
             if (chkIsEconomicLifeMoreThanOneYear.Checked && Convert.ToInt32(txtEconomicLifeInYear.Value) <= 1)
                 entity.EconomicLifeInYear = 2;
+            else if (!chkIsEconomicLifeMoreThanOneYear.Checked)
+                entity.EconomicLifeInYear = 0;
             else
                 entity.EconomicLifeInYear = Convert.ToInt32(txtEconomicLifeInYear.Value);
 

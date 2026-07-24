@@ -618,7 +618,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                                 if (ChkIsInventoryItem.Checked && (amount >= assetLimitAmount) && ((i.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
                                 {
                                     args.IsValid = false;
-                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price >= Rp. {0} and economic life >= {1} year(s), should be asset) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
+                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price >= Rp. {0} and economic life >= {1} year(s), should be classified as asset) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
                                     return;
                                 }
                             }
