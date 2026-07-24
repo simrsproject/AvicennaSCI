@@ -604,7 +604,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                             if (ChkIsAssets.Checked || (i.IsAsset ?? false))
                             {
-                                // CR: Asset must have amount >= limit AND economic life >= limit
+                                // Asset must have amount >= limit AND economic life >= limit
                                 if ((amount < assetLimitAmount) || (i.EconomicLifeInYear ?? 0) < economicLifeInYearLimit)
                                 {
                                     args.IsValid = false;
@@ -614,12 +614,11 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             }
                             else
                             {
-                                // CR: Inventory must not have amount >= limit OR economic life >= limit
-                                if (ChkIsInventoryItem.Checked && ((amount >= assetLimitAmount) || (i.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
+                                // Inventory warning: amount >= limit AND economic life >= limit (should be asset instead)
+                                if (ChkIsInventoryItem.Checked && (amount >= assetLimitAmount) && ((i.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
                                 {
-
                                     args.IsValid = false;
-                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price more than Rp. {0} or economic life more than {1} year(s)) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
+                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price >= Rp. {0} and economic life >= {1} year(s), should be asset) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
                                     return;
                                 }
                             }
