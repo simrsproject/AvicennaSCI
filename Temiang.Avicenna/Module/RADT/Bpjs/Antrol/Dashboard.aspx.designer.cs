@@ -330,6 +330,15 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.Antrol
         protected global::System.Web.UI.WebControls.Button btnAntreanPerTanggal;
 
         /// <summary>
+        /// btnExportAntreanPerTanggal control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnExportAntreanPerTanggal;
+
+        /// <summary>
         /// grdAntreanPerTanggal control.
         /// </summary>
         /// <remarks>
