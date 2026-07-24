@@ -463,6 +463,10 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
             AppendBuilder("Thorax:", string.IsNullOrWhiteSpace(pe.Thorax.Summary) ? GetSummaryValue(pe.Thorax) : pe.Thorax.Summary, strBuilder);
             AppendBuilder("Abdomen & Pelvis:", string.IsNullOrWhiteSpace(pe.AbdomenPelvis.Summary) ? GetSummaryValue(pe.AbdomenPelvis) : pe.AbdomenPelvis.Summary, strBuilder);
 
+            //Untuk IGD pengambilannya dari Info2 karena lebih lengkap
+            //2026-07-24
+            var rim = new RegistrationInfoMedic();
+            rim.LoadByPrimaryKey(asses.RegistrationInfoMedicID);
 
             /// <summary>
             /// Tambahan u/ cetakan assessment igd : Triase, Skala nyeri, Flacc, Esi, Subjective, Objective, Diagnose
@@ -587,6 +591,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     IsDoa = "05".Equals(reg.SRTriage),
                 },
                 PemeriksaanDokter = strBuilder.ToString(),
+                PemeriksaanDokterInfo2 = rim.Info2,
                 LocalistUrl = LocalistUrl(asses, "LIGD"),
                 LocalistUrl2 = LocalistUrl(asses, "NYERI"),
                 LocalistUrl3 = LocalistUrl(asses, "Nyeri(NRS)"),

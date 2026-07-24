@@ -116,6 +116,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
 
             // ✅ TAMBAHAN CASE TYPE
             igd.CaseType = rblCaseType.SelectedValue;
+            igd.TriageText = ddlTriage.SelectedText;
 
             assessment.PhysicalExam = JsonConvert.SerializeObject(igd);
 
