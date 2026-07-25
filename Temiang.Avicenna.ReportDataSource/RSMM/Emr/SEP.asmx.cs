@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Script.Services;
 using System.Web.Services;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.Common;
 
 namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 {
@@ -28,8 +29,8 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                 presQ.InnerJoin(regQ).On(presQ.RegistrationNo == regQ.RegistrationNo)
                     .InnerJoin(sepQ).On(regQ.BpjsSepNo == sepQ.NoSEP)
-                    .Where(presQ.PrescriptionNo == p_PrescriptionNo)
-                    .Select(sepQ.NoSEP, sepQ.NomorKartu, sepQ.NoRujukan, sepQ.TanggalRujukan, sepQ.TanggalSEP);
+                    .Where(presQ.PrescriptionNo == p_PrescriptionNo, regQ.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
+                    .Select(sepQ.NoSEP, sepQ.NomorKartu, sepQ.NoRujukan, sepQ.TanggalRujukan, sepQ.TanggalSEP, sepQ.PoliRujukan);
                 presQ.es.Top = 1;
                 var resultTable = presQ.LoadDataTable();
 
@@ -46,23 +47,45 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     );
                     return;
                 }
-                string poliRujukan = string.Empty;
+                string poliRujukan = Convert.ToString(resultTable.Rows[0]["PoliRujukan"]);
                 string nomorKartu = Convert.ToString(resultTable.Rows[0]["NomorKartu"]);
                 string nomorRujukan = Convert.ToString(resultTable.Rows[0]["NoRujukan"]);
+                string noSep = Convert.ToString(resultTable.Rows[0]["NoSEP"]);
 
                 if (!string.IsNullOrEmpty(nomorKartu)) 
                 {
                     try
                     {
-                        var svc = new Temiang.Avicenna.Common.BPJS.VClaim.v11.Service();
-                        var rujukan = svc.GetRujukan(nomorKartu, Temiang.Avicenna.Common.BPJS.VClaim.Enum.JenisFaskes.Faskes_1);
-                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                        if (!string.IsNullOrEmpty(poliRujukan))
                         {
-                            if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == nomorRujukan) != null)
+                            var asri = new AppStandardReferenceItem();
+                            if (asri.LoadByPrimaryKey("BpjsReferensiPoli", poliRujukan.ToUpper()))
                             {
-                                poliRujukan = rujukan.Response.Rujukan
-                                                .SingleOrDefault(r => r.NoKunjungan == nomorRujukan)?.PoliRujukan.Nama;
+                                poliRujukan = asri.ItemName;
                             }
+                        }else
+                        {
+                            var svc = new Temiang.Avicenna.Common.BPJS.VClaim.v11.Service();
+                            var rujukan = svc.GetRujukan(nomorKartu, Temiang.Avicenna.Common.BPJS.VClaim.Enum.JenisFaskes.Faskes_1);
+                            var kodePoli = string.Empty;
+                            if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                            {
+                                if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == nomorRujukan) != null)
+                                {
+                                    poliRujukan = rujukan.Response.Rujukan
+                                                    .SingleOrDefault(r => r.NoKunjungan == nomorRujukan)?.PoliRujukan.Nama;
+                                    kodePoli = rujukan.Response.Rujukan
+                                                    .SingleOrDefault(r => r.NoKunjungan == nomorRujukan)?.PoliRujukan.Kode;
+                                }
+
+                                var sep = new BpjsSEP();
+                                if (sep.LoadByPrimaryKey(noSep) && !string.IsNullOrEmpty(kodePoli))
+                                {
+                                    sep.PoliRujukan = kodePoli;
+                                    sep.Save();
+                                }
+                            }
+
                         }
                     }
                     catch(Exception e)

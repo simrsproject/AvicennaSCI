@@ -665,19 +665,38 @@ namespace Temiang.Avicenna.Module.RADT
                         {
                             try
                             {
-                                var svc = new Common.BPJS.VClaim.v11.Service();
-                                var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
-                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
+
+                                //modified by Wiliam 2026-07-26 
+                                //agar tidak perlu mengambil ke API BPJS jika ada PoliRujukan di table BpjsSEP
+                                if(!string.IsNullOrEmpty(sep.PoliRujukan))
                                 {
-                                    if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                    var asri = new AppStandardReferenceItem();
+                                    if (asri.LoadByPrimaryKey("BpjsReferensiPoli", sep.PoliRujukan.ToUpper()))
                                     {
-                                        lblNoRujukan.Text =
-                                            rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
-                                                ?.NoKunjungan ?? string.Empty;
-                                        lblPoliRujukan.Text = rujukan.Response.Rujukan
-                                            .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                        lblNoRujukan.Text = sep.NoRujukan;
+                                        lblPoliRujukan.Text = asri.ItemName;
+                                    }
+                                } else
+                                { //jika tidak ada ambil dari API BPJS
+
+                                    var svc = new Common.BPJS.VClaim.v11.Service();
+                                    var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
+                                    if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                    {
+                                        if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                        {
+                                            lblNoRujukan.Text =
+                                                rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                                    ?.NoKunjungan ?? string.Empty;
+                                            lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                                .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+
+                                            sep.PoliRujukan = rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Kode;
+                                            sep.Save();
+                                        }
                                     }
                                 }
+
 
                                 //svc = new Service();
                                 //rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
