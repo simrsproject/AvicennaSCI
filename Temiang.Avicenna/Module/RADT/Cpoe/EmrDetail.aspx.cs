@@ -679,19 +679,20 @@ namespace Temiang.Avicenna.Module.RADT
                                     }
                                 }
 
-                                svc = new Service();
-                                rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
-                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
-                                {
-                                    if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
-                                    {
-                                        lblNoRujukan.Text =
-                                            rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
-                                                ?.NoKunjungan ?? string.Empty;
-                                        lblPoliRujukan.Text = rujukan.Response.Rujukan
-                                            .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
-                                    }
-                                }
+                                //svc = new Service();
+                                //rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
+                                //if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                //{
+                                //    if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                //    {
+                                //        lblNoRujukan.Text =
+                                //            rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                //                ?.NoKunjungan ?? string.Empty;
+                                //        lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                //            .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+                                //    }
+                                //}
+
                             }
                             catch (Exception ex)
                             {
