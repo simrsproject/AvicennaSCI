@@ -357,3 +357,6 @@ Titipan Daniel
 
 ---[23-07-2026 - Wiliam]---
 1. Modifikasi CasemixList.cs agar List History berdasarkan RegistrationDate DESC.
+
+---[28-07-2026 - Rizki]---
+1. Menambah Create dan LastUpdate RegistrationInfoMedic WebService MDS.
