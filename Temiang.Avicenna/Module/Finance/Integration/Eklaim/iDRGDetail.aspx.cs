@@ -2411,7 +2411,7 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                     txtProsedurNonBedah_TextChanged(null, null);
 
                     var ib = new IntermBillCollection();
-                    ib.Query.Where(ib.Query.RegistrationNo == Request.QueryString["regno"], ib.Query.IsVoid == false);
+                    ib.Query.Where(ib.Query.RegistrationNo.In(MergeRegistrationList()), ib.Query.IsVoid == false);
                     if (ib.Query.Load())
                     {
                         var admin = ib.Select(b => b.AdministrationAmount + b.GuarantorAdministrationAmount).Sum();
@@ -3123,7 +3123,7 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                     txtBMHP.Value = 0;
 
                     var ib = new IntermBillCollection();
-                    ib.Query.Where(ib.Query.RegistrationNo == Request.QueryString["regno"], ib.Query.IsVoid == false);
+                    ib.Query.Where(ib.Query.RegistrationNo.In(MergeRegistrationList()), ib.Query.IsVoid == false);
                     if (ib.Query.Load())
                     {
                         var admin = ib.Select(b => b.AdministrationAmount + b.GuarantorAdministrationAmount).Sum();
@@ -3249,7 +3249,7 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
                 txtBMHP.Value = 0;
 
                 var ib = new IntermBillCollection();
-                ib.Query.Where(ib.Query.RegistrationNo == Request.QueryString["regno"], ib.Query.IsVoid == false);
+                ib.Query.Where(ib.Query.RegistrationNo.In(MergeRegistrationList()), ib.Query.IsVoid == false);
                 if (ib.Query.Load())
                 {
 
@@ -6108,7 +6108,7 @@ namespace Temiang.Avicenna.Module.Finance.Integration.Eklaim
 
         private string[] MergeRegistrationList()
         {
-            return Helper.MergeBilling.GetMergeRegistration(Request.QueryString["regno"]);
+            return Helper.MergeBilling.GetFullMergeRegistration(Request.QueryString["regno"]);
         }
 
         //public string IsReceiptAvalilable
