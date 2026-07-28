@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -7,11 +9,10 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.BusinessObject.JsonField;
 using Temiang.Avicenna.BusinessObject.JsonField.Assesment;
@@ -425,6 +426,28 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 var refer = new ReferExternal();
                 refer.LoadByPrimaryKey(registrationNo);
 
+                //Create and LastUpdate RegistrationInfoMedic
+                var regMed = new RegistrationInfoMedic();
+                regMed.Query.Where(
+                    regMed.Query.RegistrationNo == registrationNo,
+                    regMed.Query.SRMedicalNotesInputType == "MDS"
+                );
+
+                string lastUpdateRegMedUserName = string.Empty;
+                string createdRegMedUserName = string.Empty;
+
+                if (regMed.Query.Load())
+                {
+                    var lastUser = new AppUser();
+                    lastUser.LoadByPrimaryKey(regMed.LastUpdateByUserID);
+
+                    var createdUser = new AppUser();
+                    createdUser.LoadByPrimaryKey(regMed.CreatedByUserID);
+
+                    lastUpdateRegMedUserName = lastUser.UserName;
+                    createdRegMedUserName = createdUser.UserName;
+                }
+
                 // DPJP Sign
                 var userDpjpsign = DpjpSignUser(registrationNo);
 
@@ -504,7 +527,11 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     ExternalCause = ConvertDataTabletoObject(ExternalCause(registrationNo)),
                     DpjpName = par.ParamedicName,
                     DpjpSign = Convert.ToBase64String(imgDpjp),
-                    LastUpdateDateTime = lastUpdateDateTime
+                    LastUpdateDateTime = lastUpdateDateTime,
+                    RegistrationInfoMedicCreatedBy = createdRegMedUserName,
+                    RegistrationInfoMedicCreatedDate = regMed.CreatedDateTime,
+                    RegistrationInfoMedicLastUpdatedBy = lastUpdateRegMedUserName,
+                    RegistrationInfoMedicLastUpdatedDate = regMed.LastUpdateDateTime
                 };
 
                 var retField = MergeJsonData(HeaderField(pat, reg, null), additionalField);
@@ -927,6 +954,28 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 var refer = new ReferExternal();
                 refer.LoadByPrimaryKey(registrationNo);
 
+                //Create and LastUpdate RegistrationInfoMedic
+                var regMed = new RegistrationInfoMedic();
+                regMed.Query.Where(
+                    regMed.Query.RegistrationNo == registrationNo,
+                    regMed.Query.SRMedicalNotesInputType == "MDS"
+                );
+
+                string lastUpdateRegMedUserName = string.Empty;
+                string createdRegMedUserName = string.Empty;
+
+                if (regMed.Query.Load())
+                {
+                    var lastUser = new AppUser();
+                    lastUser.LoadByPrimaryKey(regMed.LastUpdateByUserID);
+
+                    var createdUser = new AppUser();
+                    createdUser.LoadByPrimaryKey(regMed.CreatedByUserID);
+
+                    lastUpdateRegMedUserName = lastUser.UserName;
+                    createdRegMedUserName = createdUser.UserName;
+                }
+
                 var signParamedic = SignParamedic(registrationNo).Rows.Count > 1 ? SignParamedic(registrationNo).Rows[0]["SignatureImage"] : null;
 
                 // DPJP Sign
@@ -935,7 +984,6 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 DataRow row = userDpjpsign.Rows[0];
                 byte[] imgDpjp = row["SignatureImage"] as byte[];
                 imgDpjp = imgDpjp ?? new byte[0];
-
 
                 var additionalField = new
                 {
@@ -991,7 +1039,11 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     Dpjp = par.ParamedicName,
                     DpjpSign = Convert.ToBase64String(imgDpjp),
                     DpjpSignByte = imgDpjp,
-                    SignatureImageByte = signimg.SignatureImage
+                    SignatureImageByte = signimg.SignatureImage,
+                    RegistrationInfoMedicCreatedBy = createdRegMedUserName,
+                    RegistrationInfoMedicCreatedDate = regMed.CreatedDateTime,
+                    RegistrationInfoMedicLastUpdatedBy = lastUpdateRegMedUserName,
+                    RegistrationInfoMedicLastUpdatedDate = regMed.LastUpdateDateTime
                 };
 
                 var retField = MergeJsonData(HeaderField(pat, reg, null), additionalField);
