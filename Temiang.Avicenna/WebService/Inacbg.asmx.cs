@@ -660,8 +660,10 @@ namespace Temiang.Avicenna.WebService
                 return "not ok - data mds dischargemethod tidak ditemukan";
             }
 
+            var registrationNos = Helper.MergeBilling.GetFullMergeRegistration(reg.RegistrationNo);
+
             var bill = new IntermBillCollection();
-            bill.Query.Where(bill.Query.RegistrationNo == reg.RegistrationNo, bill.Query.IsVoid == false);
+            bill.Query.Where(bill.Query.RegistrationNo.In(registrationNos), bill.Query.IsVoid == false);
             if (!bill.Query.Load())
             {
                 log.Response = "Data Interm Bill tidak ditemukan";
@@ -1121,6 +1123,14 @@ namespace Temiang.Avicenna.WebService
 
             SaveNccIdrg(registrationNo, "InacbgDiagnosaGet", paramGetDiag, responseGetDiag);
 
+            var oldDiagInas = new EpisodeDiagnoseInaGroupperCollection();
+            oldDiagInas.Query.Where(oldDiagInas.Query.RegistrationNo == registrationNo);
+            if (oldDiagInas.Query.Load())
+            {
+                oldDiagInas.MarkAllAsDeleted();
+                oldDiagInas.Save();
+            }
+
             var diagInas = new EpisodeDiagnoseInaGroupperCollection();
             foreach (var diag in responseGetDiag.Data.Expanded.Where(d => d.ValidCode == "1"))
             {
@@ -1159,6 +1169,14 @@ namespace Temiang.Avicenna.WebService
             }
 
             SaveNccIdrg(registrationNo, "InacbgProcedureGet", paramGetProc, responseGetProc);
+
+            var oldDiagProcs = new EpisodeProcedureInaGroupperCollection();
+            oldDiagProcs.Query.Where(oldDiagProcs.Query.RegistrationNo == registrationNo);
+            if (oldDiagProcs.Query.Load())
+            {
+                oldDiagProcs.MarkAllAsDeleted();
+                oldDiagProcs.Save();
+            }
 
             var diagProcs = new EpisodeProcedureInaGroupperCollection();
             foreach (var proc in responseGetProc.Data.Expanded.Where(d => d.ValidCode == "1"))
