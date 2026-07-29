@@ -523,7 +523,9 @@ namespace Temiang.Avicenna.WebService
                 regs.Query.GuarantorCardNo.IsNotNull(),
                 regs.Query.GuarantorCardNo != string.Empty,
                 regs.Query.BpjsSepNo.IsNotNull(),
-                regs.Query.BpjsSepNo != string.Empty, regs.Query.RegistrationDate == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
+                regs.Query.BpjsSepNo != string.Empty,
+                regs.Query.BpjsSepNo != "0",
+                regs.Query.RegistrationDate == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
             regs.Query.Load();
             var count = 0;
             foreach (var reg in regs)
@@ -585,6 +587,7 @@ namespace Temiang.Avicenna.WebService
                 reg.Query.GuarantorCardNo != string.Empty,
                 reg.Query.BpjsSepNo.IsNotNull(),
                 reg.Query.BpjsSepNo != string.Empty,
+                reg.Query.BpjsSepNo != "0",
                 reg.Query.RegistrationNo == registrationNo);
             if (!reg.Query.Load())
             {
@@ -598,6 +601,7 @@ namespace Temiang.Avicenna.WebService
                     reg.Query.GuarantorCardNo != string.Empty,
                     reg.Query.BpjsSepNo.IsNotNull(),
                     reg.Query.BpjsSepNo != string.Empty,
+                    reg.Query.BpjsSepNo != "0",
                     reg.Query.BpjsSepNo == registrationNo);
                 if (reg.Query.Load()) registrationNo = reg.RegistrationNo;
             }
@@ -610,6 +614,13 @@ namespace Temiang.Avicenna.WebService
                 Params = reg.BpjsSepNo,
                 Totalms = 0
             };
+
+            if (string.IsNullOrWhiteSpace(reg.RegistrationNo) || string.IsNullOrWhiteSpace(reg.BpjsSepNo) || reg.BpjsSepNo == "0")
+            {
+                log.Response = string.Format("Data registrasi / SEP tidak valid. Input: {0}", registrationNo);
+                log.Save();
+                return string.Format("not ok - {0}", log.Response);
+            }
 
             var pmedic = new Paramedic();
             pmedic.LoadByPrimaryKey(reg.ParamedicID);
@@ -1123,39 +1134,44 @@ namespace Temiang.Avicenna.WebService
 
             SaveNccIdrg(registrationNo, "InacbgDiagnosaGet", paramGetDiag, responseGetDiag);
 
-            var oldDiagInas = new EpisodeDiagnoseInaGroupperCollection();
-            oldDiagInas.Query.Where(oldDiagInas.Query.RegistrationNo == registrationNo);
-            if (oldDiagInas.Query.Load())
+            using (var trans = new esTransactionScope())
             {
-                oldDiagInas.MarkAllAsDeleted();
-                oldDiagInas.Save();
-            }
+                var oldDiagInas = new EpisodeDiagnoseInaGroupperCollection();
+                oldDiagInas.Query.Where(oldDiagInas.Query.RegistrationNo == registrationNo);
+                if (oldDiagInas.Query.Load())
+                {
+                    oldDiagInas.MarkAllAsDeleted();
+                    oldDiagInas.Save();
+                }
 
-            var diagInas = new EpisodeDiagnoseInaGroupperCollection();
-            foreach (var diag in responseGetDiag.Data.Expanded.Where(d => d.ValidCode == "1"))
-            {
-                var diagIna = diagInas.AddNew();
-                diagIna.RegistrationNo = registrationNo;
-                diagIna.SequenceNo = diag.No;
-                diagIna.DiagnoseID = diag.Code;
-                diagIna.SRDiagnoseType = diag.No == "1" ? "DiagnoseType-001" : "DiagnoseType-003";
-                diagIna.DiagnosisText = diag.Display;
-                diagIna.MorphologyID = string.Empty;
-                diagIna.ParamedicID = string.Empty;
-                diagIna.IsAcuteDisease = false;
-                diagIna.IsChronicDisease = false;
-                diagIna.IsOldCase = false;
-                diagIna.IsConfirmed = true;
-                diagIna.IsVoid = false;
-                diagIna.Notes = string.Empty;
-                diagIna.LastUpdateDateTime = DateTime.Now;
-                diagIna.LastUpdateByUserName = "idrg";
-                diagIna.ExternalCauseID = string.Empty;
-                diagIna.CreateDateTime = DateTime.Now;
-                diagIna.CreateByUserID = "idrg";
-                diagIna.DiagnoseSynonym = string.Empty;
+                var diagInas = new EpisodeDiagnoseInaGroupperCollection();
+                foreach (var diag in responseGetDiag.Data.Expanded.Where(d => d.ValidCode == "1"))
+                {
+                    var diagIna = diagInas.AddNew();
+                    diagIna.RegistrationNo = registrationNo;
+                    diagIna.SequenceNo = diag.No;
+                    diagIna.DiagnoseID = diag.Code;
+                    diagIna.SRDiagnoseType = diag.No == "1" ? "DiagnoseType-001" : "DiagnoseType-003";
+                    diagIna.DiagnosisText = diag.Display;
+                    diagIna.MorphologyID = string.Empty;
+                    diagIna.ParamedicID = string.Empty;
+                    diagIna.IsAcuteDisease = false;
+                    diagIna.IsChronicDisease = false;
+                    diagIna.IsOldCase = false;
+                    diagIna.IsConfirmed = true;
+                    diagIna.IsVoid = false;
+                    diagIna.Notes = string.Empty;
+                    diagIna.LastUpdateDateTime = DateTime.Now;
+                    diagIna.LastUpdateByUserName = "idrg";
+                    diagIna.ExternalCauseID = string.Empty;
+                    diagIna.CreateDateTime = DateTime.Now;
+                    diagIna.CreateByUserID = "idrg";
+                    diagIna.DiagnoseSynonym = string.Empty;
+                }
+                if (diagInas.Any()) diagInas.Save();
+
+                trans.Complete();
             }
-            if (diagInas.Any()) diagInas.Save();
 
             svc54 = new Common.Inacbg.v510.Service();
             var paramGetProc = new Common.Inacbg.v510.Procedure.Get.Data { nomor_sep = reg.BpjsSepNo };
@@ -1170,55 +1186,60 @@ namespace Temiang.Avicenna.WebService
 
             SaveNccIdrg(registrationNo, "InacbgProcedureGet", paramGetProc, responseGetProc);
 
-            var oldDiagProcs = new EpisodeProcedureInaGroupperCollection();
-            oldDiagProcs.Query.Where(oldDiagProcs.Query.RegistrationNo == registrationNo);
-            if (oldDiagProcs.Query.Load())
+            using (var trans = new esTransactionScope())
             {
-                oldDiagProcs.MarkAllAsDeleted();
-                oldDiagProcs.Save();
-            }
+                var oldDiagProcs = new EpisodeProcedureInaGroupperCollection();
+                oldDiagProcs.Query.Where(oldDiagProcs.Query.RegistrationNo == registrationNo);
+                if (oldDiagProcs.Query.Load())
+                {
+                    oldDiagProcs.MarkAllAsDeleted();
+                    oldDiagProcs.Save();
+                }
 
-            var diagProcs = new EpisodeProcedureInaGroupperCollection();
-            foreach (var proc in responseGetProc.Data.Expanded.Where(d => d.ValidCode == "1"))
-            {
-                var diagProc = diagProcs.AddNew();
-                diagProc.RegistrationNo = registrationNo;
-                diagProc.SequenceNo = proc.No;
-                diagProc.ProcedureDate = DateTime.Now.Date;
-                diagProc.ProcedureTime = string.Empty;
-                diagProc.ProcedureDate2 = DateTime.Now.Date;
-                diagProc.ProcedureTime2 = string.Empty;
-                diagProc.ParamedicID = string.Empty;
-                diagProc.ParamedicID2 = string.Empty;
-                diagProc.ProcedureID = proc.Code;
-                diagProc.SRProcedureCategory = string.Empty;
-                diagProc.SRAnestesi = string.Empty;
-                diagProc.RoomID = string.Empty;
-                diagProc.IsCito = false;
-                diagProc.IsVoid = false;
-                diagProc.LastUpdateDateTime = DateTime.Now;
-                diagProc.LastUpdateByUserName = "idrg";
-                diagProc.AssistantID1 = string.Empty;
-                diagProc.AssistantID2 = string.Empty;
-                diagProc.Notes = string.Empty;
-                diagProc.BookingNo = string.Empty;
-                diagProc.ParamedicID2a = string.Empty;
-                diagProc.ParamedicID3a = string.Empty;
-                diagProc.ParamedicID4a = string.Empty;
-                diagProc.ParamedicIDAnestesi = string.Empty;
-                diagProc.AssistantIDAnestesi = string.Empty;
-                diagProc.InstrumentatorID1 = string.Empty;
-                diagProc.InstrumentatorID2 = string.Empty;
-                diagProc.IsFromOperatingRoom = true;
-                diagProc.CreateDateTime = DateTime.Now;
-                diagProc.CreateByUserID = "idrg";
-                diagProc.AnestesyNotes = string.Empty;
-                diagProc.ProcedureName = proc.Display;
-                diagProc.OpNotesSeqNo = string.Empty;
-                diagProc.OperatingNotes = string.Empty;
-                diagProc.ProcedureSynonym = string.Empty;
+                var diagProcs = new EpisodeProcedureInaGroupperCollection();
+                foreach (var proc in responseGetProc.Data.Expanded.Where(d => d.ValidCode == "1"))
+                {
+                    var diagProc = diagProcs.AddNew();
+                    diagProc.RegistrationNo = registrationNo;
+                    diagProc.SequenceNo = proc.No;
+                    diagProc.ProcedureDate = DateTime.Now.Date;
+                    diagProc.ProcedureTime = string.Empty;
+                    diagProc.ProcedureDate2 = DateTime.Now.Date;
+                    diagProc.ProcedureTime2 = string.Empty;
+                    diagProc.ParamedicID = string.Empty;
+                    diagProc.ParamedicID2 = string.Empty;
+                    diagProc.ProcedureID = proc.Code;
+                    diagProc.SRProcedureCategory = string.Empty;
+                    diagProc.SRAnestesi = string.Empty;
+                    diagProc.RoomID = string.Empty;
+                    diagProc.IsCito = false;
+                    diagProc.IsVoid = false;
+                    diagProc.LastUpdateDateTime = DateTime.Now;
+                    diagProc.LastUpdateByUserName = "idrg";
+                    diagProc.AssistantID1 = string.Empty;
+                    diagProc.AssistantID2 = string.Empty;
+                    diagProc.Notes = string.Empty;
+                    diagProc.BookingNo = string.Empty;
+                    diagProc.ParamedicID2a = string.Empty;
+                    diagProc.ParamedicID3a = string.Empty;
+                    diagProc.ParamedicID4a = string.Empty;
+                    diagProc.ParamedicIDAnestesi = string.Empty;
+                    diagProc.AssistantIDAnestesi = string.Empty;
+                    diagProc.InstrumentatorID1 = string.Empty;
+                    diagProc.InstrumentatorID2 = string.Empty;
+                    diagProc.IsFromOperatingRoom = true;
+                    diagProc.CreateDateTime = DateTime.Now;
+                    diagProc.CreateByUserID = "idrg";
+                    diagProc.AnestesyNotes = string.Empty;
+                    diagProc.ProcedureName = proc.Display;
+                    diagProc.OpNotesSeqNo = string.Empty;
+                    diagProc.OperatingNotes = string.Empty;
+                    diagProc.ProcedureSynonym = string.Empty;
+                }
+                if (diagProcs.Any()) diagProcs.Save();
+
+                trans.Complete();
             }
-            if (diagProcs.Any()) diagProcs.Save();
 
             svc54 = new Common.Inacbg.v510.Service();
             var paramsGrouper = new Common.Inacbg.v510.Gruoper.Grouper1.Data() { nomor_sep = reg.BpjsSepNo };
