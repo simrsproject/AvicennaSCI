@@ -360,3 +360,6 @@ Titipan Daniel
 
 ---[28-07-2026 - Rizki]---
 1. Menambah Create dan LastUpdate RegistrationInfoMedic WebService MDS.
+
+---[29-07-2026 - Wiliam]---
+1. Modifikasi RegistrationDetail.aspx.cs agar ketika Parameter IsCrmMembershipActive berubah, label Membership No berubah
