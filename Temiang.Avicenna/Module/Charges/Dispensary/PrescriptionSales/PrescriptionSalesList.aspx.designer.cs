@@ -24,6 +24,15 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::Telerik.Web.UI.RadCodeBlock RadCodeBlock1;
 
         /// <summary>
+        /// RadWindow1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadWindow RadWindow1;
+
+        /// <summary>
         /// RadAjaxPanel1 control.
         /// </summary>
         /// <remarks>
@@ -663,6 +672,33 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::Telerik.Web.UI.RadPageView pgDataApol;
 
         /// <summary>
+        /// tabStripApol control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTabStrip tabStripApol;
+
+        /// <summary>
+        /// multiPageApol control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadMultiPage multiPageApol;
+
+        /// <summary>
+        /// pgApolHeader control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadPageView pgApolHeader;
+
+        /// <summary>
         /// txtPPK control.
         /// </summary>
         /// <remarks>
@@ -717,6 +753,15 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::System.Web.UI.WebControls.Button btnOpenRef;
 
         /// <summary>
+        /// btnExportApol control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnExportApol;
+
+        /// <summary>
         /// cboTgl control.
         /// </summary>
         /// <remarks>
@@ -760,5 +805,149 @@ namespace Temiang.Avicenna.Module.Charges
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadGrid grdListApol;
+
+        /// <summary>
+        /// pgApolDetail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadPageView pgApolDetail;
+
+        /// <summary>
+        /// hfNoSepApol control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hfNoSepApol;
+
+        /// <summary>
+        /// txtNoSepDetail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNoSepDetail;
+
+        /// <summary>
+        /// btnLoadPelayananObat control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnLoadPelayananObat;
+
+        /// <summary>
+        /// grdPelayananObat control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadGrid grdPelayananObat;
+
+        /// <summary>
+        /// pgApolRekapPrb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadPageView pgApolRekapPrb;
+
+        /// <summary>
+        /// dpPeriodePrb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadDatePicker dpPeriodePrb;
+
+        /// <summary>
+        /// btnLoadRekapPrb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnLoadRekapPrb;
+
+        /// <summary>
+        /// grdRekapPrb control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadGrid grdRekapPrb;
+
+        /// <summary>
+        /// pgApolRiwayat control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadPageView pgApolRiwayat;
+
+        /// <summary>
+        /// txtPeriode1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadDatePicker txtPeriode1;
+
+        /// <summary>
+        /// txtPeriode2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadDatePicker txtPeriode2;
+
+        /// <summary>
+        /// txtNoKaHist control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtNoKaHist;
+
+        /// <summary>
+        /// btnCariHistory control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCariHistory;
+
+        /// <summary>
+        /// lblInfoHist control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblInfoHist;
+
+        /// <summary>
+        /// grdListHist control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadGrid grdListHist;
     }
 }

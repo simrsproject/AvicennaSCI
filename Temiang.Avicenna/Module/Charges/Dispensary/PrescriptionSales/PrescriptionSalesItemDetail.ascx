@@ -435,3 +435,146 @@
         </td>
     </tr>
 </table>
+<br />
+<table>
+    <tr>
+        <td class="entrydescription">
+            <table style="border-color: Gray; border-style: solid; height:1px">
+                <!-- ===== ATAS ===== -->
+                <tr>
+                    <td class="header">No SJP</td>
+                    <td class="header">No Resep</td>
+                    <td class="header">Kode Obat</td>
+                    <td class="header">Nama Obat</td>
+                    <td class="header">Sediaan</td>
+                    <td class="header">Satuan</td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <telerik:RadTextBox ID="txtApolNOSJP" runat="server" Width="100px" />
+                    </td>
+                    <td>
+                        <telerik:RadTextBox ID="txtApolNORESEP" runat="server" Width="100px" />
+                    </td>
+                    <td>
+                        <telerik:RadTextBox ID="txtApolKDOBT" runat="server" Width="100px" />
+                    </td>
+                    <td>
+                        <telerik:RadTextBox ID="txtApolNMOBAT" runat="server" Width="200px" />
+                    </td>
+                    <td>
+                        <telerik:RadNumericTextBox ID="txtApolSediaan"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+                    <td>
+                        <telerik:RadTextBox ID="txtSatuan"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+                    <td>
+                        <asp:Label ID="lblMsgApol"
+                            runat="server"
+                            ForeColor="Green" />
+                    </td>
+                </tr>
+
+                <!-- SPACER -->
+                <tr>
+                    <td colspan="7" style="height:5px;"></td>
+                </tr>
+
+                <!-- ===== BAWAH ===== -->
+                <tr>
+                    <td class="header">Signa 1</td>
+                    <td class="header">Signa 2</td>
+                    <td class="header">Permintaan</td>
+                    <td class="header">JHO</td>
+                    <td class="header">Jml Obat</td>
+                    <td class="header">Jenis Racikan</td>
+                    <td class="header">Catatan</td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <telerik:RadNumericTextBox ID="txtApolSigna1"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+
+                    <td>
+                        <telerik:RadNumericTextBox ID="txtApolSigna2"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+
+                    <td>
+                        <telerik:RadNumericTextBox ID="txtApolPermintaan"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+
+                    <td>
+                        <telerik:RadNumericTextBox ID="txtApolJHO"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+
+                    <td>
+                        <telerik:RadNumericTextBox ID="txtApolJmlObt"
+                            runat="server"
+                            Width="100px"
+                            CssClass="RightAligned"
+                            AutoPostBack="true"
+                            OnTextChanged="ApolFormula_TextChanged" />
+                    </td>
+
+                    <td>
+                        <telerik:RadTextBox ID="txtApolJnsRacik"
+                            runat="server"
+                            Width="100px" />
+                    </td>
+
+                     <td>
+                        <telerik:RadTextBox ID="txtApolCatatan"
+                            runat="server"
+                            Width="200px" />
+                    </td>
+                </tr>
+
+                <!-- BUTTON -->
+                <tr>
+                    <td colspan="7" align="right">
+                        <asp:Button ID="btnSaveApol"
+                            runat="server"
+                            Text="Save APOL"
+                            OnClick="btnSaveApol_Click"
+                            CausesValidation="false" />
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+        <td width="20px"></td>
+        <td></td>
+    </tr>
+</table>

@@ -132,6 +132,63 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
             return plaintext;
         }
 
+        public Referensi.Srb.Root GetRekapPesertaPrb(int tahun, int bulan)
+        {
+            _baseUrl += $"Prb/rekappeserta/tahun/{tahun}/bulan/{bulan}";
+
+            using (var response = PopulateWebRequest(_baseUrl, Helper.WebRequestMethod.GET, out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception(string.Format("Server error (HTTP {0}: {1}).",
+                        response.StatusCode,
+                        response.StatusDescription));
+
+                var sr = new StreamReader(response.GetResponseStream());
+                var responseData = sr.ReadToEnd();
+
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                {
+                    return JsonConvert.DeserializeObject<Referensi.Srb.Root>(responseData);
+                }
+                else
+                {
+                    var encryptedResponse =
+                        JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(responseData);
+
+                    if (encryptedResponse.MetaData.IsApolValid)
+                    {
+                        var decryptResponse =
+                            LZString.DecompressFromEncodedURIComponent(
+                                DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                        var entity = new Referensi.Srb.Root()
+                        {
+                            MetaData = new Metadata()
+                            {
+                                Code = encryptedResponse.MetaData.Code,
+                                Message = encryptedResponse.MetaData.Message
+                            },
+                            Response = JsonConvert.DeserializeObject<Referensi.Srb.Response>(decryptResponse)
+                        };
+
+                        return entity;
+                    }
+                    else
+                    {
+                        return new Referensi.Srb.Root
+                        {
+                            MetaData = new Metadata()
+                            {
+                                Code = encryptedResponse.MetaData.Code,
+                                Message = encryptedResponse.MetaData.Message
+                            },
+                            Response = null
+                        };
+                    }
+                }
+            }
+        }
+
         #region referensi
         public Referensi.Dpho.Root GetObatDpho()
         {
@@ -379,6 +436,53 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
         #endregion
 
         #region obat
+        public Obat.UpdateStok.Response UpdateStokObat(Obat.UpdateStok.Request.Root root)
+        {
+            _baseUrl += $"UpdateStokObat/updatestok";
+
+            using (var response = PopulateWebRequest(
+                _baseUrl,
+                Helper.WebRequestMethod.POST,
+                Helper.WebRequestContentType.TEXT,
+                JsonConvert.SerializeObject(root),
+                out var timeStamp).GetResponse() as HttpWebResponse)
+            {
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception($"Server error (HTTP {response.StatusCode}: {response.StatusDescription}).");
+
+                var sr = new StreamReader(response.GetResponseStream());
+                var responseData = sr.ReadToEnd();
+
+                if (string.IsNullOrEmpty(_encrypted) || _encrypted == "false")
+                {
+                    return JsonConvert.DeserializeObject<Obat.UpdateStok.Response>(responseData);
+                }
+
+                var encryptedResponse =
+                    JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(responseData);
+
+                var code = encryptedResponse?.MetaData?.Code;
+                var message = encryptedResponse?.MetaData?.Message;
+
+                if (string.IsNullOrWhiteSpace(encryptedResponse?.Response))
+                {
+                    return new Obat.UpdateStok.Response
+                    {
+                        MetaData = new Metadata
+                        {
+                            Code = code,
+                            Message = message
+                        }
+                    };
+                }
+
+                var decryptResponse =
+                    LZString.DecompressFromEncodedURIComponent(
+                        DecryptResponse(timeStamp, encryptedResponse.Response));
+
+                return JsonConvert.DeserializeObject<Obat.UpdateStok.Response>(decryptResponse);
+            }
+        }
 
         public Obat.NonRacikan.Response InsertNonRacikan(Obat.NonRacikan.Request.Root root)
         {
@@ -393,9 +497,11 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
                 {
                     var raw = sr.ReadToEnd();
 
+                    // non-encrypted path
                     if (string.IsNullOrEmpty(_encrypted) || _encrypted.Equals("false", StringComparison.OrdinalIgnoreCase))
                         return JsonConvert.DeserializeObject<Obat.NonRacikan.Response>(raw);
 
+                    // encrypted path
                     var enc = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(raw);
                     var code = enc?.MetaData?.Code?.ToString() ?? "";
                     var msg = enc?.MetaData?.Message ?? "";
@@ -429,9 +535,11 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
                 {
                     var raw = sr.ReadToEnd();
 
+                    // non-encrypted path
                     if (string.IsNullOrEmpty(_encrypted) || _encrypted.Equals("false", StringComparison.OrdinalIgnoreCase))
                         return JsonConvert.DeserializeObject<Obat.Racikan.Response>(raw);
 
+                    // encrypted path
                     var enc = JsonConvert.DeserializeObject<Helper.EncryptedResponse.Root>(raw);
                     var code = enc?.MetaData?.Code?.ToString() ?? "";
                     var msg = enc?.MetaData?.Message ?? "";
@@ -496,7 +604,7 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
                                 Code = encryptedResponse.MetaData.Code,
                                 Message = encryptedResponse.MetaData.Message
                             },
-                            Response = JsonConvert.DeserializeObject<PelayananObat.DaftarPelayananObat.Response>(decryptResponse)
+                            Response = JsonConvert.DeserializeObject<PelayananObat.DaftarPelayananObat.DetailSep>(decryptResponse)
                         };
 
                         return entity;
@@ -612,13 +720,14 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
             }
         }
 
-        public MetadataResponse HapusResep(HapusResep.Request.Root root)
+        public MetadataResponse HapusResep(HapusResep.Request root)
         {
-            _baseUrl += "/hapusresep";
+            _baseUrl += "hapusresep";
 
             using (var response = PopulateWebRequest(_baseUrl, Helper.WebRequestMethod.DELETE, Helper.WebRequestContentType.TEXT, JsonConvert.SerializeObject(root), out var timeStamp).GetResponse() as HttpWebResponse)
             {
-                if (response.StatusCode != HttpStatusCode.OK) throw new Exception(String.Format("Server error (HTTP {0}: {1}).", response.StatusCode, response.StatusDescription));
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new Exception(string.Format("Server error (HTTP {0}: {1}).", response.StatusCode, response.StatusDescription));
 
                 var sr = new StreamReader(response.GetResponseStream());
                 return JsonConvert.DeserializeObject<MetadataResponse>(sr.ReadToEnd());
@@ -627,7 +736,7 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek
 
         public Resep.DaftarResep.Response.Root GetDaftarResep(Resep.DaftarResep.Request.Root root)
         {
-            _baseUrl += "/daftarresep";
+            _baseUrl += "daftarresep";
 
             using (var response = PopulateWebRequest(_baseUrl, Helper.WebRequestMethod.POST, Helper.WebRequestContentType.TEXT, JsonConvert.SerializeObject(root), out var timeStamp).GetResponse() as HttpWebResponse)
             {
