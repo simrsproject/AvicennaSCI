@@ -1453,14 +1453,19 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
             #region apol
             //apol
-            if (Helper.IsApotekOnlineIntegration && reg.GuarantorID == AppSession.Parameter.GuarantorAskesID[0])
+            if (Helper.IsApotekOnlineIntegration && reg.GuarantorID == AppSession.Parameter.GuarantorAskesID[0] && !string.IsNullOrWhiteSpace(reg.BpjsSepNo))
             {
-                var bpjsapol = new BpjsApol();
-                bpjsapol.Query.Where(bpjsapol.Query.RegistrationNo == RegistrationNo, bpjsapol.Query.PrescriptionNo == tp.PrescriptionNo);
-                if (!bpjsapol.Query.Load())
+                var bpjsapols = new BpjsApol();
+                bpjsapols.Query.Where(bpjsapols.Query.RegistrationNo == RegistrationNo, bpjsapols.Query.PrescriptionNo == tp.PrescriptionNo);
+                bool exists = bpjsapols.Query.Load();
+
+                if (!exists)
                 {
                     using (var trans = new esTransactionScope())
                     {
+                        var bpjsapol = new BpjsApol();
+                        bpjsapol.AddNew();
+
                         bpjsapol.RegistrationNo = RegistrationNo;
                         bpjsapol.PrescriptionNo = tp.PrescriptionNo;
                         bpjsapol.REFASALSJP = reg.BpjsSepNo;
@@ -1468,10 +1473,12 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                         bpjsapol.TGLSJP = tp.CreatedDateTime;
                         bpjsapol.TGLPELRSP = tp.LastUpdateDateTime;
                         bpjsapol.TGLRSP = tp.PrescriptionDate;
-                        bpjsapol.MetadataCode = "ORDER";
+                        bpjsapol.METADATACODE = "ORDER";
                         bpjsapol.LastUpdateByUserID = AppSession.UserLogin.UserID;
                         bpjsapol.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
                         bpjsapol.Save();
+
+                        var apolId = bpjsapol.ID;
 
                         // Insert data tpi ke bad
                         foreach (var it in TransPrescriptionItems)
@@ -1494,7 +1501,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                             string kdobt = null, nmobat = null;
                             var map = new ItemBridging();
                             map.Query.Where(
-                                map.Query.ItemID == it.ItemID,
+                                map.Query.ItemID == (string.IsNullOrWhiteSpace(it.ItemInterventionID) ? it.ItemID : it.ItemInterventionID),
                                 map.Query.SRBridgingType == AppEnum.BridgingType.APOTEKONLINE.ToString()
                             );
                             if (map.Query.Load()) { kdobt = map.BridgingID; nmobat = map.BridgingName; }
@@ -1508,17 +1515,17 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                             {
                                 PrescriptionNo = tp.PrescriptionNo,
                                 SequenceNo = it.SequenceNo,
-                                BpjsApolID = bpjsapol.ID,
+                                BpjsApolID = apolId,
                                 JNSROBT = jnsrobt,
                                 KDOBT = kdobt,
                                 NMOBAT = nmobat,
-                                SIGNA1OBT = it.DosageQty.ToInt(),
-                                SIGNA2OBT = signa2,
+                                SIGNA1OBT = signa2,
+                                SIGNA2OBT = it.DosageQty.ToInt(),
                                 PERMINTAAN = it.PrescriptionQty.ToInt(), // penting utk racikan
                                 JMLOBT = it.TakenQty.ToInt(),
                                 JHO = it.DaysOfUsage,
                                 CATKHSOBT = it.Notes,
-                                MetadataCode = "ORDER",
+                                METADATACODE = "ORDER",
                                 LastUpdateByUserID = AppSession.UserLogin.UserID,
                                 LastUpdateDateTime = (new DateTime()).NowAtSqlServer()
                             };
@@ -1673,6 +1680,115 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                                 gyssens.SRConsumeUnit = item.SRConsumeUnit;
                                 gyssens.Save();
                             }
+                        }
+                    }
+                }
+
+                var reg = new Registration();
+                reg.LoadByPrimaryKey(RegistrationNo);
+
+                if (Helper.IsApotekOnlineIntegration && reg.GuarantorID == AppSession.Parameter.GuarantorAskesID[0] && !string.IsNullOrWhiteSpace(reg.BpjsSepNo))
+                {
+                    var bpjsapol = new BpjsApol();
+                    bpjsapol.Query.Where(bpjsapol.Query.RegistrationNo == RegistrationNo, bpjsapol.Query.PrescriptionNo == header.PrescriptionNo);
+                    if (!bpjsapol.Query.Load())
+                    {
+                        using (var transs = new esTransactionScope())
+                        {
+                            bpjsapol.AddNew();
+
+                            bpjsapol.RegistrationNo = RegistrationNo;
+                            bpjsapol.PrescriptionNo = header.PrescriptionNo;
+                            bpjsapol.REFASALSJP = reg.BpjsSepNo;
+                            bpjsapol.IDUSERSJP = AppSession.UserLogin.UserID;
+                            bpjsapol.TGLSJP = header.CreatedDateTime;
+                            bpjsapol.TGLPELRSP = header.LastUpdateDateTime;
+                            bpjsapol.TGLRSP = header.PrescriptionDate;
+                            bpjsapol.METADATACODE = "ORDER";
+                            bpjsapol.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                            bpjsapol.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                            bpjsapol.Save();
+
+                            var apolId = bpjsapol.ID;
+
+                            // Insert data tpi ke bad
+                            foreach (var it in TransPrescriptionItems)
+                            {
+                                // jns robit racikan: "R.{NN}" -> R.01
+                                var seqStr = (Convert.ToString(it.SequenceNo) ?? "").Trim();
+                                var m = System.Text.RegularExpressions.Regex.Match(seqStr, @"\d{1,2}(?!.*\d)");
+                                string jnsrobt;
+                                if (it.IsCompound == true)
+                                {
+                                    var seq = Convert.ToString(it.SequenceNo) ?? "";
+                                    var lastDigit = seq.Reverse().FirstOrDefault(char.IsDigit);
+                                    jnsrobt = (lastDigit != default(char)) ? ("R.0" + lastDigit) : "R.01"; // fallback aman
+                                }
+                                else
+                                {
+                                    jnsrobt = "N";
+                                }
+
+                                string kdobt = null, nmobat = null;
+                                var map = new ItemBridging();
+                                map.Query.Where(
+                                    map.Query.ItemID == (string.IsNullOrWhiteSpace(it.ItemInterventionID) ? it.ItemID : it.ItemInterventionID),
+                                    map.Query.SRBridgingType == AppEnum.BridgingType.APOTEKONLINE.ToString()
+                                );
+                                if (map.Query.Load()) { kdobt = map.BridgingID; nmobat = map.BridgingName; }
+
+                                int signa2 = 0;
+                                var cm = new ConsumeMethod();
+                                cm.Query.Where(cm.Query.SRConsumeMethod == it.SRConsumeMethod);
+                                if (cm.Query.Load()) signa2 = cm.IterationQty ?? 0;
+
+                                //var det = new BpjsApolDetail
+                                //{
+                                //    PrescriptionNo = header.PrescriptionNo,
+                                //    SequenceNo = it.SequenceNo,
+                                //    BpjsApolID = apolId,
+                                //    JNSROBT = jnsrobt,
+                                //    KDOBT = kdobt,
+                                //    NMOBAT = nmobat,
+                                //    SIGNA1OBT = it.DosageQty.ToInt(),
+                                //    SIGNA2OBT = signa2,
+                                //    PERMINTAAN = it.PrescriptionQty.ToInt(), // penting utk racikan
+                                //    JMLOBT = it.TakenQty.ToInt(),
+                                //    JHO = it.DaysOfUsage,
+                                //    CATKHSOBT = it.Notes,
+                                //    METADATACODE = "ORDER",
+                                //    LastUpdateByUserID = AppSession.UserLogin.UserID,
+                                //    LastUpdateDateTime = (new DateTime()).NowAtSqlServer()
+                                //};
+
+                                //det.Save();
+
+                                var det = new BpjsApolDetail();
+                                det.AddNew();
+
+                                det.PrescriptionNo = header.PrescriptionNo;
+                                det.SequenceNo = it.SequenceNo;
+                                det.BpjsApolID = apolId;
+                                det.JNSROBT = jnsrobt;
+                                det.KDOBT = kdobt;
+                                det.NMOBAT = nmobat;
+                                det.SIGNA1OBT = signa2;
+                                det.SIGNA2OBT = it.DosageQty.ToInt();
+
+                                if (it.IsCompound == true)
+                                    det.PERMINTAAN = it.PrescriptionQty.ToInt();
+
+                                det.JMLOBT = it.TakenQty.ToInt();
+                                det.JHO = it.DaysOfUsage;
+                                det.CATKHSOBT = it.Notes;
+                                det.METADATACODE = "ORDER";
+                                det.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                                det.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+
+                                det.Save();
+                            }
+
+                            transs.Complete();
                         }
                     }
                 }

@@ -44,7 +44,7 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.Obat
 
         public class Response : Metadata
         {
-            
+
         }
     }
 
@@ -92,6 +92,38 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.Obat
         public class Response : Metadata
         {
 
+        }
+
+        public class Root
+        {
+            [JsonProperty("response")]
+            public Response Response;
+
+            [JsonProperty("metaData")]
+            public Metadata MetaData;
+        }
+    }
+    public class UpdateStok
+    {
+        public class Request
+        {
+            public class Root
+            {
+                [JsonProperty("KDOBAT")]
+                public string Kdobat;
+
+                [JsonProperty("STOK")]
+                public int Stok;
+            }
+        }
+
+        public class Response
+        {
+            [JsonProperty("response")]
+            public object ResponseData;
+
+            [JsonProperty("metaData")]
+            public Metadata MetaData;
         }
     }
 }
