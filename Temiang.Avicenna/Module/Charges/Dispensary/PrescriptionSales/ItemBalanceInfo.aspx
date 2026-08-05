@@ -3,7 +3,7 @@
 
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <telerik:RadGrid ID="grdBalance" runat="server" OnNeedDataSource="grdBalance_NeedDataSource" 
+    <telerik:RadGrid ID="grdBalance" runat="server" OnNeedDataSource="grdBalance_NeedDataSource" OnItemCommand="grdBalance_ItemCommand"
         AllowSorting="true" ShowStatusBar="true" AllowPaging="true" PageSize="15">
             <MasterTableView DataKeyNames="LocationID" AutoGenerateColumns="false">
                 <Columns>
@@ -25,6 +25,11 @@
                     <telerik:GridBoundColumn HeaderStyle-Width="60px" DataField="SRItemUnit" HeaderText="Item Unit"
                             UniqueName="SRItemUnit" SortExpression="SRItemUnit" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />
+                    <telerik:GridButtonColumn 
+                        UniqueName="UpdateStokColumn" Text="Update Stok" CommandName="UpdateStok" ButtonType="PushButton">
+                        <HeaderStyle Width="100px" />
+                        <ItemStyle HorizontalAlign="Center" />
+                    </telerik:GridButtonColumn>
                 </Columns>
         </MasterTableView>
     </telerik:RadGrid>

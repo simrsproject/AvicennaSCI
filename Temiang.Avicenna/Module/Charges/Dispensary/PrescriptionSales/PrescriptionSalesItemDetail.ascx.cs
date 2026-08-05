@@ -137,6 +137,32 @@ namespace Temiang.Avicenna.Module.Charges
                 return;
             }
 
+            if (Helper.IsApotekOnlineIntegration)
+            {
+                string apolKode = e.Value;
+                string apolNama = e.Text;
+
+                var ibg = new ItemBridging();
+                ibg.Query.Where(
+                    ibg.Query.ItemID == e.Value,
+                    ibg.Query.SRBridgingType == "BridgingType-018"
+                );
+
+                if (ibg.Query.Load())
+                {
+                    if (!string.IsNullOrWhiteSpace(ibg.BridgingID))
+                        apolKode = ibg.BridgingID.Trim();
+
+                    if (!string.IsNullOrWhiteSpace(ibg.BridgingName))
+                        apolNama = ibg.BridgingName.Trim();
+                }
+
+                txtApolKDOBT.Text = apolKode;
+                txtApolNMOBAT.Text = apolNama;
+
+
+            }
+
             PopulateItemInfo(e.Value);
 
             DateTime transactionDate = (new DateTime()).NowAtSqlServer().Date;//DateTime.Now.Date;
@@ -615,6 +641,20 @@ namespace Temiang.Avicenna.Module.Charges
                 txtPrescriptionQty.Focus();
 
             ShowPrevBuy(PatientIds, cboItemID.SelectedValue, cboItemID.Text, e.Value, e.Text);
+
+            //apol
+            var ib = new ItemBridging();
+            ib.Query.Where(
+                ib.Query.ItemID == e.Value,
+                ib.Query.SRBridgingType == "BridgingType-018"
+            );
+            if (ib.Query.Load())
+            {
+                if (!string.IsNullOrWhiteSpace(ib.BridgingID))
+                    txtApolKDOBT.Text = ib.BridgingID.Trim();
+                if (!string.IsNullOrWhiteSpace(ib.BridgingName))
+                    txtApolNMOBAT.Text = ib.BridgingName.Trim();
+            }
         }
 
         #endregion
@@ -1046,6 +1086,54 @@ namespace Temiang.Avicenna.Module.Charges
             chkIsPending.Checked = ((bool?)DataBinder.Eval(DataItem, TransPrescriptionItemMetadata.ColumnNames.IsPendingDelivery)) ?? false;
 
             ShowPrevBuy(PatientIds, cboItemID.SelectedValue, cboItemID.Text, cboItemInterventionID.SelectedValue, cboItemInterventionID.Text);
+
+
+            //apol
+            var sequenceNo = ViewState["SequenceNo"]?.ToString();
+            var prescriptionNo = TxtPrescriptionNo.Text;
+
+            txtApolNOSJP.Text = "";
+            txtApolNORESEP.Text = "";
+            txtApolKDOBT.Text = "";
+            txtApolNMOBAT.Text = "";
+            txtApolSigna1.Value = null;
+            txtApolSigna2.Value = null;
+            txtApolPermintaan.Value = null;
+            txtApolJHO.Value = null;
+            txtApolJmlObt.Value = null;
+            txtApolJnsRacik.Text = "";
+            txtApolCatatan.Text = "";
+
+            txtApolSediaan.Text = "";
+
+            if (!string.IsNullOrEmpty(sequenceNo))
+            {
+                var apolDetail = new BpjsApolDetail();
+                apolDetail.Query.Where(
+                    apolDetail.Query.PrescriptionNo == prescriptionNo,
+                    apolDetail.Query.SequenceNo == sequenceNo
+                );
+
+                var apolSediaan = new ItemProductMedic();
+                apolSediaan.LoadByPrimaryKey(cboItemID.SelectedValue);
+
+                if (apolDetail.Query.Load())
+                {
+                    txtApolSediaan.Text = apolSediaan.Dosage.ToString();
+                    txtApolNOSJP.Text = apolDetail.NOSJP;
+                    txtApolNORESEP.Text = apolDetail.NORESEP;
+                    txtApolKDOBT.Text = apolDetail.KDOBT;
+                    txtApolNMOBAT.Text = apolDetail.NMOBAT;
+                    txtApolSigna1.Value = apolDetail.SIGNA1OBT.HasValue ? (double?)Convert.ToDouble(apolDetail.SIGNA1OBT.Value) : null;
+                    txtApolSigna2.Value = apolDetail.SIGNA2OBT.HasValue ? (double?)Convert.ToDouble(apolDetail.SIGNA2OBT.Value) : null;
+                    txtApolPermintaan.Value = apolDetail.PERMINTAAN.HasValue ? (double?)Convert.ToDouble(apolDetail.PERMINTAAN.Value) : null;
+                    txtApolJHO.Value = apolDetail.JHO.HasValue ? (double?)Convert.ToDouble(apolDetail.JHO.Value) : null;
+                    txtApolJmlObt.Value = apolDetail.JMLOBT.HasValue ? (double?)Convert.ToDouble(apolDetail.JMLOBT.Value) : null;
+                    txtApolJnsRacik.Text = apolDetail.JNSROBT;
+                    txtApolCatatan.Text = apolDetail.CATKHSOBT;
+                }
+            }
+
         }
 
         protected void customValidator_ServerValidate(object source, ServerValidateEventArgs args)
@@ -2250,5 +2338,145 @@ namespace Temiang.Avicenna.Module.Charges
                 txtResultQty.Value = Convert.ToDouble(decimal.Truncate(Convert.ToDecimal(txtResultQty.Value)) + deduct.DeductionAmount);
             }
         }
+
+        #region APOL DETAIL
+
+        protected void ApolFormula_TextChanged(object sender, EventArgs e)
+        {
+            CalculateApolFormula();
+        }
+
+        private void CalculateApolFormula()
+        {
+            decimal signa1 = Convert.ToDecimal(txtApolSigna1.Value ?? 0d);
+            decimal signa2 = Convert.ToDecimal(txtApolSigna2.Value ?? 0d);
+            decimal jmlobt = Convert.ToDecimal(txtApolJmlObt.Value ?? 0d);
+            decimal jho = Convert.ToDecimal(txtApolJHO.Value ?? 0d);
+            decimal permintaan = Convert.ToDecimal(txtApolPermintaan.Value ?? 0d);
+            decimal sediaan = Convert.ToDecimal(txtApolSediaan.Value ?? 1d);
+
+            bool isRacikan = txtApolJnsRacik.Text.StartsWith("R");
+
+            if (!isRacikan)
+            {
+                if (signa1 > 0 && signa2 > 0 && jmlobt > 0)
+                {
+                    decimal result = jmlobt / (signa1 * signa2);
+                    txtApolJHO.Value = (double)result;
+                }
+                else
+                {
+                    txtApolJHO.Value = null;
+                }
+            }
+            else
+            {
+                if (signa1 > 0 && signa2 > 0 && jho > 0 && permintaan > 0 && sediaan > 0)
+                {
+                    decimal result = (permintaan / sediaan) * (signa1 * signa2) * jho;
+                    txtApolJmlObt.Value = (double)result;
+                }
+            }
+            //else if(!isRacikan && !string.IsNullOrWhiteSpace(txtSatuan.Text))
+            //{
+            //    if (signa1 > 0 && signa2 > 0 && jho > 0 && permintaan > 0 && sediaan > 0)
+            //    {
+            //        decimal result = (signa1 * signa2 * jho * permintaan) / sediaan;
+            //        txtApolJmlObt.Value = (double)result;
+            //    }
+            //}
+            //else
+            //{
+            //    if (signa1 > 0 && signa2 > 0 && jho > 0 && permintaan > 0 && sediaan > 0)
+            //    {
+            //        decimal result = (jho * sediaan) / permintaan;
+            //        txtApolJmlObt.Value = (double)result;
+            //    }
+            //}
+        }
+        #endregion
+
+        #region SAVE DB
+
+        private void SaveApolDetailToDatabase()
+        {
+            var det = new BpjsApolDetail();
+
+            // UPSERT (by NORESEP)
+            det.Query.Where(
+                det.Query.PrescriptionNo == TxtPrescriptionNo.Text,
+                det.Query.NORESEP == txtApolNORESEP.Text,
+                det.Query.SequenceNo == ViewState["SequenceNo"].ToString()
+            //det.Query.KDOBT == txtApolKDOBT.Text
+            );
+
+            bool exists = det.Query.Load();
+
+            if (!exists)
+                det.AddNew();
+
+            det.NOSJP = txtApolNOSJP.Text;
+            det.NORESEP = txtApolNORESEP.Text;
+            det.KDOBT = txtApolKDOBT.Text;
+            det.NMOBAT = txtApolNMOBAT.Text;
+
+            det.SIGNA1OBT = (int?)Convert.ToDecimal(txtApolSigna1.Value ?? 0);
+            det.SIGNA2OBT = (int?)Convert.ToDecimal(txtApolSigna2.Value ?? 0);
+            det.JMLOBT = (int?)Convert.ToDecimal(txtApolJmlObt.Value ?? 0);
+            det.JHO = (decimal?)Convert.ToDecimal(txtApolJHO.Value ?? 0);
+            det.PERMINTAAN = (int?)Convert.ToDecimal(txtApolPermintaan.Value ?? 0);
+
+            det.CATKHSOBT = txtApolCatatan.Text;
+            det.JNSROBT = txtApolJnsRacik.Text;
+
+            det.LastUpdateDateTime = DateTime.Now;
+            det.LastUpdateByUserID = AppSession.UserLogin.UserID;
+
+            det.Save();
+        }
+
+        #endregion
+
+        #region BUTTON CLICK
+
+        protected void btnSaveApol_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                lblMsgApol.ForeColor = System.Drawing.Color.Black;
+                lblMsgApol.Text = "Saving...";
+
+                ValidateApolBeforeSubmit();
+
+                SaveApolDetailToDatabase();
+
+                lblMsgApol.ForeColor = System.Drawing.Color.Green;
+                lblMsgApol.Text = "APOL Saved to Database";
+            }
+            catch (Exception ex)
+            {
+                lblMsgApol.ForeColor = System.Drawing.Color.Red;
+                lblMsgApol.Text = "Save Error : " + ex.Message;
+            }
+        }
+
+        #endregion
+
+        #region VALIDATION
+
+        private void ValidateApolBeforeSubmit()
+        {
+            if (string.IsNullOrWhiteSpace(txtApolNOSJP.Text))
+                throw new Exception("No SJP wajib diisi");
+
+            if (string.IsNullOrWhiteSpace(txtApolKDOBT.Text))
+                throw new Exception("Kode Obat kosong");
+
+            if ((txtApolJmlObt.Value ?? 0) <= 0)
+                throw new Exception("Jml Obat tidak valid");
+        }
+
+        #endregion
+
     }
 }
