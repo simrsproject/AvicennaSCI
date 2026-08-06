@@ -171,11 +171,13 @@ namespace Temiang.Avicenna.Module.Charges
                     trPRBApol.Visible = true;
                     btnCariPasienSep.Enabled = false;
                     txtRefAsalSJP.Enabled = false;
-                    txtPoliRSP.Enabled = false;
+                    cboPoliApol.Enabled = false;
                     cboJnsRsp.Enabled = false;
                     txtNoResep.Enabled = false;
-                    txtKdDokter.Enabled = false;
+                    cboDokterApol.Enabled = false;
                     cboIterasi.Enabled = false;
+
+                    txtNoResep.Text = GetNextApolResepNo();
                 }
 
                 //Guarantor
@@ -769,17 +771,16 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 //pasien pribadi tentunya gk pake BPJS
                 //modified by wiliam 2026-05-15
 
-                if(!string.IsNullOrEmpty(txtBpjsSepNo.Text))
+
+                var sepapol = new BpjsSEP();
+                if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
                 {
-                    var sepapol = new BpjsSEP();
-                    if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
+                    if (sepapol.TanggalSEP.HasValue)
                     {
-                        if (sepapol.TanggalSEP.HasValue)
-                        {
-                            txtTglSep.SelectedDate = sepapol.TanggalSEP.Value;
-                        }
+                        txtTglSep.SelectedDate = sepapol.TanggalSEP.Value;
                     }
-                }else
+                }
+                else
                 {
                     txtTglSep.SelectedDate = null;
                 }
@@ -792,13 +793,16 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     if (apol.Query.Load())
                     {
                         txtRefAsalSJP.Text = apol.REFASALSJP;
-                        txtPoliRSP.Text = apol.POLIRSP;
+                        cboPoliApol.SelectedValue = apol.POLIRSP;
                         cboJnsRsp.SelectedValue = apol.KDJNSOBAT.ToString();
                         txtNoResep.Text = apol.NORESEP;
-                        txtKdDokter.Text = apol.KDDOKTER;
+                        cboDokterApol.SelectedValue = apol.KDDOKTER;
                         cboIterasi.SelectedValue = apol.ITERASI.ToString();
+                        txtTglSjp.SelectedDate = apol.TGLSJP;
+                        txtTglPlynRsp.SelectedDate = apol.TGLPELRSP;
                         txtTglRsp.SelectedDate = apol.TGLRSP;
 
+                        // kalau ada tgl-nya, isi juga
                         //if (apol.TGLSJP != null)
                         //    txtTglSep.SelectedDate = apol.TGLSJP;
 
@@ -806,7 +810,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         apoldet.Query.Where(
                             apoldet.Query.PrescriptionNo == apol.PrescriptionNo,
                             apoldet.Query.BpjsApolID == apol.ID,
-                            apoldet.Query.MetadataCode != "200"
+                            apoldet.Query.METADATACODE != "200"
                         );
 
                         if (apoldet.Query.Load())
@@ -814,12 +818,12 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             lblApolDtl.Text = $"Detail APOL ditemukan: {apoldet.Count} item Belum Terkirim";
                         }
 
-                        if (apol.MetadataCode == "200")
+                        if (apol.METADATACODE == "200")
                         {
                             btnCreateAPOL.Enabled = false;
                         }
 
-                        lblCreateApolResult.Text = apol.MetadataMessage;
+                        lblCreateApolResult.Text = apol.METADATAMESSAGE;
                         lblCreateApolResult.ForeColor = System.Drawing.Color.Green;
                     }
                     else
@@ -827,15 +831,17 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         lblCreateApolResult.Text = "Data APOL tidak ditemukan.";
                         lblCreateApolResult.ForeColor = System.Drawing.Color.Red;
 
+                        // kosongkan form jika mau:
+                        txtTglSjp.SelectedDate = DateTime.Now;
                         txtRefAsalSJP.Text = "";
-                        txtPoliRSP.Text = "";
+                        cboPoliApol.ClearSelection();
                         cboJnsRsp.ClearSelection();
                         txtNoResep.Text = "";
-                        txtKdDokter.Text = "";
+                        cboDokterApol.ClearSelection();
                         cboIterasi.ClearSelection();
                     }
                 }
-            
+
 
             #region height, weight, allergies
             decimal h = 0, w = 0;
@@ -1260,10 +1266,10 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             {
                 btnCariPasienSep.Enabled = true;
                 txtRefAsalSJP.Enabled = true;
-                txtPoliRSP.Enabled = true;
+                cboPoliApol.Enabled = true;
                 cboJnsRsp.Enabled = true;
                 txtNoResep.Enabled = true;
-                txtKdDokter.Enabled = true;
+                cboDokterApol.Enabled = true;
                 cboIterasi.Enabled = true;
             }
             //}
@@ -2222,6 +2228,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 else
                     trPayment.Visible = false;
 
+
                 if (Helper.IsApotekOnlineIntegration)
                 {
                     // buat nampung item gagal
@@ -2262,7 +2269,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             // cek sudah sukses sebelumnya
                             var detChk = new BpjsApolDetail();
                             detChk.Query.Where(detChk.Query.PrescriptionNo == hdr.PrescriptionNo, detChk.Query.SequenceNo == tpi.SequenceNo);
-                            if (detChk.Query.Load() && (detChk.MetadataCode ?? "") == "200") continue;
+                            if (detChk.Query.Load() && (detChk.METADATACODE ?? "") == "200") continue;
 
                             // cek mapping
                             var map = new ItemBridging();
@@ -2282,16 +2289,18 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                 d0.BpjsApolID = apol.ID;
                                 d0.NOSJP = nosjp;
                                 d0.NORESEP = noresep;
-                                d0.MetadataCode = "PENDING-NOMAP";
-                                d0.MetadataMessage = $"APOL: Mapping belum ada untuk ItemID '{tpi.ItemID}'.";
+                                d0.METADATACODE = "PENDING-NOMAP";
+                                d0.METADATAMESSAGE = $"APOL: Mapping belum ada untuk ItemID '{tpi.ItemID}'.";
                                 d0.LastUpdateDateTime = DateTime.Now;
                                 d0.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                 d0.Save();
 
+                                // catet ke alert juga
                                 apolErrors.Add($"Seq {tpi.SequenceNo}: mapping belum ada");
                                 continue;
                             }
 
+                            // consume (opsional)
                             int signa2 = 0;
                             var cm = new ConsumeMethod();
                             cm.Query.Where(cm.Query.SRConsumeMethod == tpi.SRConsumeMethod);
@@ -2312,13 +2321,28 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                 jnsrobt = "N";
                             }
 
-                            //payload prep
+                            // siapkan field
                             var kdobt = map.BridgingID; var nmobat = map.BridgingName;
                             var signa1 = ToInt(tpi.ConsumeQty);
                             var permintaan = ToInt(tpi.PrescriptionQty); // racikan
                             var jmlobt = ToInt(tpi.TakenQty);
-                            var jho = ToInt(tpi.DaysOfUsage);
+                            decimal jho = Convert.ToDecimal(tpi.DaysOfUsage ?? 0);
                             var catatan = Convert.ToString(tpi.Notes);
+
+                            //pakai bila field ini udah di save di detail apol
+                            var bpjsApolDet = new BpjsApolDetail();
+                            bpjsApolDet.Query.Where(bpjsApolDet.Query.PrescriptionNo == hdr.PrescriptionNo,
+                            bpjsApolDet.Query.SequenceNo == tpi.SequenceNo);
+                            if (bpjsApolDet.Query.Load())
+                            {
+                                kdobt = Convert.ToString(bpjsApolDet.KDOBT);
+                                signa1 = ToInt(bpjsApolDet.SIGNA1OBT);
+                                signa2 = ToInt(bpjsApolDet.SIGNA2OBT);
+                                permintaan = ToInt(bpjsApolDet.PERMINTAAN);
+                                jmlobt = ToInt(bpjsApolDet.JMLOBT);
+                                jho = bpjsApolDet.JHO ?? 0;
+                                catatan = Convert.ToString(bpjsApolDet.CATKHSOBT);
+                            }
 
                             var svc = new Temiang.Avicenna.Common.BPJS.Apotek.Service();
                             string metaCode = null, metaMsg = null;
@@ -2391,6 +2415,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                 metaMsg = ex.Message;
                             }
 
+                            // upsert hasil
                             var det = new BpjsApolDetail();
                             det.Query.Where(det.Query.PrescriptionNo == hdr.PrescriptionNo, det.Query.SequenceNo == tpi.SequenceNo);
                             var exists = det.Query.Load();
@@ -2410,14 +2435,16 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             det.CATKHSOBT = catatan;
                             if (tpi.IsCompound == true) { det.JNSROBT = jnsrobt; det.PERMINTAAN = permintaan; }
 
-                            det.MetadataCode = metaCode ?? "";
-                            det.MetadataMessage = metaMsg ?? "";
+                            det.METADATACODE = metaCode ?? "";
+                            det.METADATAMESSAGE = metaMsg ?? "";
                             det.LastUpdateDateTime = DateTime.Now;
                             det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                             det.Save();
 
+                            // kalau gagal / bukan 200, simpan untuk di-alert
                             if (!string.Equals(metaCode, "200", StringComparison.OrdinalIgnoreCase))
                             {
+                                // biar singkat: Seq xx - KdObat - Pesan
                                 var shortMsg = string.IsNullOrWhiteSpace(metaMsg) ? "Tidak diketahui" : metaMsg;
                                 apolErrors.Add($"Seq {tpi.SequenceNo} ({kdobt}): {shortMsg}");
                             }
@@ -2431,6 +2458,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
                 END_APOL:;
 
+                    // --- tampilkan alert kalo ada yang gagal ---
                     if (apolErrors.Count > 0)
                     {
                         var toShow = string.Join("\\n", apolErrors.Take(6));
@@ -2445,6 +2473,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         ShowInformationHeader("Sebagian item APOL gagal dikirim. Silakan cek BpjsApolDetail.");
                     }
                 }
+
             }
             catch (Exception e)
             {
@@ -2923,6 +2952,188 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             dt.Save();
 
                             txtPrescriptionNo.Text = hd.PrescriptionNo;
+
+                            //Apol
+                            if (Helper.IsApotekOnlineIntegration)
+                            {
+                                try
+                                {
+                                    var oldPrescNo = (Request.QueryString["prescno"] ?? "").Trim();
+                                    if (string.IsNullOrEmpty(oldPrescNo)) oldPrescNo = prc.ReferenceNo ?? txtPrescriptionNo.Text;
+                                    var newPrescNo = hd.PrescriptionNo;
+                                    var regNo = prc.RegistrationNo;
+                                    var sepNo = (txtBpjsSepNo.Text ?? "").Trim();
+
+                                    string nosjp = null, noresep = null;
+
+                                    var oldApol = new BpjsApol();
+                                    oldApol.Query.Where(
+                                        oldApol.Query.PrescriptionNo == oldPrescNo,
+                                        oldApol.Query.REFASALSJP == sepNo
+                                    );
+                                    var hasOldHdr = oldApol.Query.Load();
+
+                                    if (hasOldHdr)
+                                    {
+                                        nosjp = Convert.ToString(oldApol.NOAPOTIK)?.Trim();
+                                        noresep = Convert.ToString(oldApol.NORESEP)?.Trim();
+                                    }
+
+                                    var newHdr = new BpjsApol();
+                                    newHdr.Query.Where(
+                                        newHdr.Query.PrescriptionNo == newPrescNo,
+                                        newHdr.Query.REFASALSJP == sepNo
+                                    );
+                                    var existsNew = newHdr.Query.Load();
+                                    if (!existsNew) newHdr.AddNew();
+
+                                    newHdr.RegistrationNo = regNo;
+                                    newHdr.PrescriptionNo = newPrescNo;
+                                    newHdr.REFASALSJP = sepNo;
+                                    if (!string.IsNullOrEmpty(nosjp)) newHdr.NOAPOTIK = nosjp;
+                                    if (!string.IsNullOrEmpty(noresep)) newHdr.NORESEP = noresep;
+                                    if (hasOldHdr)
+                                    {
+                                        newHdr.POLIRSP = oldApol.POLIRSP;
+                                        newHdr.KDJNSOBAT = oldApol.KDJNSOBAT;
+                                        newHdr.ITERASI = oldApol.ITERASI;
+                                        newHdr.KDDOKTER = oldApol.KDDOKTER;
+                                        newHdr.TGLSJP = oldApol.TGLSJP;
+                                        newHdr.IDUSERSJP = oldApol.IDUSERSJP;
+                                        newHdr.TGLRSP = oldApol.TGLRSP;
+                                        newHdr.TGLPELRSP = oldApol.TGLPELRSP;
+                                        newHdr.NosepKunjungan = oldApol.NosepKunjungan;
+                                        newHdr.NOKARTU = oldApol.NOKARTU;
+                                        newHdr.NAMA = oldApol.NAMA;
+                                        newHdr.FASKESASAL = oldApol.FASKESASAL;
+                                        newHdr.TGLRESEP = oldApol.TGLRESEP;
+                                        newHdr.TGLENTRY = oldApol.TGLENTRY;
+                                        newHdr.METADATACODE = oldApol.METADATACODE;
+                                        newHdr.METADATAMESSAGE = oldApol.METADATAMESSAGE;
+                                    }
+                                    newHdr.LastUpdateDateTime = DateTime.Now;
+                                    newHdr.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                                    newHdr.Save();
+
+                                    var apolHeaderId = newHdr.ID;
+
+                                    var newItems = new TransPrescriptionItemCollection();
+                                    newItems.Query.Where(newItems.Query.PrescriptionNo == newPrescNo);
+                                    newItems.LoadAll();
+
+                                    foreach (var d in newItems)
+                                    {
+                                        // skip void / qty 0
+                                        int ToInt(object o) { int v; return int.TryParse(Convert.ToString(o), out v) ? v : 0; }
+                                        if ((d.IsVoid ?? false) || ToInt(d.TakenQty) == 0) continue;
+
+                                        // coba pakai detail lama (untuk copy KDOBT/NMOBAT/JNSR), fallback ke mapping
+                                        string kdobt = null, nmobat = null, jnsrobt = null;
+                                        decimal signa1 = 0, signa2 = 0, permintaan = 0, jmlobt = 0, jho = 0;
+                                        string catatan = Convert.ToString(d.Notes);
+
+                                        var oldDet = new BpjsApolDetail();
+                                        oldDet.Query.Where(oldDet.Query.PrescriptionNo == oldPrescNo, oldDet.Query.SequenceNo == d.SequenceNo);
+                                        var hasOldDet = oldDet.Query.Load();
+                                        if (hasOldDet)
+                                        {
+                                            // 🔥 DELETE DULU JIKA PERNAH 200
+                                            if (string.Equals(oldDet.METADATACODE, "200", StringComparison.OrdinalIgnoreCase)
+                                                && !string.IsNullOrWhiteSpace(nosjp)
+                                                && !string.IsNullOrWhiteSpace(noresep)
+                                                && !string.IsNullOrWhiteSpace(oldDet.KDOBT))
+                                            {
+                                                var tipeObat = (oldDet.JNSROBT ?? "")
+                                                    .StartsWith("R.", StringComparison.OrdinalIgnoreCase)
+                                                    ? "NSROBT"
+                                                    : "N";
+
+                                                var svcDel = new Temiang.Avicenna.Common.BPJS.Apotek.Service();
+
+                                                var reqDel = new Temiang.Avicenna.Common.BPJS.Apotek.PelayananObat.HapusPelayananObat.Request.Root
+                                                {
+                                                    Nosepapotek = nosjp,
+                                                    Noresep = noresep,
+                                                    Kodeobat = oldDet.KDOBT.Trim(),
+                                                    Tipeobat = tipeObat
+                                                };
+
+                                                var respDel = svcDel.HapusPelayananObat(reqDel);
+                                                var delCode = respDel?.Metadata?.Code ?? "";
+                                                var delMsg = respDel?.Metadata?.Message ?? "";
+
+                                                if (!string.Equals(delCode, "200", StringComparison.OrdinalIgnoreCase))
+                                                    throw new Exception("APOL Delete gagal: " + delMsg);
+
+                                                oldDet.METADATACODE = "DEL-200";
+                                                oldDet.METADATAMESSAGE = string.IsNullOrWhiteSpace(delMsg) ? "Deleted by Unapprove" : delMsg;
+                                                oldDet.LastUpdateDateTime = DateTime.Now;
+                                                oldDet.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                                                oldDet.Save();
+                                            }
+
+                                            kdobt = (oldDet.KDOBT ?? "").Trim();
+                                            nmobat = oldDet.NMOBAT;
+                                            jnsrobt = oldDet.JNSROBT;
+                                            signa1 = oldDet.SIGNA1OBT ?? 0m;
+                                            signa2 = oldDet.SIGNA2OBT ?? 0m;
+                                            permintaan = oldDet.PERMINTAAN ?? 0m;
+                                            jmlobt = oldDet.JMLOBT ?? 0m;
+                                            jho = oldDet.JHO ?? 0m;
+                                            if (string.IsNullOrWhiteSpace(catatan))
+                                                catatan = oldDet.CATKHSOBT;
+                                        }
+
+                                        if (signa1 == 0) signa1 = ToInt(d.ConsumeQty);
+                                        if (jmlobt == 0) jmlobt = ToInt(d.TakenQty);
+                                        if (jho == 0) jho = ToInt(d.DaysOfUsage);
+
+                                        var nd = new BpjsApolDetail();
+                                        nd.Query.Where(
+                                            nd.Query.PrescriptionNo == newPrescNo,
+                                            nd.Query.SequenceNo == d.SequenceNo
+                                        );
+                                        var existsDet = nd.Query.Load();
+                                        if (!existsDet) nd.AddNew();
+
+                                        nd.PrescriptionNo = newPrescNo;
+                                        nd.SequenceNo = d.SequenceNo;
+                                        nd.ParentNo = d.ParentNo;
+                                        nd.BpjsApolID = apolHeaderId;
+                                        nd.NOSJP = nosjp;
+                                        nd.NORESEP = noresep;
+                                        nd.JNSROBT = jnsrobt;
+                                        nd.KDOBT = kdobt;
+                                        nd.NMOBAT = nmobat;
+                                        nd.SIGNA1OBT = (int?)signa1;
+                                        nd.SIGNA2OBT = (int?)signa2;
+                                        nd.JMLOBT = (int?)jmlobt;
+                                        nd.JHO = jho;
+                                        nd.CATKHSOBT = catatan;
+
+                                        // 🔥 BUKAN PENDING LAGI
+                                        nd.METADATACODE = "ORDER";
+                                        nd.METADATAMESSAGE = "Reseed after Unapprove (siap kirim ulang)";
+                                        nd.LastUpdateDateTime = DateTime.Now;
+                                        nd.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                                        nd.Save();
+                                    }
+
+                                    ScriptManager.RegisterStartupScript(
+                                        this, GetType(),
+                                        "apolSeed_" + Guid.NewGuid().ToString("N"),
+                                        "console.log('APOL: Header & detail disinkron dan item lama dihapus dari APOL jika sudah 200.');",
+                                        true
+                                    );
+                                }
+                                catch (Exception ex)
+                                {
+                                    this.LogError(ex);
+                                    ShowInformationHeader("APOL Sync (Unapprove): " +
+                                        System.Web.HttpUtility.JavaScriptStringEncode(ex.Message));
+                                }
+                            }
+
                         }
                     }
                 }
@@ -3054,6 +3265,91 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         }
                         TransPrescriptionItems.Save();
                     }
+
+                    // APOL - Unapprove Sync
+                    if (Helper.IsApotekOnlineIntegration)
+                    {
+                        try
+                        {
+                            var bpjsapol = new BpjsApol();
+                            bpjsapol.Query.Where(
+                                bpjsapol.Query.PrescriptionNo == prc.PrescriptionNo,
+                                bpjsapol.Query.RegistrationNo == prc.RegistrationNo
+                            );
+
+                            if (!bpjsapol.Query.Load())
+                                return;
+
+                            var nosjp = Convert.ToString(bpjsapol.NOAPOTIK)?.Trim();
+                            var noresep = Convert.ToString(bpjsapol.NORESEP)?.Trim();
+
+                            if (string.IsNullOrWhiteSpace(nosjp) || string.IsNullOrWhiteSpace(noresep))
+                                return;
+
+                            var details = new BpjsApolDetailCollection();
+                            details.Query.Where(details.Query.PrescriptionNo == prc.PrescriptionNo);
+
+                            if (!details.LoadAll())
+                                return;
+
+                            var svc = new Temiang.Avicenna.Common.BPJS.Apotek.Service();
+
+                            foreach (var d in details)
+                            {
+                                if (!string.Equals(d.METADATACODE, "200", StringComparison.OrdinalIgnoreCase))
+                                    continue;
+
+                                if (string.IsNullOrWhiteSpace(d.KDOBT))
+                                    continue;
+
+                                var tipeObat = (d.JNSROBT ?? "")
+                                    .StartsWith("R.", StringComparison.OrdinalIgnoreCase)
+                                    ? "NSROBT"
+                                    : "N";
+
+                                var reqDel = new Temiang.Avicenna.Common.BPJS.Apotek.PelayananObat.HapusPelayananObat.Request.Root
+                                {
+                                    Nosepapotek = nosjp,
+                                    Noresep = noresep,
+                                    Kodeobat = d.KDOBT.Trim(),
+                                    Tipeobat = tipeObat
+                                };
+
+                                var respDel = svc.HapusPelayananObat(reqDel);
+                                var delCode = respDel?.Metadata?.Code ?? "";
+                                var delMsg = respDel?.Metadata?.Message ?? "";
+
+                                if (!string.Equals(delCode, "200", StringComparison.OrdinalIgnoreCase))
+                                    throw new Exception("APOL Delete gagal: " + delMsg);
+
+                                // update metadata
+                                d.METADATACODE = "DEL-200";
+                                d.METADATAMESSAGE = string.IsNullOrWhiteSpace(delMsg)
+                                    ? "Deleted by Unapprove"
+                                    : delMsg;
+
+                                d.LastUpdateDateTime = DateTime.Now;
+                                d.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                            }
+
+                            details.Save();
+
+                            ScriptManager.RegisterStartupScript(
+                                this,
+                                GetType(),
+                                "apolDel_" + Guid.NewGuid().ToString("N"),
+                                "console.log('APOL: Detail Item Obat sukses 200 sudah dihapus dari endpoint.');",
+                                true
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            this.LogError(ex);
+                            ShowInformationHeader("APOL Delete (Unapprove): " +
+                                System.Web.HttpUtility.JavaScriptStringEncode(ex.Message));
+                        }
+                    }
+
                 }
 
                 //Commit if success, Rollback if failed
@@ -3726,6 +4022,178 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 // krn sudah langsung diimport saat dokter save order (Handono 231101)
                 if (entity.IsForTakeItHome ?? false)
                     AddReduceMedicationQty(entity.PrescriptionNo, reg.RegistrationNo, reg.SRRegistrationType, !isVoid);
+
+
+                if (Helper.IsApotekOnlineIntegration)
+                {
+                    try
+                    {
+                        // cari header dulu
+                        var apol = new BpjsApol();
+                        apol.Query.Where(
+                            apol.Query.PrescriptionNo == txtPrescriptionNo.Text,
+                            apol.Query.RegistrationNo == txtRegistrationNo.Text
+                        );
+
+                        if (!apol.Query.Load())
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(),
+                                "apol-nohdr",
+                                "alert('APOL: Header tidak ditemukan.');",
+                                true
+                            );
+                            return;
+                        }
+
+                        //cek induk iterasi
+                        //var indukapol = new BpjsApol();
+                        //indukapol.Query.Where(
+                        //    indukapol.Query.NosepKunjungan == apol.NosepKunjungan,
+                        //    indukapol.Query.ITERASI != 0,
+                        //    indukapol.Query.METADATACODE == "200"
+                        //    );
+                        //indukapol.Query.es.Top=1;
+                        //if (indukapol.Query.Load())
+                        //{
+                        //    ScriptManager.RegisterStartupScript(
+                        //        this, GetType(),
+                        //        "apol-iterasi-exist",
+                        //        "alert('APOL: Tidak Bisa Hapus Data Resep APOL (Sudah ada Data Iterasi)');",
+                        //        true
+                        //    );
+                        //    return;
+                        //}
+
+
+                        var detCheck = new BpjsApolDetail();
+                        detCheck.Query.Where(
+                            detCheck.Query.PrescriptionNo == apol.PrescriptionNo,
+                            detCheck.Query.METADATACODE == "200"
+                        );
+                        detCheck.Query.es.Top = 1;
+
+                        if (detCheck.Query.Load())
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(),
+                                "apol-detail-exist",
+                                "alert('APOL: Tidak Bisa Hapus Data Resep APOL (Sudah ada Data Detail Obat)');",
+                                true
+                            );
+                            return;
+                        }
+
+                        var nosjp = Convert.ToString(apol.NOAPOTIK)?.Trim();
+                        var refasal = Convert.ToString(apol.REFASALSJP)?.Trim();
+                        var noresep = Convert.ToString(apol.NORESEP)?.Trim();
+
+                        if (string.IsNullOrWhiteSpace(nosjp) ||
+                            string.IsNullOrWhiteSpace(refasal) ||
+                            string.IsNullOrWhiteSpace(noresep))
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(),
+                                "apol-missing",
+                                "alert('APOL: NOSJP/REFASALSJP/NORESEP belum lengkap untuk HapusResep.');",
+                                true
+                            );
+                            return;
+                        }
+
+                        var req = new Common.BPJS.Apotek.Resep.HapusResep.Request
+                        {
+                            NOSJP = nosjp,
+                            REFASALSJP = refasal,
+                            NORESEP = noresep
+                        };
+
+                        var svc = new Common.BPJS.Apotek.Service();
+                        var result = svc.HapusResep(req); // <- return MetadataResponse (Code/Message)
+
+                        var code = (result?.Metadata.Code ?? "").Trim();
+                        var msg = result?.Metadata.Message ?? "";
+
+                        // simpan jejak ke header (kalau kolomnya ada)
+                        apol.METADATACODE = string.IsNullOrEmpty(code) ? "HDR-DEL-UNKNOWN" : $"HDR-DEL-{code}";
+                        apol.METADATAMESSAGE = string.IsNullOrWhiteSpace(msg) ? "HapusResep executed" : msg;
+                        apol.LastUpdateDateTime = DateTime.Now;
+                        apol.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                        apol.Save();
+
+                        if (!string.Equals(code, "200", StringComparison.OrdinalIgnoreCase))
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(),
+                                "apol-delhdr-nok",
+                                $"alert('APOL HapusResep: {System.Web.HttpUtility.JavaScriptStringEncode(apol.METADATAMESSAGE)}');",
+                                true
+                            );
+                            return;
+                        }
+
+                        // sukses
+                        ScriptManager.RegisterStartupScript(
+                            this, GetType(),
+                            "apol-delhdr-ok",
+                            "alert('APOL: Resep berhasil dihapus di endpoint.');",
+                            true
+                        );
+                    }
+                    catch (System.Net.WebException wex)
+                    {
+                        var http = wex.Response as System.Net.HttpWebResponse;
+                        var sc = http != null ? (int)http.StatusCode : 0;
+
+                        try
+                        {
+                            var apol = new BpjsApol();
+                            apol.Query.Where(apol.Query.PrescriptionNo == txtPrescriptionNo.Text, apol.Query.RegistrationNo == txtRegistrationNo.Text);
+                            if (apol.Query.Load())
+                            {
+                                apol.METADATACODE = $"HDR-DEL-{sc}";
+                                apol.METADATAMESSAGE = sc == 504 ? "Gateway Timeout (504) saat HapusResep" : $"HTTP Error {sc} saat HapusResep";
+                                apol.LastUpdateDateTime = DateTime.Now;
+                                apol.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                                apol.Save();
+                            }
+                        }
+                        catch { /* no-block */ }
+
+                        ScriptManager.RegisterStartupScript(
+                            this, GetType(),
+                            "apol-delhdr-err",
+                            $"alert('APOL HapusResep: {System.Web.HttpUtility.JavaScriptStringEncode((sc == 0 ? wex.Message : $"HTTP {sc}"))}');",
+                            true
+                        );
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            var apol = new BpjsApol();
+                            apol.Query.Where(apol.Query.PrescriptionNo == txtPrescriptionNo.Text, apol.Query.RegistrationNo == txtRegistrationNo.Text);
+                            if (apol.Query.Load())
+                            {
+                                apol.METADATACODE = "HDR-DEL-CATCH";
+                                apol.METADATAMESSAGE = ex.Message;
+                                apol.LastUpdateDateTime = DateTime.Now;
+                                apol.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                                apol.Save();
+                            }
+                        }
+                        catch { /* no-block */ }
+
+                        ScriptManager.RegisterStartupScript(
+                            this, GetType(),
+                            "apol-delhdr-ex",
+                            $"alert('APOL HapusResep: {System.Web.HttpUtility.JavaScriptStringEncode(ex.Message)}');",
+                            true
+                        );
+                        return;
+                    }
+                }
 
                 //Commit if success, Rollback if failed
                 trans.Complete();
@@ -4713,21 +5181,38 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         apol.Query.REFASALSJP == txtBpjsSepNo.Text
                     );
 
+                    var apolprescno = txtPrescriptionNo.Text?.Trim();
+                    if (!string.IsNullOrEmpty(apolprescno) && apolprescno.Contains("-"))
+                    {
+                        var parts = apolprescno.Split('-');
+
+                        if (parts.Length == 2 && int.TryParse(parts[1], out int number))
+                        {
+                            number = number - 1;
+
+                            if (number >= 0)
+                            {
+                                var newPrescNo = parts[0] + "-" + number.ToString("D4");
+                                // hasil: RSO/260226-0005
+                            }
+                        }
+                    }
+
                     if (apol.Query.Load()
                         && !string.IsNullOrWhiteSpace(Convert.ToString(apol.NOAPOTIK))
                         && !string.IsNullOrWhiteSpace(Convert.ToString(apol.NORESEP)))
                     {
-                        // detail APOL
+                        // detail APOL utk seq ini
                         var det = new BpjsApolDetail();
                         det.Query.Where(
-                            det.Query.PrescriptionNo == apol.PrescriptionNo,
+                            det.Query.PrescriptionNo == apolprescno,
                             det.Query.SequenceNo == sequenceNo
                         );
 
                         if (det.Query.Load())
                         {
-                            var meta = (det.MetadataCode ?? "").Trim();
-                            
+                            var meta = (det.METADATACODE ?? "").Trim();
+
                             if (string.Equals(meta, "200", StringComparison.OrdinalIgnoreCase))
                             {
                                 var kdobt = (det.KDOBT ?? "").Trim();
@@ -4735,7 +5220,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                 {
                                     // tipe obat
                                     var jns = (det.JNSROBT ?? "").Trim();
-                                    // kalau racikan: "R.{NN/SeqNo}", kalau non: "N"
+                                    // kalau racikan: "NSROBT", kalau non: "N"
                                     var tipeObat = jns.StartsWith("R.", StringComparison.OrdinalIgnoreCase) ? "NSROBT" : "N";
 
                                     var svc = new Temiang.Avicenna.Common.BPJS.Apotek.Service();
@@ -4755,9 +5240,9 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
                                         if (!string.Equals(code, "200", StringComparison.OrdinalIgnoreCase))
                                         {
-                                            // API validasi, misal udah diverif - alert
-                                            det.MetadataCode = $"DEL-{code}";
-                                            det.MetadataMessage = string.IsNullOrWhiteSpace(msg) ? "Gagal hapus di APOL." : msg;
+                                            //Alert Kalo Udah Verif
+                                            det.METADATACODE = $"DEL-{code}";
+                                            det.METADATAMESSAGE = string.IsNullOrWhiteSpace(msg) ? "Gagal hapus di APOL." : msg;
                                             det.LastUpdateDateTime = DateTime.Now;
                                             det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                             det.Save();
@@ -4765,14 +5250,15 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                             ScriptManager.RegisterStartupScript(
                                                 this, GetType(),
                                                 "apolDelNok_" + Guid.NewGuid().ToString("N"),
-                                                $"alert('APOL: {System.Web.HttpUtility.JavaScriptStringEncode(det.MetadataMessage)}');",
+                                                $"alert('APOL: {System.Web.HttpUtility.JavaScriptStringEncode(det.METADATAMESSAGE)}');",
                                                 true
                                             );
                                             return;
                                         }
 
-                                        det.MetadataCode = "DEL-200";
-                                        det.MetadataMessage = string.IsNullOrWhiteSpace(msg) ? "Deleted" : msg;
+                                        // sukses hapus di APOL → save log di db
+                                        det.METADATACODE = "DEL-200";
+                                        det.METADATAMESSAGE = string.IsNullOrWhiteSpace(msg) ? "Deleted" : msg;
                                         det.LastUpdateDateTime = DateTime.Now;
                                         det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                         det.Save();
@@ -4782,8 +5268,8 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                         var http = wex.Response as System.Net.HttpWebResponse;
                                         var sc = http != null ? (int)http.StatusCode : 0;
 
-                                        det.MetadataCode = $"DEL-{sc}";
-                                        det.MetadataMessage = sc == 504
+                                        det.METADATACODE = $"DEL-{sc}";
+                                        det.METADATAMESSAGE = sc == 504
                                             ? "Gateway Timeout (504) saat hapus obat di APOL"
                                             : $"HTTP Error {sc} saat hapus obat di APOL";
                                         det.LastUpdateDateTime = DateTime.Now;
@@ -4793,15 +5279,15 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                         ScriptManager.RegisterStartupScript(
                                             this, GetType(),
                                             "apolDelErr_" + Guid.NewGuid().ToString("N"),
-                                            $"alert('APOL: {System.Web.HttpUtility.JavaScriptStringEncode(det.MetadataMessage)}');",
+                                            $"alert('APOL: {System.Web.HttpUtility.JavaScriptStringEncode(det.METADATAMESSAGE)}');",
                                             true
                                         );
                                         return;
                                     }
                                     catch (Exception ex)
                                     {
-                                        det.MetadataCode = "DEL-CATCH";
-                                        det.MetadataMessage = ex.Message;
+                                        det.METADATACODE = "DEL-CATCH";
+                                        det.METADATAMESSAGE = ex.Message;
                                         det.LastUpdateDateTime = DateTime.Now;
                                         det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                         det.Save();
@@ -4812,14 +5298,14 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                             $"alert('APOL: {System.Web.HttpUtility.JavaScriptStringEncode(ex.Message)}');",
                                             true
                                         );
-                                        return;
+                                        return; // STOP
                                     }
                                 }
                             }
                             else
                             {
-                                det.MetadataCode = "DEL-LOCAL";
-                                det.MetadataMessage = "Dihapus lokal (belum pernah terkirim ke APOL).";
+                                det.METADATACODE = "DEL-LOCAL";
+                                det.METADATAMESSAGE = "Dihapus lokal (belum pernah terkirim ke APOL).";
                                 det.LastUpdateDateTime = DateTime.Now;
                                 det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                 det.Save();
@@ -4829,16 +5315,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 }
                 catch (Exception ex)
                 {
-                    var log = new WebServiceAPILog
-                    {
-                        DateRequest = DateTime.Now,
-                        IPAddress = "",
-                        UrlAddress = "DEL-DET-APOL",
-                        Params = "",
-                        Response = ex.Message,
-                        Totalms = 0
-                    };
-                    log.Save();
+                    this.LogError(ex);
                 }
             }
 
@@ -4974,6 +5451,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 else
                     entity.IsCasemixApproved = true;
 
+
                 if (Helper.IsApotekOnlineIntegration)
                 {
                     string nosjp = null, noresep = null;
@@ -4988,7 +5466,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     string kdobt = null, nmobat = null;
                     var map = new ItemBridging();
                     map.Query.Where(
-                        map.Query.ItemID == userControl.ItemID,
+                        map.Query.ItemID == (string.IsNullOrWhiteSpace(userControl.ItemInterventionID) ? userControl.ItemID : userControl.ItemInterventionID),
                         map.Query.SRBridgingType == AppEnum.BridgingType.APOTEKONLINE.ToString()
                     );
                     if (map.Query.Load()) { kdobt = map.BridgingID; nmobat = map.BridgingName; }
@@ -5014,6 +5492,41 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     }
                     int ToInt(object o) { int v; return int.TryParse(Convert.ToString(o), out v) ? v : 0; }
 
+                    decimal ToDecimal(object o)
+                    {
+                        decimal v;
+                        return decimal.TryParse(Convert.ToString(o), out v) ? v : 0m;
+                    }
+
+                    decimal signa1 = ToDecimal(userControl.QtyOfDosage);
+                    decimal signa2Dec = signa2;
+                    decimal jmlobt = ToDecimal(userControl.TakenQty);
+                    decimal daysOfUsage = ToDecimal(userControl.DaysOfUsage);
+
+                    decimal apolJho = daysOfUsage;
+
+                    var itmpdmc = new ItemProductMedic();
+                    itmpdmc.LoadByPrimaryKey(userControl.ItemID);
+
+                    var asri = new AppStandardReferenceItem();
+                    asri.LoadByPrimaryKey("ProductType", itmpdmc.SRProductType);
+
+                    string productTypeName = Convert.ToString(asri.ItemName);
+
+                    bool isInjeksi =
+                        productTypeName.IndexOf("INJEKSI", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    bool isInsulin =
+                        productTypeName.IndexOf("INSULIN", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    if (userControl.IsCompound == false && isInjeksi || isInsulin)
+                    {
+                        if (signa1 > 0m && signa2Dec > 0m && jmlobt > 0m)
+                        {
+                            apolJho = jmlobt / (signa1 * signa2Dec);
+                        }
+                    }
+
                     // save detail (PENDING)
                     var det = new BpjsApolDetail();
                     det.Query.Where(det.Query.PrescriptionNo == txtPrescriptionNo.Text, det.Query.SequenceNo == userControl.SequenceNo);
@@ -5028,15 +5541,18 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     det.JNSROBT = jnsrobt;
                     det.KDOBT = kdobt;
                     det.NMOBAT = nmobat;
-                    det.SIGNA1OBT = ToInt(userControl.QtyOfDosage);
-                    det.SIGNA2OBT = signa2;
-                    det.PERMINTAAN = ToInt(userControl.PrescriptionQty); // penting utk racikan
+                    det.SIGNA1OBT = signa2;
+                    det.SIGNA2OBT = ToInt(userControl.QtyOfDosage);
+                    if (userControl.IsCompound == true)
+                    {
+                        det.PERMINTAAN = ToInt(userControl.PrescriptionQty); // penting utk racikan
+                    }
                     det.JMLOBT = ToInt(userControl.TakenQty);
-                    det.JHO = ToInt(userControl.DaysOfUsage);
+                    det.JHO = apolJho;
                     det.CATKHSOBT = Convert.ToString(userControl.Notes);
 
-                    det.MetadataCode = "PENDING";
-                    det.MetadataMessage = "Menunggu Approval";
+                    det.METADATACODE = "PENDING";
+                    det.METADATAMESSAGE = "Menunggu Approval";
                     det.LastUpdateDateTime = DateTime.Now;
                     det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                     det.Save();
@@ -5110,10 +5626,10 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             {
                 btnCariPasienSep.Enabled = true;
                 txtRefAsalSJP.Enabled = true;
-                txtPoliRSP.Enabled = true;
+                cboPoliApol.Enabled = true;
                 cboJnsRsp.Enabled = true;
                 txtNoResep.Enabled = true;
-                txtKdDokter.Enabled = true;
+                cboDokterApol.Enabled = true;
                 cboIterasi.Enabled = true;
             }
 
@@ -6162,9 +6678,135 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
         }
 
         #region APOL
-        //protected void btnSaveApolDtl_Click(object sender, EventArgs e)
+
+        protected void cboPoliApol_ItemsRequested(object sender, RadComboBoxItemsRequestedEventArgs e)
+        {
+            cboPoliApol.Items.Clear();
+
+            try
+            {
+                var service = new Common.BPJS.Apotek.Service();
+                var result = service.GetPoli(e.Text);
+
+                if (result != null &&
+                    result.MetaData != null &&
+                    result.MetaData.Code == "200" &&
+                    result.Response != null &&
+                    result.Response.List != null)
+                {
+                    foreach (var poli in result.Response.List)
+                    {
+                        RadComboBoxItem item = new RadComboBoxItem();
+                        item.Text = poli.Nama;
+                        item.Value = poli.Kode;
+
+                        cboPoliApol.Items.Add(item);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logging
+            }
+        }
+
+        protected void cboPoliApol_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
+        {
+            string kode = cboPoliApol.SelectedValue;
+            string nama = cboPoliApol.Text;
+        }
+
+        protected void cboDokterApol_ItemsRequested(object sender, RadComboBoxItemsRequestedEventArgs e)
+        {
+            cboDokterApol.Items.Clear();
+
+            try
+            {
+                // Misalnya ambil dari poli yang sudah dipilih
+                string poliKode = cboPoliApol.SelectedValue;
+
+                if (string.IsNullOrWhiteSpace(poliKode))
+                    return;
+
+                var sub = new ParamedicBridgingQuery("a");
+                var su = new ParamedicQuery("b");
+                var sup = new ServiceUnitParamedicQuery("c");
+
+                sub.Select(
+                    sub.BridgingID,
+                    "<CASE WHEN a.BridgingName = '' THEN b.ParamedicName ELSE a.BridgingName END AS ParamedicName>",
+                    sub.ParamedicID);
+
+                sub.InnerJoin(su).On(
+                    sub.ParamedicID == su.ParamedicID &&
+                    sub.SRBridgingType.In(AppEnum.BridgingType.BPJS.ToString()));
+
+                // Cari mapping Service Unit berdasarkan BridgingID (Kode Poli BPJS)
+                var subx = new ServiceUnitBridgingQuery("a");
+                var sux = new ServiceUnitQuery("b");
+
+                subx.InnerJoin(sux).On(
+                    subx.ServiceUnitID == sux.ServiceUnitID &&
+                    subx.SRBridgingType.In(AppEnum.BridgingType.BPJS.ToString()));
+
+                subx.Where(
+                    subx.BridgingID == poliKode,
+                    sux.IsActive == true);
+
+                var bridging = new ServiceUnitBridging();
+
+                if (bridging.Load(subx))
+                {
+                    sub.InnerJoin(sup).On(
+                        sub.ParamedicID == sup.ParamedicID &&
+                        sup.ServiceUnitID == bridging.ServiceUnitID);
+                }
+
+                sub.Where(string.Format(
+                    "<CASE WHEN a.BridgingName = '' THEN b.ParamedicName ELSE a.BridgingName END LIKE '%{0}%'>",
+                    e.Text));
+
+                sub.Where(su.IsActive == true);
+
+                DataTable dt = sub.LoadDataTable();
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    RadComboBoxItem item = new RadComboBoxItem();
+
+                    item.Text =
+                        (string.IsNullOrEmpty(row["BridgingID"].ToString())
+                            ? string.Empty
+                            : row["BridgingID"] + " - ")
+                        + row["ParamedicName"];
+
+                    item.Value = row["BridgingID"].ToString();
+
+                    cboDokterApol.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Logging
+            }
+        }
+
+        //protected void btnSearchSepByNoKa_Click(object sender, EventArgs e)
         //{
+        //    // Search logic
         //}
+
+        protected void cboDokterApol_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
+        {
+            string kode = cboDokterApol.SelectedValue;
+            string nama = cboDokterApol.Text;
+        }
+
+        protected void btnSaveApolDtl_Click(object sender, EventArgs e)
+        {
+
+        }
+
         protected void btnCariHistory_Click(object sender, EventArgs e)
         {
             lblInfo.Text = "";
@@ -6225,8 +6867,8 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 {
                     chkPRB.Checked = response.Response.Flagprb == "1";
                     txtRefAsalSJP.Text = response.Response.NoSep;
-                    txtPoliRSP.Text = response.Response.Poli;
-                    txtKdDokter.Text = response.Response.Kodedokter;
+                    //cboPoliApol.SelectedValue = response.Response.Poli;
+                    //txtKdDokter.Text = response.Response.Kodedokter;
 
                     //var parmedbrid = new ParamedicBridging();
                     //parmedbrid.Query.Where(parmedbrid.Query.BridgingID == response.Response.Kodedokter);
@@ -6252,15 +6894,15 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             {
                 var requestData = new Common.BPJS.Apotek.Resep.SimpanResep.Request
                 {
-                    TGLSJP = txtTglRsp.SelectedDate.Value.ToString("yyyy-MM-dd"),
+                    TGLSJP = txtTglSjp.SelectedDate.Value.ToString("yyyy-MM-dd"),
                     REFASALSJP = txtRefAsalSJP.Text,
-                    POLIRSP = txtPoliRSP.Text,
+                    POLIRSP = cboPoliApol.SelectedValue,
                     KDJNSOBAT = cboJnsRsp.SelectedValue,
                     NORESEP = txtNoResep.Text,
                     IDUSERSJP = AppSession.UserLogin.UserID,
-                    TGLRSP = txtPrescriptionDate.SelectedDate.Value.ToString("yyyy-MM-dd"),
-                    TGLPELRSP = txtPrescriptionDate.SelectedDate.Value.ToString("yyyy-MM-dd"),
-                    KdDokter = txtKdDokter.Text,
+                    TGLRSP = txtTglRsp.SelectedDate.Value.ToString("yyyy-MM-dd"),
+                    TGLPELRSP = txtTglPlynRsp.SelectedDate.Value.ToString("yyyy-MM-dd"),
+                    KdDokter = cboDokterApol.SelectedValue,
                     Iterasi = cboIterasi.SelectedValue
                 };
 
@@ -6273,15 +6915,33 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 bool exists = bpjsapol.Query.Load();
 
                 // case 1: header ADA dan statusnya ORDER → update + kirim
-                if (exists && (bpjsapol.MetadataCode ?? "").ToUpper() == "ORDER")
+                if (exists && (bpjsapol.METADATACODE ?? "").ToUpper() == "ORDER")
                 {
                     var svc = new Common.BPJS.Apotek.Service();
                     var result = svc.SimpanResep(requestData);
 
                     if (result != null && result.MetaData != null)
                     {
+                        var msg1 = $"[Code: {result.MetaData.Code}] {result.MetaData.Message}";
+                        var encodedMsg1 = HttpUtility.JavaScriptStringEncode(msg1);
+
+                        lblCreateApolResult.Text = msg1;
+                        lblCreateApolResult.ForeColor =
+                            result.MetaData.IsValid
+                            ? System.Drawing.Color.Green
+                            : System.Drawing.Color.Red;
+
+                        ScriptManager.RegisterStartupScript(
+                            this,
+                            GetType(),
+                            Guid.NewGuid().ToString(),
+                            $"alert('{encodedMsg1}');",
+                            true
+                        );
+
                         lblCreateApolResult.Text = $"[Code: {result.MetaData.Code}] {result.MetaData.Message}";
                         lblCreateApolResult.ForeColor = System.Drawing.Color.Green;
+                        //btnCreateAPOL.Enabled = false;
 
                         if (result.MetaData.IsValid && result.ResponseData != null)
                         {
@@ -6309,8 +6969,8 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             bpjsapol.TGLENTRY = DateTime.Parse(response.TglEntry);
 
                             // update status
-                            bpjsapol.MetadataCode = result.MetaData.Code;
-                            bpjsapol.MetadataMessage = result.MetaData.Message;
+                            bpjsapol.METADATACODE = result.MetaData.Code;
+                            bpjsapol.METADATAMESSAGE = result.MetaData.Message;
                             bpjsapol.LastUpdateDateTime = DateTime.Now;
                             bpjsapol.LastUpdateByUserID = AppSession.UserLogin.UserID;
 
@@ -6319,8 +6979,19 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     }
                     else
                     {
-                        lblCreateApolResult.Text = "No metadata returned from server.";
+                        var msg2 = "No metadata returned from server.";
+                        var encodedMsg2 = HttpUtility.JavaScriptStringEncode(msg2);
+
+                        lblCreateApolResult.Text = msg2;
                         lblCreateApolResult.ForeColor = System.Drawing.Color.Red;
+
+                        ScriptManager.RegisterStartupScript(
+                            this,
+                            GetType(),
+                            Guid.NewGuid().ToString(),
+                            $"alert('{encodedMsg2}');",
+                            true
+                        );
                     }
 
                     return;
@@ -6344,12 +7015,13 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         KDDOKTER = requestData.KdDokter,
                         ITERASI = Convert.ToByte(requestData.Iterasi),
 
+                        // tambahan otomatis
                         RegistrationNo = txtRegistrationNo.Text,
                         PrescriptionNo = txtPrescriptionNo.Text,
                         LastUpdateDateTime = DateTime.Now,
                         LastUpdateByUserID = AppSession.UserLogin.UserID,
-                        MetadataCode = "ORDER",
-                        MetadataMessage = "Header dibuat sebelum kirim."
+                        METADATACODE = "ORDER",
+                        METADATAMESSAGE = "Header dibuat sebelum kirim."
                     };
                     apol.Save();
 
@@ -6359,8 +7031,22 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
                     if (result != null && result.MetaData != null)
                     {
-                        lblCreateApolResult.Text = $"[Code: {result.MetaData.Code}] {result.MetaData.Message}";
-                        lblCreateApolResult.ForeColor = System.Drawing.Color.Green;
+                        var msg3 = $"[Code: {result.MetaData.Code}] {result.MetaData.Message}";
+                        var encodedMsg3 = HttpUtility.JavaScriptStringEncode(msg3);
+
+                        lblCreateApolResult.Text = msg3;
+                        lblCreateApolResult.ForeColor =
+                            result.MetaData.IsValid
+                            ? System.Drawing.Color.Green
+                            : System.Drawing.Color.Red;
+
+                        ScriptManager.RegisterStartupScript(
+                            this,
+                            GetType(),
+                            Guid.NewGuid().ToString(),
+                            $"alert('{encodedMsg3}');",
+                            true
+                        );
 
                         if (result.MetaData.IsValid && result.ResponseData != null)
                         {
@@ -6373,8 +7059,8 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             apol.NOAPOTIK = response.NoApotik;
                             apol.TGLRESEP = DateTime.Parse(response.TglResep);
                             apol.TGLENTRY = DateTime.Parse(response.TglEntry);
-                            apol.MetadataCode = result.MetaData.Code;
-                            apol.MetadataMessage = result.MetaData.Message;
+                            apol.METADATACODE = result.MetaData.Code;
+                            apol.METADATAMESSAGE = result.MetaData.Message;
                             apol.LastUpdateDateTime = DateTime.Now;
                             apol.LastUpdateByUserID = AppSession.UserLogin.UserID;
 
@@ -6383,21 +7069,60 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     }
                     else
                     {
-                        lblCreateApolResult.Text = "No metadata returned from server.";
+                        var msg4 = "No metadata returned from server.";
+                        var encodedMsg4 = HttpUtility.JavaScriptStringEncode(msg4);
+
+                        lblCreateApolResult.Text = msg4;
                         lblCreateApolResult.ForeColor = System.Drawing.Color.Red;
+
+                        ScriptManager.RegisterStartupScript(
+                            this,
+                            GetType(),
+                            Guid.NewGuid().ToString(),
+                            $"alert('{encodedMsg4}');",
+                            true
+                        );
                     }
 
                     return;
                 }
 
                 // case 3: header ADA tapi statusnya BUKAN ORDER (misal sudah 200) → jangan kirim ulang
-                lblCreateApolResult.Text = $"[Code: {bpjsapol.MetadataCode}] {bpjsapol.MetadataMessage}";
+                //lblCreateApolResult.Text = $"[Code: {bpjsapol.MetadataCode}] {bpjsapol.MetadataMessage}";
+                //lblCreateApolResult.ForeColor = System.Drawing.Color.Orange;
+                ////btnCreateAPOL.Enabled = false;
+                ///
+
+                var msg = $"[Code: {bpjsapol.METADATACODE}] {bpjsapol.METADATAMESSAGE}";
+                var encodedMsg = HttpUtility.JavaScriptStringEncode(msg);
+
+                lblCreateApolResult.Text = msg;
                 lblCreateApolResult.ForeColor = System.Drawing.Color.Orange;
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    Guid.NewGuid().ToString(),
+                    $"alert('{encodedMsg}');",
+                    true
+                );
             }
             catch (Exception ex)
             {
-                lblCreateApolResult.Text = $"Error: {ex.Message}";
+                var msg = $"Error: {ex.Message}";
+                var encodedMsg = HttpUtility.JavaScriptStringEncode(msg);
+
+                lblCreateApolResult.Text = msg;
                 lblCreateApolResult.ForeColor = System.Drawing.Color.Red;
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    Guid.NewGuid().ToString(),
+                    $"alert('{encodedMsg}');",
+                    true
+                );
+
                 HandleException(ex);
             }
         }
@@ -6420,6 +7145,52 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 }
             }
             Response.Write(errorMessage);
+        }
+
+        private string GetNextApolResepNo()
+        {
+            var coll = new BpjsApolCollection();
+            coll.LoadAll();   // load semua dulu
+
+            string lastNo = null;
+
+            foreach (BpjsApol item in coll)
+            {
+                var no = Convert.ToString(item.NORESEP);
+
+                if (!string.IsNullOrEmpty(no) &&
+                    no.Length == 5 &&
+                    char.IsLetter(no[0]) &&
+                    int.TryParse(no.Substring(1), out _))
+                {
+                    if (lastNo == null || string.Compare(no, lastNo) > 0)
+                    {
+                        lastNo = no;
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(lastNo))
+            {
+                char prefix = lastNo[0];
+                int number = int.Parse(lastNo.Substring(1));
+
+                if (number < 9999)
+                {
+                    number++;
+                    return prefix + number.ToString("D4");
+                }
+                else
+                {
+                    if (prefix == 'Z')
+                        throw new Exception("Sudah mencapai Z9999.");
+
+                    char nextPrefix = (char)(prefix + 1);
+                    return nextPrefix + "0001";
+                }
+            }
+
+            return "A0001";
         }
         #endregion
     }

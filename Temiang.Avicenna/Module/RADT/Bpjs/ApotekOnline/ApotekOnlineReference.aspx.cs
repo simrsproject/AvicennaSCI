@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -37,13 +38,15 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.ApotekOnline
                 DataTable data = new DataTable();
                 data.Columns.Add("Kodeobat");
                 data.Columns.Add("Namaobat");
-                data.Columns.Add("Prb");
-                data.Columns.Add("Kronis");
-                data.Columns.Add("Kemo");
+                data.Columns.Add("Prb", typeof(bool));
+                data.Columns.Add("Kronis", typeof(bool));
+                data.Columns.Add("Kemo", typeof(bool));
                 data.Columns.Add("Harga");
                 data.Columns.Add("Restriksi");
                 data.Columns.Add("Generik");
                 data.Columns.Add("Aktif");
+                data.Columns.Add("Sedia");
+                data.Columns.Add("Stok");
 
                 if (response.MetaData.IsApolValid)
                 {
@@ -52,9 +55,9 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.ApotekOnline
                         DataRow row = data.NewRow();
                         row["Kodeobat"] = item.Kodeobat;
                         row["Namaobat"] = item.Namaobat;
-                        row["Prb"] = item.Prb;
-                        row["Kronis"] = item.Kronis;
-                        row["Kemo"] = item.Kemo;
+                        row["Prb"] = item.Prb == "1" || item.Prb?.ToLower() == "true";
+                        row["Kronis"] = item.Kronis == "1" || item.Kronis?.ToLower() == "true";
+                        row["Kemo"] = item.Kemo == "1" || item.Kemo?.ToLower() == "true";
                         double harga;
                         if (double.TryParse(item.Harga, out harga))
                         {
@@ -67,6 +70,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.ApotekOnline
                         row["Restriksi"] = item.Restriksi;
                         row["Generik"] = item.Generik;
                         row["Aktif"] = item.Aktif;
+                        row["Sedia"] = item.Sedia;
+                        row["Stok"] = item.Stok;
                         data.Rows.Add(row);
                     }
 
@@ -134,7 +139,10 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.ApotekOnline
                 var svc = new Common.BPJS.Apotek.Service();
                 var jsonResponse = svc.SettingApotek(kodeApotek);
 
-                Response.Write(jsonResponse);
+                if (string.IsNullOrWhiteSpace(jsonResponse))
+                    return;
+
+                dynamic obj = JsonConvert.DeserializeObject(jsonResponse);
 
                 DataTable data = new DataTable();
                 data.Columns.Add("Kode");
@@ -149,7 +157,25 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.ApotekOnline
                 data.Columns.Add("Nppverifikator");
                 data.Columns.Add("Namapetugasapotek");
                 data.Columns.Add("Nippetugasapotek");
-                data.Columns.Add("Checkstock");
+                data.Columns.Add("Checkstock", typeof(bool));
+
+                var row = data.NewRow();
+                row["Kode"] = obj.kode;
+                row["Namaapoteker"] = obj.namaapoteker;
+                row["Namakepala"] = obj.namakepala;
+                row["Jabatankepala"] = obj.jabatankepala;
+                row["Nipkepala"] = obj.nipkepala;
+                row["Siup"] = obj.siup;
+                row["Alamat"] = obj.alamat;
+                row["Kota"] = obj.kota;
+                row["Namaverifikator"] = obj.namaverifikator;
+                row["Nppverifikator"] = obj.nppverifikator;
+                row["Namapetugasapotek"] = obj.namapetugasapotek;
+                row["Nippetugasapotek"] = obj.nippetugasapotek;
+                row["Checkstock"] =
+                    Convert.ToString(obj.checkstock).ToLower() == "true";
+
+                data.Rows.Add(row);
 
                 grdSetting.DataSource = data;
                 grdSetting.DataBind();

@@ -363,3 +363,9 @@ Titipan Daniel
 
 ---[29-07-2026 - Wiliam]---
 1. Modifikasi RegistrationDetail.aspx.cs agar ketika Parameter IsCrmMembershipActive berubah, label Membership No berubah
+
+---[31-07-2026 - Danang]---
+1. Apol Feature (Document SOP Menyusul)
+
+---[06-08-2026 - Wiliam]
+1. Modifikasi PpaNoteEntry.aspx.cs method GetPHRL() agar tampilan Assement Monitoring TTV Rawat Inap benar.

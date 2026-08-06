@@ -516,6 +516,13 @@ namespace Temiang.Avicenna.WebService
         public string GroupperOutpatientByDate(string date)
         {
             var regs = new RegistrationCollection();
+            var inpatientReg = new RegistrationQuery("ip");
+            inpatientReg.Select(inpatientReg.RegistrationNo);
+            inpatientReg.Where(
+                inpatientReg.FromRegistrationNo == regs.Query.RegistrationNo,
+                inpatientReg.SRRegistrationType == AppConstant.RegistrationType.InPatient,
+                inpatientReg.IsVoid == false);
+
             regs.Query.Where(regs.Query.SRRegistrationType.In(AppConstant.RegistrationType.OutPatient, AppConstant.RegistrationType.EmergencyPatient), //regs.Query.RegistrationDate.Date() == DateTime.Now.Date,
                 regs.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
                 regs.Query.IsVoid == false,
@@ -525,6 +532,7 @@ namespace Temiang.Avicenna.WebService
                 regs.Query.BpjsSepNo.IsNotNull(),
                 regs.Query.BpjsSepNo != string.Empty,
                 regs.Query.BpjsSepNo != "0",
+                regs.Query.NotExists(inpatientReg),
                 regs.Query.RegistrationDate == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
             regs.Query.Load();
             var count = 0;
@@ -618,6 +626,13 @@ namespace Temiang.Avicenna.WebService
             if (string.IsNullOrWhiteSpace(reg.RegistrationNo) || string.IsNullOrWhiteSpace(reg.BpjsSepNo) || reg.BpjsSepNo == "0")
             {
                 log.Response = string.Format("Data registrasi / SEP tidak valid. Input: {0}", registrationNo);
+                log.Save();
+                return string.Format("not ok - {0}", log.Response);
+            }
+
+            if (IsOutpatientReferredToInpatient(reg.RegistrationNo))
+            {
+                log.Response = string.Format("Registrasi rawat jalan sudah lanjut rawat inap. Input: {0}", registrationNo);
                 log.Save();
                 return string.Format("not ok - {0}", log.Response);
             }
@@ -1356,6 +1371,18 @@ namespace Temiang.Avicenna.WebService
             log.Save();
 
             return "ok";
+        }
+
+        private static bool IsOutpatientReferredToInpatient(string registrationNo)
+        {
+            var inpatientReg = new Registration();
+            inpatientReg.Query.Where(
+                inpatientReg.Query.FromRegistrationNo == registrationNo,
+                inpatientReg.Query.SRRegistrationType == AppConstant.RegistrationType.InPatient,
+                inpatientReg.Query.IsVoid == false);
+            inpatientReg.Query.es.Top = 1;
+
+            return inpatientReg.Query.Load();
         }
 
         private static string BuildProcedureStringWithQty(IEnumerable<EpisodeProcedure> rows)

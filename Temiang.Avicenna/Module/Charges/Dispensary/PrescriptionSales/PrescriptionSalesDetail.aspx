@@ -367,6 +367,19 @@
                oWnd.setSize($(window).width() * 0.95, $(window).height() * 0.95);
                oWnd.center();
            }
+
+           function openApolDetail(itemid, itemiid) {
+               var oWnd = $find("<%= winRegInfo.ClientID %>");
+               var regNo = $find("<%= txtRegistrationNo.ClientID %>");
+               var prescNo = $find("<%= txtPrescriptionNo.ClientID %>");
+               oWnd.setUrl("openApolDetail.aspx?itemid=" + itemid + "&itemiid=" + itemiid + "&rno=" + regNo.get_value() + "&pno=" + prescNo.get_value());
+
+               oWnd.set_title('Apol Detail Info');
+               oWnd.set_width(900);
+               oWnd.set_height(300);
+               oWnd.show();
+           }
+
         </script>
 
     </telerik:RadScriptBlock>
@@ -748,8 +761,8 @@
                             <td width="20px"></td>
                             <td></td>
                         </tr>
-                        <tr runat="server" id="trBpjApol" visible="false">
-                            <td class="label">Tgl. SEP
+                        <tr runat="server" id="trBpjApol">
+                            <td class="label">SEP Date
                             </td>
                             <td class="entry">
                                 <telerik:RadDatePicker ID="txtTglSep" runat="server" Width="100px" DateInput-DateFormat="yyyy-MM-dd" DateInput-DisplayDateFormat="yyyy-MM-dd" DatePopupButton-Visible="true" DateInput-ReadOnly="true" />
@@ -1172,11 +1185,11 @@
                             </tr>
                         </table>
                     </fieldset>
-                    <asp:Panel runat="server" ID="pnlApol" Visible="false">
+                    <asp:Panel runat="server" ID="pnlApol">
                         <telerik:RadTabStrip ID="RadTabStripAPOL" runat="server" MultiPageID="RadMultiPageAPOL">
                             <Tabs>
                                 <telerik:RadTab Text="Entry APOL" PageViewID="pgEntryApol" Selected="true" />
-                                <telerik:RadTab Text="Riwayat" PageViewID="pgRiwayatApol" />
+                                <telerik:RadTab Text="History" PageViewID="pgRiwayatApol" />
                             </Tabs>
                         </telerik:RadTabStrip>
                         <telerik:RadMultiPage ID="RadMultiPageAPOL" runat="server" SelectedIndex="0">
@@ -1185,13 +1198,24 @@
                                             <tr>
                                                 <td class="label">SEP / From SJP</td>
                                                 <td>
-                                                    <asp:TextBox ID="txtRefAsalSJP" runat="server" Width="140" />
-                                                    <telerik:RadDatePicker ID="txtTglRsp" runat="server" Width="100px" DateInput-DateFormat="yyyy-MM-dd" DateInput-DisplayDateFormat="yyyy-MM-dd" DatePopupButton-Visible="true" DateInput-ReadOnly="true" />
+                                                    <asp:TextBox ID="txtRefAsalSJP" runat="server" Width="145px" />
+                                                    <telerik:RadDatePicker ID="txtTglSjp" runat="server" Width="100px" DateInput-DateFormat="yyyy-MM-dd" DateInput-DisplayDateFormat="yyyy-MM-dd" DatePopupButton-Visible="true" DateInput-ReadOnly="true" />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="label">Service & Presc. Date</td>
+                                                <td>
+                                                    <telerik:RadDatePicker ID="txtTglPlynRsp" runat="server" Width="115px" DateInput-DateFormat="yyyy-MM-dd" DateInput-DisplayDateFormat="yyyy-MM-dd" DatePopupButton-Visible="true" DateInput-ReadOnly="true" />
+                                                    <telerik:RadDatePicker ID="txtTglRsp" runat="server" Width="115px" DateInput-DateFormat="yyyy-MM-dd" DateInput-DisplayDateFormat="yyyy-MM-dd" DatePopupButton-Visible="true" DateInput-ReadOnly="true" />
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="label">Service Unit Apol</td>
-                                                <td><asp:TextBox ID="txtPoliRSP" runat="server" Width="220px" /></td>
+                                                <td>                                            
+                                                    <telerik:RadComboBox ID="cboPoliApol" runat="server" Width="230px" EnableLoadOnDemand="true" AutoPostBack="true" AllowCustomText="false"
+                                                        OnItemsRequested="cboPoliApol_ItemsRequested" OnSelectedIndexChanged="cboPoliApol_SelectedIndexChanged">
+                                                    </telerik:RadComboBox>
+                                                </td>
                                             </tr>
 <%--                                            <tr>
                                                 <td class="label">
@@ -1221,7 +1245,11 @@
                                             </tr>
                                             <tr>
                                                 <td class="label">Physician</td>
-                                                <td><asp:TextBox ID="txtKdDokter" runat="server" Width="220px" /></td>
+                                                <td>
+                                                    <telerik:RadComboBox ID="cboDokterApol" runat="server" Width="230px" EnableLoadOnDemand="true" AutoPostBack="true" AllowCustomText="false"
+                                                        OnItemsRequested="cboDokterApol_ItemsRequested" OnSelectedIndexChanged="cboDokterApol_SelectedIndexChanged">
+                                                    </telerik:RadComboBox>
+                                                </td>
                                             </tr>
 <%--                                            <tr>
                                                 <td class="label">
@@ -1240,6 +1268,7 @@
                                                         <Items>
                                                             <telerik:RadComboBoxItem Value="0" Text="Non Iterasi" Selected="true" />
                                                             <telerik:RadComboBoxItem Value="1" Text="Iterasi" />
+                                                            <telerik:RadComboBoxItem Value="2" Text="2 Iterasi" />
                                                         </Items>
                                                     </telerik:RadComboBox>
                                                 </td>
@@ -1253,9 +1282,9 @@
                                                 </td>
                                             </tr>
                                             <tr>
-<%--                                                <td>
-                                                    <asp:Button ID="btnSaveApolDtl" runat="server" Text="SAVE APOL DETAIL PRESC." OnClick="btnSaveApolDtl_Click" />
-                                                </td>--%>
+                                                <td>
+                                                    <asp:Button ID="btnSaveApolDtl" runat="server" Text="SAVE APOL DETAIL PRESC." OnClick="btnSaveApolDtl_Click" visible="false" />
+                                                </td>
                                                 <td>
                                                     <asp:Label ID="lblApolDtl" runat="server" ForeColor="Green" />
                                                 </td>

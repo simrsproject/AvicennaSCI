@@ -2453,6 +2453,7 @@
     <Content Include="Module\Charges\Cashier\ClosingVisiteDownPayment\VisitDownPaymentList.aspx" />
     <Content Include="Module\Charges\Cashier\DownPayment\VisitPackegeTemplatePickList.aspx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\ItemBalanceInfo.aspx" />
+    <Content Include="Module\Charges\Dispensary\PrescriptionSales\openApolDetail.aspx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionSalesCommon\Prescription.asmx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionSalesCommon\PrescriptionTemplate.aspx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionSalesCommon\PrevBuyInfo.ascx" />
@@ -2480,9 +2481,8 @@
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\SpecimenCollectItem.aspx" />
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\Template\TemplateNew.aspx" />
     <Content Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx" />
-    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx" />
+    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx" />
     <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.js" />
-    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogViewHist.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogWs.asmx" />
     <Content Include="Module\ControlPanel\Setting\StandardReferencePerGroup\WorkTradeItemDetail.ascx" />
@@ -7163,6 +7163,13 @@
     <Compile Include="Module\Charges\Dispensary\PrescriptionReturn\PrescriptionTransactionList.aspx.designer.cs">
       <DependentUpon>PrescriptionTransactionList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\Charges\Dispensary\PrescriptionSales\openApolDetail.aspx.cs">
+      <DependentUpon>openApolDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Charges\Dispensary\PrescriptionSales\openApolDetail.aspx.designer.cs">
+      <DependentUpon>openApolDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\Charges\Dispensary\PrescriptionSales\PatientEducationEntry.aspx.cs">
       <DependentUpon>PatientEducationEntry.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -7811,19 +7818,12 @@
     <Compile Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx.designer.cs">
       <DependentUpon>UpdateICUPhysicianList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.cs">
-      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx.cs">
+      <DependentUpon>UserDokterAsuransi.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.designer.cs">
-      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.cs">
-      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.designer.cs">
-      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx.designer.cs">
+      <DependentUpon>UserDokterAsuransi.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\ControlPanel\AuditLog\AuditLogSetting\AuditLogSettingDetail.aspx.cs">
       <DependentUpon>AuditLogSettingDetail.aspx</DependentUpon>
