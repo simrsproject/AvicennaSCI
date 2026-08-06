@@ -11,8 +11,62 @@ namespace Temiang.Avicenna.Module.ControlPanel.Admin.UserDokterAsuransi
 {
 
 
-    public partial class UserDokterAsuransiDetail
+    public partial class UserDokterAsuransi
     {
+
+        /// <summary>
+        /// ajxLoadingPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadAjaxLoadingPanel ajxLoadingPanel;
+
+        /// <summary>
+        /// ajxPanel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadAjaxPanel ajxPanel;
+
+        /// <summary>
+        /// validationSummary control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ValidationSummary validationSummary;
+
+        /// <summary>
+        /// pnlInformation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlInformation;
+
+        /// <summary>
+        /// imgAttention control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgAttention;
+
+        /// <summary>
+        /// lblInformation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblInformation;
 
         /// <summary>
         /// lblUserID control.
@@ -103,6 +157,15 @@ namespace Temiang.Avicenna.Module.ControlPanel.Admin.UserDokterAsuransi
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Telerik.Web.UI.RadComboBox cboParamedicID;
+
+        /// <summary>
+        /// btnOk control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnOk;
 
         /// <summary>
         /// RadCodeBlock1 control.
