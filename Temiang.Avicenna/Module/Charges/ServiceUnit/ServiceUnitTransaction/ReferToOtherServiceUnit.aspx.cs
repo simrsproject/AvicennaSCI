@@ -863,6 +863,34 @@ namespace Temiang.Avicenna.Module.Charges
 
                 entity.Save();
 
+                if (string.Equals(
+                    AppSession.Parameter.HealthcareID,
+                    "RSI",
+                    StringComparison.OrdinalIgnoreCase))
+                {
+                    var visitQueue = new VisitQueue();
+                    var query = new VisitQueueQuery();
+
+                    query.Where(query.RegistrationNo == txtRegistrationNo.Text);
+
+                    if (visitQueue.Load(query))
+                    {
+                        visitQueue.ServiceUnitID = entity.ServiceUnitID;
+                        visitQueue.ParamedicID = entity.ParamedicID;
+
+                        // Update QueueKey
+                        visitQueue.QueueKey = string.Format("{0}|{1}|{2}",
+                            entity.ServiceUnitID,
+                            visitQueue.StageID,
+                            entity.ParamedicID);
+
+                        visitQueue.LastUpdated = DateTime.Now;
+                        visitQueue.UpdatedBy = AppSession.UserLogin.UserID;
+
+                        visitQueue.Save();
+                    }
+                }
+
                 //service unit que
                 que.Save();
 
