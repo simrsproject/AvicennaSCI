@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects  
 ===============================================================================
-                       Date Generated       : 10/31/2025 10:01:18 AM
+                       Date Generated       : 5/4/2026 1:35:17 PM
 ===============================================================================
 */
 
@@ -180,8 +180,8 @@ namespace Temiang.Avicenna.BusinessObject
                         case "JMLOBT": this.str.JMLOBT = (string)value; break;
                         case "JHO": this.str.JHO = (string)value; break;
                         case "CATKHSOBT": this.str.CATKHSOBT = (string)value; break;
-                        case "MetadataCode": this.str.MetadataCode = (string)value; break;
-                        case "MetadataMessage": this.str.MetadataMessage = (string)value; break;
+                        case "METADATACODE": this.str.METADATACODE = (string)value; break;
+                        case "METADATAMESSAGE": this.str.METADATAMESSAGE = (string)value; break;
                         case "LastUpdateDateTime": this.str.LastUpdateDateTime = (string)value; break;
                         case "LastUpdateByUserID": this.str.LastUpdateByUserID = (string)value; break;
                     }
@@ -217,13 +217,13 @@ namespace Temiang.Avicenna.BusinessObject
                             break;
                         case "JMLOBT":
 
-                            if (value == null || value is System.Int32)
+                            if (value == null || value is System.Decimal)
                                 this.JMLOBT = (System.Int32?)value;
                             break;
                         case "JHO":
 
-                            if (value == null || value is System.Int32)
-                                this.JHO = (System.Int32?)value;
+                            if (value == null || value is System.Decimal)
+                                this.JHO = (System.Decimal?)value;
                             break;
                         case "LastUpdateDateTime":
 
@@ -444,31 +444,31 @@ namespace Temiang.Avicenna.BusinessObject
         /// <summary>
         /// Maps to BpjsApolDetail.JMLOBT
         /// </summary>
-        virtual public System.Int32? JMLOBT
+        virtual public System.Decimal? JMLOBT
         {
             get
             {
-                return base.GetSystemInt32(BpjsApolDetailMetadata.ColumnNames.JMLOBT);
+                return base.GetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.JMLOBT);
             }
 
             set
             {
-                base.SetSystemInt32(BpjsApolDetailMetadata.ColumnNames.JMLOBT, value);
+                base.SetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.JMLOBT, value);
             }
         }
         /// <summary>
         /// Maps to BpjsApolDetail.JHO
         /// </summary>
-        virtual public System.Int32? JHO
+        virtual public System.Decimal? JHO
         {
             get
             {
-                return base.GetSystemInt32(BpjsApolDetailMetadata.ColumnNames.JHO);
+                return base.GetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.JHO);
             }
 
             set
             {
-                base.SetSystemInt32(BpjsApolDetailMetadata.ColumnNames.JHO, value);
+                base.SetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.JHO, value);
             }
         }
         /// <summary>
@@ -487,33 +487,33 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
         /// <summary>
-        /// Maps to BpjsApolDetail.METADATA_CODE
+        /// Maps to BpjsApolDetail.METADATACODE
         /// </summary>
-        virtual public System.String MetadataCode
+        virtual public System.String METADATACODE
         {
             get
             {
-                return base.GetSystemString(BpjsApolDetailMetadata.ColumnNames.MetadataCode);
+                return base.GetSystemString(BpjsApolDetailMetadata.ColumnNames.METADATACODE);
             }
 
             set
             {
-                base.SetSystemString(BpjsApolDetailMetadata.ColumnNames.MetadataCode, value);
+                base.SetSystemString(BpjsApolDetailMetadata.ColumnNames.METADATACODE, value);
             }
         }
         /// <summary>
-        /// Maps to BpjsApolDetail.METADATA_MESSAGE
+        /// Maps to BpjsApolDetail.METADATAMESSAGE
         /// </summary>
-        virtual public System.String MetadataMessage
+        virtual public System.String METADATAMESSAGE
         {
             get
             {
-                return base.GetSystemString(BpjsApolDetailMetadata.ColumnNames.MetadataMessage);
+                return base.GetSystemString(BpjsApolDetailMetadata.ColumnNames.METADATAMESSAGE);
             }
 
             set
             {
-                base.SetSystemString(BpjsApolDetailMetadata.ColumnNames.MetadataMessage, value);
+                base.SetSystemString(BpjsApolDetailMetadata.ColumnNames.METADATAMESSAGE, value);
             }
         }
         /// <summary>
@@ -781,28 +781,28 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 get
                 {
-                    System.Int32? data = entity.JMLOBT;
+                    System.Decimal? data = entity.JMLOBT;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
                     if (value == null || value.Length == 0) entity.JMLOBT = null;
-                    else entity.JMLOBT = Convert.ToInt32(value);
+                    else entity.JMLOBT = Convert.ToDecimal(value);
                 }
             }
             public System.String JHO
             {
                 get
                 {
-                    System.Int32? data = entity.JHO;
+                    System.Decimal? data = entity.JHO;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
                     if (value == null || value.Length == 0) entity.JHO = null;
-                    else entity.JHO = Convert.ToInt32(value);
+                    else entity.JHO = Convert.ToDecimal(value);
                 }
             }
             public System.String CATKHSOBT
@@ -819,32 +819,32 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.CATKHSOBT = Convert.ToString(value);
                 }
             }
-            public System.String MetadataCode
+            public System.String METADATACODE
             {
                 get
                 {
-                    System.String data = entity.MetadataCode;
+                    System.String data = entity.METADATACODE;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.MetadataCode = null;
-                    else entity.MetadataCode = Convert.ToString(value);
+                    if (value == null || value.Length == 0) entity.METADATACODE = null;
+                    else entity.METADATACODE = Convert.ToString(value);
                 }
             }
-            public System.String MetadataMessage
+            public System.String METADATAMESSAGE
             {
                 get
                 {
-                    System.String data = entity.MetadataMessage;
+                    System.String data = entity.METADATAMESSAGE;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.MetadataMessage = null;
-                    else entity.MetadataMessage = Convert.ToString(value);
+                    if (value == null || value.Length == 0) entity.METADATAMESSAGE = null;
+                    else entity.METADATAMESSAGE = Convert.ToString(value);
                 }
             }
             public System.String LastUpdateDateTime
@@ -1029,7 +1029,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             get
             {
-                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.JMLOBT, esSystemType.Int32);
+                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.JMLOBT, esSystemType.Decimal);
             }
         }
 
@@ -1037,7 +1037,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             get
             {
-                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.JHO, esSystemType.Int32);
+                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.JHO, esSystemType.Decimal);
             }
         }
 
@@ -1049,19 +1049,19 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        public esQueryItem MetadataCode
+        public esQueryItem METADATACODE
         {
             get
             {
-                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.MetadataCode, esSystemType.String);
+                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.METADATACODE, esSystemType.String);
             }
         }
 
-        public esQueryItem MetadataMessage
+        public esQueryItem METADATAMESSAGE
         {
             get
             {
-                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.MetadataMessage, esSystemType.String);
+                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.METADATAMESSAGE, esSystemType.String);
             }
         }
 
@@ -1541,15 +1541,16 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.JMLOBT, 13, typeof(System.Int32), esSystemType.Int32);
+            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.JMLOBT, 13, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = BpjsApolDetailMetadata.PropertyNames.JMLOBT;
             c.NumericPrecision = 10;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.JHO, 14, typeof(System.Int32), esSystemType.Int32);
+            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.JHO, 14, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = BpjsApolDetailMetadata.PropertyNames.JHO;
-            c.NumericPrecision = 10;
+            c.NumericPrecision = 30;
+            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -1559,22 +1560,20 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.MetadataCode, 16, typeof(System.String), esSystemType.String);
-            c.PropertyName = BpjsApolDetailMetadata.PropertyNames.MetadataCode;
+            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.METADATACODE, 16, typeof(System.String), esSystemType.String);
+            c.PropertyName = BpjsApolDetailMetadata.PropertyNames.METADATACODE;
             c.CharacterMaxLength = 10;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.MetadataMessage, 17, typeof(System.String), esSystemType.String);
-            c.PropertyName = BpjsApolDetailMetadata.PropertyNames.MetadataMessage;
+            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.METADATAMESSAGE, 17, typeof(System.String), esSystemType.String);
+            c.PropertyName = BpjsApolDetailMetadata.PropertyNames.METADATAMESSAGE;
             c.CharacterMaxLength = 255;
             c.IsNullable = true;
             _columns.Add(c);
 
             c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.LastUpdateDateTime, 18, typeof(System.DateTime), esSystemType.DateTime);
             c.PropertyName = BpjsApolDetailMetadata.PropertyNames.LastUpdateDateTime;
-            c.HasDefault = true;
-            c.Default = @"(getdate())";
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -1627,8 +1626,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string JMLOBT = "JMLOBT";
             public const string JHO = "JHO";
             public const string CATKHSOBT = "CATKHSOBT";
-            public const string MetadataCode = "METADATA_CODE";
-            public const string MetadataMessage = "METADATA_MESSAGE";
+            public const string METADATACODE = "METADATACODE";
+            public const string METADATAMESSAGE = "METADATAMESSAGE";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
         }
@@ -1653,8 +1652,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string JMLOBT = "JMLOBT";
             public const string JHO = "JHO";
             public const string CATKHSOBT = "CATKHSOBT";
-            public const string MetadataCode = "MetadataCode";
-            public const string MetadataMessage = "MetadataMessage";
+            public const string METADATACODE = "METADATACODE";
+            public const string METADATAMESSAGE = "METADATAMESSAGE";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
         }
@@ -1713,11 +1712,11 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("SIGNA1OBT", new esTypeMap("int", "System.Int32"));
                 meta.AddTypeMap("SIGNA2OBT", new esTypeMap("int", "System.Int32"));
                 meta.AddTypeMap("PERMINTAAN", new esTypeMap("int", "System.Int32"));
-                meta.AddTypeMap("JMLOBT", new esTypeMap("int", "System.Int32"));
-                meta.AddTypeMap("JHO", new esTypeMap("int", "System.Int32"));
+                meta.AddTypeMap("JMLOBT", new esTypeMap("int", "System.Decimal"));
+                meta.AddTypeMap("JHO", new esTypeMap("decimal", "System.Decimal"));
                 meta.AddTypeMap("CATKHSOBT", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("MetadataCode", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("MetadataMessage", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("METADATACODE", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("METADATAMESSAGE", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("LastUpdateDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("LastUpdateByUserID", new esTypeMap("varchar", "System.String"));
 

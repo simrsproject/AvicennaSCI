@@ -609,13 +609,13 @@
         }
         function SetTotal(sum) {
             //$('#spanSubTotal').html(sum);
-            $('#spanSubTotal').html(sum.toFixed(4));
+            $('#spanSubTotal').html(sum.toFixed(2));
 
             var calcFN = function (ID, Name, Val, Cust, TotalTrans, AccTotalTrans) {
                 if (Val == 0) return 0;
                 if (Cust.includes('%')) {
                     //$('#spanAddCharges' + ID).html(Val / 100 * TotalTrans);
-                    $('#spanAddCharges' + ID).html((Val / 100 * TotalTrans).toFixed(4));
+                    $('#spanAddCharges' + ID).html((Val / 100 * TotalTrans).toFixed(2));
                 } else if (Cust.includes('round')) {
                     var total = AccTotalTrans;
                     var roundingBase = Val * 1;

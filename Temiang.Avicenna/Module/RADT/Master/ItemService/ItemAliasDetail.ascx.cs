@@ -171,10 +171,10 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 if (dpho == null || dpho.MetaData == null || !dpho.MetaData.IsApolValid)
                 {
                     cboServiceUnitAliasID.Items.Clear();
-                    var it = new RadComboBoxItem(
-                        $"Server error (HTTP {dpho?.MetaData?.Code}: {dpho?.MetaData?.Message ?? "Tidak diketahui"})",
-                        string.Empty)
-                    { Enabled = false };
+                    var it = new RadComboBoxItem($"Server error (HTTP {dpho?.MetaData?.Code}: {dpho?.MetaData?.Message ?? "Tidak diketahui"})",  string.Empty)
+                    { 
+                        Enabled = false 
+                    };
                     cboServiceUnitAliasID.Items.Add(it);
                     return;
                 }
@@ -190,7 +190,12 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     {
                         var obat = list[i];
                         var text = $"{obat.Namaobat} - {obat.Kodeobat}";
-                        cboServiceUnitAliasID.Items.Add(new RadComboBoxItem(text, obat.Kodeobat));
+
+                        var item = new RadComboBoxItem(text, obat.Kodeobat);
+
+                        item.Attributes["Restriksi"] = obat.Restriksi ?? string.Empty;
+
+                        cboServiceUnitAliasID.Items.Add(item);
                     }
                 }
                 else
@@ -200,19 +205,12 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
                 if (!fromCache)
                 {
-                    HttpRuntime.Cache.Insert(
-                        cacheKey,
-                        dpho,
-                        null,
-                        System.Web.Caching.Cache.NoAbsoluteExpiration,
-                        TimeSpan.FromMinutes(10)
-                    );
+                    HttpRuntime.Cache.Insert(cacheKey, dpho, null, System.Web.Caching.Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10));
                 }
 
                 if (fromCache)
                 {
-                    cboServiceUnitAliasID.Items.Insert(0,
-                        new RadComboBoxItem("ⓘ Menampilkan data cache (server timeout).", string.Empty) { Enabled = false });
+                    cboServiceUnitAliasID.Items.Insert(0, new RadComboBoxItem("ⓘ Menampilkan data cache (server timeout).", string.Empty) { Enabled = false });
                 }
             }
             else
