@@ -1414,7 +1414,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             if (!string.IsNullOrEmpty(hfRelatedPHRNo.Value))
             {
                 coll.Query.Select("<*>", "<GETDATE() as refToPatientHealthRecord_RecordDate>");
-                coll.Query.Where(coll.Query.TransactionNo == hfRelatedPHRNo.Value);
+                coll.Query.Where(coll.Query.TransactionNo == hfRelatedPHRNo.Value, coll.Query.RegistrationNo == RegistrationNo);
                 coll.LoadAll();
             }
             return coll;
