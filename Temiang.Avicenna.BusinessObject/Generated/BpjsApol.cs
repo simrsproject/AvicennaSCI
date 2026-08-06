@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects  
 ===============================================================================
-                       Date Generated       : 10/31/2025 10:00:57 AM
+                       Date Generated       : 5/4/2026 1:35:00 PM
 ===============================================================================
 */
 
@@ -186,8 +186,8 @@ namespace Temiang.Avicenna.BusinessObject
                         case "BYTAGRSP": this.str.BYTAGRSP = (string)value; break;
                         case "BYVERRSP": this.str.BYVERRSP = (string)value; break;
                         case "TGLENTRY": this.str.TGLENTRY = (string)value; break;
-                        case "MetadataCode": this.str.MetadataCode = (string)value; break;
-                        case "MetadataMessage": this.str.MetadataMessage = (string)value; break;
+                        case "METADATACODE": this.str.METADATACODE = (string)value; break;
+                        case "METADATAMESSAGE": this.str.METADATAMESSAGE = (string)value; break;
                         case "LastUpdateDateTime": this.str.LastUpdateDateTime = (string)value; break;
                         case "LastUpdateByUserID": this.str.LastUpdateByUserID = (string)value; break;
                     }
@@ -463,7 +463,7 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
         /// <summary>
-        /// Maps to BpjsApol.NOSEP_KUNJUNGAN
+        /// Maps to BpjsApol.NOSEPKUNJUNGAN
         /// </summary>
         virtual public System.String NosepKunjungan
         {
@@ -598,33 +598,33 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
         /// <summary>
-        /// Maps to BpjsApol.METADATA_CODE
+        /// Maps to BpjsApol.METADATACODE
         /// </summary>
-        virtual public System.String MetadataCode
+        virtual public System.String METADATACODE
         {
             get
             {
-                return base.GetSystemString(BpjsApolMetadata.ColumnNames.MetadataCode);
+                return base.GetSystemString(BpjsApolMetadata.ColumnNames.METADATACODE);
             }
 
             set
             {
-                base.SetSystemString(BpjsApolMetadata.ColumnNames.MetadataCode, value);
+                base.SetSystemString(BpjsApolMetadata.ColumnNames.METADATACODE, value);
             }
         }
         /// <summary>
-        /// Maps to BpjsApol.METADATA_MESSAGE
+        /// Maps to BpjsApol.METADATAMESSAGE
         /// </summary>
-        virtual public System.String MetadataMessage
+        virtual public System.String METADATAMESSAGE
         {
             get
             {
-                return base.GetSystemString(BpjsApolMetadata.ColumnNames.MetadataMessage);
+                return base.GetSystemString(BpjsApolMetadata.ColumnNames.METADATAMESSAGE);
             }
 
             set
             {
-                base.SetSystemString(BpjsApolMetadata.ColumnNames.MetadataMessage, value);
+                base.SetSystemString(BpjsApolMetadata.ColumnNames.METADATAMESSAGE, value);
             }
         }
         /// <summary>
@@ -1014,32 +1014,32 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.TGLENTRY = Convert.ToDateTime(value);
                 }
             }
-            public System.String MetadataCode
+            public System.String METADATACODE
             {
                 get
                 {
-                    System.String data = entity.MetadataCode;
+                    System.String data = entity.METADATACODE;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.MetadataCode = null;
-                    else entity.MetadataCode = Convert.ToString(value);
+                    if (value == null || value.Length == 0) entity.METADATACODE = null;
+                    else entity.METADATACODE = Convert.ToString(value);
                 }
             }
-            public System.String MetadataMessage
+            public System.String METADATAMESSAGE
             {
                 get
                 {
-                    System.String data = entity.MetadataMessage;
+                    System.String data = entity.METADATAMESSAGE;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
-                    if (value == null || value.Length == 0) entity.MetadataMessage = null;
-                    else entity.MetadataMessage = Convert.ToString(value);
+                    if (value == null || value.Length == 0) entity.METADATAMESSAGE = null;
+                    else entity.METADATAMESSAGE = Convert.ToString(value);
                 }
             }
             public System.String LastUpdateDateTime
@@ -1292,19 +1292,19 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        public esQueryItem MetadataCode
+        public esQueryItem METADATACODE
         {
             get
             {
-                return new esQueryItem(this, BpjsApolMetadata.ColumnNames.MetadataCode, esSystemType.String);
+                return new esQueryItem(this, BpjsApolMetadata.ColumnNames.METADATACODE, esSystemType.String);
             }
         }
 
-        public esQueryItem MetadataMessage
+        public esQueryItem METADATAMESSAGE
         {
             get
             {
-                return new esQueryItem(this, BpjsApolMetadata.ColumnNames.MetadataMessage, esSystemType.String);
+                return new esQueryItem(this, BpjsApolMetadata.ColumnNames.METADATAMESSAGE, esSystemType.String);
             }
         }
 
@@ -1833,22 +1833,20 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolMetadata.ColumnNames.MetadataCode, 22, typeof(System.String), esSystemType.String);
-            c.PropertyName = BpjsApolMetadata.PropertyNames.MetadataCode;
+            c = new esColumnMetadata(BpjsApolMetadata.ColumnNames.METADATACODE, 22, typeof(System.String), esSystemType.String);
+            c.PropertyName = BpjsApolMetadata.PropertyNames.METADATACODE;
             c.CharacterMaxLength = 10;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolMetadata.ColumnNames.MetadataMessage, 23, typeof(System.String), esSystemType.String);
-            c.PropertyName = BpjsApolMetadata.PropertyNames.MetadataMessage;
+            c = new esColumnMetadata(BpjsApolMetadata.ColumnNames.METADATAMESSAGE, 23, typeof(System.String), esSystemType.String);
+            c.PropertyName = BpjsApolMetadata.PropertyNames.METADATAMESSAGE;
             c.CharacterMaxLength = 255;
             c.IsNullable = true;
             _columns.Add(c);
 
             c = new esColumnMetadata(BpjsApolMetadata.ColumnNames.LastUpdateDateTime, 24, typeof(System.DateTime), esSystemType.DateTime);
             c.PropertyName = BpjsApolMetadata.PropertyNames.LastUpdateDateTime;
-            c.HasDefault = true;
-            c.Default = @"(getdate())";
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -1898,7 +1896,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string TGLPELRSP = "TGLPELRSP";
             public const string KDDOKTER = "KDDOKTER";
             public const string ITERASI = "ITERASI";
-            public const string NosepKunjungan = "NOSEP_KUNJUNGAN";
+            public const string NosepKunjungan = "NOSEPKUNJUNGAN";
             public const string NOKARTU = "NOKARTU";
             public const string NAMA = "NAMA";
             public const string FASKESASAL = "FASKESASAL";
@@ -1907,8 +1905,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string BYTAGRSP = "BYTAGRSP";
             public const string BYVERRSP = "BYVERRSP";
             public const string TGLENTRY = "TGLENTRY";
-            public const string MetadataCode = "METADATA_CODE";
-            public const string MetadataMessage = "METADATA_MESSAGE";
+            public const string METADATACODE = "METADATACODE";
+            public const string METADATAMESSAGE = "METADATAMESSAGE";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
         }
@@ -1939,8 +1937,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string BYTAGRSP = "BYTAGRSP";
             public const string BYVERRSP = "BYVERRSP";
             public const string TGLENTRY = "TGLENTRY";
-            public const string MetadataCode = "MetadataCode";
-            public const string MetadataMessage = "MetadataMessage";
+            public const string METADATACODE = "METADATACODE";
+            public const string METADATAMESSAGE = "METADATAMESSAGE";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
         }
@@ -2008,8 +2006,8 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("BYTAGRSP", new esTypeMap("tinyint", "System.Byte"));
                 meta.AddTypeMap("BYVERRSP", new esTypeMap("tinyint", "System.Byte"));
                 meta.AddTypeMap("TGLENTRY", new esTypeMap("date", "System.DateTime"));
-                meta.AddTypeMap("MetadataCode", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("MetadataMessage", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("METADATACODE", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("METADATAMESSAGE", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("LastUpdateDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("LastUpdateByUserID", new esTypeMap("varchar", "System.String"));
 

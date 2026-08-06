@@ -45,12 +45,13 @@ namespace Temiang.Avicenna.Module.Charges
                     RadToolBar2.Items[1].Visible = AppSession.Parameter.IsVisibleOtc;
                 }
 
+                //apol
+                trBpjsApol.Visible = (!string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["ApotekServiceUrlLocation"]));
                 if (Helper.IsApotekOnlineIntegration)
                 {
                     txtPPK.Text = ConfigurationManager.AppSettings["ApotekHospitalID"];
                     txtTglAwal.SelectedDate = (new DateTime()).NowAtSqlServer();
                     txtTglAkhir.SelectedDate = (new DateTime()).NowAtSqlServer();
-                    trBpjsApol.Visible = true;
                     TabPrescApol.Visible = true;
                 }
 
@@ -1192,7 +1193,7 @@ namespace Temiang.Avicenna.Module.Charges
             ComboBox.StandardReferenceItemDataBound(e);
         }
 
-        #region apol
+
         private DataTable BpjsApol
         {
             get
@@ -1239,20 +1240,296 @@ namespace Temiang.Avicenna.Module.Charges
             }
         }
 
-
-        protected void grdListApol_NeedDataSource(object source, Telerik.Web.UI.GridNeedDataSourceEventArgs e)
+        [Serializable]
+        public class RiwayatPelayananObatGridItem
         {
-            if (Helper.IsApotekOnlineIntegration)
+            public string NamaFaskes { get; set; }
+            public string KodeFaskes { get; set; }
+
+            public string Nosjp { get; set; }
+            public string Tglpelayanan { get; set; }
+            public string Noresep { get; set; }
+            public string Kodeobat { get; set; }
+            public string Namaobat { get; set; }
+            public string Jmlobat { get; set; }
+        }
+
+        private List<RiwayatPelayananObatGridItem> RiwayatApolGridData
+        {
+            get
             {
-                grdListApol.DataSource = BpjsApol;
+                return ViewState["RiwayatApolGridData"] as List<RiwayatPelayananObatGridItem>
+                    ?? new List<RiwayatPelayananObatGridItem>();
+            }
+            set
+            {
+                ViewState["RiwayatApolGridData"] = value;
             }
         }
 
+        protected void btnCariHistory_Click(object sender, EventArgs e)
+        {
+            lblInfoHist.Text = "";
+
+            try
+            {
+                RiwayatApolGridData = new List<RiwayatPelayananObatGridItem>();
+
+                if (string.IsNullOrWhiteSpace(txtNoKaHist.Text) ||
+                    txtPeriode1.IsEmpty ||
+                    txtPeriode2.IsEmpty)
+                {
+                    lblInfoHist.Text = "Mohon lengkapi No Kartu dan Periode.";
+                    grdListHist.Rebind();
+                    return;
+                }
+
+                var svc = new Common.BPJS.Apotek.Service();
+
+                var riwayat = svc.GetRiwayatPelayanan(
+                    txtPeriode1.SelectedDate.Value.Date,
+                    txtPeriode2.SelectedDate.Value.Date,
+                    txtNoKaHist.Text.Trim());
+
+                if (riwayat == null || riwayat.MetaData == null)
+                {
+                    lblInfoHist.Text = "Response riwayat pelayanan kosong.";
+                    grdListHist.Rebind();
+                    return;
+                }
+
+                if (!riwayat.MetaData.IsValid)
+                {
+                    lblInfoHist.Text = $"{riwayat.MetaData.Code} - {riwayat.MetaData.Message}";
+                    grdListHist.Rebind();
+                    return;
+                }
+
+                var histories = riwayat.Response?.List?.Histories;
+
+                if (histories == null || histories.Count == 0)
+                {
+                    lblInfoHist.Text = "Data riwayat pelayanan obat tidak ditemukan.";
+                    grdListHist.Rebind();
+                    return;
+                }
+
+                var cacheFaskes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                var data = new List<RiwayatPelayananObatGridItem>();
+
+                foreach (var h in histories)
+                {
+                    var kodeFaskes = GetKodeFaskesFromNoSjp(h.Nosjp);
+                    var namaFaskes = GetNamaFaskesApotekByKode(kodeFaskes, cacheFaskes);
+
+                    data.Add(new RiwayatPelayananObatGridItem
+                    {
+                        NamaFaskes = namaFaskes,
+                        KodeFaskes = kodeFaskes,
+
+                        Nosjp = h.Nosjp,
+                        Tglpelayanan = h.Tglpelayanan,
+                        Noresep = h.Noresep,
+                        Kodeobat = h.Kodeobat,
+                        Namaobat = h.Namaobat,
+                        Jmlobat = h.Jmlobat
+                    });
+                }
+
+                RiwayatApolGridData = data;
+                grdListHist.Rebind();
+            }
+            catch (Exception ex)
+            {
+                lblInfoHist.Text = "Terjadi kesalahan: " + ex.Message;
+                RiwayatApolGridData = new List<RiwayatPelayananObatGridItem>();
+                grdListHist.Rebind();
+            }
+        }
+
+        private string GetKodeFaskesFromNoSjp(string noSjp)
+        {
+            if (string.IsNullOrWhiteSpace(noSjp))
+                return string.Empty;
+
+            noSjp = noSjp.Trim();
+
+            if (noSjp.Length < 8)
+                return string.Empty;
+
+            return noSjp.Substring(0, 8);
+        }
+
+        private string GetNamaFaskesApotekByKode(
+           string kodeFaskes,
+           Dictionary<string, string> cacheFaskes)
+        {
+            if (string.IsNullOrWhiteSpace(kodeFaskes))
+                return string.Empty;
+
+            kodeFaskes = kodeFaskes.Trim();
+
+            if (cacheFaskes.ContainsKey(kodeFaskes))
+                return cacheFaskes[kodeFaskes];
+
+            string namaFaskes = kodeFaskes;
+
+            try
+            {
+                var svcFaskes = new Common.BPJS.Apotek.Service();
+
+                var response = svcFaskes.GetFaskes("3", kodeFaskes);
+
+                if (response != null &&
+                    response.Response != null &&
+                    response.Response.List != null &&
+                    response.Response.List.Count > 0)
+                {
+                    var faskes = response.Response.List
+                        .FirstOrDefault(x =>
+                            !string.IsNullOrWhiteSpace(x.Kode) &&
+                            x.Kode.Trim().Equals(kodeFaskes, StringComparison.OrdinalIgnoreCase));
+
+                    if (faskes == null)
+                        faskes = response.Response.List.FirstOrDefault();
+
+                    if (faskes != null && !string.IsNullOrWhiteSpace(faskes.Nama))
+                        namaFaskes = faskes.Nama.Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                lblInfoHist.Text += $"GetFaskes {kodeFaskes} error: {ex.Message}<br/>";
+                namaFaskes = kodeFaskes;
+            }
+
+            cacheFaskes[kodeFaskes] = namaFaskes;
+            return namaFaskes;
+        }
+
+        protected void grdListHist_NeedDataSource(object sender, Telerik.Web.UI.GridNeedDataSourceEventArgs e)
+        {
+            grdListHist.DataSource = RiwayatApolGridData;
+        }
+
+        protected void grdListApol_NeedDataSource(object sender, GridNeedDataSourceEventArgs e)
+        {
+            var dt = Session[SessionNameForList] as DataTable;
+
+            if (dt == null)
+                dt = BuildApolDataTableForGrid();
+
+            grdListApol.DataSource = dt;
+        }
+
+        private DataTable GetDaftarResepApolDataTable()
+        {
+            if (txtTglAwal.IsEmpty || txtTglAkhir.IsEmpty)
+                throw new Exception("Tanggal awal dan tanggal akhir wajib diisi.");
+
+            var svc = new Common.BPJS.Apotek.Service();
+
+            var kdPpk = string.IsNullOrWhiteSpace(txtPPK.Text)
+                ? (ConfigurationManager.AppSettings["ApotekHospitalID"] ?? string.Empty)
+                : txtPPK.Text.Trim();
+
+            var request = new Common.BPJS.Apotek.Resep.DaftarResep.Request.Root()
+            {
+                KdPPK = kdPpk,
+                KdJnsObat = cboJnsObt.SelectedValue,
+                JnsTgl = cboTgl.SelectedValue,
+                TglMulai = txtTglAwal.SelectedDate?.ToString("yyyy-MM-dd"),
+                TglAkhir = txtTglAkhir.SelectedDate?.ToString("yyyy-MM-dd")
+            };
+
+            var response = svc.GetDaftarResep(request);
+
+            if (response?.Metadata?.IsValid != true)
+            {
+                var code = response?.Metadata?.Code ?? "";
+                var message = response?.Metadata?.Message ?? "Gagal mengambil daftar resep APOL.";
+                throw new Exception($"{code} - {message}");
+            }
+
+            var dt = BuildApolDataTableForGrid();
+
+            if (response.Response == null)
+                return dt;
+
+            foreach (var res in response.Response)
+            {
+                var row = dt.NewRow();
+
+                row["NORESEP"] = res.NoResep ?? "";
+                row["NOAPOTIK"] = res.NoApotik ?? "";
+                row["NOSEP_KUNJUNGAN"] = res.NoSep_Kunjungan ?? "";
+                row["NOKARTU"] = res.NoKartu ?? "";
+                row["PesertaNama"] = res.Nama ?? "";
+
+                row["TGLENTRY"] = ParseDate(res.TglEntry) ?? (object)DBNull.Value;
+                row["TGLRESEP"] = ParseDate(res.TglResep) ?? (object)DBNull.Value;
+                row["TGLPELRSP"] = ParseDate(res.TglPelResep) ?? (object)DBNull.Value;
+
+                if (decimal.TryParse(Convert.ToString(res.ByTagRsp), out var byTag))
+                    row["BYTAGRSP"] = byTag;
+                else
+                    row["BYTAGRSP"] = 0m;
+
+                if (decimal.TryParse(Convert.ToString(res.ByVerRsp), out var byVer))
+                    row["BYVERRSP"] = byVer;
+                else
+                    row["BYVERRSP"] = 0m;
+
+                row["KDJNSOBAT"] = res.KdJnsObat ?? "";
+                row["FASKESASAL"] = res.FaskesAsal ?? "";
+
+                dt.Rows.Add(row);
+            }
+
+            return dt;
+        }
+
+        protected void btnExportApol_Click(object sender, ImageClickEventArgs e)
+        {
+            try
+            {
+                var dt = GetDaftarResepApolDataTable();
+
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    ScriptManager.RegisterStartupScript(
+                        this,
+                        GetType(),
+                        "apol-export-empty",
+                        "alert('Data APOL kosong, tidak ada yang bisa di-export.');",
+                        true);
+
+                    return;
+                }
+
+                var fileName = string.Format(
+                    "DaftarResepApol-{0}-{1}.xlsx",
+                    txtTglAwal.SelectedDate?.ToString("yyyyMMdd"),
+                    txtTglAkhir.SelectedDate?.ToString("yyyyMMdd"));
+
+                CreateExcelFile.CreateExcelDocument(dt, fileName, this.Response);
+            }
+            catch (Exception ex)
+            {
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "apol-export-error",
+                    $"alert('Gagal export Excel: {ex.Message.Replace("'", "\\'")}');",
+                    true);
+            }
+        }
 
         protected void grdListApol_DeleteCommand(object sender, GridCommandEventArgs e)
         {
             var item = e.Item as GridDataItem;
             if (item == null) return;
+
             var noResep = Convert.ToString(item.GetDataKeyValue("NORESEP"))?.Trim();
             var noSEP = Convert.ToString(item.GetDataKeyValue("NOSEP_KUNJUNGAN"))?.Trim();
 
@@ -1265,14 +1542,11 @@ namespace Temiang.Avicenna.Module.Charges
             try
             {
                 var svc = new Common.BPJS.Apotek.Service();
-                var response = svc.HapusResep(new Common.BPJS.Apotek.Resep.HapusResep.Request.Root
+                var response = svc.HapusResep(new Common.BPJS.Apotek.Resep.HapusResep.Request
                 {
-                    Request = new Common.BPJS.Apotek.Resep.HapusResep.Request
-                    {
-                        NOSJP = noSEP,
-                        REFASALSJP = noSEP,
-                        NORESEP = noResep
-                    }
+                    NOSJP = noSEP,    // SEP kunjungan
+                    REFASALSJP = noSEP,
+                    NORESEP = noResep
                 });
 
                 if (response?.Metadata?.IsValid == true)
@@ -1326,12 +1600,35 @@ namespace Temiang.Avicenna.Module.Charges
             if (DateTime.TryParseExact(s, fmts, System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.AssumeLocal, out var d))
                 return d;
+            // fallback
             if (DateTime.TryParse(s, out d)) return d;
             return null;
         }
 
         protected void btnDaftarResepApol_Click(object sender, EventArgs e)
         {
+
+            try
+            {
+                var dt = GetDaftarResepApolDataTable();
+
+                Session[SessionNameForList] = dt;
+                grdListApol.Rebind();
+            }
+            catch (Exception ex)
+            {
+                var dt = BuildApolDataTableForGrid();
+                Session[SessionNameForList] = dt;
+                grdListApol.Rebind();
+
+                ScriptManager.RegisterStartupScript(
+                    this,
+                    GetType(),
+                    "apol-list-error",
+                    $"alert('{ex.Message.Replace("'", "\\'")}');",
+                    true);
+            }
+
             var svc = new Common.BPJS.Apotek.Service();
 
             try
@@ -1382,6 +1679,7 @@ namespace Temiang.Avicenna.Module.Charges
                     }
                 }
 
+                // cache & bind
                 Session[SessionNameForList] = dt;
                 grdListApol.Rebind();
             }
@@ -1392,6 +1690,173 @@ namespace Temiang.Avicenna.Module.Charges
                 grdListApol.Rebind();
             }
         }
-        #endregion
+
+        private DataTable BuildPelayananObatTable()
+        {
+            var dt = new DataTable();
+            dt.Columns.Add("KodeObat", typeof(string));
+            dt.Columns.Add("NamaObat", typeof(string));
+            dt.Columns.Add("TipeObat", typeof(string));
+            dt.Columns.Add("Signa", typeof(string));
+            dt.Columns.Add("Hari", typeof(string));
+            dt.Columns.Add("Permintaan", typeof(string));
+            dt.Columns.Add("Jumlah", typeof(string));
+            dt.Columns.Add("Harga", typeof(string));
+            return dt;
+        }
+
+        protected void grdPelayananObat_NeedDataSource(object sender, GridNeedDataSourceEventArgs e)
+        {
+            grdPelayananObat.DataSource = Session["APOL_DETAIL"];
+        }
+
+        protected void btnLoadPelayananObat_Click(object sender, EventArgs e)
+        {
+            var noSep = txtNoSepDetail.Text?.Trim();
+
+            if (string.IsNullOrWhiteSpace(noSep))
+            {
+                ScriptManager.RegisterStartupScript(this, GetType(),
+                    "alert", "alert('No SEP kosong');", true);
+                return;
+            }
+
+            try
+            {
+                var svc = new Common.BPJS.Apotek.Service();
+                var response = svc.GetPelayananObat(noSep);
+
+                var dt = BuildPelayananObatTable();
+
+                if (response == null)
+                {
+                    ShowAlert("Response kosong dari service.");
+                }
+                else if (response.MetaData?.Code != "200")
+                {
+                    ShowAlert(response.MetaData?.Message ?? "Gagal mengambil data.");
+                }
+                else if (response.Response?.Listobat != null)
+                {
+                    foreach (var obat in response.Response.Listobat)
+                    {
+                        var row = dt.NewRow();
+
+                        row["KodeObat"] = obat.Kodeobat ?? "";
+                        row["NamaObat"] = obat.Namaobat ?? "";
+                        row["TipeObat"] = obat.Tipeobat ?? "";
+
+                        // SIGNATURE LEBIH AMAN
+                        var s1 = obat.Signa1 ?? "0";
+                        var s2 = obat.Signa2 ?? "0";
+                        row["Signa"] = $"{s1} x {s2}";
+
+                        row["Hari"] = obat.Hari ?? "";
+                        row["Permintaan"] = obat.Permintaan ?? "";
+                        row["Jumlah"] = obat.Jumlah ?? "";
+
+                        // FORMAT HARGA
+                        if (decimal.TryParse(obat.Harga, out var harga))
+                            row["Harga"] = string.Format("Rp {0:N0}", harga);
+                        else
+                            row["Harga"] = obat.Harga ?? "0";
+
+                        dt.Rows.Add(row);
+                    }
+                }
+                else
+                {
+                    ShowAlert("Data obat tidak ditemukan.");
+                }
+
+                Session["APOL_DETAIL"] = dt;
+                grdPelayananObat.Rebind();
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error: " + ex.Message);
+            }
+        }
+
+        private void ShowAlert(string message)
+        {
+            ScriptManager.RegisterStartupScript(
+                this,
+                GetType(),
+                Guid.NewGuid().ToString(),
+                $"alert('{message.Replace("'", "")}');",
+                true);
+        }
+
+        private DataTable BuildRekapPrbTable()
+        {
+            var dt = new DataTable();
+            dt.Columns.Add("No", typeof(int));
+            dt.Columns.Add("NamaPeserta", typeof(string));
+            dt.Columns.Add("NomorKaPst", typeof(string));
+            dt.Columns.Add("Alamat", typeof(string));
+            dt.Columns.Add("TglSRB", typeof(string));
+            dt.Columns.Add("Diagnosa", typeof(string));
+            dt.Columns.Add("Obat", typeof(string));
+            dt.Columns.Add("DPJP", typeof(string));
+            dt.Columns.Add("AsalFaskes", typeof(string));
+            return dt;
+        }
+
+        protected void grdRekapPrb_NeedDataSource(object sender, GridNeedDataSourceEventArgs e)
+        {
+            grdRekapPrb.DataSource = Session["PRB_REKAP"] ?? BuildRekapPrbTable();
+        }
+        protected void btnLoadRekapPrb_Click(object sender, EventArgs e)
+        {
+            if (!dpPeriodePrb.SelectedDate.HasValue)
+            {
+                ShowAlert("Periode belum dipilih.");
+                return;
+            }
+
+            try
+            {
+                int tahun = dpPeriodePrb.SelectedDate.Value.Year;
+                int bulan = dpPeriodePrb.SelectedDate.Value.Month;
+
+                var svc = new Common.BPJS.Apotek.Service();
+                var response = svc.GetRekapPesertaPrb(tahun, bulan);
+
+                var dt = BuildRekapPrbTable();
+
+                if (response?.MetaData?.Code == "200" &&
+                    response.Response?.List != null)
+                {
+                    foreach (var item in response.Response.List)
+                    {
+                        var row = dt.NewRow();
+
+                        row["No"] = item.No;
+                        row["NamaPeserta"] = item.NamaPeserta ?? "";
+                        row["NomorKaPst"] = item.NomorKaPst ?? "";
+                        row["Alamat"] = item.Alamat ?? "";
+                        row["TglSRB"] = item.TglSRB ?? "";
+                        row["Diagnosa"] = item.Diagnosa ?? "";
+                        row["Obat"] = item.Obat ?? "";
+                        row["DPJP"] = item.DPJP ?? "";
+                        row["AsalFaskes"] = item.AsalFaskes ?? "";
+
+                        dt.Rows.Add(row);
+                    }
+                }
+                else
+                {
+                    ShowAlert(response?.MetaData?.Message ?? "Data tidak ditemukan.");
+                }
+
+                Session["PRB_REKAP"] = dt;
+                grdRekapPrb.Rebind();
+            }
+            catch (Exception ex)
+            {
+                ShowAlert("Error: " + ex.Message);
+            }
+        }
     }
 }
