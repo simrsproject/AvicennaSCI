@@ -1293,7 +1293,9 @@ namespace Temiang.Avicenna.BusinessObject
             IsUseCurrentDateRegistration,
             IsCallQueueingListEmrV2,
             IsDirectButtonBetweenKioskVersion,
-            IsUsingSuggestion
+            IsUsingSuggestion,
+
+            IsAllowZeroNewPriceForTariff
         }
 
         public class DefaultRecordValue

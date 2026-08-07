@@ -56,30 +56,38 @@ namespace Temiang.Avicenna.Module.Finance.Tariff
                     var refNo = table.Rows[0]["ReferenceNo"].ToString();
                     ItemTariffRequestItemToImport.DeletePrevRecord(refNo);
 
+                    //cek parameter apakah boleh NewPrice nilai 0
+                    bool isAllowZeroNewPriceForTariff = AppParameter.IsYes(AppParameter.ParameterItem.IsAllowZeroNewPriceForTariff);
+
                     var coll = new ItemTariffRequestItemToImportCollection();
 
                     if (getPageID == "import")
                     {
                         foreach (DataRow row in table.Rows)
                         {
-                            if (!(row["NewPrice"] is DBNull) && Convert.ToDecimal(row["NewPrice"]) > 0)
-                            {
-                                var x = coll.AddNew();
-                                x.ReferenceNo = row["ReferenceNo"].ToString();
-                                x.StartingDate = Convert.ToDateTime(row["StartingDate"]);
-                                x.SRTariffType = row["SRTariffType"].ToString();
-                                x.ItemGroupID = row["ItemGroupID"].ToString();
-                                x.ItemID = row["ItemID"].ToString();
-                                x.ClassID = row["ClassID"].ToString();
-                                x.ItemName = row["ItemName"].ToString();
-                                x.TariffComponentID = row["TariffComponentID"].ToString();
-                                x.GeneralPrice = Convert.ToDecimal(row["GeneralPrice"]);
-                                x.OldPrice = Convert.ToDecimal(row["OldPrice"]);
-                                x.NewPrice = Convert.ToDecimal(row["NewPrice"]);
+                            decimal newPrice = row["NewPrice"] == DBNull.Value
+                                                ? 0
+                                                : Convert.ToDecimal(row["NewPrice"]);
 
-                                x.LastUpdateDateTime = DateTime.Now;
-                                x.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                            }
+                            bool hasNewPrice = newPrice > 0;
+                            if (!hasNewPrice && !isAllowZeroNewPriceForTariff)
+                                continue;
+
+                            var x = coll.AddNew();
+                            x.ReferenceNo = row["ReferenceNo"].ToString();
+                            x.StartingDate = Convert.ToDateTime(row["StartingDate"]);
+                            x.SRTariffType = row["SRTariffType"].ToString();
+                            x.ItemGroupID = row["ItemGroupID"].ToString();
+                            x.ItemID = row["ItemID"].ToString();
+                            x.ClassID = row["ClassID"].ToString();
+                            x.ItemName = row["ItemName"].ToString();
+                            x.TariffComponentID = row["TariffComponentID"].ToString();
+                            x.GeneralPrice = Convert.ToDecimal(row["GeneralPrice"]);
+                            x.OldPrice = Convert.ToDecimal(row["OldPrice"]);
+                            x.NewPrice = newPrice;
+
+                            x.LastUpdateDateTime = DateTime.Now;
+                            x.LastUpdateByUserID = AppSession.UserLogin.UserID;
                         }
                         coll.Save();
                     }
@@ -87,24 +95,29 @@ namespace Temiang.Avicenna.Module.Finance.Tariff
                     {
                         foreach (DataRow row in table.Rows)
                         {
-                            if (!(row["NewPrice"] is DBNull) && Convert.ToDecimal(row["NewPrice"]) > 0)
-                            {
-                                var x = coll.AddNew();
-                                x.ReferenceNo = row["ReferenceNo"].ToString();
-                                x.StartingDate = Convert.ToDateTime(row["StartingDate"]);
-                                x.SRTariffType = row["SRTariffType"].ToString();
-                                x.ItemGroupID = row["ItemGroupID"].ToString();
-                                x.ItemID = row["ItemID"].ToString();
-                                x.ClassID = row["ClassID"].ToString();
-                                x.ItemName = row["ItemName"].ToString();
-                                x.TariffComponentID = row["TariffComponentID"].ToString();
-                                x.GeneralPrice = Convert.ToDecimal(0);
-                                x.OldPrice = Convert.ToDecimal(0);
-                                x.NewPrice = Convert.ToDecimal(row["NewPrice"]);
+                            decimal newPrice = row["NewPrice"] == DBNull.Value
+                                                ? 0
+                                                : Convert.ToDecimal(row["NewPrice"]);
 
-                                x.LastUpdateDateTime = DateTime.Now;
-                                x.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                            }
+                            bool hasNewPrice = newPrice > 0;
+                            if (!hasNewPrice && !isAllowZeroNewPriceForTariff)
+                                continue;
+
+                            var x = coll.AddNew();
+                            x.ReferenceNo = row["ReferenceNo"].ToString();
+                            x.StartingDate = Convert.ToDateTime(row["StartingDate"]);
+                            x.SRTariffType = row["SRTariffType"].ToString();
+                            x.ItemGroupID = row["ItemGroupID"].ToString();
+                            x.ItemID = row["ItemID"].ToString();
+                            x.ClassID = row["ClassID"].ToString();
+                            x.ItemName = row["ItemName"].ToString();
+                            x.TariffComponentID = row["TariffComponentID"].ToString();
+                            x.GeneralPrice = Convert.ToDecimal(0);
+                            x.OldPrice = Convert.ToDecimal(0);
+                            x.NewPrice = newPrice;
+
+                            x.LastUpdateDateTime = DateTime.Now;
+                            x.LastUpdateByUserID = AppSession.UserLogin.UserID;
                         }
 
                         coll.Save();

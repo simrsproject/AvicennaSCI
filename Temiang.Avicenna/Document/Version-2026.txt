@@ -369,3 +369,6 @@ Titipan Daniel
 
 ---[06-08-2026 - Wiliam]
 1. Modifikasi PpaNoteEntry.aspx.cs method GetPHRL() agar tampilan Assement Monitoring TTV Rawat Inap benar.
+
+---[07-08-2026 - Wiliam]---
+1. Modifikasi ItemTariffRequestImport.aspx.cs agar NewPrice 0 bisa diimport. dengan penambahan parameter IsAllowZeroNewPriceForTariff
