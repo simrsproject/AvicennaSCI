@@ -1,4 +1,6 @@
 ﻿using DevExpress.XtraRichEdit.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,6 +17,8 @@ using Temiang.Avicenna.Common;
 using Temiang.Dal;
 using Temiang.Dal.DynamicQuery;
 using Temiang.Dal.Interfaces;
+using static Temiang.Avicenna.BusinessObject.DashboardClinicConfig;
+using static Temiang.Avicenna.BusinessObject.VisitQueue;
 
 namespace Temiang.Avicenna.WebService
 {
@@ -23,9 +27,9 @@ namespace Temiang.Avicenna.WebService
     /// </summary>
     public class ApiResponeForAntrian
     {
-        public static void Success(System.Web.HttpContext context, object data, string message = "OK")
+        public static void Success(HttpContext context, object data, string message = "OK")
         {
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+            var json = JsonConvert.SerializeObject(new
             {
                 success = true,
                 code = 200,
@@ -36,12 +40,16 @@ namespace Temiang.Avicenna.WebService
 
             context.Response.Clear();
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = 200;
             context.Response.Write(json);
+            context.Response.Flush();
+            context.Response.SuppressContent = true;
+            context.ApplicationInstance.CompleteRequest();
         }
 
-        public static void Error(System.Web.HttpContext context, string message, int code = 500)
+        public static void Error(HttpContext context, string message, int code = 500)
         {
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(new
+            var json = JsonConvert.SerializeObject(new
             {
                 success = false,
                 code = code,
@@ -52,7 +60,10 @@ namespace Temiang.Avicenna.WebService
 
             context.Response.Clear();
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = code;
             context.Response.Write(json);
+
+            context.ApplicationInstance.CompleteRequest();
         }
     }
 
@@ -106,6 +117,40 @@ namespace Temiang.Avicenna.WebService
             return GetCounterList()
                 .Select(x => x.CounterID)
                 .ToList();
+        }
+
+        public class UpdateDisplayDoctorRequest
+        {
+            public string ServiceUnitID { get; set; }
+
+            public List<DisplayDoctorItem> Doctors { get; set; }
+        }
+
+        public class GetDisplayDoctorListRequest
+        {
+            public List<string> ServiceUnitID { get; set; }
+
+            public DateTime? QueueDate { get; set; }
+        }
+
+        public class DashboardClinicConfigRequest
+        {
+            public string ConfigID { get; set; }
+
+            public string UserID { get; set; }
+
+            public string ConfigName { get; set; }
+
+            public DashboardClinicSetting Settings { get; set; }
+
+            public List<DashboardClinicRoomItem> Rooms { get; set; }
+        }
+
+        public class DashboardClinicSetting
+        {
+            public bool AutoRefresh { get; set; }
+
+            public int RefreshIntervalSec { get; set; }
         }
 
         //1. Pasien Ambil Antrian
@@ -1498,6 +1543,21 @@ namespace Temiang.Avicenna.WebService
             try
             {
                 // =========================
+                // CORS
+                // =========================
+                Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                Context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                Context.Response.AddHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+                // Handle Preflight Request
+                if (Context.Request.HttpMethod.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase))
+                {
+                    Context.Response.StatusCode = 200;
+                    Context.Response.End();
+                    return;
+                }
+
+                // =========================
                 // NORMALIZE
                 // =========================
                 string VisitQueueNo =
@@ -2422,11 +2482,13 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
+            - KamarCode (optional)
 
             EXAMPLE:
             CallAntrianAllServiceUnit?
             VisitQueueNo=VQUE-260516-0015&
-            UserID=Admin
+            UserID=Admin&
+            KamarCode=Kamar_5
 
             RESPONSE:
                200 = Berhasil memanggil antrian
@@ -2448,6 +2510,10 @@ namespace Temiang.Avicenna.WebService
 
                 string UserID =
                     (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2483,7 +2549,8 @@ namespace Temiang.Avicenna.WebService
                     result =
                         VisitQueue.CallAntrianAllServiceUnit(
                             VisitQueueNo,
-                            UserID
+                            UserID,
+                            KamarCode
                         );
 
                     if (result == null)
@@ -2498,9 +2565,7 @@ namespace Temiang.Avicenna.WebService
                 }
                 catch (Exception ex)
                 {
-                    if (
-                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
-                    )
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
                     {
                         ApiResponeForAntrian.Error(
                             Context,
@@ -2538,11 +2603,13 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - VisitQueueNo (required)
+            - KamarCode (optional)
 
             EXAMPLE:
 
             GetQueueSoundForAllServiceUnit?
-            VisitQueueNo=VQUE-260603-0006
+            VisitQueueNo=VQUE-260603-0006&
+            KamarCode=Kamar_1
 
             RESPONSE:
                200 = Sound antrian All Service Unit berhasil diambil
@@ -2555,11 +2622,32 @@ namespace Temiang.Avicenna.WebService
             try
             {
                 // =========================
+                // CORS
+                // =========================
+                Context.Response.ClearHeaders();
+                Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                Context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                Context.Response.AddHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+                // Handle Preflight Request
+                if (Context.Request.HttpMethod == "OPTIONS")
+                {
+                    Context.Response.StatusCode = 200;
+                    Context.Response.End();
+                    return;
+                }
+
+                // =========================
                 // NORMALIZE
                 // =========================
 
                 string VisitQueueNo =
                     (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim()
+                    .ToUpper();
+
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim()
                     .ToUpper();
 
@@ -2584,7 +2672,8 @@ namespace Temiang.Avicenna.WebService
 
                 var data =
                     QueueingSound.GetQueueSoundForAllServiceUnit(
-                        VisitQueueNo
+                        VisitQueueNo,
+                        KamarCode
                     );
 
                 // =========================
@@ -2613,11 +2702,13 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
+            - KamarCode (optional)
 
             EXAMPLE:
             RecallAntrianAllServiceUnit?
             VisitQueueNo=VQUE-260516-0015&
-            UserID=Admin
+            UserID=Admin&
+            KamarCode=Kamar_5
 
             RESPONSE:
                200 = Berhasil recall antrian
@@ -2639,6 +2730,10 @@ namespace Temiang.Avicenna.WebService
 
                 string UserID =
                     (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2674,14 +2769,13 @@ namespace Temiang.Avicenna.WebService
                     result =
                         VisitQueue.RecallAntrianAllServiceUnit(
                             VisitQueueNo,
-                            UserID
+                            UserID,
+                            KamarCode
                         );
                 }
                 catch (Exception ex)
                 {
-                    if (
-                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
-                    )
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
                     {
                         ApiResponeForAntrian.Error(
                             Context,
@@ -2733,11 +2827,13 @@ namespace Temiang.Avicenna.WebService
             PARAMETER:
             - VisitQueueNo (required)
             - UserID (required)
+            - KamarCode (optional)
 
             EXAMPLE:
             CallNextQueueAllServiceUnit?
             VisitQueueNo=VQUE-260520-0020&
-            UserID=240076
+            UserID=240076&
+            KamarCode=Kamar_5
 
             RESPONSE:
                200 = Berhasil memanggil antrian berikutnya
@@ -2759,6 +2855,10 @@ namespace Temiang.Avicenna.WebService
 
                 string UserID =
                     (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                string KamarCode =
+                    (Context.Request["KamarCode"] ?? "")
                     .Trim();
 
                 // =========================================
@@ -2794,14 +2894,13 @@ namespace Temiang.Avicenna.WebService
                     result =
                         VisitQueue.CallNextQueueAllServiceUnit(
                             VisitQueueNo,
-                            UserID
+                            UserID,
+                            KamarCode
                         );
                 }
                 catch (Exception ex)
                 {
-                    if (
-                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
-                    )
+                    if (ex.Message.ToUpper().Contains("TIDAK DITEMUKAN"))
                     {
                         ApiResponeForAntrian.Error(
                             Context,
@@ -4120,99 +4219,82 @@ namespace Temiang.Avicenna.WebService
 
         [WebMethod(Description = @"
             Digunakan untuk mengambil daftar dokter yang aktif ditampilkan
-            pada display antrian berdasarkan Service Unit.
-
-            PARAMETER:
-            - ServiceUnitID
-            - QueueDate (Optional)
-
-            CONTOH REQUEST:
-
-            GetListUpdateDisplayDokterForPoli?
-            ServiceUnitID=D2.2.41.1
-
-            KETERANGAN:
-               - ServiceUnitID :
-                 Kode poli/unit pelayanan yang akan ditampilkan.
-
-            RESPONSE:
-               200 = Berhasil mengambil daftar dokter display
-               500 = Terjadi kesalahan pada server 
+            pada display antrian berdasarkan satu atau beberapa Service Unit.
         ")]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void GetListUpdateDisplayDokterForPoli()
         {
             try
             {
-                string serviceUnitID =
+                List<string> serviceUnitID = new List<string>();
+                DateTime? queueDate = null;
+
+                // ===========================
+                // PRIORITAS 1 : FORM / QUERY
+                // ===========================
+                string serviceUnitIDsText =
                     (Context.Request["ServiceUnitID"] ?? "")
                     .Trim();
 
+                if (!string.IsNullOrWhiteSpace(serviceUnitIDsText))
+                {
+                    serviceUnitID = serviceUnitIDsText
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => x.Trim())
+                        .Distinct(StringComparer.OrdinalIgnoreCase)
+                        .ToList();
+
+                    DateTime dt;
+                    if (DateTime.TryParse(Context.Request["QueueDate"], out dt))
+                    {
+                        queueDate = dt;
+                    }
+                }
+                else
+                {
+                    // ===========================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ===========================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!string.IsNullOrWhiteSpace(body))
+                        {
+                            var request =
+                                JsonConvert.DeserializeObject<GetDisplayDoctorListRequest>(body);
+
+                            if (request != null)
+                            {
+                                serviceUnitID = request.ServiceUnitID ?? new List<string>();
+                                queueDate = request.QueueDate;
+                            }
+                        }
+                    }
+                }
+
+                if (serviceUnitID.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "ServiceUnitIDs wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
                 var data =
                     VisitQueue.GetDisplayDoctorListForPoli(
-                        serviceUnitID
+                        serviceUnitID,
+                        queueDate
                     );
 
                 ApiResponeForAntrian.Success(
                     Context,
                     data,
                     "Berhasil mengambil daftar dokter"
-                );
-            }
-            catch (Exception ex)
-            {
-                ApiResponeForAntrian.Error(
-                    Context,
-                    ex.Message,
-                    500
-                );
-            }
-        }
-
-        [WebMethod(Description = @"
-            Digunakan untuk mengatur dokter yang akan ditampilkan pada display antrian.
-
-            PARAMETER:
-            - ServiceUnitID
-            - ParamedicID
-
-            CONTOH REQUEST:
-
-            UpdateDisplayDoctorList?
-            ServiceUnitID=D2.2.41.1&
-            ParamedicID=MD-00170,MD-00145,MD-00023
-
-            RESPONSE:
-            200 = Berhasil update dokter display
-            500 = Terjadi kesalahan pada server
-        ")]
-        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public void UpdateDisplayDoctorListForPoli()
-        {
-            try
-            {
-                string serviceUnitID =
-                    (Context.Request["ServiceUnitID"] ?? "")
-                    .Trim();
-
-                string paramedicIDs =
-                    (Context.Request["ParamedicID"] ?? "")
-                    .Trim();
-
-                VisitQueue.UpdateDisplayDoctorList(
-                    serviceUnitID,
-                    paramedicIDs
-                );
-
-                var data =
-                    VisitQueue.GetDisplayDoctorListForPoli(
-                        serviceUnitID
-                    );
-
-                ApiResponeForAntrian.Success(
-                    Context,
-                    data,
-                    "Berhasil update dokter display"
                 );
             }
             catch (Exception ex)
@@ -4279,6 +4361,840 @@ namespace Temiang.Avicenna.WebService
                 // =========================================
                 // RESPONSE ERROR
                 // =========================================
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = false, Description = @"
+            Mendapatkan daftar kamar untuk antrian.
+
+            PARAMETER:
+            - Tidak ada
+
+            RESPONSE:
+             200 = Berhasil mendapatkan data kamar
+             404 = Data kamar tidak ditemukan
+             500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetListKamarForPoli()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("===== GET ROOM LIST =====");
+
+                ListKamarForAntrianCollection collection =
+                    new ListKamarForAntrianCollection();
+
+                collection.Query.Where(
+                    collection.Query.IsActive == true
+                );
+
+                collection.Query.OrderBy(
+                    collection.Query.KamarID.Ascending
+                );
+
+                collection.Query.Load();
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Total Room = {collection.Count}"
+                );
+
+                if (collection.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data kamar tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                var data = collection
+                    .Select(x => new
+                    {
+                        KamarID = x.KamarID,
+                        KamarCode = x.KamarCode,
+                        KamarName = x.KamarName
+                    })
+                    .ToList();
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        Rooms = data
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "ERROR : " + ex.ToString()
+                );
+
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk memindahkan antrian ke Stage berikutnya.
+            Data antrian lama akan diubah menjadi FINISHED
+            dan otomatis membuat antrian baru pada Stage berikutnya.
+
+            PARAMETER:
+            - VisitQueueNo (required)
+            - UserID (required)
+
+            EXAMPLE:
+            MoveNextStageAllServiceUnit?
+            VisitQueueNo=VQUE-260713-0010&
+            UserID=240092
+
+            RESPONSE:
+               200 = Berhasil memindahkan antrian ke stage berikutnya
+               400 = Parameter tidak valid
+               404 = Data antrian tidak ditemukan
+               500 = Error server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void MoveNextStageAllServiceUnit()
+        {
+            try
+            {
+                // =========================================
+                // NORMALIZE
+                // =========================================
+                string VisitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
+                    .Trim();
+
+                string UserID =
+                    (Context.Request["UserID"] ?? "")
+                    .Trim();
+
+                // =========================================
+                // VALIDASI
+                // =========================================
+                if (string.IsNullOrEmpty(VisitQueueNo))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "VisitQueueNo wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(UserID))
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "UserID wajib diisi",
+                        400
+                    );
+                    return;
+                }
+
+                // =========================================
+                // EXEC BO
+                // =========================================
+                object result = null;
+
+                try
+                {
+                    result =
+                        VisitQueue.MoveNextStage(
+                            VisitQueueNo,
+                            UserID
+                        );
+                }
+                catch (Exception ex)
+                {
+                    if (
+                        ex.Message.ToUpper().Contains("TIDAK DITEMUKAN")
+                    )
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            ex.Message,
+                            404
+                        );
+                        return;
+                    }
+
+                    throw;
+                }
+
+                // =========================================
+                // NOT FOUND
+                // =========================================
+                if (result == null)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data antrian tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
+                ApiResponeForAntrian.Success(
+                    Context,
+                    result,
+                    "Berhasil memindahkan antrian ke stage berikutnya"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(Description = @"
+            Digunakan untuk mengatur dokter yang akan ditampilkan pada display antrian.
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void UpdateDisplayDoctorListForPoli()
+        {
+            try
+            {
+                string serviceUnitID = "";
+                List<DisplayDoctorItem> doctors = new List<DisplayDoctorItem>();
+
+                // ===========================
+                // PRIORITAS 1 : FORM / QUERY
+                // ===========================
+                serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                string doctorsJson =
+                    (Context.Request["Doctors"] ?? "")
+                    .Trim();
+
+                if (!string.IsNullOrWhiteSpace(doctorsJson))
+                {
+                    doctors =
+                        JsonConvert.DeserializeObject<List<DisplayDoctorItem>>(doctorsJson);
+                }
+                else
+                {
+                    // ===========================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ===========================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!string.IsNullOrWhiteSpace(body))
+                        {
+                            var request =
+                                JsonConvert.DeserializeObject<UpdateDisplayDoctorRequest>(body);
+
+                            if (request != null)
+                            {
+                                serviceUnitID = request.ServiceUnitID;
+                                doctors = request.Doctors ?? new List<DisplayDoctorItem>();
+                            }
+                        }
+                    }
+                }
+
+                VisitQueue.UpdateDisplayDoctorList(
+                    serviceUnitID,
+                    doctors
+                );
+
+                var data =
+                    VisitQueue.GetDisplayDoctorListForPoli(
+                        new List<string>
+                        {
+                        serviceUnitID
+                        }
+                    );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Berhasil update dokter display"
+                );
+                return;
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = false, Description = @"
+            Mendapatkan daftar Service Unit Farmasi.
+
+            PARAMETER:
+            - ServiceUnitID (Optional)
+
+            RESPONSE:
+             200 = Berhasil mendapatkan data Service Unit Farmasi
+             404 = Data Service Unit Farmasi tidak ditemukan
+             500 = Terjadi kesalahan pada server
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetListServiceUnitFarmasi()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("===== GET SERVICE UNIT FARMASI =====");
+
+                string serviceUnitID =
+                    (Context.Request["ServiceUnitID"] ?? "")
+                    .Trim();
+
+                ServiceUnitCollection collection =
+                    new ServiceUnitCollection();
+
+                collection.Query.Where(
+                    collection.Query.ShortName.Like("%FAR%")
+                );
+
+                if (!string.IsNullOrWhiteSpace(serviceUnitID))
+                {
+                    collection.Query.Where(
+                        collection.Query.ServiceUnitID == serviceUnitID
+                    );
+                }
+
+                collection.Query.OrderBy(
+                    collection.Query.ServiceUnitName.Ascending
+                );
+
+                collection.Query.Load();
+
+                System.Diagnostics.Debug.WriteLine(
+                    $"Total Farmasi = {collection.Count}"
+                );
+
+                if (collection.Count == 0)
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "Data Service Unit Farmasi tidak ditemukan",
+                        404
+                    );
+                    return;
+                }
+
+                var data = collection
+                    .Select(x => new
+                    {
+                        ServiceUnitCode = x.DepartmentID,
+                        ServiceUnitID = x.ServiceUnitID,
+                        ServiceUnitName = x.ServiceUnitName,
+                        ShortName = x.ShortName
+                    })
+                    .ToList();
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        ServiceUnits = data
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "ERROR : " + ex.ToString()
+                );
+
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = true, Description = @"
+        Digunakan untuk menyimpan konfigurasi Dashboard Clinic.
+
+        Method : POST
+
+        Request Body (JSON)
+
+        {
+            ""ConfigID"": ""CFG-260723-0001"", // Optional. Kosongkan untuk membuat konfigurasi baru.
+            ""UserID"": ""240092"",
+            ""ConfigName"": ""Display Poli Anak Lantai 1"",
+            ""Settings"": {
+                ""AutoRefresh"": true,
+                ""RefreshIntervalSec"": 5
+            },
+            ""Rooms"": [
+                {
+                    ""ServiceUnitID"": ""D2.2.03.2"",
+                    ""StageID"": ""POLI"",
+                    ""ParamedicID"": ""DR001"",
+                    ""KamarID"": 1
+                },
+                {
+                    ""ServiceUnitID"": ""D2.2.03.2"",
+                    ""StageID"": ""POLI"",
+                    ""ParamedicID"": ""DR002"",
+                    ""KamarID"": 2
+                }
+            ]
+        }
+
+        Keterangan Parameter :
+
+        ConfigID            : ID konfigurasi Dashboard Clinic.
+                              - Kosong = Tambah konfigurasi baru.
+                              - Diisi = Update konfigurasi yang sudah ada.
+
+        UserID              : ID User pemilik konfigurasi.
+
+        ConfigName          : Nama konfigurasi Dashboard Clinic.
+
+        Settings.AutoRefresh
+                            : Mengaktifkan atau menonaktifkan auto refresh dashboard.
+
+        Settings.RefreshIntervalSec
+                            : Interval refresh dashboard dalam satuan detik.
+
+        Rooms               : Daftar konfigurasi room yang akan ditampilkan.
+
+        Rooms.ServiceUnitID : ID Service Unit.
+
+        Rooms.StageID       : ID Tahapan Antrian.
+
+        Rooms.ParamedicID   : ID Dokter.
+
+        Rooms.KamarID       : ID Kamar Display.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""message"": ""Dashboard clinic configuration berhasil disimpan."",
+            ""data"": {
+                ""ConfigID"": ""CFG-260723-0001""
+            }
+        }
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void SaveDashboardClinicConfig()
+        {
+            try
+            {
+                if (AppSession.UserLogin == null)
+                {
+                    AppSession.UserLogin = new UserLogin
+                    {
+                        UserID = "WEBSERVICE",
+                        UserName = "WEBSERVICE"
+                    };
+                }
+
+                DashboardClinicConfigRequest request = null;
+
+                // ==================================
+                // PRIORITAS 1 : FORM / QUERY STRING
+                // ==================================
+                string userID = (Context.Request["UserID"] ?? "").Trim();
+
+                if (!String.IsNullOrEmpty(userID))
+                {
+                    request = new DashboardClinicConfigRequest();
+
+                    request.ConfigID = (Context.Request["ConfigID"] ?? "").Trim();
+                    request.UserID = userID;
+                    request.ConfigName = (Context.Request["ConfigName"] ?? "").Trim();
+
+                    request.Settings = new DashboardClinicSetting
+                    {
+                        AutoRefresh = Convert.ToBoolean(Context.Request["AutoRefresh"] ?? "false"),
+                        RefreshIntervalSec = Convert.ToInt32(Context.Request["RefreshIntervalSec"] ?? "0")
+                    };
+
+                    string roomsJson = (Context.Request["Rooms"] ?? "").Trim();
+
+                    request.Rooms = String.IsNullOrWhiteSpace(roomsJson)
+                        ? new List<DashboardClinicConfig.DashboardClinicRoomItem>()
+                        : JsonConvert.DeserializeObject<List<DashboardClinicConfig.DashboardClinicRoomItem>>(roomsJson);
+                }
+                else
+                {
+                    // ==================================
+                    // PRIORITAS 2 : RAW JSON BODY
+                    // ==================================
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!String.IsNullOrWhiteSpace(body))
+                        {
+                            request =
+                                JsonConvert.DeserializeObject<DashboardClinicConfigRequest>(body);
+                        }
+                    }
+                }
+
+                if (request == null)
+                    throw new Exception("Request tidak valid.");
+
+                if (String.IsNullOrEmpty(request.UserID))
+                    throw new Exception("UserID tidak boleh kosong.");
+
+                if (request.Settings == null)
+                    throw new Exception("Settings tidak boleh kosong.");
+
+                if (request.Rooms == null || request.Rooms.Count == 0)
+                    throw new Exception("Room minimal satu.");
+
+                bool isNew = String.IsNullOrEmpty(request.ConfigID);
+
+                string configID = request.ConfigID;
+
+                if (isNew)
+                {
+                    var autoNumber = Helper.GetNewAutoNumber(
+                        (new DateTime()).NowAtSqlServer().Date,
+                        AppEnum.AutoNumber.DashboardClinicConfigNo
+                    );
+
+                    configID = autoNumber.LastCompleteNumber;
+
+                    // jangan lupa simpan LastNumber
+                    autoNumber.Save();
+                }
+
+                configID = DashboardClinicConfig.SaveConfig(
+                    configID,
+                    isNew,
+                    request.UserID,
+                    request.ConfigName,
+                    request.Settings.AutoRefresh,
+                    request.Settings.RefreshIntervalSec,
+                    request.Rooms
+                );
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        ConfigID = configID,
+                        ConfigName = request.ConfigName,
+                        UserID = request.UserID,
+
+                        Settings = new
+                        {
+                            AutoRefresh = request.Settings.AutoRefresh,
+                            RefreshIntervalSec = request.Settings.RefreshIntervalSec
+                        },
+
+                        RoomCount = request.Rooms.Count,
+
+                        Rooms = request.Rooms,
+
+                        LastUpdateDateTime = (new DateTime()).NowAtSqlServer()
+                    },
+                    "Dashboard poliklinik configuration berhasil disimpan."
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.ToString(),
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = false, Description = @"
+        Digunakan untuk mendapatkan daftar konfigurasi Dashboard Clinic.
+
+        Request Body (JSON)
+
+        {
+            ""UserID"": ""240092"" // Optional
+        }
+
+        Keterangan Parameter :
+
+        UserID : (Optional)
+                 - Kosong = Menampilkan seluruh konfigurasi Dashboard Clinic.
+                 - Diisi  = Menampilkan konfigurasi Dashboard Clinic milik User tersebut.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""errorCode"": null,
+            ""message"": ""Dashboard config ditemukan"",
+            ""data"": {
+                ""Configs"": [
+                    {
+                        ""ConfigID"": ""CFG-001"",
+                        ""ConfigName"": ""Display Poli Anak Lantai 1"",
+                        ""RoomCount"": 2,
+                        ""UpdatedAt"": ""2026-07-23T10:30:00+07:00""
+                    },
+                    {
+                        ""ConfigID"": ""CFG-002"",
+                        ""ConfigName"": ""Dashboard Poli Penyakit Dalam"",
+                        ""RoomCount"": 3,
+                        ""UpdatedAt"": ""2026-07-23T11:00:00+07:00""
+                    }
+                ]
+            }
+        }
+        ")]         
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetDashboardClinicConfigList()
+        {
+            try
+            {
+                string userID = (Context.Request["UserID"] ?? "").Trim();
+
+                if (String.IsNullOrWhiteSpace(userID))
+                {
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!String.IsNullOrWhiteSpace(body))
+                        {
+                            dynamic request = JsonConvert.DeserializeObject(body);
+
+                            if (request != null && request.UserID != null)
+                                userID = request.UserID.ToString();
+                        }
+                    }
+                }
+
+                var configs = DashboardClinicConfig.GetConfigList(userID);
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        Configs = configs
+                    },
+                    "Dashboard config ditemukan"
+                );
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.ToString(),
+                    500
+                );
+            }
+        }
+
+        [WebMethod(EnableSession = true, Description = @"
+        Digunakan untuk mengambil detail konfigurasi Dashboard Clinic berdasarkan UserID dan ConfigID.
+
+        Parameter :
+
+        ConfigID = ID konfigurasi Dashboard Clinic.
+        UserID   = ID User pemilik konfigurasi.
+
+        Contoh Request :
+
+        GetDashboardClinicConfigDetail?
+        ConfigID=CFG-260723-0007&
+        UserID=240092
+
+        Keterangan Parameter :
+
+        ConfigID
+            : Wajib.
+              ID konfigurasi Dashboard Clinic yang akan diambil.
+
+        UserID
+            : Wajib.
+              User pemilik konfigurasi. Digunakan untuk memastikan
+              bahwa konfigurasi yang diminta memang milik User tersebut.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""errorCode"": null,
+            ""message"": ""Dashboard clinic configuration found"",
+            ""data"": {
+                ""ConfigID"": ""CFG-260723-0001"",
+                ""ConfigName"": ""Display Executive Klinik"",
+                ""UserID"": ""240092"",
+                ""Rooms"": [
+                    {
+                        ""ServiceUnitID"": ""D2.2.03.2"",
+                        ""ServiceUnitName"": ""Poliklinik Anak"",
+                        ""StageID"": ""POLI"",
+                        ""StageName"": ""Poliklinik"",
+                        ""ParamedicID"": ""MD-00005"",
+                        ""ParamedicName"": ""dr. Budi"",
+                        ""KamarID"": ""1"",
+                        ""KamarCode"": ""Kamar_1"",
+                        ""KamarName"": ""Kamar 1""
+                    }
+                ],
+                ""Settings"": {
+                    ""AutoRefresh"": true,
+                    ""RefreshIntervalSec"": 5
+                },
+                ""UpdatedAt"": ""2026-07-23T21:17:39+07:00""
+            }
+        }
+
+        Response Error :
+
+        {
+            ""success"": false,
+            ""code"": 500,
+            ""errorCode"": ""ERR"",
+            ""message"": ""Dashboard clinic configuration tidak ditemukan."",
+            ""data"": null
+        }
+        ")]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void GetDashboardClinicConfigDetail()
+        {
+            try
+            {
+                string configID = (Context.Request["ConfigID"] ?? "").Trim();
+                string userID = (Context.Request["UserID"] ?? "").Trim();
+
+                if (String.IsNullOrEmpty(configID))
+                    throw new Exception("ConfigID tidak boleh kosong.");
+
+                if (String.IsNullOrEmpty(userID))
+                    throw new Exception("UserID tidak boleh kosong.");
+
+                var data = DashboardClinicConfig.GetConfigDetail(
+                    configID,
+                    userID);
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    data,
+                    "Dashboard clinic detail ditemukan");
+            }
+            catch (Exception ex)
+            {
+                ApiResponeForAntrian.Error(
+                    Context,
+                    ex.Message,
+                    500);
+            }
+        }
+
+        [WebMethod(EnableSession = true, Description = @"
+        Digunakan untuk menghapus konfigurasi Dashboard Clinic.
+
+        Request Body (JSON)
+
+        {
+            ""ConfigID"": ""CFG-260723-0001""
+        }
+
+        Keterangan Parameter :
+
+        ConfigID : ID konfigurasi Dashboard Clinic yang akan dihapus.
+
+        Response Success :
+
+        {
+            ""success"": true,
+            ""code"": 200,
+            ""message"": ""Dashboard clinic configuration berhasil dihapus.""
+        }
+        ")]
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void DeleteDashboardClinicConfig()
+        {
+            try
+            {
+                if (AppSession.UserLogin == null)
+                {
+                    AppSession.UserLogin = new UserLogin
+                    {
+                        UserID = "WEBSERVICE",
+                        UserName = "WEBSERVICE"
+                    };
+                }
+
+                string configID = (Context.Request["ConfigID"] ?? "").Trim();
+
+                // =============================
+                // Support Raw JSON
+                // =============================
+                if (String.IsNullOrEmpty(configID))
+                {
+                    Context.Request.InputStream.Position = 0;
+
+                    using (var reader = new StreamReader(Context.Request.InputStream))
+                    {
+                        string body = reader.ReadToEnd();
+
+                        if (!String.IsNullOrWhiteSpace(body))
+                        {
+                            JObject obj = JsonConvert.DeserializeObject<JObject>(body);
+
+                            configID = (obj["ConfigID"] ?? "").ToString();
+                        }
+                    }
+                }
+
+                if (String.IsNullOrWhiteSpace(configID))
+                    throw new Exception("ConfigID tidak boleh kosong.");
+
+                DashboardClinicConfig.DeleteConfig(configID);
+
+                ApiResponeForAntrian.Success(
+                    Context,
+                    new
+                    {
+                        ConfigID = configID
+                    },
+                    "Dashboard clinic configuration berhasil dihapus."
+                );
+            }
+            catch (Exception ex)
+            {
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,

@@ -1,7 +1,8 @@
 CREATE OR ALTER PROCEDURE AntrianRecallAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
-    @UserID       VARCHAR(50)
+    @UserID       VARCHAR(50),
+	@KamarCode    VARCHAR(50) = NULL
 )
 AS
 BEGIN
@@ -14,7 +15,8 @@ BEGIN
 		@CurrentStage  VARCHAR(50),
         @ServiceUnitID VARCHAR(50),
 		@CategoryID    VARCHAR(50),
-        @ParamedicID   VARCHAR(50);
+        @ParamedicID   VARCHAR(50),
+		@QueueLocation VARCHAR(50);
 
     BEGIN TRAN;
 
@@ -55,6 +57,12 @@ BEGIN
             1;
         END
 
+		-- =========================================
+		-- SET QUEUE LOCATION (OPTIONAL)
+		-- =========================================
+		SET @QueueLocation =
+			NULLIF(LTRIM(RTRIM(@KamarCode)), '');
+
         -- =========================================
         -- 2. UPDATE RECALL
         -- =========================================
@@ -62,6 +70,7 @@ BEGIN
         SET 
             CalledTime      = GETDATE(),
             UpdatedBy       = @UserID,
+			QueueLocation    = @QueueLocation,
             LastUpdated     = GETDATE(),
             IsManualOverride = 1,
             RecallCount        = ISNULL(RecallCount, 0) + 1
@@ -86,6 +95,7 @@ BEGIN
 			CategoryID,
             ServiceUnitID,
             ParamedicID,
+			QueueLocation,
             CalledTime,
             LastUpdated,
             UpdatedBy,
@@ -108,5 +118,6 @@ END
 GO
 
 EXEC AntrianRecallAllServiceUnit
-    @VisitQueueNo = 'VQUE-260516-0018',
-    @UserID       = 'Admin';
+    @VisitQueueNo = 'VQUE-260707-0190',
+    @UserID       = 'Admin',
+	@KamarCode        = 'Kamar_3'

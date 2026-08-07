@@ -461,6 +461,7 @@
     <Content Include="Audio\belas.MP3" />
     <Content Include="Audio\c.MP3" />
     <Content Include="Audio\d.MP3" />
+    <Content Include="Audio\di kamar.mp3" />
     <Content Include="Audio\e.MP3" />
     <Content Include="Audio\f.MP3" />
     <Content Include="Audio\farmasi.mp3" />
@@ -1918,6 +1919,17 @@
     <Content Include="Document\2026\05\13\AntrianRSI\045-SP TakeQueueVisitPasienTititpan.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\046-SP GenerateSRAutoNumberPasienTitipan.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\047-UPDATE Query Field IsDisplayActive Tabel ServiceUnitParamedic.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\048-INSERT Tabel Into AppProgram Antrian Satu Tiket.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\049-INSERT Tabel Into QueueStage.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\051-Query CREATE Tabel ListKamarForAntrian.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\052-Query INSERT Tabel ListKamarForAntrian.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\053-Query INSERT %27Kamar%27 Tabel QueueingSound.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\054-SP AntrianMoveNextStage.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\055-Alter Tabel ServiceUnitParamedic Add KamarForAntrianID.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\056-Query INSERT Tabel DashboardClinicConfig.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\057-Query INSERT Tabel DashboardClinicConfigDetail.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\058-Query INSERT AppAutoNumber DashboardClinicConfigNo.sql" />
+    <Content Include="Document\2026\05\13\AntrianRSI\059-Query INSERT AppStandardReferenceItem DashboardClinicConfigNo.sql" />
     <Content Include="Document\2026\06\11\create_view_Vw_POPreComputeQtyFinished.sql" />
     <Content Include="Document\2026\07\create_sp_GetTariffComponentByItemID.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
@@ -2441,6 +2453,7 @@
     <Content Include="Module\Charges\Cashier\ClosingVisiteDownPayment\VisitDownPaymentList.aspx" />
     <Content Include="Module\Charges\Cashier\DownPayment\VisitPackegeTemplatePickList.aspx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\ItemBalanceInfo.aspx" />
+    <Content Include="Module\Charges\Dispensary\PrescriptionSales\openApolDetail.aspx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionSalesCommon\Prescription.asmx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionSalesCommon\PrescriptionTemplate.aspx" />
     <Content Include="Module\Charges\Dispensary\PrescriptionSales\PrescriptionSalesCommon\PrevBuyInfo.ascx" />
@@ -2468,9 +2481,8 @@
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\SpecimenCollectItem.aspx" />
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\Template\TemplateNew.aspx" />
     <Content Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx" />
-    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx" />
+    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx" />
     <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.js" />
-    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogViewHist.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogWs.asmx" />
     <Content Include="Module\ControlPanel\Setting\StandardReferencePerGroup\WorkTradeItemDetail.ascx" />
@@ -3311,6 +3323,7 @@
     <Content Include="Module\Reports\OptionControl\CssdMachineCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\ItemGroupGenericNonGenericCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\ItemBinLocationCtl.ascx" />
+    <Content Include="Module\Reports\OptionControl\InvoiceNoCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\StandardReferenceChkBoxCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\StandardReferenceCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\DepartmentCtl.ascx" />
@@ -3325,6 +3338,7 @@
     <Content Include="Module\Reports\OptionControl\PermissionTypeCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\ProcurementTypeCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\OutstandingCtl.ascx" />
+    <Content Include="Module\Reports\OptionControl\RegistrationNoCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\YearSemesterCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\pJasmedPeriodCtl.ascx" />
     <Content Include="Module\Reports\OptionControl\PurchaseCategorizationCtl.ascx" />
@@ -3391,6 +3405,7 @@
     <Content Include="WebService\Antrol.asmx" />
     <Content Include="WebService\Attendance.asmx" />
     <Content Include="WebService\AutoBillOnSchedule.asmx" />
+    <Content Include="WebService\ExecutiveMembershipRSI.asmx" />
     <Content Include="WebService\MobileWS2.asmx" />
     <Content Include="WebService\PCareService.asmx" />
     <Content Include="WebService\Disdukcapil.asmx" />
@@ -7148,6 +7163,13 @@
     <Compile Include="Module\Charges\Dispensary\PrescriptionReturn\PrescriptionTransactionList.aspx.designer.cs">
       <DependentUpon>PrescriptionTransactionList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\Charges\Dispensary\PrescriptionSales\openApolDetail.aspx.cs">
+      <DependentUpon>openApolDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Charges\Dispensary\PrescriptionSales\openApolDetail.aspx.designer.cs">
+      <DependentUpon>openApolDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\Charges\Dispensary\PrescriptionSales\PatientEducationEntry.aspx.cs">
       <DependentUpon>PatientEducationEntry.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -7796,19 +7818,12 @@
     <Compile Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx.designer.cs">
       <DependentUpon>UpdateICUPhysicianList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.cs">
-      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx.cs">
+      <DependentUpon>UserDokterAsuransi.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.designer.cs">
-      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.cs">
-      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.designer.cs">
-      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx.designer.cs">
+      <DependentUpon>UserDokterAsuransi.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\ControlPanel\AuditLog\AuditLogSetting\AuditLogSettingDetail.aspx.cs">
       <DependentUpon>AuditLogSettingDetail.aspx</DependentUpon>
@@ -22049,6 +22064,13 @@
     <Compile Include="Module\Reports\OptionControl\ItemBinLocationCtl.ascx.designer.cs">
       <DependentUpon>ItemBinLocationCtl.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Module\Reports\OptionControl\InvoiceNoCtl.ascx.cs">
+      <DependentUpon>InvoiceNoCtl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\InvoiceNoCtl.ascx.designer.cs">
+      <DependentUpon>InvoiceNoCtl.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Module\Reports\OptionControl\StandardReferenceChkBoxCtl.ascx.cs">
       <DependentUpon>StandardReferenceChkBoxCtl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -22237,6 +22259,13 @@
     </Compile>
     <Compile Include="Module\Reports\OptionControl\OutstandingCtl.ascx.designer.cs">
       <DependentUpon>OutstandingCtl.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\RegistrationNoCtl.ascx.cs">
+      <DependentUpon>RegistrationNoCtl.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Reports\OptionControl\RegistrationNoCtl.ascx.designer.cs">
+      <DependentUpon>RegistrationNoCtl.ascx</DependentUpon>
     </Compile>
     <Compile Include="Module\Reports\OptionControl\YearSemesterCtl.ascx.cs">
       <DependentUpon>YearSemesterCtl.ascx</DependentUpon>
@@ -22628,6 +22657,9 @@
     <Compile Include="WebService\BillingChargeService.asmx.cs">
       <DependentUpon>BillingChargeService.asmx</DependentUpon>
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebService\ExecutiveMembershipRSI.asmx.cs">
+      <DependentUpon>ExecutiveMembershipRSI.asmx</DependentUpon>
     </Compile>
     <Compile Include="WebService\MobileWS2.asmx.cs">
       <DependentUpon>MobileWS2.asmx</DependentUpon>

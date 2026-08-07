@@ -594,17 +594,34 @@ namespace Temiang.Avicenna.BusinessObject
             return list;
         }
 
-        public static object GetQueueSoundForAllServiceUnit(string visitQueueNo)
+        public static object GetQueueSoundForAllServiceUnit(
+			string visitQueueNo,
+			string kamarCode = null)
         {
             var entity = new QueueingSound();
+
+            var parameters = new esParameters();
+
+            parameters.Add(
+                "VisitQueueNo",
+                visitQueueNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50);
+
+            parameters.Add(
+                "KamarCode",
+                string.IsNullOrWhiteSpace(kamarCode)
+                    ? (object)DBNull.Value
+                    : kamarCode,
+                esParameterDirection.Input,
+                DbType.String,
+                50);
 
             var reader = entity.ExecuteReader(
                 esQueryType.StoredProcedure,
                 "GetQueueSoundForAllServiceUnit",
-                new esParameters
-                {
-            { "VisitQueueNo", visitQueueNo, esParameterDirection.Input, DbType.String, 50 }
-                }
+                parameters
             );
 
             var list = new List<object>();

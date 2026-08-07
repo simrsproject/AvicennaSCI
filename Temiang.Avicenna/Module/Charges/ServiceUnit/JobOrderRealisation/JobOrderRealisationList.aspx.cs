@@ -556,21 +556,28 @@ namespace Temiang.Avicenna.Module.Charges
                             var transNo = args[1];
 
                             var charges = new TransCharges();
-                            charges.LoadByPrimaryKey(transNo);
-
-                            var serviceUnitRadiologyID = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyID);
-                            var serviceUnitRadiologyIdArray = AppParameter.GetParameterValue(AppParameter.ParameterItem.ServiceUnitRadiologyIdArray);
-
-                            if (!string.IsNullOrWhiteSpace(serviceUnitRadiologyIdArray) &&
-                                !string.IsNullOrWhiteSpace(serviceUnitRadiologyID))
+                            if (!charges.LoadByPrimaryKey(transNo))
                             {
-                                SatuSehatHelper.SendServiceRequestToRis(charges.TransactionNo, charges.RegistrationNo);
-
                                 ScriptManager.RegisterStartupScript(
                                     this,
                                     this.GetType(),
                                     "alert",
-                                    $"alert('Success Send Service Request To SatuSehat (TRX: {charges.TransactionNo})');",
+                                    $"alert('Failed To Send Service Request: Transaction {transNo} not found');",
+                                    true
+                                );
+                                return;
+                            }
+
+                            var result = SatuSehatHelper.SendServiceRequestToRis(charges.TransactionNo, charges.RegistrationNo);
+
+                            // Cek apakah result mengandung error
+                            if (!string.IsNullOrEmpty(result) && (result.Contains("\"severity\":\"error\"") || result.StartsWith("error:")))
+                            {
+                                ScriptManager.RegisterStartupScript(
+                                    this,
+                                    this.GetType(),
+                                    "alert",
+                                    $"alert('Failed Send Service Request: {result.Replace("'", "\\'")}');",
                                     true
                                 );
                             }
@@ -580,7 +587,7 @@ namespace Temiang.Avicenna.Module.Charges
                                     this,
                                     this.GetType(),
                                     "alert",
-                                    "alert('Failed To Send Service Request, Check For Post Data Or Already Sent To SatuSehat');",
+                                    $"alert('Success Send Service Request To SatuSehat (TRX: {charges.TransactionNo})');",
                                     true
                                 );
                             }
@@ -602,20 +609,18 @@ namespace Temiang.Avicenna.Module.Charges
 
         public class SatuSehatHelper
         {
-            public static void SendServiceRequestToRis(string transactionNo, string registrationNo)
+            public static string SendServiceRequestToRis(string transactionNo, string registrationNo)
             {
                 var tc = new TransCharges();
-                if (!tc.LoadByPrimaryKey(transactionNo)) return;
+                if (!tc.LoadByPrimaryKey(transactionNo)) return "error: Transaction not found";
 
                 var reg = new Registration();
-                reg.LoadByPrimaryKey(registrationNo);
+                if (!reg.LoadByPrimaryKey(registrationNo)) return "error: Registration not found";
 
                 var util = new Temiang.Avicenna.Bridging.SatuSehat.Utils();
-                util.OrderRadRealization(transactionNo);
+                var result = util.OrderRadRealization(transactionNo);
 
-                var satuSehatLog = new SatuSehatKunjungan();
-                if (!satuSehatLog.LoadByPrimaryKey(reg.RegistrationNo)) return;
-                if (!satuSehatLog.EncounterID.HasValue) return;
+                return result;
             }
         }
 

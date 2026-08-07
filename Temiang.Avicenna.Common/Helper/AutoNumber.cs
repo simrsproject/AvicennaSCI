@@ -101,6 +101,8 @@ namespace Temiang.Avicenna.Common
                     return GetNewAutoNumber(transactionDate, AppEnum.AutoNumber.Sales, departmentInitial);
                 case "SalesReturn":
                     return GetNewAutoNumber(transactionDate, AppEnum.AutoNumber.SalesReturn, departmentInitial);
+                case "DashboardClinicConfigNo":
+                    return GetNewAutoNumber(transactionDate, AppEnum.AutoNumber.DashboardClinicConfigNo, departmentInitial);
                 default:
                     throw new Exception("GetNewAutoNumber function not defined");
             }

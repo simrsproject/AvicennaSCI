@@ -202,6 +202,7 @@ Titipan Daniel
 11.Menambahkan dan memodifikasi respone API RegistrationCreateFromAppointment supaya dapat masuk ke tabel VisitQueue.
 12.Menambahkan Validasi IPR pada RegistrationDetail.aspx.cs untuk hide field VisitNo dan GenerateVisitNo jika RegistrationType = IPR
 13.Menambahkan Statement untuk InsertVisitQueue pada KioskselfregController.cs pada void Register untuk dapat masuk ke tabel VisitQueue
+13.Menambahkan Kolom KamarForAntrianID di dalam tabel ServiceUnitParamedic
 
 ---- [15-05-2026 - Wiliam] ---
 1. Modifikasi PrescriptionSalesDetail.aspx.cs 
@@ -329,3 +330,42 @@ Titipan Daniel
    - source utama : webservice
    - source sekunder : database
 
+---[06-07-2026 - Wiliam]---
+1. Modifikasi AntrolController.cs untuk menangani duplikasi MedicalNo pada table Patient.
+
+---[09-07-2026 - Wiliam]---
+1. Modifikasi Inacbg.asmx.cs line 1621 
+   reg.save --> regis.save();
+
+---[13-07-2026 - Wiliam]---
+1. Modifikasi EmrIpDetail.aspx.cs untuk IPR tidak perlu ada informasi Tgl Rujukan dan Poli Rujukan.
+
+---[14-07-2026 - Wiliam]---
+1. Modifikasi 4 file untuk MDS Control Plan (Pengkhususan RSI) :
+   ResumeMedisRichTextInPatientEntry.aspx.cs
+   ResumeMedisRichTextOutPatientEntry.aspx.cs
+   NursingResumeInPatientEntry.aspx.cs
+   FollowUpPlanOprCtl.ascx.cs
+
+---[16-07-2026 - Wiliam]---
+1. modifikasi PurchaseOrderDetail.aspx.cs agar ketika Print Preview tidak usah update :
+   LastPrintedDateTime
+   LastPrintedByUserID
+
+---[20-07-2026 - Wiliam]---
+1. Modifikasi Temiang.Avicenna.ReportDataSource\RSMM\Emr\Assessment.asmx.cs method InPatientStd() untuk menambahkan field response SignImgByte agar INEUR.trdx muncul tanda tangan.
+
+---[23-07-2026 - Wiliam]---
+1. Modifikasi CasemixList.cs agar List History berdasarkan RegistrationDate DESC.
+
+---[28-07-2026 - Rizki]---
+1. Menambah Create dan LastUpdate RegistrationInfoMedic WebService MDS.
+
+---[29-07-2026 - Wiliam]---
+1. Modifikasi RegistrationDetail.aspx.cs agar ketika Parameter IsCrmMembershipActive berubah, label Membership No berubah
+
+---[31-07-2026 - Danang]---
+1. Apol Feature (Document SOP Menyusul)
+
+---[06-08-2026 - Wiliam]
+1. Modifikasi PpaNoteEntry.aspx.cs method GetPHRL() agar tampilan Assement Monitoring TTV Rawat Inap benar.

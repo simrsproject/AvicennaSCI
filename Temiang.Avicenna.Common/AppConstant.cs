@@ -1241,6 +1241,7 @@ namespace Temiang.Avicenna.Common
             public const string ResumeMedisRawatInap = "SLP.01.0089";
             public const string PrescriptionOrderSlip = "SLP.02.0078";
             public const string PrescriptionOrderSlipTanggalRujukan = "SLP.02.00076";
+            public const string RSSA_PrescriptionSlipTanggalRujukan = "SLP.02.00077";
             public const string PatientLabel = "SLP.01.0008";
             public const string BabyWirstband = "SLP.01.0019";
             public const string ReferNotes = "SLP.01.0081";

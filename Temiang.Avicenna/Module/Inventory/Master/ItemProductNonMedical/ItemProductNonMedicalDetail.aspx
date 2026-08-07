@@ -566,7 +566,7 @@
                                 </tr>
                                 <tr>
                                     <td style="width: 155px;">
-                                        
+                                        <asp:CheckBox ID="chkIsEconomicLifeMoreThanOneYear" runat="server" Text="Masa Pakai > 1 Tahun" />
                                     </td>
                                     <td style="width: 155px;"></td>
                                     <td></td>

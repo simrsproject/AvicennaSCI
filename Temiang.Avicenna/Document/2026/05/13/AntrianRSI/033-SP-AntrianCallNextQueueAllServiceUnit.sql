@@ -1,7 +1,8 @@
 ﻿CREATE OR ALTER PROCEDURE AntrianCallNextQueueAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
-    @UserID       VARCHAR(50)
+    @UserID       VARCHAR(50),
+	@KamarCode	  VARCHAR(50) = NULL 
 )
 AS
 BEGIN
@@ -17,6 +18,7 @@ BEGIN
         @ServiceUnitID      VARCHAR(50),
 		@StageID			VARCHAR(50),
 		@CategoryID			VARCHAR(50),
+		@QueueLocation      VARCHAR(50),
 
         -- 🔥 IMPORTANT: pisahkan variable
         @NextVisitQueueNo   VARCHAR(50),
@@ -47,6 +49,12 @@ BEGIN
 
         IF @CurrentStatus <> 'CALLED'
             THROW 50002, 'Hanya antrian CALLED yang bisa di-next', 1;
+
+		-- =========================================
+		-- SET QUEUE LOCATION (OPTIONAL)
+		-- =========================================
+		SET @QueueLocation =
+			NULLIF(LTRIM(RTRIM(@KamarCode)), '');
 
         -- =========================================
         -- FINISH CURRENT
@@ -87,6 +95,7 @@ BEGIN
 				Status      = 'CALLED',
 				CalledTime  = GETDATE(),
 				UpdatedBy   = @UserID,
+				QueueLocation = @QueueLocation,
 				LastUpdated = GETDATE(),
 				CalledByCounterID = @CounterID
 			WHERE VisitQueueNo = @NextVisitQueueNo;
@@ -116,7 +125,8 @@ BEGIN
 			@ParamedicID AS ParamedicID,
 			@ServiceUnitID AS ServiceUnitID,
 			@CurrentStage AS CurrentStage,
-			@StageID AS StageID;
+			@StageID AS StageID,
+			@QueueLocation AS QueueLocation;
 
     END TRY
     BEGIN CATCH
@@ -127,5 +137,6 @@ END
 
 
 EXEC AntrianCallNextQueueAllServiceUnit
-    @VisitQueueNo = 'VQUE-260520-0020',
-    @UserID       = '240076';
+    @VisitQueueNo = 'VQUE-260713-0114',
+    @UserID       = '240076',
+	@KamarCode        = 'Kamar_3'

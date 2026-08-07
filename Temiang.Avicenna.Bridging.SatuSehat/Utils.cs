@@ -6393,6 +6393,739 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
 
         #endregion Pelayanan Rawat Jalan
 
+        #region Rujukan Satusehat IGD
+        //Task Pra Permintaan Rujukan
+        private void PostTaskReferralPreRequest(Registration reg, PatientBridging patSs, string encounterId, string organizationId, string primaryDiagnosisCode, string primaryDiagnosisDisplay, ref string accessToken)
+        {
+            //Check status kirim
+            var ssResult = LoadSatuSehatResult(encounterId, "Task", "REFERRAL", "PRE_REQUEST");
+            if (ssResult != null && ssResult.ResultID != null) return;
+
+            var authoredOn = DateTime.UtcNow;
+            var lastModified = DateTime.UtcNow;
+
+            var postData = new
+            {
+                resourceType = "Task",
+                identifier = new List<object>
+                {
+                    new
+                    {
+                        system = $"http://sys-ids.kemkes.go.id/task/{organizationId}",
+                        value = reg.RegistrationNo // atau RegistrationID sesuai requirement
+                    }
+                },
+                status = "requested",
+                intent = "instance-order",
+                priority = "routine",
+                code = new
+                {
+                    coding = new List<object>
+                    {
+                        new
+                        {
+                            system = "http://terminology.kemkes.go.id",
+                            code = "referral-pre-request",
+                            display = "Referral pre request"
+                        }
+                    }
+                },
+                authoredOn = $"{authoredOn:yyyy-MM-ddTHH:mm:ss}+00:00",
+                lastModified = $"{lastModified:yyyy-MM-ddTHH:mm:ss}+00:00",
+                requester = new
+                {
+                    reference = $"Organization/{organizationId}"
+                },
+                owner = new
+                {
+                    reference = $"Organization/{organizationId}"
+                },
+                encounter = new
+                {
+                    reference = $"Encounter/{encounterId}"
+                },
+                input = new List<object>
+                {
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://snomed.info/sct",
+                                    code = "119270007",
+                                    display = "Management procedure"
+                                }
+                            }
+                        },
+                        valueCoding = new
+                        {
+                            system = "http://snomed.info/sct",
+                            code = "385868005",
+                            display = "Emergency treatment management"
+                        }
+                    },
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://terminology.kemkes.go.id",
+                                    code = "primary-diagnosis",
+                                    display = "Primary Diagnosis"
+                                }
+                            }
+                        },
+                        valueCoding = new
+                        {
+                            system = "http://hl7.org/fhir/sid/icd-10",
+                            code = primaryDiagnosisCode,
+                            display = primaryDiagnosisDisplay
+                        }
+                    }
+                }
+            };
+
+            if (ssResult == null)
+            {
+                ssResult = new SatuSehatResult()
+                {
+                    EncounterID = new Guid(encounterId),
+                    Category = "REFERRAL",
+                    Code = "PRE_REQUEST"
+                };
+            }
+
+            var requestBody = JsonConvert.SerializeObject(postData);
+            RestClientPostAndSaveLog("Task", requestBody, ssResult, ref accessToken);
+        }
+
+        private void PostTaskRequestReferralCandidate(Registration reg, PatientBridging patSs, string encounterId, string organizationId, string provinceCode, string provinceName, string cityCode, string cityName, string primaryDiagnosisCode,
+        string primaryDiagnosisDisplay, string secondaryDiagnosisCode, string secondaryDiagnosisDisplay, ref string accessToken)
+        {
+            //Check status kirim
+            var ssResult = LoadSatuSehatResult(encounterId, "Task", "REFERRAL", "CANDIDATE");
+            if (ssResult != null && ssResult.ResultID != null) return;
+
+            var referralCriteriaId = Guid.NewGuid().ToString("N");
+            var areaId = Guid.NewGuid().ToString("N");
+
+            var postData = new
+            {
+                resourceType = "Task",
+
+                contained = new List<object>
+                {
+                    new
+                    {
+                        resourceType = "QuestionnaireResponse",
+                        id = referralCriteriaId,
+                        questionnaire = "https://fhir.kemkes.go.id/Questionnaire/Q100",
+                        status = "completed",
+                        subject = new
+                        {
+                            reference = $"Patient/{patSs.BridgingID}"
+                        },
+                        encounter = new
+                        {
+                            reference = $"Encounter/{encounterId}"
+                        },
+                        item = new List<object>
+                        {
+                            new
+                            {
+                                linkId = "0",
+                                text = "GAWAT DARURAT",
+                                item = new List<object>
+                                {
+                                    new
+                                    {
+                                        linkId = "000001",
+                                        text = "Mengancam nyawa, membahayakan diri dan orang lain/lingkungan",
+                                        answer = new List<object>
+                                        {
+                                            new { valueBoolean = true }
+                                        }
+                                    },
+                                    new
+                                    {
+                                        linkId = "000002",
+                                        text = "Adanya gangguan pada jalan nafas, pernafasan, dan sirkulasi",
+                                        answer = new List<object>
+                                        {
+                                            new { valueBoolean = true }
+                                        }
+                                    },
+                                    new
+                                    {
+                                        linkId = "000003",
+                                        text = "Adanya penurunan kesadaran",
+                                        answer = new List<object>
+                                        {
+                                            new { valueBoolean = false }
+                                        }
+                                    },
+                                    new
+                                    {
+                                        linkId = "000004",
+                                        text = "Adanya gangguan hemodinamik",
+                                        answer = new List<object>
+                                        {
+                                            new { valueBoolean = true }
+                                        }
+                                    },
+                                    new
+                                    {
+                                        linkId = "000005",
+                                        text = "Memerlukan tindakan segera",
+                                        answer = new List<object>
+                                        {
+                                            new { valueBoolean = true }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    new
+                    {
+                        resourceType = "QuestionnaireResponse",
+                        id = areaId,
+                        questionnaire = "https://fhir.kemkes.go.id/Questionnaire/Q101",
+                        status = "completed",
+                        subject = new
+                        {
+                            reference = $"Patient/{patSs.BridgingID}"
+                        },
+                        encounter = new
+                        {
+                            reference = $"Encounter/{encounterId}"
+                        },
+                        item = new List<object>
+                        {
+                            new
+                            {
+                                linkId = "1",
+                                text = "Jejaring wilayah rujukan",
+                                item = new List<object>
+                                {
+                                    new
+                                    {
+                                        linkId = "1.1",
+                                        text = "Provinsi",
+                                        answer = new List<object>
+                                        {
+                                            new
+                                            {
+                                                valueCoding = new
+                                                {
+                                                    system = "http://sys-ids.kemkes.go.id/administrative-area",
+                                                    code = provinceCode,
+                                                    display = provinceName
+                                                }
+                                            }
+                                        }
+                                    },
+                                    new
+                                    {
+                                        linkId = "1.2",
+                                        text = "Kabupaten/Kota",
+                                        answer = new List<object>
+                                        {
+                                            new
+                                            {
+                                                valueCoding = new
+                                                {
+                                                    system = "http://sys-ids.kemkes.go.id/administrative-area",
+                                                    code = cityCode,
+                                                    display = cityName
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                identifier = new List<object>
+                {
+                    new
+                    {
+                        system = $"http://sys-ids.kemkes.go.id/task/{organizationId}",
+                        value = reg.RegistrationNo
+                    }
+                },
+
+                status = "requested",
+                intent = "instance-order",
+                priority = "routine",
+
+                code = new
+                {
+                    coding = new List<object>
+                    {
+                        new
+                        {
+                            system = "http://terminology.kemkes.go.id",
+                            code = "request-referral-candidate",
+                            display = "Request for referral candidate"
+                        }
+                    }
+                },
+
+                @for = new
+                {
+                    reference = $"Patient/{patSs.BridgingID}"
+                },
+
+                authoredOn = $"{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss}+00:00",
+                lastModified = $"{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss}+00:00",
+
+                requester = new
+                {
+                    reference = $"Organization/{organizationId}"
+                },
+
+                owner = new
+                {
+                    reference = $"Organization/{organizationId}"
+                },
+
+                encounter = new
+                {
+                    reference = $"Encounter/{encounterId}"
+                },
+
+                input = new List<object>
+                {
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://terminology.kemkes.go.id",
+                                    code = "referral-criteria",
+                                    display = "Referral Criteria"
+                                }
+                            }
+                        },
+                        valueReference = new
+                        {
+                            reference = $"#{referralCriteriaId}",
+                            display = "Referral Criteria Response"
+                        }
+                    },
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://terminology.kemkes.go.id",
+                                    code = "area",
+                                    display = "Area"
+                                }
+                            }
+                        },
+                        valueReference = new
+                        {
+                            reference = $"#{areaId}",
+                            display = "Jejaring Wilayah Rujukan"
+                        }
+                    },
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://snomed.info/sct",
+                                    code = "119270007",
+                                    display = "Management procedure"
+                                }
+                            }
+                        },
+                        valueCoding = new
+                        {
+                            system = "http://snomed.info/sct",
+                            code = "385868005",
+                            display = "Emergency treatment management"
+                        }
+                    },
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://terminology.kemkes.go.id",
+                                    code = "primary-diagnosis",
+                                    display = "Primary Diagnosis"
+                                }
+                            }
+                        },
+                        valueCoding = new
+                        {
+                            system = "http://hl7.org/fhir/sid/icd-10",
+                            code = primaryDiagnosisCode,
+                            display = primaryDiagnosisDisplay
+                        }
+                    },
+                    new
+                    {
+                        type = new
+                        {
+                            coding = new List<object>
+                            {
+                                new
+                                {
+                                    system = "http://terminology.kemkes.go.id",
+                                    code = "secondary-diagnosis",
+                                    display = "Secondary diagnosis"
+                                }
+                            }
+                        },
+                        valueCoding = new
+                        {
+                            system = "http://hl7.org/fhir/sid/icd-10",
+                            code = secondaryDiagnosisCode,
+                            display = secondaryDiagnosisDisplay
+                        }
+                    }
+                }
+            };
+
+            if (ssResult == null)
+            {
+                ssResult = new SatuSehatResult()
+                {
+                    EncounterID = new Guid(encounterId),
+                    Category = "REFERRAL",
+                    Code = "CANDIDATE"
+                };
+            }
+
+            var requestBody = JsonConvert.SerializeObject(postData);
+            RestClientPostAndSaveLog("Task", requestBody, ssResult, ref accessToken);
+        }
+
+        //Service Request Pengiriman Rujukan
+        private void PostServiceRequestReferral(
+            Registration reg,
+            PatientBridging patSs,
+            string encounterId,
+            string organizationId,
+            string organizationName,
+            string serviceRequestId,
+            string referralNumberPcare,
+            string carePlanId,
+            string destinationOrganizationId,
+            string destinationOrganizationName,
+            string specialityCode,
+            string specialityName,
+            string referralReason,
+            string primaryDiagnosisId,
+            string historyConditionId,
+            string taskReferralCandidateId,
+            string chiefComplaintId,
+            string allergyId,
+            string tingkatKesadaranId,
+            string tinggiBadanId,
+            string beratBadanId,
+            string lingkarPerutId,
+            string imtId,
+            string sistoleId,
+            string diastoleId,
+            string nadiId,
+            string suhuId,
+            string pernafasanId,
+            string nrsId,
+            string observationHba1cId,
+            string diagnosticReportHba1cId,
+            string procedureEkgId,
+            string observationEkgId,
+            string medicationDispenseId,
+            string medicationAdministrationId,
+            ref string accessToken)
+        {
+            // Check status kirim
+            var ssResult = LoadSatuSehatResult(encounterId, "ServiceRequest", "REFERRAL", "SEND");
+            if (ssResult != null && ssResult.ResultID != null) return;
+
+            var postData = new
+            {
+                resourceType = "ServiceRequest",
+
+                identifier = new List<object>
+                {
+                    new
+                    {
+                        system = $"http://sys-ids.kemkes.go.id/servicerequest/{organizationId}",
+                        value = serviceRequestId
+                    },
+                    new
+                    {
+                        system = "http://sys-ids.kemkes.go.id/referral-number-pcare",
+                        value = referralNumberPcare
+                    }
+                },
+
+                basedOn = new List<object>
+                {
+                    new
+                    {
+                        reference = $"CarePlan/{carePlanId}"
+                    }
+                },
+
+                status = "active",
+
+                intent = "original-order",
+
+                priority = "stat",
+
+                category = new List<object>
+                {
+                    new
+                    {
+                        coding = new List<object>
+                        {
+                            new
+                            {
+                                system = "http://snomed.info/sct",
+                                code = "3457005",
+                                display = "Patient referral"
+                            }
+                        }
+                    }
+                },
+
+                code = new
+                {
+                    coding = new List<object>
+                    {
+                        new
+                        {
+                            system = "http://snomed.info/sct",
+                            code = "385868005",
+                            display = "Emergency treatment management"
+                        }
+                    },
+                    text = referralReason
+                },
+
+                subject = new
+                {
+                    reference = $"Patient/{patSs.BridgingID}"
+                },
+
+                encounter = new
+                {
+                    reference = $"Encounter/{encounterId}"
+                },
+
+                occurrenceDateTime = string.Format("{0}+00:00",
+                    reg.RegistrationDate.Value.AddHours(GmtDif).ToString(DateFormatLong)),
+
+                requester = new
+                {
+                    reference = $"Organization/{organizationId}",
+                    display = organizationName
+                },
+
+                performerType = new
+                {
+                    coding = new List<object>
+                    {
+                        new
+                        {
+                            system = "http://terminology.kemkes.go.id/CodeSystem/practitioner-speciality",
+                            code = specialityCode,
+                            display = specialityName
+                        }
+                    }
+                },
+
+                performer = new List<object>
+                {
+                    new
+                    {
+                        reference = $"Organization/{destinationOrganizationId}",
+                        display = destinationOrganizationName
+                    }
+                },
+
+                reasonReference = new List<object>
+                {
+                    new
+                    {
+                        reference = $"Condition/{primaryDiagnosisId}"
+                    },
+                    new
+                    {
+                        reference = $"Condition/{historyConditionId}"
+                    }
+                },
+
+                locationCode = new List<object>
+                {
+                    new
+                    {
+                        coding = new List<object>
+                        {
+                            new
+                            {
+                                system = "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                                code = "HOSP",
+                                display = "Hospital"
+                            }
+                        }
+                    }
+                },
+
+                supportingInfo = new List<object>
+                {
+                new
+                {
+                    display = "Task Respon Kandidat Faskes Rujukan",
+                    reference = $"Task/{taskReferralCandidateId}"
+                },
+                new
+                {
+                    display = "Anamnesis - Keluhan Utama",
+                    reference = $"Condition/{chiefComplaintId}"
+                },
+                new
+                {
+                    display = "Anamnesis - Riwayat Penyakit",
+                    reference = $"Condition/{historyConditionId}"
+                },
+                new
+                {
+                    display = "Anamnesis - Riwayat Alergi",
+                    reference = $"AllergyIntolerance/{allergyId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Pemeriksaan Fisik - Tingkat Kesadaran",
+                    reference = $"Observation/{tingkatKesadaranId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Antropometri - Tinggi Badan",
+                    reference = $"Observation/{tinggiBadanId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Antropometri - Berat Badan",
+                    reference = $"Observation/{beratBadanId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Antropometri - Lingkar Perut",
+                    reference = $"Observation/{lingkarPerutId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Antropometri - IMT",
+                    reference = $"Observation/{imtId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Vital Sign - Tekanan Darah Sistolik",
+                    reference = $"Observation/{sistoleId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Vital Sign - Tekanan Darah Diastolik",
+                    reference = $"Observation/{diastoleId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Vital Sign - Nadi",
+                    reference = $"Observation/{nadiId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Vital Sign - Suhu",
+                    reference = $"Observation/{suhuId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Vital Sign - Pernafasan",
+                    reference = $"Observation/{pernafasanId}"
+                },
+                new
+                {
+                    display = "Asesmen Awal - Skala Nyeri - NRS",
+                    reference = $"Observation/{nrsId}"
+                },
+                new
+                {
+                    display = "Pemeriksaan Penunjang - Laboratorium - Pemeriksaan Gula Darah - Hasil",
+                    reference = $"Observation/{observationHba1cId}"
+                },
+                new
+                {
+                    display = "Pemeriksaan Penunjang - Laboratorium - Pemeriksaan Gula Darah - Laporan",
+                    reference = $"DiagnosticReport/{diagnosticReportHba1cId}"
+                },
+                new
+                {
+                    display = "Tindakan/Prosedur Medis - Diagnostik - EKG - Prosedur",
+                    reference = $"Procedure/{procedureEkgId}"
+                },
+                new
+                {
+                    display = "Tindakan/Prosedur Medis - Diagnostik - EKG - Hasil",
+                    reference = $"Observation/{observationEkgId}"
+                },
+                new
+                {
+                    display = "Pengeluaran Obat",
+                    reference = $"MedicationDispense/{medicationDispenseId}"
+                },
+                new
+                {
+                    display = "Pemberian Obat",
+                    reference = $"MedicationAdministration/{medicationAdministrationId}"
+                }
+            },
+
+                patientInstruction = "Rujukan ke RS SATUSEHAT"
+            };
+
+            if (ssResult == null)
+            {
+                ssResult = new SatuSehatResult()
+                {
+                    EncounterID = new Guid(encounterId),
+                    Category = "REFERRAL",
+                    Code = "SEND"
+                };
+            }
+
+            var requestBody = JsonConvert.SerializeObject(postData);
+            RestClientPostAndSaveLog("ServiceRequest", requestBody, ssResult, ref accessToken);
+        }
+        #endregion
+
         #region Mapping ID
         public RestResponse PostServiceUnit(string serviceUnitID)
         {
@@ -17677,6 +18410,11 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 pbQr.es.Top = 1;
                 parMedicSs = new ParamedicBridging();
                 if (!parMedicSs.Load((pbQr))) return OrderRadInfVal("error", "10", "Requester bridging not found");
+
+                // Selalu post ServiceRequest radiologi, baik encounter baru maupun yang sudah ada
+                // PostServiceRequestRad internal sudah cek apakah item sudah pernah dikirim (ResultID != null)
+                string accessToken = string.Empty;
+                PostServiceRequestRad(reg, patSs, parMedicSs, encounterId, ref accessToken);
 
                 return OrderRadInfVal("success", "", "", encounterId, patSs.BridgingID, patSs.BridgingName, parMedicSs.BridgingID, parMedicSs.BridgingName, org.ParameterValue);
             }

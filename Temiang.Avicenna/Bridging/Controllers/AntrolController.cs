@@ -266,6 +266,16 @@ namespace Temiang.Avicenna.Bridging.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, responseAntrol);
         }
 
+        private bool isMedicalNoExist(string medicalNo)
+        {
+            var reCheckPasienExist = new Patient();
+            reCheckPasienExist.Query.es.Top = 1;
+            reCheckPasienExist.Query.Where(reCheckPasienExist.Query.MedicalNo == medicalNo);
+
+            bool isExist = reCheckPasienExist.Query.Load();
+            return isExist;
+        }
+
         //[CustomAuthorization]
         [System.Web.Http.HttpPost]
         [System.Web.Http.Route("antrol/ambilantrean")]
@@ -1211,6 +1221,14 @@ namespace Temiang.Avicenna.Bridging.Controllers
 
                         pasien.PatientID = autoNumberLastPID.LastCompleteNumber;
                         pasien.MedicalNo = autoNumberLastMRN.LastCompleteNumber;
+
+                        //recheck sebelum save. karena ada case MedicalNonya sama
+                        //modified by wiliam 2026-07-06
+                        if(isMedicalNoExist(pasien.MedicalNo))
+                        {
+                            autoNumberLastMRN = Helper.GetNewAutoNumber((new DateTime()).NowAtSqlServer().Date, AppEnum.AutoNumber.MedicalNo);
+                            pasien.MedicalNo = autoNumberLastMRN.LastCompleteNumber;
+                        }
 
                         autoNumberLastPID.Save();
                         autoNumberLastMRN.Save();
@@ -2347,6 +2365,14 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     {
                         if (pasienBaru)
                         {
+                            //recheck sebelum save. karena ada case MedicalNonya sama
+                            //modified by wiliam 2026-07-06
+                            if (isMedicalNoExist(pasien.MedicalNo))
+                            {
+                                autoNumberLastMRN = Helper.GetNewAutoNumber((new DateTime()).NowAtSqlServer().Date, AppEnum.AutoNumber.MedicalNo);
+                                pasien.MedicalNo = autoNumberLastMRN.LastCompleteNumber;
+                            }
+
                             autoNumberLastPID.Save();
                             autoNumberLastMRN.Save();
                             pasien.Save();
@@ -2870,7 +2896,6 @@ namespace Temiang.Avicenna.Bridging.Controllers
         [CustomAuthorization]
         [System.Web.Http.HttpPost]
         [System.Web.Http.Route("antrol/ckeckin")]
-        [System.Web.Http.Route("antrol/checkin")]
         public HttpResponseMessage CheckIn(Antrol.CheckIn.Request.Root param)
         {
             var log = new WebServiceAPILog
@@ -3466,6 +3491,15 @@ namespace Temiang.Avicenna.Bridging.Controllers
             //{
             using (var trans = new esTransactionScope())
             {
+
+                //recheck sebelum save. karena ada case MedicalNonya sama
+                //modified by wiliam 2026-07-06
+                if (isMedicalNoExist(pasien.MedicalNo))
+                {
+                    autoNumberLastMRN = Helper.GetNewAutoNumber((new DateTime()).NowAtSqlServer().Date, AppEnum.AutoNumber.MedicalNo);
+                    pasien.MedicalNo = autoNumberLastMRN.LastCompleteNumber;
+                }
+
                 autoNumberLastPID.Save();
                 autoNumberLastMRN.Save();
                 pasien.Save();
@@ -6248,6 +6282,54 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     if (CostCalculations.Count > 0) CostCalculations.Save();
 
                     trans.Complete();
+                }
+
+                // =============================
+                // GENERATE VISIT QUEUE UNTUK CHECK IN MANDIRI
+                // =============================
+
+                const string userID = "KIOSKBPJS";
+
+                var healthCareId = AppSession.Parameter.HealthcareID;
+
+                bool isEnable = string.Equals(
+                    healthCareId,
+                    "RSI",
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+                if (isEnable)
+                {
+                    string visitNo =
+                        VisitQueue.TakeQueueVisitPasienTitipan(
+                            reg.GuarantorID,
+                            reg.ServiceUnitID,
+                            userID,
+                            DateTime.Now.Date
+                        );
+
+                    if (!string.IsNullOrEmpty(visitNo))
+                    {
+                        string srAutoNumber =
+                            VisitQueue.GenerateSRAutoNumberPasienTitipan(
+                                reg.GuarantorID,
+                                reg.ServiceUnitID
+                            );
+
+                        if (!string.IsNullOrEmpty(srAutoNumber))
+                        {
+                            VisitQueue.InsertVisitQueueStage(
+                                visitNo,
+                                srAutoNumber,
+                                userID,
+                                DateTime.Now.Date,
+                                reg.ServiceUnitID,
+                                reg.ParamedicID,
+                                reg.RegistrationNo,
+                                reg.PatientID
+                            );
+                        }
+                    }
                 }
 
                 // update task id antrol

@@ -70,6 +70,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 },
                 //SignImgUrl = asses.SignImg,
                 SignImgUrl = !string.IsNullOrEmpty(Convert.ToString(au.SignatureImage)) ? Encoding.UTF8.GetBytes(Convert.ToString(au.SignatureImage)) : asses.SignImg,
+                SignImgByte = au.SignatureImage != null ? au.SignatureImage : asses.SignImg,
                 PatientSignImg = asses.PatientSignImg,
                 DiagnosaLengkap = Diagnosis(asses),
                 PerencanaanPulang = ConvertDataTabletoObject(DischargePlanning(asses.RegistrationInfoMedicID))
@@ -463,6 +464,9 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
             AppendBuilder("Abdomen & Pelvis:", string.IsNullOrWhiteSpace(pe.AbdomenPelvis.Summary) ? GetSummaryValue(pe.AbdomenPelvis) : pe.AbdomenPelvis.Summary, strBuilder);
 
 
+            //InfoMedic
+            var infoMedic = new RegistrationInfoMedic();
+            infoMedic.LoadByPrimaryKey(asses.RegistrationInfoMedicID);
             /// <summary>
             /// Tambahan u/ cetakan assessment igd : Triase, Skala nyeri, Flacc, Esi, Subjective, Objective, Diagnose
             /// </summary>
@@ -586,6 +590,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     IsDoa = "05".Equals(reg.SRTriage),
                 },
                 PemeriksaanDokter = strBuilder.ToString(),
+                PemeriksaanDokterInfo2 = infoMedic.Info2,
                 LocalistUrl = LocalistUrl(asses, "LIGD"),
                 LocalistUrl2 = LocalistUrl(asses, "NYERI"),
                 LocalistUrl3 = LocalistUrl(asses, "Nyeri(NRS)"),
@@ -620,10 +625,6 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
             //Penjamin
             var bayar = new Guarantor();
             bayar.LoadByPrimaryKey(reg.GuarantorID);
-
-            //InfoMedic
-            var infoMedic = new RegistrationInfoMedic();
-            infoMedic.LoadByPrimaryKey(asses.RegistrationInfoMedicID);
 
             //Paramedic
             var Par = new Paramedic();

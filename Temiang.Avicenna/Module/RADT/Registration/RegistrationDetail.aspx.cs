@@ -248,8 +248,20 @@ namespace Temiang.Avicenna.Module.RADT
         {
             pnlInfoReg.Visible = !_isNewRecord || pnlBtnPrint.Visible == true;
             hdnSRPatientRiskStatus.Value = string.Empty;
-            PopulateVisitNo();
-            SetVisitNoVisibility(); // Hide label VisitNo jika bukan RSI
+
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            bool isEnable = string.Equals(
+                healthCareId,
+                "RSI",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            if (isEnable)
+            {
+                PopulateVisitNo();
+                SetVisitNoVisibility(); // Tampilkan VisitNo untuk RSI
+            }
 
             //Service Unit & Paramedic
             var suColl = new ServiceUnitCollection();
@@ -352,12 +364,17 @@ namespace Temiang.Avicenna.Module.RADT
 
             trGuarantorHeader.Visible = (AppSession.Parameter.HealthcareInitialAppsVersion == "RSCH");
 
+            AppSession.Parameter.Load("IsCrmMembershipActive");
+
             var ms = new AppProgram();
             if ((ms.LoadByPrimaryKey(AppConstant.Program.Membership.ToString()) && ms.IsVisible == true) || AppSession.Parameter.IsCrmMembershipActive)
                 trMembershipNo.Visible = true;
             else trMembershipNo.Visible = false;
+            
             if (trMembershipNo.Visible && AppSession.Parameter.IsCrmMembershipActive)
                 lblMembershipNo.Text = "Membership No";
+            else
+                lblMembershipNo.Text = "Employee Member No";
 
             trPromoPackage.Visible = RegistrationType != "EMR" && AppSession.Parameter.IsPromoPackageActivated;
 

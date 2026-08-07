@@ -522,7 +522,10 @@
                                 </tr>
                             </table>
                         </td>
-                        <td width="50%" style="vertical-align: top"></td>
+                        <td width="50%" style="vertical-align: top">
+                            <asp:ImageButton runat="server" ID="btnExportAntreanPerTanggal" ImageUrl="~/Images/Toolbar/imp_exp_excel16.png"
+                                OnClick="btnExportAntreanPerTanggal_Click" ToolTip="Export Antrean Per Tanggal" />
+                        </td>
                     </tr>
                 </table>
             </cc:CollapsePanel>

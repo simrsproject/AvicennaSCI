@@ -1,6 +1,7 @@
 CREATE OR ALTER PROCEDURE GetQueueSoundForAllServiceUnit
 (
-    @VisitQueueNo VARCHAR(50)
+    @VisitQueueNo VARCHAR(50),
+	@KamarCode VARCHAR(50) = NULL
 )
 AS
 BEGIN
@@ -148,36 +149,159 @@ BEGIN
     END
 
     -- ==================================
-    -- Angka Natural
-    -- ==================================
-    IF @num < 10
-    BEGIN
-        INSERT INTO @SoundOrder
-        VALUES (CAST(@num AS VARCHAR),0);
-    END
-    ELSE IF @num = 10
-    BEGIN
-        INSERT INTO @SoundOrder VALUES ('sepuluh',0);
-    END
-    ELSE IF @num = 11
-    BEGIN
-        INSERT INTO @SoundOrder VALUES ('sebelas',0);
-    END
-    ELSE IF @num BETWEEN 12 AND 19
-    BEGIN
-        INSERT INTO @SoundOrder VALUES (CAST(@num - 10 AS VARCHAR),0);
-        INSERT INTO @SoundOrder VALUES ('belas',0);
-    END
-    ELSE IF @num BETWEEN 20 AND 99
-    BEGIN
-        INSERT INTO @SoundOrder VALUES (CAST(@num / 10 AS VARCHAR),0);
-        INSERT INTO @SoundOrder VALUES ('puluh',0);
+	-- Angka Natural (1 - 5000)
+	-- ==================================
 
-        IF @num % 10 <> 0
-        BEGIN
-            INSERT INTO @SoundOrder VALUES (CAST(@num % 10 AS VARCHAR),0);
-        END
-    END
+	DECLARE @Ribu INT, @Ratus INT, @Sisa INT;
+
+	IF @num < 10
+	BEGIN
+		INSERT INTO @SoundOrder VALUES (CAST(@num AS VARCHAR),0);
+	END
+	ELSE IF @num = 10
+	BEGIN
+		INSERT INTO @SoundOrder VALUES ('sepuluh',0);
+	END
+	ELSE IF @num = 11
+	BEGIN
+		INSERT INTO @SoundOrder VALUES ('sebelas',0);
+	END
+	ELSE IF @num BETWEEN 12 AND 19
+	BEGIN
+		INSERT INTO @SoundOrder VALUES (CAST(@num-10 AS VARCHAR),0);
+		INSERT INTO @SoundOrder VALUES ('belas',0);
+	END
+	ELSE IF @num BETWEEN 20 AND 99
+	BEGIN
+		INSERT INTO @SoundOrder VALUES (CAST(@num/10 AS VARCHAR),0);
+		INSERT INTO @SoundOrder VALUES ('puluh',0);
+
+		IF @num%10<>0
+			INSERT INTO @SoundOrder VALUES (CAST(@num%10 AS VARCHAR),0);
+	END
+	ELSE IF @num BETWEEN 100 AND 999
+	BEGIN
+		SET @Ratus=@num/100;
+		SET @Sisa=@num%100;
+
+		IF @Ratus=1
+			INSERT INTO @SoundOrder VALUES('seratus',0);
+		ELSE
+		BEGIN
+			INSERT INTO @SoundOrder VALUES(CAST(@Ratus AS VARCHAR),0);
+			INSERT INTO @SoundOrder VALUES('ratus',0);
+		END
+
+		IF @Sisa>0
+		BEGIN
+			IF @Sisa<10
+				INSERT INTO @SoundOrder VALUES(CAST(@Sisa AS VARCHAR),0);
+
+			ELSE IF @Sisa=10
+				INSERT INTO @SoundOrder VALUES('sepuluh',0);
+
+			ELSE IF @Sisa=11
+				INSERT INTO @SoundOrder VALUES('sebelas',0);
+
+			ELSE IF @Sisa BETWEEN 12 AND 19
+			BEGIN
+				INSERT INTO @SoundOrder VALUES(CAST(@Sisa-10 AS VARCHAR),0);
+				INSERT INTO @SoundOrder VALUES('belas',0);
+			END
+			ELSE
+			BEGIN
+				INSERT INTO @SoundOrder VALUES(CAST(@Sisa/10 AS VARCHAR),0);
+				INSERT INTO @SoundOrder VALUES('puluh',0);
+
+				IF @Sisa%10<>0
+					INSERT INTO @SoundOrder VALUES(CAST(@Sisa%10 AS VARCHAR),0);
+			END
+		END
+	END
+	ELSE IF @num BETWEEN 1000 AND 5000
+	BEGIN
+		SET @Ribu=@num/1000;
+		SET @Sisa=@num%1000;
+
+		-- =========================
+		-- Ribuan
+		-- =========================
+		IF @Ribu=1
+			INSERT INTO @SoundOrder VALUES('seribu',0);
+		ELSE
+		BEGIN
+			INSERT INTO @SoundOrder VALUES(CAST(@Ribu AS VARCHAR),0);
+			INSERT INTO @SoundOrder VALUES('ribu',0);
+		END
+
+		-- =========================
+		-- Sisa 1-999
+		-- =========================
+		IF @Sisa>0
+		BEGIN
+			IF @Sisa<10
+				INSERT INTO @SoundOrder VALUES(CAST(@Sisa AS VARCHAR),0);
+
+			ELSE IF @Sisa=10
+				INSERT INTO @SoundOrder VALUES('sepuluh',0);
+
+			ELSE IF @Sisa=11
+				INSERT INTO @SoundOrder VALUES('sebelas',0);
+
+			ELSE IF @Sisa BETWEEN 12 AND 19
+			BEGIN
+				INSERT INTO @SoundOrder VALUES(CAST(@Sisa-10 AS VARCHAR),0);
+				INSERT INTO @SoundOrder VALUES('belas',0);
+			END
+			ELSE IF @Sisa BETWEEN 20 AND 99
+			BEGIN
+				INSERT INTO @SoundOrder VALUES(CAST(@Sisa/10 AS VARCHAR),0);
+				INSERT INTO @SoundOrder VALUES('puluh',0);
+
+				IF @Sisa%10<>0
+					INSERT INTO @SoundOrder VALUES(CAST(@Sisa%10 AS VARCHAR),0);
+			END
+			ELSE
+			BEGIN
+				SET @Ratus=@Sisa/100;
+				DECLARE @Sisa2 INT=@Sisa%100;
+
+				IF @Ratus=1
+					INSERT INTO @SoundOrder VALUES('seratus',0);
+				ELSE
+				BEGIN
+					INSERT INTO @SoundOrder VALUES(CAST(@Ratus AS VARCHAR),0);
+					INSERT INTO @SoundOrder VALUES('ratus',0);
+				END
+
+				IF @Sisa2>0
+				BEGIN
+					IF @Sisa2<10
+						INSERT INTO @SoundOrder VALUES(CAST(@Sisa2 AS VARCHAR),0);
+
+					ELSE IF @Sisa2=10
+						INSERT INTO @SoundOrder VALUES('sepuluh',0);
+
+					ELSE IF @Sisa2=11
+						INSERT INTO @SoundOrder VALUES('sebelas',0);
+
+					ELSE IF @Sisa2 BETWEEN 12 AND 19
+					BEGIN
+						INSERT INTO @SoundOrder VALUES(CAST(@Sisa2-10 AS VARCHAR),0);
+						INSERT INTO @SoundOrder VALUES('belas',0);
+					END
+					ELSE
+					BEGIN
+						INSERT INTO @SoundOrder VALUES(CAST(@Sisa2/10 AS VARCHAR),0);
+						INSERT INTO @SoundOrder VALUES('puluh',0);
+
+						IF @Sisa2%10<>0
+							INSERT INTO @SoundOrder VALUES(CAST(@Sisa2%10 AS VARCHAR),0);
+					END
+				END
+			END
+		END
+	END
 
     -- ==================================
     -- Ke / Ke Loket / Ke Poliklinik
@@ -198,6 +322,35 @@ BEGIN
         @ServiceUnitFilePath,
         1
     );
+
+	-- ==================================
+	-- Tambahan Suara Kamar (Optional)
+	-- ==================================
+	DECLARE @NoKamar INT;
+
+	SET @NoKamar =
+		TRY_CAST(
+			REPLACE(@KamarCode, 'Kamar_', '')
+			AS INT
+		);
+
+	IF @NoKamar IS NOT NULL
+	BEGIN
+		-- "kamar"
+		INSERT INTO @SoundOrder (SoundCode)
+		VALUES ('kamar');
+
+		IF @NoKamar < 10
+		BEGIN
+			INSERT INTO @SoundOrder (SoundCode)
+			VALUES (CAST(@NoKamar AS VARCHAR));
+		END
+		ELSE IF @NoKamar = 10
+		BEGIN
+			INSERT INTO @SoundOrder (SoundCode)
+			VALUES ('sepuluh');
+		END
+	END
 
    
     -- ==================================
@@ -230,4 +383,4 @@ BEGIN
 GO
 
 Exec GetQueueSoundForAllServiceUnit
-@VisitQueueNo = 'VQUE-260525-0002'
+@VisitQueueNo = 'VQUE-260707-0184'

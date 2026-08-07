@@ -219,6 +219,7 @@
     <Compile Include="Custom\PerformancePlan\PerformancePlanNonJptItem.cs" />
     <Compile Include="Custom\PerformancePlan\PerformancePlanNonJptTxItem.cs" />
     <Compile Include="Custom\PerformancePlan\PerformancePlanPppkItem.cs" />
+    <Compile Include="Custom\RangeScoreApacheII.cs" />
     <Compile Include="Custom\RlMasterReportItemV2025.cs" />
     <Compile Include="Custom\RlTxReport310V2025.cs" />
     <Compile Include="Custom\RlTxReport311V2025.cs" />
@@ -801,6 +802,8 @@
     <Compile Include="Generated\BpjsApolDetail.cs" />
     <Compile Include="Generated\BpjsRujukanSatuSehat.cs" />
     <Compile Include="Generated\BridgingTemplate.cs" />
+    <Compile Include="Generated\DashboardClinicConfig.cs" />
+    <Compile Include="Generated\DashboardClinicConfigDetail.cs" />
     <Compile Include="Generated\DiagnoseSynonym.cs" />
     <Compile Include="Generated\DietBridging.cs" />
     <Compile Include="Generated\ImmunizationBridging.cs" />
@@ -808,6 +811,7 @@
     <Compile Include="Generated\Interop\Wynakom\SatusehatOrderedItems.cs" />
     <Compile Include="Generated\ItemImmunization.cs" />
     <Compile Include="Generated\JsonBridgingRujukBalikValueTemp.cs" />
+    <Compile Include="Generated\ListKamarForAntrian.cs" />
     <Compile Include="Generated\LoincItem.cs" />
     <Compile Include="Generated\MedicalDischargeSummaryBodyDiagramCmx.cs" />
     <Compile Include="Generated\NccIDRG.cs" />

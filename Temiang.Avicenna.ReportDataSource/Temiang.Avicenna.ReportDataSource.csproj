@@ -91,6 +91,7 @@
   <ItemGroup>
     <Content Include="GenericRpt\GetJson.asmx" />
     <Content Include="GenericRpt\ReadMe.txt" />
+    <Content Include="RSMM\Billing\BillingPatientStatement.asmx" />
     <Content Include="RSMM\Emr\Assessment.asmx" />
     <Content Include="Global.asax" />
     <Content Include="RSMM\Emr\NosocomialMon.asmx" />
@@ -106,6 +107,10 @@
     <Compile Include="Common\Util.cs" />
     <Compile Include="GenericRpt\GetJson.asmx.cs">
       <DependentUpon>GetJson.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RSMM\Billing\BillingPatientStatement.asmx.cs">
+      <DependentUpon>BillingPatientStatement.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="RSMM\Emr\Assessment.asmx.cs">

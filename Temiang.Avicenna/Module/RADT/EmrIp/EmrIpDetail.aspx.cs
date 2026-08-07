@@ -827,42 +827,45 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             unit.LoadByPrimaryKey(ServiceUnitID);
             lblServiceUnit.Text = unit.ServiceUnitName;
 
-            if (AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
-                !string.IsNullOrWhiteSpace(reg.BpjsSepNo) && reg.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
-            {
-                var sep = new BpjsSEP();
-                try
-                {
-                    if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
-                    {
-                        lblTglRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
+            //CR 0000038 : Untuk IPR tidak perlu ada informasi tgl rujukan dan poli rujukan.
+            //modified by Wiliam 2026-07-13
 
-                        if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
-                        {
-                            try
-                            {
-                                var svc = new Common.BPJS.VClaim.v11.Service();
-                                var rujukan = svc.GetRujukan(sep.NoRujukan);
-                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
-                                {
-                                    lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                lblPoliRujukan.Text = "- BPJS Service Not Connected -";
-                            }
-                        }
+            //if (AppSession.Parameter.GuarantorAskesID.Contains(reg.GuarantorID) &&
+            //    !string.IsNullOrWhiteSpace(reg.BpjsSepNo) && reg.SRRegistrationType != AppConstant.RegistrationType.EmergencyPatient)
+            //{
+            //    var sep = new BpjsSEP();
+            //    try
+            //    {
+            //        if (sep.LoadByPrimaryKey(reg.BpjsSepNo))
+            //        {
+            //            lblTglRujukan.Text = sep.TanggalRujukan.Value.AddDays(90).ToString("dd-MMM-yyyy");
 
-                        trRujukan.Visible = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    trRujukan.Visible = true;
-                    lblPoliRujukan.Text = "error : double SEP / not found";
-                }
-            }
+            //            if (!string.IsNullOrWhiteSpace(sep.NoRujukan))
+            //            {
+            //                try
+            //                {
+            //                    var svc = new Common.BPJS.VClaim.v11.Service();
+            //                    var rujukan = svc.GetRujukan(sep.NoRujukan);
+            //                    if (rujukan.MetaData.IsValid && rujukan.Response != null)
+            //                    {
+            //                        lblPoliRujukan.Text = rujukan.Response.Rujukan.PoliRujukan.Nama;
+            //                    }
+            //                }
+            //                catch (Exception ex)
+            //                {
+            //                    lblPoliRujukan.Text = "- BPJS Service Not Connected -";
+            //                }
+            //            }
+
+            //            trRujukan.Visible = true;
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        trRujukan.Visible = true;
+            //        lblPoliRujukan.Text = "error : double SEP / not found";
+            //    }
+            //}
 
             PopulatePatientAllergy();
             PopulateEpisodeDiagnose();

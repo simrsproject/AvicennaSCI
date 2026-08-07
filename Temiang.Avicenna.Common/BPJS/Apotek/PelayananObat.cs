@@ -35,75 +35,73 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.PelayananObat
 
     public class DaftarPelayananObat : Metadata
     {
-        public class detailsep
+        public class DetailSep
         {
             [JsonProperty("noSepApotek")]
-            public string NoSepApotek;
+            public string NoSepApotek { get; set; }
 
             [JsonProperty("noSepAsal")]
-            public string NoSepAsal;
+            public string NoSepAsal { get; set; }
 
             [JsonProperty("noresep")]
-            public string Noresep;
+            public string Noresep { get; set; }
 
             [JsonProperty("nokartu")]
-            public string Nokartu;
+            public string Nokartu { get; set; }
 
             [JsonProperty("nmpst")]
-            public string Nmpst;
+            public string Nmpst { get; set; }
 
             [JsonProperty("kdjnsobat")]
-            public string Kdjnsobat;
+            public string Kdjnsobat { get; set; }
 
             [JsonProperty("nmjnsobat")]
-            public string Nmjnsobat;
+            public string Nmjnsobat { get; set; }
 
             [JsonProperty("tglpelayanan")]
-            public string Tglpelayanan;
+            public string Tglpelayanan { get; set; }
 
-            public class listobat
-            {
-                [JsonProperty("kodeobat")]
-                public string Kodeobat;
-
-                [JsonProperty("namaobat")]
-                public string Namaobat;
-
-                [JsonProperty("tipeobat")]
-                public string Tipeobat;
-
-                [JsonProperty("signa1")]
-                public string Signa1;
-
-                [JsonProperty("signa2")]
-                public string Signa2;
-
-                [JsonProperty("hari")]
-                public string Hari;
-
-                [JsonProperty("permintaan")]
-                public string Permintaan;
-
-                [JsonProperty("jumlah")]
-                public string Jumlah;
-
-                [JsonProperty("harga")]
-                public string Harga;
-            }
+            [JsonProperty("listobat")]
+            public List<ListObat> Listobat { get; set; }
         }
-        public class Response
+
+        public class ListObat
         {
-            [JsonProperty("list")]
-            public List<detailsep> List;
+            [JsonProperty("kodeobat")]
+            public string Kodeobat { get; set; }
+
+            [JsonProperty("namaobat")]
+            public string Namaobat { get; set; }
+
+            [JsonProperty("tipeobat")]
+            public string Tipeobat { get; set; }
+
+            [JsonProperty("signa1")]
+            public string Signa1 { get; set; }
+
+            [JsonProperty("signa2")]
+            public string Signa2 { get; set; }
+
+            [JsonProperty("hari")]
+            public string Hari { get; set; }
+
+            [JsonProperty("permintaan")]
+            public string Permintaan { get; set; }
+
+            [JsonProperty("jumlah")]
+            public string Jumlah { get; set; }
+
+            [JsonProperty("harga")]
+            public string Harga { get; set; }
         }
 
         public class Root
         {
             [JsonProperty("response")]
-            public Response Response;
+            public DetailSep Response { get; set; }
 
             [JsonProperty("metaData")]
-            public Metadata MetaData;
+            public Metadata MetaData { get; set; }
         }
     }
 

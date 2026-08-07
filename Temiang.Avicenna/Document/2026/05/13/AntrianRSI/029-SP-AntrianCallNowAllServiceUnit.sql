@@ -1,7 +1,8 @@
 ﻿CREATE OR ALTER PROCEDURE AntrianCallNowAllServiceUnit
 (
     @VisitQueueNo VARCHAR(50),
-    @UserID       VARCHAR(50)
+    @UserID       VARCHAR(50),
+	@KamarCode    VARCHAR(50) = NULL
 )
 AS
 BEGIN
@@ -14,6 +15,7 @@ BEGIN
 		@CurrentStage  VARCHAR(50),
         @ServiceUnitID VARCHAR(50),
 		@CategoryID	   VARCHAR(50),
+		@QueueLocation VARCHAR(50),
         @ParamedicID   VARCHAR(50);
 
     BEGIN TRAN;
@@ -54,6 +56,12 @@ BEGIN
             1;
         END
 
+		-- =========================================
+        -- SET QUEUE LOCATION (OPTIONAL)
+        -- =========================================
+        SET @QueueLocation =
+            NULLIF(LTRIM(RTRIM(@KamarCode)), '');
+
         -- =========================================
         -- 2. TURUNKAN CALLED → PENDING
         -- GROUP YANG SAMA
@@ -81,6 +89,7 @@ BEGIN
         SET
             Status           = 'CALLED',
             CalledTime       = GETDATE(),
+			QueueLocation    = @QueueLocation,
             IsManualOverride = 1,
             UpdatedBy        = @UserID,
             LastUpdated      = GETDATE()
@@ -99,6 +108,7 @@ BEGIN
 			CategoryID,
             ServiceUnitID,
             ParamedicID,
+			QueueLocation,
             CalledTime,
             LastUpdated,
             UpdatedBy
@@ -122,7 +132,8 @@ GO
 DECLARE @VisitNo VARCHAR(50);
 
 EXEC AntrianCallNowAllServiceUnit
-    @VisitQueueNo = 'VQUE-260516-0018',
-    @UserID       = 'Admin'
+    @VisitQueueNo = 'VQUE-260707-0190',
+    @UserID       = '240076',
+	@KamarCode        = 'Kamar_2'
 
 SELECT @VisitNo;

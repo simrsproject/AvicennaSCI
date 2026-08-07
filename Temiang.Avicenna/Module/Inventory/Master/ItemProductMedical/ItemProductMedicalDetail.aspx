@@ -16,6 +16,11 @@
             context["tp"] = "kfa";
         }
 
+        function onItemAliasRestriksiChanged(restriksi) {
+            var txt = $find("<%= txtFornasRestrictionNotes.ClientID %>");
+            if (txt) txt.set_value(restriksi);
+        }
+
         function txtBarcodeEntryKeyPress(sender, eventArgs) {
             var code = eventArgs.get_keyCode();
             if (code == 13) {

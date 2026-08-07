@@ -7,20 +7,29 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Temiang.Avicenna.Module.ControlPanel.Admin.UserDokterAsuransi
+namespace Temiang.Avicenna.Module.Reports.OptionControl
 {
 
 
-    public partial class UserDokterAsuransiList
+    public partial class InvoiceNoCtl
     {
 
         /// <summary>
-        /// grdList control.
+        /// lblCaption control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Telerik.Web.UI.RadGrid grdList;
+        protected global::System.Web.UI.WebControls.Label lblCaption;
+
+        /// <summary>
+        /// txtInvoiceNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtInvoiceNo;
     }
 }
