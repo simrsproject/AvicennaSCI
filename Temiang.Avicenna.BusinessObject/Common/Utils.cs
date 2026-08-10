@@ -226,6 +226,52 @@ namespace Temiang.Avicenna.BusinessObject.Common
             }
         }
 
+        public static void ExecuteNonQuery(string storedProcedure, esParameters pars, int commandTimeout)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(esConfigSettings.ConnectionInfo.Connections[esConfigSettings.ConnectionInfo.Default].ConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand(storedProcedure, conn))
+                    {
+                        cmd.CommandTimeout = commandTimeout == 0 ? conn.ConnectionTimeout : commandTimeout;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        if (pars != null)
+                        {
+                            foreach (esParameter parameter in pars)
+                            {
+                                SqlParameter sqlParameter = cmd.Parameters.AddWithValue(Delimiters.Param + parameter.Name, parameter.Value);
+                                switch (parameter.Direction)
+                                {
+                                    case esParameterDirection.InputOutput:
+                                        sqlParameter.Direction = ParameterDirection.InputOutput;
+                                        continue;
+                                    case esParameterDirection.Output:
+                                        sqlParameter.Direction = ParameterDirection.Output;
+                                        sqlParameter.DbType = parameter.DbType;
+                                        sqlParameter.Size = parameter.Size;
+                                        sqlParameter.Scale = parameter.Scale;
+                                        sqlParameter.Precision = parameter.Precision;
+                                        continue;
+                                    case esParameterDirection.ReturnValue:
+                                        sqlParameter.Direction = ParameterDirection.ReturnValue;
+                                        continue;
+                                    default:
+                                        continue;
+                                }
+                            }
+                        }
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
 
     }
     internal class Delimiters

@@ -1932,6 +1932,7 @@
     <Content Include="Document\2026\05\13\AntrianRSI\059-Query INSERT AppStandardReferenceItem DashboardClinicConfigNo.sql" />
     <Content Include="Document\2026\06\11\create_view_Vw_POPreComputeQtyFinished.sql" />
     <Content Include="Document\2026\07\create_sp_GetTariffComponentByItemID.sql" />
+    <Content Include="Document\2026\08\07\INSERT_INTO_AppParamter_IsAllowZeroNewPriceForTariff.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
@@ -2481,9 +2482,8 @@
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\SpecimenCollectItem.aspx" />
     <Content Include="Module\Charges\ServiceUnit\ServiceUnitTransaction\Template\TemplateNew.aspx" />
     <Content Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx" />
-    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx" />
+    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx" />
     <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.js" />
-    <Content Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogViewHist.aspx" />
     <Content Include="Module\ControlPanel\AuditLog\Common\AuditLogWs.asmx" />
     <Content Include="Module\ControlPanel\Setting\StandardReferencePerGroup\WorkTradeItemDetail.ascx" />
@@ -7819,19 +7819,12 @@
     <Compile Include="Module\Charges\ServiceUnit\UpdateICUPhysician\UpdateICUPhysicianList.aspx.designer.cs">
       <DependentUpon>UpdateICUPhysicianList.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.cs">
-      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx.cs">
+      <DependentUpon>UserDokterAsuransi.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiDetail.aspx.designer.cs">
-      <DependentUpon>UserDokterAsuransiDetail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.cs">
-      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransiList.aspx.designer.cs">
-      <DependentUpon>UserDokterAsuransiList.aspx</DependentUpon>
+    <Compile Include="Module\ControlPanel\Admin\UserDokterAsuransi\UserDokterAsuransi.aspx.designer.cs">
+      <DependentUpon>UserDokterAsuransi.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\ControlPanel\AuditLog\AuditLogSetting\AuditLogSettingDetail.aspx.cs">
       <DependentUpon>AuditLogSettingDetail.aspx</DependentUpon>
