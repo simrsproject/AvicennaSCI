@@ -230,6 +230,7 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Slip.BillingCharges.Billing.RSRG
             this.pageFooterSection1 = new Telerik.Reporting.PageFooterSection();
             this.textBox40 = new Telerik.Reporting.TextBox();
             this.textBox53 = new Telerik.Reporting.TextBox();
+            this.pictureBox2 = new Telerik.Reporting.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // groupFooterSection7
@@ -1515,7 +1516,8 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Slip.BillingCharges.Billing.RSRG
             this.textBox154,
             this.textBox155,
             this.textBox156,
-            this.textBox110});
+            this.textBox110,
+            this.pictureBox2});
             this.reportFooterSection1.Name = "reportFooterSection1";
             this.reportFooterSection1.Style.BorderStyle.Top = Telerik.Reporting.Drawing.BorderType.None;
             // 
@@ -2645,6 +2647,15 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Slip.BillingCharges.Billing.RSRG
             this.textBox53.Style.VerticalAlign = Telerik.Reporting.Drawing.VerticalAlign.Middle;
             this.textBox53.Value = "=Now()";
             // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Location = new Telerik.Reporting.Drawing.PointU(Telerik.Reporting.Drawing.Unit.Inch(5.613D), Telerik.Reporting.Drawing.Unit.Inch(2.8D));
+            this.pictureBox2.MimeType = "";
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(0.687D), Telerik.Reporting.Drawing.Unit.Inch(0.5D));
+            this.pictureBox2.Sizing = Telerik.Reporting.Drawing.ImageSizeMode.Stretch;
+            this.pictureBox2.Value = "=OfficerSign";
+            // 
             // BillingIntermStatementPatientIncComponentByDate
             // 
             group1.GroupFooter = this.groupFooterSection7;
@@ -2884,6 +2895,9 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Slip.BillingCharges.Billing.RSRG
         private Telerik.Reporting.TextBox textBox160;
         private Telerik.Reporting.TextBox textBox161;
         private Telerik.Reporting.TextBox textBox162;
+        private Telerik.Reporting.PictureBox pictureBox2;
+
+        //tambahkan picturebox1 dibawah textbox38
 
     }
 }
