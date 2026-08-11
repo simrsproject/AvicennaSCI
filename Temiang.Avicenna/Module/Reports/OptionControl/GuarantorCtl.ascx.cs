@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
-using Temiang.Dal.Interfaces;
 using Temiang.Avicenna.Common;
+using Temiang.Dal.Interfaces;
 
 namespace Temiang.Avicenna.Module.Reports.OptionControl
 {
@@ -11,20 +12,30 @@ namespace Temiang.Avicenna.Module.Reports.OptionControl
     {
 
         #region ComboBox 
-        protected void cboGuarantor_ItemsRequested(object sender, RadComboBoxItemsRequestedEventArgs e)
+        public void cboGuarantor_ItemsRequested(object sender, RadComboBoxItemsRequestedEventArgs e)
         {
-            ComboBox.GuarantorItemsRequested((RadComboBox)sender,e.Text);
+            ComboBox.GuarantorItemsRequestedClean((RadComboBox)sender,e.Text);
         }
-        protected void cboGuarantorID_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        //public void cboGuarantor_ItemDataBound(object sender, RadComboBoxItemEventArgs e)
+        //{
+        //    var dataItem = e.Item.DataItem as DataRowView;
+        //    if (dataItem != null)
+        //    {
+        //        e.Item.Value = dataItem["GuarantorID"].ToString();
+        //        e.Item.Text = dataItem["GuarantorName"].ToString();
+        //    }
+        //}
+
+        protected void cboGuarantor_SelectedIndexChanged(object sender,RadComboBoxSelectedIndexChangedEventArgs e)
         {
-            ComboBox.GuarantorItemDataBound(e);
+            hdnGuarantorID.Value = e.Value;
         }
         #endregion
 
         public override PrintJobParameterCollection PrintJobParameters()
         {
             PrintJobParameterCollection parameters = new PrintJobParameterCollection();
-            parameters.AddNew("p_GuarantorID", cboGuarantorID.SelectedValue);
+            parameters.AddNew("p_GuarantorID", hdnGuarantorID.Value);
 
             //Retun List
             return parameters;
