@@ -2648,6 +2648,18 @@ namespace Temiang.Avicenna.CustomControl.Phr
                     }
                 }
             }
+
+            // RSI-specific: For Code Blue form (LKCB), override RecordTime with the answer from LKCB08 (Waktu selesai)
+            // so that vital signs (Nadi, Pernapasan, Tekanan Darah) are recorded with the resuscitation end time
+            // instead of the form save time.
+            if (AppSession.Parameter.HealthcareInitial == "RSI" && QuestionFormID == "LKCB")
+            {
+                var lkcb08Line = collValue.FirstOrDefault(l => l.QuestionID == "LKCB08");
+                if (lkcb08Line != null && !string.IsNullOrWhiteSpace(lkcb08Line.QuestionAnswerText))
+                {
+                    phr.RecordTime = lkcb08Line.QuestionAnswerText;
+                }
+            }
         }
 
         private void SetPhrLine(bool isNewRecord, Patient pat, Registration reg, Dictionary<string, esEntityWAuditLog> othRelatedEntities, PatientHealthRecord phr, PatientHealthRecordLineCollection collValue, DataRow rowQuestion, string questionGroupID, string lastRegistrationNo)

@@ -10,8 +10,9 @@
         </td>
         <td>
             <telerik:RadComboBox ID="cboGuarantorID" Width="100%" runat="server" EnableLoadOnDemand="true"
-                HighlightTemplatedItems="true" OnItemDataBound="cboGuarantorID_ItemDataBound"
-                OnItemsRequested="cboGuarantor_ItemsRequested">
+                HighlightTemplatedItems="true" OnItemsRequested="cboGuarantor_ItemsRequested" DataTextField="GuarantorName"
+                OnSelectedIndexChanged="cboGuarantor_SelectedIndexChanged" AutoPostBack="true"  
+                DataValueField="GuarantorID">
                 <ItemTemplate>
                     <b>
                         <%# DataBinder.Eval(Container.DataItem, "GuarantorName")%>
@@ -22,6 +23,9 @@
                     Note : Show max 20 items
                 </FooterTemplate>
             </telerik:RadComboBox>
+            <asp:HiddenField
+                ID="hdnGuarantorID"
+                runat="server" />
         </td>
     </tr>
 </table>
