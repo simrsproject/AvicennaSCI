@@ -2470,27 +2470,52 @@ Helper.UrlRoot()
 
 
             // Hanya user yg membuat yg bisa mengedit
-            var isEditable = (DataBinder.Eval(container.DataItem, "IsApproved") == DBNull.Value ||
+            // ==========================================================
+            // EDIT LINK
+            // ==========================================================
+
+            var medicalNotesInputType = DataBinder.Eval(
+                container.DataItem,
+                "SRMedicalNotesInputType"
+            )?.ToString() ?? string.Empty;
+
+            // APACHE II tidak boleh diedit dari Integrated Notes
+            var isApacheII = string.Equals(
+                medicalNotesInputType,
+                "APACHE II",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            var isEditable = !isApacheII &&
+                             (DataBinder.Eval(container.DataItem, "IsApproved") == DBNull.Value ||
                               false.Equals(DataBinder.Eval(container.DataItem, "IsApproved")))
-                             && DataBinder.Eval(container.DataItem, "CreatedByUserID")
+                             &&
+                             DataBinder.Eval(container.DataItem, "CreatedByUserID")
                                  .Equals(AppSession.UserLogin.UserID);
 
             var icon = isEditable ? "edit16.png" : "views16.png";
             var mode = isEditable ? "edit" : "view";
 
-            var editLink = string.Format(
-                "<a href=\"#\" onclick=\"javascript:entryAssessment('{7}', '{0}', '{1}','{2}','{3}','{4}','{8}','{9}','{10}','{11}'); return false;\"><img src=\"{5}/Images/Toolbar/{6}\"  alt=\"{7}\" /></a><br /><br />",
-                DataBinder.Eval(container.DataItem, "RegistrationNo"),
-                DataBinder.Eval(container.DataItem, "ServiceUnitID"),
-                DataBinder.Eval(container.DataItem, "SRAssessmentType"),
-                DataBinder.Eval(container.DataItem, "RegistrationInfoMedicID"),
-                true.Equals(DataBinder.Eval(container.DataItem, "IsInitialAssessment")),
-                Helper.UrlRoot(), icon, mode,
-                DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType"),
-                DataBinder.Eval(container.DataItem, "ReferenceNo"),
-                DataBinder.Eval(container.DataItem, "FromRegistrationNo"),
-                DataBinder.Eval(container.DataItem, "ParamedicID")
-            );
+            var editLink = string.Empty;
+
+            if (!isApacheII)
+            {
+                editLink = string.Format(
+                    "<a href=\"#\" onclick=\"javascript:entryAssessment('{7}', '{0}', '{1}','{2}','{3}','{4}','{8}','{9}','{10}','{11}'); return false;\"><img src=\"{5}/Images/Toolbar/{6}\" alt=\"{7}\" /></a><br /><br />",
+                    DataBinder.Eval(container.DataItem, "RegistrationNo"),
+                    DataBinder.Eval(container.DataItem, "ServiceUnitID"),
+                    DataBinder.Eval(container.DataItem, "SRAssessmentType"),
+                    DataBinder.Eval(container.DataItem, "RegistrationInfoMedicID"),
+                    true.Equals(DataBinder.Eval(container.DataItem, "IsInitialAssessment")),
+                    Helper.UrlRoot(),
+                    icon,
+                    mode,
+                    DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType"),
+                    DataBinder.Eval(container.DataItem, "ReferenceNo"),
+                    DataBinder.Eval(container.DataItem, "FromRegistrationNo"),
+                    DataBinder.Eval(container.DataItem, "ParamedicID")
+                );
+            }
 
             var printLink = IntegratedNotePrintLink(container);
 
