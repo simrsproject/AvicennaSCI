@@ -773,16 +773,19 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
 
                 var sepapol = new BpjsSEP();
-                if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
+                if(!string.IsNullOrEmpty(txtBpjsSepNo.Text))
                 {
-                    if (sepapol.TanggalSEP.HasValue)
+                    if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
                     {
-                        txtTglSep.SelectedDate = sepapol.TanggalSEP.Value;
+                        if (sepapol.TanggalSEP.HasValue)
+                        {
+                            txtTglSep.SelectedDate = sepapol.TanggalSEP.Value;
+                        }
                     }
-                }
-                else
-                {
-                    txtTglSep.SelectedDate = null;
+                    else
+                    {
+                        txtTglSep.SelectedDate = null;
+                    }
                 }
 
 
