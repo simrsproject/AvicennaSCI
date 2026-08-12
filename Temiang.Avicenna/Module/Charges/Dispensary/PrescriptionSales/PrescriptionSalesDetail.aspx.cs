@@ -772,9 +772,9 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 //modified by wiliam 2026-05-15
 
 
-                var sepapol = new BpjsSEP();
                 if(!string.IsNullOrEmpty(txtBpjsSepNo.Text))
                 {
+                    var sepapol = new BpjsSEP();
                     if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
                     {
                         if (sepapol.TanggalSEP.HasValue)
