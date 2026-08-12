@@ -372,3 +372,11 @@ Titipan Daniel
 
 ---[07-08-2026 - Wiliam]---
 1. Modifikasi ItemTariffRequestImport.aspx.cs agar NewPrice 0 bisa diimport. dengan penambahan parameter IsAllowZeroNewPriceForTariff
+
+---[10-08-2026 - Wiliam]---
+1. Menambah function ExecuteNonQuery pada BusinessObject.Common.Utils
+2. Modifikasi file Temiang.Avicenna.ReportLibrary\RLib_Slip\BillingCharges\Billing\RSRG\BillingIntermStatementPatientIncComponentByDate.cs
+   untuk penambahan tanda tangan ka sub bag billing.
+
+---[11-08-2026 - Wiliam]---
+1. Modifikasi file GuarantorCtl.ascx. Ada bug pada ComboBox Guarantor.
