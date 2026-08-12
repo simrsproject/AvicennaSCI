@@ -1605,6 +1605,13 @@ namespace Temiang.Avicenna.Module.Charges
                             header.FromServiceUnitID = (pac.IsOrder) ? entity.FromServiceUnitID : pac.ToServiceUnitID;
                             header.IsBillProceed = false;
                             header.IsApproved = pac.IsOrder;
+                            if (header.IsApproved ?? false)
+                            {
+                                header.ApprovedDateTime = entity.ApprovedDateTime ?? (new DateTime()).NowAtSqlServer();
+                                header.ApprovedByUserID = string.IsNullOrEmpty(entity.ApprovedByUserID)
+                                    ? AppSession.UserLogin.UserID
+                                    : entity.ApprovedByUserID;
+                            }
                             header.ToServiceUnitID = pac.ToServiceUnitID;
                             header.ClassID = entity.ClassID;
                             header.RoomID = entity.RoomID;
