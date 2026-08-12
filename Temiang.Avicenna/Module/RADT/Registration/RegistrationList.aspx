@@ -1110,7 +1110,7 @@
                         <telerik:GridTemplateColumn UniqueName="TemplateColumn" Groupable="false">
                             <ItemTemplate>
                                 <%# (DataBinder.Eval(Container.DataItem, "IsAlive").Equals(false) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Rip16.png\" border=\"0\" title=\"Decease\" /></a>")
-                                     : (DataBinder.Eval(Container.DataItem, "IsBlackList").Equals(true) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Toolbar/blacklist.png\" border=\"0\" title=\"Blacklist\" /></a>")
+                                     : (DataBinder.Eval(Container.DataItem, "IsBlackList").Equals(true) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Toolbar/blacklist.png\" border=\"0\" title=\"Pending Administrasi\" /></a>")
                                      : (DataBinder.Eval(Container.DataItem, "IsActive").Equals(false) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Toolbar/new16_d.png\" border=\"0\" title=\"Non-Active\" /></a>")
                                      : GetUrlForNewRegistration(Container))))%>
                             </ItemTemplate>
@@ -1432,7 +1432,7 @@
                         <telerik:GridTemplateColumn UniqueName="TemplateColumn" Groupable="false">
                             <ItemTemplate>
                                 <%# (DataBinder.Eval(Container.DataItem, "IsAlive").Equals(false) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Rip16.png\" border=\"0\" title=\"Decease\" /></a>")
-                                     : (DataBinder.Eval(Container.DataItem, "IsBlackList").Equals(true) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Toolbar/blacklist.png\" border=\"0\" title=\"Blacklist\" /></a>")
+                                     : (DataBinder.Eval(Container.DataItem, "IsBlackList").Equals(true) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Toolbar/blacklist.png\" border=\"0\" title=\"Pending Administrasi\" /></a>")
                                      : (DataBinder.Eval(Container.DataItem, "IsActive").Equals(false) ? string.Format("<a href=\"#\" return false;\"><img src=\"../../../Images/Toolbar/new16_d.png\" border=\"0\" title=\"Non-Active\" /></a>")
                                      : GetUrlForRegistration(Container))))%>
                             </ItemTemplate>
