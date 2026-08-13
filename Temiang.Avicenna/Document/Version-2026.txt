@@ -385,3 +385,6 @@ Titipan Daniel
 1. mengubah title=Blacklists pada Registrationlist.aspx.cs menjadi title=Pending Administrasi
 2. mengubah error message untuk pasien blacklist di KiosselfregController.cs menjadi "This patient has a pending administrative issue. Please contact the registration staff for assistance.\r\n" : "Terdapat pending administrasi pada pasien ini. Silakan hubungi petugas registrasi."
 3. mengubah ProgramNamae pada ProgramID = 01.15.12, Patient Blacklist >> Patient Pending Administration
+
+---[13-08-2026 - Wiliam]---
+1. Modifikasi file ServiceUnitTransactionDetail.aspx.cs dan ServiceUnitTransactionDetail.aspx agar saat enter barcode tidak empty.
