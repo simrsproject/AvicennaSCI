@@ -858,9 +858,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             if (chkIsAssets.Checked || p.IsAsset)
                             {
                                 // Asset must have amount >= limit AND economic life >= limit
-                                // Skip economic life check if EconomicLifeInYear = 0 (not yet set on old data)
-                                var economicLifeFail = (p.EconomicLifeInYear ?? 0) > 0 && (p.EconomicLifeInYear ?? 0) < economicLifeInYearLimit;
-                                if ((amount < assetLimitAmount) || economicLifeFail)
+                                if ((amount < assetLimitAmount) || (p.EconomicLifeInYear ?? 0) < economicLifeInYearLimit)
                                 {
                                     if (assetValidationMsg == string.Empty)
                                         assetValidationMsg = "[" + p.ItemID + "] " + p.Description;
@@ -871,9 +869,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             else
                             {
                                 // Inventory warning: amount >= limit AND economic life >= limit (should be asset instead)
-                                // Skip economic life check if EconomicLifeInYear = 0 (not yet set on old data)
-                                var economicLifeExceed = (p.EconomicLifeInYear ?? 0) > 0 && (p.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit;
-                                if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount) && economicLifeExceed)
+                                if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount) && ((p.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
                                 {
                                     if (inventoryValidationMsg == string.Empty)
                                         inventoryValidationMsg = "[" + p.ItemID + "] " + p.Description;
