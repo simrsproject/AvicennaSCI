@@ -841,6 +841,9 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 var isAssetsJournaled = AppParameter.IsYes(AppParameter.ParameterItem.acc_IsJournalAssets);
                 if (isAssetsJournaled)
                 {
+                    // Force reload to get latest EconomicLifeInYear from Item master (avoid stale session cache)
+                    ItemTransactionItems = null;
+
                     var assetValidationMsg = string.Empty;
                     var inventoryValidationMsg = string.Empty;
 
@@ -855,7 +858,9 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             if (chkIsAssets.Checked || p.IsAsset)
                             {
                                 // Asset must have amount >= limit AND economic life >= limit
-                                if ((amount < assetLimitAmount) || (p.EconomicLifeInYear ?? 0) < economicLifeInYearLimit)
+                                // Skip economic life check if EconomicLifeInYear = 0 (not yet set on old data)
+                                var economicLifeFail = (p.EconomicLifeInYear ?? 0) > 0 && (p.EconomicLifeInYear ?? 0) < economicLifeInYearLimit;
+                                if ((amount < assetLimitAmount) || economicLifeFail)
                                 {
                                     if (assetValidationMsg == string.Empty)
                                         assetValidationMsg = "[" + p.ItemID + "] " + p.Description;
@@ -866,7 +871,9 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             else
                             {
                                 // Inventory warning: amount >= limit AND economic life >= limit (should be asset instead)
-                                if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount) && ((p.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
+                                // Skip economic life check if EconomicLifeInYear = 0 (not yet set on old data)
+                                var economicLifeExceed = (p.EconomicLifeInYear ?? 0) > 0 && (p.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit;
+                                if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount) && economicLifeExceed)
                                 {
                                     if (inventoryValidationMsg == string.Empty)
                                         inventoryValidationMsg = "[" + p.ItemID + "] " + p.Description;
