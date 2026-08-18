@@ -14,6 +14,19 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 {
     public partial class RencanaKontrolDetail : BasePageDetail
     {
+        private bool IsHDL201Status
+        {
+            get
+            {
+                return ViewState["IsHDL201Status"] != null
+                    && (bool)ViewState["IsHDL201Status"];
+            }
+            set
+            {
+                ViewState["IsHDL201Status"] = value;
+            }
+        }
+
         protected void Page_Init(object sender, EventArgs e)
         {
             UrlPageSearch = "RencanaKontrolSearch.aspx";
@@ -73,6 +86,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 }
 
                 cboPoliDirujuk.Items.Clear();
+                cboDpjpKontrol.Items.Clear();
+                IsHDL201Status = false;
                 //if (rblJenisKontrol.SelectedValue == "2")
                 if (!txtTglRujukan.IsEmpty)
                 {
@@ -102,7 +117,29 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     }
                     else
                     {
-                        cboPoliDirujuk.Items.Add(new RadComboBoxItem(responsePoli.MetaData.Message, string.Empty));
+                        //ketika 201 muncul pesan : Surat Rujukan ini Masa Berlaku Habis, Maksimal 3(tiga) bulan dari tanggal rujukan
+                        //perlu dicek dulu.
+                        if(txtPoliSep.Text.Contains("HDL") &&
+                            responsePoli.MetaData.Code == "201" &&
+                            responsePoli.MetaData.Message.ToLower().Contains("masa berlaku habis"))
+                        {
+                            svc = new Common.BPJS.VClaim.v11.Service();
+                            var metadataMonthlyRencanaKontrol = svc.GetRencanaKontrolByNoPeserta(DateTime.Now.ToString("MM"), DateTime.Now.Year.ToString(), txtNoPeserta.Text, Common.BPJS.VClaim.Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
+                            if(metadataMonthlyRencanaKontrol.MetaData.IsValid)
+                            {
+                                var responseDataRencanaKontrol = metadataMonthlyRencanaKontrol.Response.List.Where(x => x.NoSepAsalKontrol == txtNoSep.Text).ToList();
+                                foreach(var item in responseDataRencanaKontrol)
+                                {
+                                    cboPoliDirujuk.Items.Add(new RadComboBoxItem(item.NamaPoliTujuan, item.PoliTujuan));
+                                    cboDpjpKontrol.Items.Add(new RadComboBoxItem(string.Format("{0} - {1}", item.KodeDokter, item.NamaDokter) , item.KodeDokter));
+                                    IsHDL201Status = true;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            cboPoliDirujuk.Items.Add(new RadComboBoxItem(responsePoli.MetaData.Message, string.Empty));
+                        }
                     }
                 }
             }
@@ -139,6 +176,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
             cboDpjpKontrol.Items.Clear();
             cboDpjpKontrol.SelectedValue = string.Empty;
             cboDpjpKontrol.Text = string.Empty;
+            IsHDL201Status = false;
         }
 
         protected void btnCariPasienPeserta_Click(object sender, ImageClickEventArgs e)
@@ -165,6 +203,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                 }
 
                 cboPoliDirujuk.Items.Clear();
+                cboDpjpKontrol.Items.Clear();
                 cboPoliDirujuk.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
 
                 svc = new Common.BPJS.VClaim.v11.Service();
@@ -581,6 +620,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         protected void cboPoliDirujuk_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
         {
+            if(IsHDL201Status) return;
+
             if (string.IsNullOrWhiteSpace(e.Value))
             {
                 cboDpjpKontrol.Items.Clear();
