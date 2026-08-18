@@ -766,13 +766,76 @@ namespace Temiang.Avicenna.Module.Emr.Phr
                 }
 
                 // Save to ReistrationInfoMedic for InPatient and Emergency
-                if (reg.SRRegistrationType == AppConstant.RegistrationType.InPatient || reg.SRRegistrationType == AppConstant.RegistrationType.EmergencyPatient)
+                if (reg.SRRegistrationType == AppConstant.RegistrationType.InPatient ||
+                    reg.SRRegistrationType == AppConstant.RegistrationType.EmergencyPatient)
+                {
                     SaveSoap(entity);
+
+                    // Save APACHE II
+                    if (string.Equals(
+                        entity.QuestionFormID,
+                        "FSAII",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        SaveApacheIIScore(entity);
+                    }
+                }
 
                 //Commit if success, Rollback if failed
                 trans.Complete();
                 hdnTransactionNo.Value = txtTransactionNo.Text; // Untuk pengecekan pada proses save and stay
             }
+        }
+
+        //FORM TOTAL SKOR APACHE
+        private void SaveApacheIIScore(PatientHealthRecord phr)
+        {
+            if (phr == null)
+                return;
+
+            if (!string.Equals(
+                phr.QuestionFormID,
+                "FSAII",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var pars = new esParameters();
+
+            pars.Add(
+                new esParameter(
+                    "p_RegistrationNo",
+                    phr.RegistrationNo
+                )
+            );
+
+            pars.Add(
+                new esParameter(
+                    "p_UserID",
+                    AppSession.UserLogin.UserID
+                )
+            );
+
+            pars.Add(
+                new esParameter(
+                    "p_ServiceUnitID",
+                    phr.ServiceUnitID
+                )
+            );
+
+            pars.Add(
+                new esParameter(
+                    "p_ParamedicID",
+                    AppSession.UserLogin.ParamedicID
+                )
+            );
+
+            Utils.ExecuteNonQuery(
+                "SaveApacheIIScore",
+                pars,
+                0
+            );
         }
 
         private void SaveSoap(PatientHealthRecord phr)

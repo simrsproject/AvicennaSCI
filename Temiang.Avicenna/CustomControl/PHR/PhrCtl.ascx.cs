@@ -1045,6 +1045,13 @@ namespace Temiang.Avicenna.CustomControl.Phr
                 DataRow[] questionRows = dtbQuestion.Select(string.Format("QuestionGroupID='{0}'", questionGroup.QuestionGroupID), "RowIndex");
 
                 InitializedQuestion(questionRows, groupTable, row, formulas, questionGroup.QuestionGroupID, dateTimeNow, qf.IsModeMapping ?? false);
+
+                // TOMBOL CALCULATE TOTAL SKOR APACHE II
+                if (formID == "FSAII")
+                {
+                    AddCalculateApacheButton(groupTable);
+                }
+
                 this.Controls.Add(groupTable);
                 this.Controls.Add(new Literal() { Text = "<br/>" });
             }
@@ -1059,6 +1066,146 @@ namespace Temiang.Avicenna.CustomControl.Phr
 
             Page.ClientScript.RegisterClientScriptBlock(GetType(), "formula", script.ToString());
             //}
+        }
+
+        private void AddCalculateApacheButton(Table groupTable)
+        {
+            var btnRow = new TableRow();
+
+            // Kolom label kosong
+            btnRow.Cells.Add(new TableCell());
+
+            var btnCell = new TableCell();
+            btnCell.ColumnSpan = 2;
+
+            var btn = new RadButton
+            {
+                ID = "btnCalculateApacheII",
+                Text = "Calculate",
+                AutoPostBack = true
+            };
+
+            btn.Click += btnCalculateApacheII_Click;
+
+            btn.OnClientClicked = "calculateApacheII";
+
+            btnCell.Controls.Add(btn);
+            btnRow.Cells.Add(btnCell);
+
+            groupTable.Rows.Add(btnRow);
+        }
+
+        protected void btnCalculateApacheII_Click(object sender, EventArgs e)
+        {
+            // ===========================
+            // TOTAL ACUTE PHYSIOLOGY POINT
+            // ===========================
+            int totalPoint = CalculateApacheTotalPoint();
+
+            // ===========================
+            // GCS ACTUAL
+            // ===========================
+            decimal gcsActual = 0;
+
+            var gcs = Helper.FindControlRecursive(this, "q_FSAII0015") as RadNumericTextBox;
+
+            if (gcs != null && gcs.Value != null)
+                gcsActual = Convert.ToDecimal(gcs.Value);
+
+            // ===========================
+            // ACUTE PHYSIOLOGY SCORE (APS)
+            // ===========================
+            decimal aps = (15 - gcsActual) + totalPoint;
+
+            var apsCtl = Helper.FindControlRecursive(this, "q_FSAII0019") as RadNumericTextBox;
+
+            if (apsCtl != null)
+                apsCtl.Value = Convert.ToDouble(aps);
+
+            // ===========================
+            // AGE POINT
+            // ===========================
+            int agePoint = 0;
+
+            var age = Helper.FindControlRecursive(this, "q_FSAII0016") as RadNumericTextBox;
+
+            if (age != null && age.Value != null)
+            {
+                agePoint = RangeScoreApacheII.GetPoint(
+                    "FSAII0016",
+                    Convert.ToDecimal(age.Value)
+                );
+            }
+
+            var agePointCtl = Helper.FindControlRecursive(this, "q_FSAII0020") as RadNumericTextBox;
+
+            if (agePointCtl != null)
+                agePointCtl.Value = agePoint;
+
+            // ===========================
+            // CHRONIC HEALTH POINT
+            // ===========================
+            decimal chronicHealthPoint = 0;
+
+            var chronic = Helper.FindControlRecursive(this, "q_FSAII0017") as RadNumericTextBox;
+
+            if (chronic != null && chronic.Value != null)
+                chronicHealthPoint = Convert.ToDecimal(chronic.Value);
+
+            // ===========================
+            // TOTAL APACHE II SCORE
+            // ===========================
+            decimal totalApacheII = aps + agePoint + chronicHealthPoint;
+
+            var apacheCtl = Helper.FindControlRecursive(this, "q_FSAII0021") as RadNumericTextBox;
+
+            if (apacheCtl != null)
+                apacheCtl.Value = Convert.ToDouble(totalApacheII);
+
+            // ===========================
+            // APACHE II RESULT (FSAII0022)
+            // ===========================
+            int apacheResult = RangeScoreApacheII.GetPoint(
+                "FSAII0022",
+                totalApacheII
+            );
+
+            var apacheResultCtl = Helper.FindControlRecursive(this, "q_FSAII0022") as RadNumericTextBox;
+
+            if (apacheResultCtl != null)
+                apacheResultCtl.Value = apacheResult;
+        }
+
+        private int CalculateApacheTotalPoint()
+        {
+            int total = 0;
+
+            var rangeCollection = new RangeScoreApacheIICollection();
+            rangeCollection.LoadAll();
+
+            var questionIDs = rangeCollection
+            .Select(x => x.QuestionID)
+            .Distinct()
+            .Where(x =>
+                x != "FSAII0016" &&   // Age Point
+                x != "FSAII0022"      // Hasil Total APACHE II
+            )
+            .ToList();
+
+            foreach (string questionID in questionIDs)
+            {
+                var num = Helper.FindControlRecursive(this, "q_" + questionID) as RadNumericTextBox;
+
+                if (num == null || num.Value == null)
+                    continue;
+
+                total += RangeScoreApacheII.GetPoint(
+                    questionID,
+                    Convert.ToDecimal(num.Value)
+                );
+            }
+
+            return total;
         }
 
         public void InitializedQuestionFromNursingDiagTemplate(int templateID)
@@ -2499,6 +2646,18 @@ namespace Temiang.Avicenna.CustomControl.Phr
                     {
                         SetPhrLine(phr.es.IsAdded, pat, reg, othRelatedEntities, phr, collValue, rowSubQuestion, rowQuestion["QuestionGroupID"].ToString(), lastRegistrationNo);
                     }
+                }
+            }
+
+            // RSI-specific: For Code Blue form (LKCB), override RecordTime with the answer from LKCB08 (Waktu selesai)
+            // so that vital signs (Nadi, Pernapasan, Tekanan Darah) are recorded with the resuscitation end time
+            // instead of the form save time.
+            if (AppSession.Parameter.HealthcareInitial == "RSI" && QuestionFormID == "LKCB")
+            {
+                var lkcb08Line = collValue.FirstOrDefault(l => l.QuestionID == "LKCB08");
+                if (lkcb08Line != null && !string.IsNullOrWhiteSpace(lkcb08Line.QuestionAnswerText))
+                {
+                    phr.RecordTime = lkcb08Line.QuestionAnswerText;
                 }
             }
         }

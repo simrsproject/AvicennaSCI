@@ -672,6 +672,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                     SRItemType = string.Empty,
                     IsProceed = true,
                     IsApproved = true,
+                    ApprovedDateTime = (new DateTime()).NowAtSqlServer(),
+                    ApprovedByUserID = AppSession.UserLogin.UserID,
                     IsVoid = false,
                     IsAutoBillTransaction = false,
                     IsBillProceed = false,

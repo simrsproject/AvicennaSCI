@@ -1543,6 +1543,21 @@ namespace Temiang.Avicenna.WebService
             try
             {
                 // =========================
+                // CORS
+                // =========================
+                Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                Context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                Context.Response.AddHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+                // Handle Preflight Request
+                if (Context.Request.HttpMethod.Equals("OPTIONS", StringComparison.OrdinalIgnoreCase))
+                {
+                    Context.Response.StatusCode = 200;
+                    Context.Response.End();
+                    return;
+                }
+
+                // =========================
                 // NORMALIZE
                 // =========================
                 string VisitQueueNo =
@@ -2606,6 +2621,22 @@ namespace Temiang.Avicenna.WebService
         {
             try
             {
+                // =========================
+                // CORS
+                // =========================
+                Context.Response.ClearHeaders();
+                Context.Response.AddHeader("Access-Control-Allow-Origin", "*");
+                Context.Response.AddHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                Context.Response.AddHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+                // Handle Preflight Request
+                if (Context.Request.HttpMethod == "OPTIONS")
+                {
+                    Context.Response.StatusCode = 200;
+                    Context.Response.End();
+                    return;
+                }
+
                 // =========================
                 // NORMALIZE
                 // =========================
@@ -5090,7 +5121,6 @@ namespace Temiang.Avicenna.WebService
             }
         }
 
-
         [WebMethod(EnableSession = true, Description = @"
         Digunakan untuk menghapus konfigurasi Dashboard Clinic.
 
@@ -5112,6 +5142,7 @@ namespace Temiang.Avicenna.WebService
             ""message"": ""Dashboard clinic configuration berhasil dihapus.""
         }
         ")]
+
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void DeleteDashboardClinicConfig()
         {

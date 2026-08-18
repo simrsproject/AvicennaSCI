@@ -26,8 +26,12 @@
         </td>
         <td class="entry">
             <telerik:RadComboBox ID="cboServiceUnitAliasID" runat="server" Width="300px" AllowCustomText="true"
-                Filter="Contains" />
-
+                Filter="Contains"                 
+                OnClientSelectedIndexChanged="function(sender,args){ 
+                    var selectedItem = args.get_item();
+                    var restriksi = selectedItem ? (selectedItem.get_attributes().getAttribute('Restriksi') || '') : '';
+                    if (typeof onItemAliasRestriksiChanged === 'function') onItemAliasRestriksiChanged(restriksi);
+                }" />
             <telerik:RadComboBox ID="cboSsBridgingID" runat="server" Width="300px" EmptyMessage="Select a Item"
                 EnableLoadOnDemand="true" ShowMoreResultsBox="true" EnableVirtualScrolling="true" OnClientItemsRequesting="cboSsBridgingID_ClientItemsRequesting">
                 <WebServiceSettings Method="SatuSehatItem" Path="~/WebService/ComboBoxDataService.asmx" />

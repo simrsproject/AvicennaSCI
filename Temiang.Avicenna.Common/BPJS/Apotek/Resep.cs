@@ -114,20 +114,6 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.Resep
 
             [JsonProperty("noresep")]
             public string NORESEP;
-
-            public class Root
-            {
-                public Request Request;
-            }
-        }
-
-        public class Root
-        {
-            [JsonProperty("Request")]
-            public Request Request;
-
-            [JsonProperty("Response")]
-            public Response Response;
         }
 
         public class Response : Metadata

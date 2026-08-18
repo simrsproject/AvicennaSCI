@@ -320,7 +320,7 @@ namespace Temiang.Avicenna.Controllers
                             // CEK BLACKLIST
                             if (Convert.ToBoolean(dtbPatient.Rows[0]["IsBlackList"]))
                             {
-                                ViewData["ErrMsg"] = lang == "en" ? "Patient is blacklisted and cannot be processed" : "Pasien ini terdaftar dalam daftar hitam dan tidak dapat diproses";
+                                ViewData["ErrMsg"] = lang == "en" ? "This patient has a pending administrative issue. Please contact the registration staff for assistance.\r\n" : "Terdapat pending administrasi pada pasien ini. Silakan hubungi petugas registrasi.";
                                 return View();
                             }
 

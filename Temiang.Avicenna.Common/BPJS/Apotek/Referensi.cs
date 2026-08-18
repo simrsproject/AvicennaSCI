@@ -172,6 +172,8 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.Referensi
         }
     }
 
+
+    // daftar plafon harga obat
     public class Dpho : Metadata
     {
         public class List
@@ -202,6 +204,12 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.Referensi
 
             [JsonProperty("aktif")]
             public string Aktif;
+
+            [JsonProperty("sedia")]
+            public string Sedia;
+
+            [JsonProperty("stok")]
+            public string Stok;
         }
 
         public class Response
@@ -352,6 +360,54 @@ namespace Temiang.Avicenna.Common.BPJS.Apotek.Referensi
 
             [JsonProperty("metaData")]
             public Metadata MetaData;
+        }
+    }
+
+    public class Srb : Metadata
+    {
+        public class List
+        {
+            [JsonProperty("No")]
+            public int No { get; set; }
+
+            [JsonProperty("NamaPeserta")]
+            public string NamaPeserta { get; set; }
+
+            [JsonProperty("NomorKaPst")]
+            public string NomorKaPst { get; set; }
+
+            [JsonProperty("Alamat")]
+            public string Alamat { get; set; }
+
+            [JsonProperty("TglSRB")]
+            public string TglSRB { get; set; }
+
+            [JsonProperty("Diagnosa")]
+            public string Diagnosa { get; set; }
+
+            [JsonProperty("Obat")]
+            public string Obat { get; set; }
+
+            [JsonProperty("DPJP")]
+            public string DPJP { get; set; }
+
+            [JsonProperty("AsalFaskes")]
+            public string AsalFaskes { get; set; }
+        }
+
+        public class Response
+        {
+            [JsonProperty("list")]
+            public List<List> List { get; set; }
+        }
+
+        public class Root
+        {
+            [JsonProperty("response")]
+            public Response Response { get; set; }
+
+            [JsonProperty("metaData")]
+            public Metadata MetaData { get; set; }
         }
     }
 }

@@ -34,13 +34,15 @@
                     <Columns>
                         <telerik:GridBoundColumn DataField="Kodeobat" HeaderText="Kode Obat" UniqueName="Kodeobat" SortExpression="Kodeobat" />
                         <telerik:GridBoundColumn DataField="Namaobat" HeaderText="Nama Obat" UniqueName="Namaobat" SortExpression="Namaobat" />
-                        <telerik:GridBoundColumn DataField="Prb" HeaderText="Prb Obat" UniqueName="Prb" SortExpression="Prb" />
-                        <telerik:GridBoundColumn DataField="Kronis" HeaderText="Kronis Obat" UniqueName="Kronis" SortExpression="Kronis" />
-                        <telerik:GridBoundColumn DataField="Kemo" HeaderText="Kemo Obat" UniqueName="Kemo" SortExpression="Kemo" />
+                        <telerik:GridCheckBoxColumn DataField="Prb" HeaderText="Prb Obat" UniqueName="Prb" ReadOnly="true" />
+                        <telerik:GridCheckBoxColumn DataField="Kronis" HeaderText="Kronis Obat" UniqueName="Kronis" ReadOnly="true" />
+                        <telerik:GridCheckBoxColumn DataField="Kemo" HeaderText="Kemo Obat" UniqueName="Kemo" ReadOnly="true" />
                         <telerik:GridBoundColumn DataField="Harga" HeaderText="Harga Obat" UniqueName="Harga" SortExpression="Harga" />
                         <telerik:GridBoundColumn DataField="Restriksi" HeaderText="Restriksi Obat" UniqueName="Restriksi" SortExpression="Restriksi" />
                         <telerik:GridBoundColumn DataField="Generik" HeaderText="Generik Obat" UniqueName="Generik" SortExpression="Generik" />
                         <telerik:GridBoundColumn DataField="Aktif" HeaderText="Aktif Obat" UniqueName="Aktif" SortExpression="Aktif" />
+                        <telerik:GridBoundColumn DataField="Sedia" HeaderText="Sedia" UniqueName="Sedia" SortExpression="Sedia" />
+                        <telerik:GridBoundColumn DataField="Stok" HeaderText="Stok" UniqueName="Stok" SortExpression="Stok" />
                     </Columns>
                 </MasterTableView>
             </telerik:RadGrid>
@@ -154,7 +156,10 @@
                         <telerik:GridBoundColumn DataField="Nppverifikator" HeaderText="NPP Verifikator" UniqueName="Nppverifikator" SortExpression="Nppverifikator" />
                         <telerik:GridBoundColumn DataField="Namapetugasapotek" HeaderText="Nama Petugas Apotek" UniqueName="Namapetugasapotek" SortExpression="Namapetugasapotek" />
                         <telerik:GridBoundColumn DataField="Nippetugasapotek" HeaderText="NIP Petugas Apotek" UniqueName="Nippetugasapotek" SortExpression="Nippetugasapotek" />
-                        <telerik:GridBoundColumn DataField="Checkstock" HeaderText="Check Stock" UniqueName="Checkstock" SortExpression="Checkstock" />
+                        <telerik:GridCheckBoxColumn DataField="Checkstock" HeaderText="Check Stock" UniqueName="Checkstock" ReadOnly="true">
+                            <HeaderStyle HorizontalAlign="Center" />
+                            <ItemStyle HorizontalAlign="Center" />
+                        </telerik:GridCheckBoxColumn>
                     </Columns>
                 </MasterTableView>
             </telerik:RadGrid>

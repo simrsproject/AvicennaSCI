@@ -768,3 +768,214 @@ ORDER BY
 END
 
 GO
+
+/*
+================================================================================
+ SECTION 16 - Feedback CR: Update QuestionText & tambah IRAMANADI
+================================================================================
+ Perubahan:
+   - LKCB02  : QuestionText -> 'Waktu mulai aktivasi:'
+   - LKCB18  : QuestionText -> 'Initial Nadi teraba :'
+   - LKCB19  : QuestionText -> 'Irama :', SRAnswerType CBO -> IRAMANADI (baru)
+   - LKCB21  : SRAnswerType TXT -> CBO pakai IRAMAJANTUNG
+   - LKCB19 QuestionInGroup QuestionLevel -> 3 (supaya sejajar Nadi)
+   - LKCB26  : Hapus dari QuestionInGroup (Age Years di bawah Waktu mulai)
+================================================================================
+*/
+
+-- 1. Fix QuestionText yang salah / kena overwrite
+UPDATE [dbo].[Question] SET [QuestionText] = 'Waktu mulai aktivasi:'  WHERE [QuestionID] = 'LKCB02'
+UPDATE [dbo].[Question] SET [QuestionText] = 'Initial Nadi teraba :'  WHERE [QuestionID] = 'LKCB18'
+UPDATE [dbo].[Question] SET [QuestionText] = 'Irama :'                WHERE [QuestionID] = 'LKCB19'
+UPDATE [dbo].[Question] SET [QuestionText] = 'Perawat Pelaksana 2 :'  WHERE [QuestionID] = 'LKCB1022'
+UPDATE [dbo].[Question] SET [QuestionText] = 'Perawat Pelaksana 3 :'  WHERE [QuestionID] = 'LKCB1023'
+
+GO
+
+-- 2. Buat Selection IRAMANADI untuk Irama Nadi (Reguler/Ireguler/Tidak dapat dinilai)
+INSERT INTO [dbo].[QuestionAnswerSelection]
+    ([QuestionAnswerSelectionID], [QuestionAnswerSelectionText], [LastUpdateDateTime], [LastUpdateByUserID])
+VALUES
+    ('IRAMANADI', 'Irama Nadi', GETDATE(), 'sci')
+
+INSERT INTO [dbo].[QuestionAnswerSelectionLine]
+    ([QuestionAnswerSelectionID], [QuestionAnswerSelectionLineID], [QuestionAnswerSelectionLineText])
+VALUES
+    ('IRAMANADI', 'IRAMANADI01', 'Reguler'),
+    ('IRAMANADI', 'IRAMANADI02', 'Ireguler'),
+    ('IRAMANADI', 'IRAMANADI03', 'Tidak dapat dinilai')
+
+GO
+
+-- 3. Update LKCB19 pakai IRAMANADI
+UPDATE [dbo].[Question]
+SET [SRAnswerType]              = 'CBO',
+    [QuestionAnswerSelectionID] = 'IRAMANADI',
+    [LastUpdateByUserID]        = 'sci',
+    [LastUpdateDateTime]        = GETDATE()
+WHERE [QuestionID] = 'LKCB19'
+
+GO
+
+-- 4. Update LKCB21 pakai IRAMAJANTUNG
+UPDATE [dbo].[Question]
+SET [SRAnswerType]              = 'CBO',
+    [QuestionAnswerSelectionID] = 'IRAMAJANTUNG',
+    [LastUpdateByUserID]        = 'sci',
+    [LastUpdateDateTime]        = GETDATE()
+WHERE [QuestionID] = 'LKCB21'
+
+GO
+
+-- 5. Fix QuestionLevel LKCB19 di QuestionInGroup supaya sejajar dengan Nadi (level 3)
+UPDATE [dbo].[QuestionInGroup]
+SET [QuestionLevel]        = 3,
+    [LastUpdateByUserID]   = 'sci',
+    [LastUpdateDateTime]   = GETDATE()
+WHERE [QuestionID]      = 'LKCB19'
+  AND [QuestionGroupID] = 'LKCB01'
+
+GO
+
+-- 6. Hapus LKCB26 dari QuestionInGroup (tampil sebagai Age Years di bawah Waktu mulai)
+DELETE FROM [dbo].[QuestionInGroup]
+WHERE [QuestionID]      = 'LKCB26'
+  AND [QuestionGroupID] = 'LKCB01'
+
+GO
+
+/*
+================================================================================
+ SECTION 17 - Feedback CR: Additional Question Changes
+================================================================================
+ Perubahan:
+   - LKCB13  : SRAnswerType TXT -> TIM (Waktu Intubation pakai icon jam)
+   - KNDS    : Fix typo "Pernafasan Kembal" -> "Pernafasan Kembali"
+   - KNDS    : Tambah pilihan "[4] Sirkulasi dan Pernafasan Kembali"
+   - LKCB31  : Insert Question baru - Label "Tanda Vital Post Resusitasi"
+   - LKCB32  : Insert Question baru - Nadi Post Resusitasi (NUM, x/mnt)
+   - QuestionInGroup: Sisipkan LKCB31 (RowIndex 28) & LKCB32 (RowIndex 30)
+================================================================================
+*/
+
+-- 1. Waktu Intubation pakai icon jam
+UPDATE [dbo].[Question]
+SET [SRAnswerType]       = 'TIM',
+    [LastUpdateByUserID] = 'sci',
+    [LastUpdateDateTime] = GETDATE()
+WHERE [QuestionID] = 'LKCB13'
+
+GO
+
+-- 2. Fix typo Kondisi dropdown
+UPDATE [dbo].[QuestionAnswerSelectionLine]
+SET [QuestionAnswerSelectionLineText] = '[2] Pernafasan Kembali'
+WHERE [QuestionAnswerSelectionID]     = 'KNDS'
+  AND [QuestionAnswerSelectionLineID] = '2'
+
+-- 3. Tambah pilihan baru Kondisi
+INSERT INTO [dbo].[QuestionAnswerSelectionLine]
+    ([QuestionAnswerSelectionID], [QuestionAnswerSelectionLineID], [QuestionAnswerSelectionLineText])
+VALUES
+    ('KNDS', '4', '[4] Sirkulasi dan Pernafasan Kembali')
+
+GO
+
+-- 4. Insert Label "Tanda Vital Post Resusitasi"
+INSERT INTO [dbo].[Question]
+    ([AnswerDecimalDigit], [AnswerPrefix], [AnswerSuffix], [AnswerWidth], [AnswerWidth2], [BodyID],
+     [EquivalentQuestionID], [Formula], [IndexNo], [IsActive], [IsAlwaysPrint], [IsEmptyDefault],
+     [IsMandatory], [IsNotOverWriteRelatedEntity], [IsReadOnly], [IsUpdateRelatedEntity],
+     [LastUpdateByUserID], [LastUpdateDateTime], [LookUpID], [NursingDisplayAs], [ParentQuestionID],
+     [QuestionAnswerDefaultSelectionID], [QuestionAnswerDefaultSelectionID2], [QuestionAnswerSelectionID],
+     [QuestionAnswerSelectionID2], [QuestionID], [QuestionLevel], [QuestionShortText], [QuestionText],
+     [ReferenceQuestionID], [RelatedColumnName], [RelatedEntityName], [SRAnswerType], [VitalSignID])
+VALUES
+    (0, NULL, NULL, NULL, NULL, NULL,
+     NULL, NULL, NULL, 1, 1, NULL,
+     0, NULL, NULL, NULL,
+     'sci', GETDATE(), NULL, NULL, NULL,
+     '', '', '',
+     NULL, 'LKCB31', 1, 'tvpr', 'Tanda Vital Post Resusitasi',
+     NULL, NULL, NULL, 'LBL', NULL)
+
+GO
+
+-- 5. Insert Question Nadi Post Resusitasi
+INSERT INTO [dbo].[Question]
+    ([AnswerDecimalDigit], [AnswerPrefix], [AnswerSuffix], [AnswerWidth], [AnswerWidth2], [BodyID],
+     [EquivalentQuestionID], [Formula], [IndexNo], [IsActive], [IsAlwaysPrint], [IsEmptyDefault],
+     [IsMandatory], [IsNotOverWriteRelatedEntity], [IsReadOnly], [IsUpdateRelatedEntity],
+     [LastUpdateByUserID], [LastUpdateDateTime], [LookUpID], [NursingDisplayAs], [ParentQuestionID],
+     [QuestionAnswerDefaultSelectionID], [QuestionAnswerDefaultSelectionID2], [QuestionAnswerSelectionID],
+     [QuestionAnswerSelectionID2], [QuestionID], [QuestionLevel], [QuestionShortText], [QuestionText],
+     [ReferenceQuestionID], [RelatedColumnName], [RelatedEntityName], [SRAnswerType], [VitalSignID])
+VALUES
+    (0, NULL, 'x/mnt', NULL, NULL, NULL,
+     NULL, NULL, NULL, 1, 1, NULL,
+     0, NULL, NULL, NULL,
+     'sci', GETDATE(), NULL, 'Nadi :', NULL,
+     '', '', NULL,
+     NULL, 'LKCB32', 2, 'nadi2', 'Nadi :',
+     NULL, NULL, NULL, 'NUM', NULL)
+
+GO
+
+-- 6. Geser RowIndex >= 28 sebanyak +2 untuk beri slot LKCB31 & LKCB32
+UPDATE [dbo].[QuestionInGroup]
+SET RowIndex           = RowIndex + 2,
+    LastUpdateByUserID = 'sci',
+    LastUpdateDateTime = GETDATE()
+WHERE QuestionGroupID = 'LKCB01'
+  AND RowIndex >= 28
+
+GO
+
+-- 7. Insert LKCB31 & LKCB32 ke QuestionInGroup
+INSERT INTO [dbo].[QuestionInGroup]
+    (QuestionGroupID, QuestionID, RowIndex, LastUpdateDateTime, LastUpdateByUserID, PageNo, ParentQuestionID, QuestionLevel)
+VALUES
+    ('LKCB01', 'LKCB31', 28, GETDATE(), 'sci', NULL, NULL, 1),
+    ('LKCB01', 'LKCB32', 30, GETDATE(), 'sci', NULL, NULL, 2)
+
+GO
+
+-- 8. Fix Pernapasan (LKCB27) RowIndex bentrok dengan LKCB32 -> geser ke 29
+UPDATE [dbo].[QuestionInGroup]
+SET RowIndex           = 29,
+    LastUpdateByUserID = 'sci',
+    LastUpdateDateTime = GETDATE()
+WHERE QuestionGroupID = 'LKCB01'
+  AND QuestionID      = 'LKCB27'
+
+GO
+
+/*
+================================================================================
+ SECTION 18 - Source Code Change: PhrCtl.ascx.cs
+================================================================================
+ File    : Temiang.Avicenna/CustomControl/PHR/PhrCtl.ascx.cs
+ Method  : SetEntityValue()
+ Change  : RSI-specific override of RecordTime for LKCB form.
+           After all PHR lines are processed, if HealthcareInitial == "RSI"
+           and QuestionFormID == "LKCB", set phr.RecordTime from LKCB08
+           (Waktu selesai) so that vital signs are recorded with resuscitation
+           end time instead of form save time.
+
+ Code added at end of SetEntityValue(), after the foreach loop:
+
+    // RSI-specific: For Code Blue form (LKCB), override RecordTime with the answer from LKCB08 (Waktu selesai)
+    // so that vital signs (Nadi, Pernapasan, Tekanan Darah) are recorded with the resuscitation end time
+    // instead of the form save time.
+    if (AppSession.Parameter.HealthcareInitial == "RSI" && QuestionFormID == "LKCB")
+    {
+        var lkcb08Line = collValue.FirstOrDefault(l => l.QuestionID == "LKCB08");
+        if (lkcb08Line != null && !string.IsNullOrWhiteSpace(lkcb08Line.QuestionAnswerText))
+        {
+            phr.RecordTime = lkcb08Line.QuestionAnswerText;
+        }
+    }
+
+ Note: No database script required for this change.
+================================================================================
+*/

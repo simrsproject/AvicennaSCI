@@ -2103,6 +2103,26 @@ namespace Temiang.Avicenna.Common
             }
         }
 
+        public static void GuarantorItemsRequestedClean(RadComboBox comboBox, string textSearch)
+        {
+            comboBox.Items.Clear();
+            if (textSearch == null)
+                textSearch = string.Empty;
+            string searchTextContain = string.Format("%{0}%", textSearch);
+
+            var query = new GuarantorQuery("a");
+            query.Where(
+                query.Or(query.GuarantorID == textSearch, query.GuarantorName.Like(searchTextContain)),
+                query.IsActive == true
+                );
+            query.Select(query.GuarantorID, query.GuarantorName);
+            query.OrderBy(query.GuarantorName.Ascending);
+            query.es.Top = 20;
+            DataTable dtb = query.LoadDataTable();
+            comboBox.DataSource = dtb;
+            comboBox.DataBind();
+        }
+
         public static void EmployeeGuarantorItemsRequested(RadComboBox comboBox, string textSearch)
         {
             comboBox.Items.Clear();

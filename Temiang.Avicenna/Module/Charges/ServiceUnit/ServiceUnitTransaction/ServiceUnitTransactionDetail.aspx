@@ -214,9 +214,23 @@
 
             function txtBarcodeEntryKeyPress(sender, eventArgs) {
                 var code = eventArgs.get_keyCode();
+
                 if (code == 13) {
-                    eventArgs.set_cancel(true); // Supaya tidak membuka edit grid
-                    __doPostBack(sender._clientID.replace(/_/g, "$"), "addwithbarcode|" + sender.get_value());
+                    eventArgs.set_cancel(true);
+
+                    var barcode = sender.get_textBoxValue();
+
+                    console.log("BARCODE BEFORE POSTBACK: [" + barcode + "]");
+
+                    if (!barcode) {
+                        console.log("BARCODE EMPTY");
+                        return;
+                    }
+
+                    __doPostBack(
+                        sender._clientID.replace(/_/g, "$"),
+                        "addwithbarcode|" + barcode
+                    );
                 }
             }
 

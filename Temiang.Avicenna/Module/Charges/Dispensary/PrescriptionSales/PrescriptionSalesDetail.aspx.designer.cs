@@ -1608,6 +1608,24 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::System.Web.UI.WebControls.TextBox txtRefAsalSJP;
 
         /// <summary>
+        /// txtTglSjp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadDatePicker txtTglSjp;
+
+        /// <summary>
+        /// txtTglPlynRsp control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadDatePicker txtTglPlynRsp;
+
+        /// <summary>
         /// txtTglRsp control.
         /// </summary>
         /// <remarks>
@@ -1617,13 +1635,13 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::Telerik.Web.UI.RadDatePicker txtTglRsp;
 
         /// <summary>
-        /// txtPoliRSP control.
+        /// cboPoliApol control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPoliRSP;
+        protected global::Telerik.Web.UI.RadComboBox cboPoliApol;
 
         /// <summary>
         /// cboJnsRsp control.
@@ -1644,13 +1662,13 @@ namespace Temiang.Avicenna.Module.Charges
         protected global::System.Web.UI.WebControls.TextBox txtNoResep;
 
         /// <summary>
-        /// txtKdDokter control.
+        /// cboDokterApol control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtKdDokter;
+        protected global::Telerik.Web.UI.RadComboBox cboDokterApol;
 
         /// <summary>
         /// cboIterasi control.
@@ -1678,6 +1696,15 @@ namespace Temiang.Avicenna.Module.Charges
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblCreateApolResult;
+
+        /// <summary>
+        /// btnSaveApolDtl control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnSaveApolDtl;
 
         /// <summary>
         /// lblApolDtl control.
