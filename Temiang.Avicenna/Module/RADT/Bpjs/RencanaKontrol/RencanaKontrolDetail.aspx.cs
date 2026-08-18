@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
-using Newtonsoft.Json;
-using System.Net;
 
 namespace Temiang.Avicenna.Module.RADT.Bpjs
 {
@@ -119,9 +120,25 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     {
                         //ketika 201 muncul pesan : Surat Rujukan ini Masa Berlaku Habis, Maksimal 3(tiga) bulan dari tanggal rujukan
                         //perlu dicek dulu.
-                        if(txtPoliSep.Text.Contains("HDL") &&
+
+                        DateTime? tglRujukanBySEP = null;
+
+                        if (!string.IsNullOrWhiteSpace(response.Response.ProvPerujuk.TglRujukan))
+                        {
+                            tglRujukanBySEP = DateTime.ParseExact(
+                                response.Response.ProvPerujuk.TglRujukan,
+                                "yyyy-MM-dd",
+                                CultureInfo.InvariantCulture
+                            );
+                        }
+
+                        bool isMoreThan90Days = tglRujukanBySEP.HasValue && (DateTime.Now - tglRujukanBySEP.Value).TotalDays > 90;
+
+                        if (txtPoliSep.Text.Contains("HDL") &&
                             responsePoli.MetaData.Code == "201" &&
-                            responsePoli.MetaData.Message.ToLower().Contains("masa berlaku habis"))
+                            responsePoli.MetaData.Message.ToLower().Contains("masa berlaku habis") &&
+                            isMoreThan90Days == false
+                            )
                         {
                             svc = new Common.BPJS.VClaim.v11.Service();
                             var metadataMonthlyRencanaKontrol = svc.GetRencanaKontrolByNoPeserta(DateTime.Now.ToString("MM"), DateTime.Now.Year.ToString(), txtNoPeserta.Text, Common.BPJS.VClaim.Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
