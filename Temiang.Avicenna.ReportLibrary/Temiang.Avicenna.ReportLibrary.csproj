@@ -1225,6 +1225,12 @@
     <Compile Include="RLib_Slip\BillingCharges\Billing\RSIWithDisc\BillingIntermStatementPatientIncComponentRecapPatientOnly.designer.cs">
       <DependentUpon>BillingIntermStatementPatientIncComponentRecapPatientOnly.cs</DependentUpon>
     </Compile>
+    <Compile Include="RLib_Slip\BillingCharges\Billing\RSRG\BillingIntermStatementPatientIncComponentByDate.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RLib_Slip\BillingCharges\Billing\RSRG\BillingIntermStatementPatientIncComponentByDate.designer.cs">
+      <DependentUpon>BillingIntermStatementPatientIncComponentByDate.cs</DependentUpon>
+    </Compile>
     <Compile Include="RLib_Slip\BillingCharges\Billing\RSUDSKY\BillingIntermStatementPatientIncComponent.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -9952,6 +9958,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RLib_Slip\BillingCharges\Billing\RSIWithDisc\BillingIntermStatementPatientIncComponentRecapPatientOnly.resx">
       <DependentUpon>BillingIntermStatementPatientIncComponentRecapPatientOnly.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RLib_Slip\BillingCharges\Billing\RSRG\BillingIntermStatementPatientIncComponentByDate.resx">
+      <DependentUpon>BillingIntermStatementPatientIncComponentByDate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RLib_Slip\BillingCharges\Billing\RSUDSKY\BillingIntermStatementPatientIncComponent.resx">
       <DependentUpon>BillingIntermStatementPatientIncComponent.cs</DependentUpon>

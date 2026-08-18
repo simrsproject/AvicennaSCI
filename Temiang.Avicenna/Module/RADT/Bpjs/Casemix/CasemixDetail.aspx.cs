@@ -198,7 +198,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
             ccq.Select(iq.SREklaimTariffGroup, (ccq.PatientAmount.Sum() + ccq.GuarantorAmount.Sum()).As("Amount"));
             ccq.InnerJoin(iq).On(ccq.ItemID == iq.ItemID);
-            ccq.Where(ccq.RegistrationNo.In(txtRegistrationNo.Text));
+            ccq.Where(ccq.RegistrationNo.In(Helper.MergeBilling.GetFullMergeRegistration(txtRegistrationNo.Text)));
             ccq.GroupBy(iq.SREklaimTariffGroup);
 
             var tbl = ccq.LoadDataTable();

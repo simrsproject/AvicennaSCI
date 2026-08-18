@@ -357,3 +357,34 @@ Titipan Daniel
 
 ---[23-07-2026 - Wiliam]---
 1. Modifikasi CasemixList.cs agar List History berdasarkan RegistrationDate DESC.
+
+---[28-07-2026 - Rizki]---
+1. Menambah Create dan LastUpdate RegistrationInfoMedic WebService MDS.
+
+---[29-07-2026 - Wiliam]---
+1. Modifikasi RegistrationDetail.aspx.cs agar ketika Parameter IsCrmMembershipActive berubah, label Membership No berubah
+
+---[31-07-2026 - Danang]---
+1. Apol Feature (Document SOP Menyusul)
+
+---[06-08-2026 - Wiliam]
+1. Modifikasi PpaNoteEntry.aspx.cs method GetPHRL() agar tampilan Assement Monitoring TTV Rawat Inap benar.
+
+---[07-08-2026 - Wiliam]---
+1. Modifikasi ItemTariffRequestImport.aspx.cs agar NewPrice 0 bisa diimport. dengan penambahan parameter IsAllowZeroNewPriceForTariff
+
+---[10-08-2026 - Wiliam]---
+1. Menambah function ExecuteNonQuery pada BusinessObject.Common.Utils
+2. Modifikasi file Temiang.Avicenna.ReportLibrary\RLib_Slip\BillingCharges\Billing\RSRG\BillingIntermStatementPatientIncComponentByDate.cs
+   untuk penambahan tanda tangan ka sub bag billing.
+
+---[11-08-2026 - Wiliam]---
+1. Modifikasi file GuarantorCtl.ascx. Ada bug pada ComboBox Guarantor.
+
+---[12-08-2026 - Wildan]---
+1. mengubah title=Blacklists pada Registrationlist.aspx.cs menjadi title=Pending Administrasi
+2. mengubah error message untuk pasien blacklist di KiosselfregController.cs menjadi "This patient has a pending administrative issue. Please contact the registration staff for assistance.\r\n" : "Terdapat pending administrasi pada pasien ini. Silakan hubungi petugas registrasi."
+3. mengubah ProgramNamae pada ProgramID = 01.15.12, Patient Blacklist >> Patient Pending Administration
+
+---[13-08-2026 - Wiliam]---
+1. Modifikasi file ServiceUnitTransactionDetail.aspx.cs dan ServiceUnitTransactionDetail.aspx agar saat enter barcode tidak empty.
