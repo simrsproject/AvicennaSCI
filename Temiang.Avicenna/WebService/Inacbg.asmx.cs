@@ -536,17 +536,23 @@ namespace Temiang.Avicenna.WebService
                 regs.Query.RegistrationDate == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
             regs.Query.Load();
             var count = 0;
+            var processedRegistrationNos = new List<string>();
             foreach (var reg in regs)
             {
+                var registrationNo = Helper.MergeBilling.GetMergeBillingFrom(reg.RegistrationNo);
+                if (string.IsNullOrEmpty(registrationNo)) registrationNo = reg.RegistrationNo;
+                if (processedRegistrationNos.Contains(registrationNo)) continue;
+                processedRegistrationNos.Add(registrationNo);
+
                 try
                 {
-                    GroupperOutpatient(reg.RegistrationNo);
+                    GroupperOutpatient(registrationNo);
                     count++;
                 }
                 catch (Exception e)
                 {
                     var log = new WebServiceAPILog();
-                    log.Query.Where(log.Query.IPAddress == "EklaimGroupper", log.Query.UrlAddress == reg.RegistrationNo, log.Query.Params == reg.BpjsSepNo);
+                    log.Query.Where(log.Query.IPAddress == "EklaimGroupper", log.Query.UrlAddress == registrationNo, log.Query.Params == reg.BpjsSepNo);
                     log.Query.es.Top = 1;
                     if (log.Query.Load())
                     {
@@ -554,7 +560,7 @@ namespace Temiang.Avicenna.WebService
                         {
                             DateRequest = DateTime.Now,
                             IPAddress = "EklaimGroupper",
-                            UrlAddress = reg.RegistrationNo,
+                            UrlAddress = registrationNo,
                             Params = reg.BpjsSepNo,
                             Totalms = 0
                         };
