@@ -536,17 +536,23 @@ namespace Temiang.Avicenna.WebService
                 regs.Query.RegistrationDate == DateTime.ParseExact(date, "yyyy-MM-dd", null, DateTimeStyles.None).Date);
             regs.Query.Load();
             var count = 0;
+            var processedRegistrationNos = new List<string>();
             foreach (var reg in regs)
             {
+                var registrationNo = Helper.MergeBilling.GetMergeBillingFrom(reg.RegistrationNo);
+                if (string.IsNullOrEmpty(registrationNo)) registrationNo = reg.RegistrationNo;
+                if (processedRegistrationNos.Contains(registrationNo)) continue;
+                processedRegistrationNos.Add(registrationNo);
+
                 try
                 {
-                    GroupperOutpatient(reg.RegistrationNo);
+                    GroupperOutpatient(registrationNo);
                     count++;
                 }
                 catch (Exception e)
                 {
                     var log = new WebServiceAPILog();
-                    log.Query.Where(log.Query.IPAddress == "EklaimGroupper", log.Query.UrlAddress == reg.RegistrationNo, log.Query.Params == reg.BpjsSepNo);
+                    log.Query.Where(log.Query.IPAddress == "EklaimGroupper", log.Query.UrlAddress == registrationNo, log.Query.Params == reg.BpjsSepNo);
                     log.Query.es.Top = 1;
                     if (log.Query.Load())
                     {
@@ -554,7 +560,7 @@ namespace Temiang.Avicenna.WebService
                         {
                             DateRequest = DateTime.Now,
                             IPAddress = "EklaimGroupper",
-                            UrlAddress = reg.RegistrationNo,
+                            UrlAddress = registrationNo,
                             Params = reg.BpjsSepNo,
                             Totalms = 0
                         };
@@ -612,6 +618,24 @@ namespace Temiang.Avicenna.WebService
                     reg.Query.BpjsSepNo != "0",
                     reg.Query.BpjsSepNo == registrationNo);
                 if (reg.Query.Load()) registrationNo = reg.RegistrationNo;
+            }
+
+            var fromRegistrationNo = Helper.MergeBilling.GetMergeBillingFrom(reg.RegistrationNo);
+            if (!string.IsNullOrEmpty(fromRegistrationNo))
+            {
+                registrationNo = fromRegistrationNo;
+                reg = new Registration();
+                reg.Query.Where(reg.Query.SRRegistrationType.In(AppConstant.RegistrationType.OutPatient, AppConstant.RegistrationType.EmergencyPatient), //regs.Query.RegistrationDate.Date() == DateTime.Now.Date,
+                    reg.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
+                    reg.Query.IsVoid == false,
+                    reg.Query.IsFromDispensary == false,
+                    reg.Query.GuarantorCardNo.IsNotNull(),
+                    reg.Query.GuarantorCardNo != string.Empty,
+                    reg.Query.BpjsSepNo.IsNotNull(),
+                    reg.Query.BpjsSepNo != string.Empty,
+                    reg.Query.BpjsSepNo != "0",
+                    reg.Query.RegistrationNo == registrationNo);
+                reg.Query.Load();
             }
 
             var log = new WebServiceAPILog

@@ -261,6 +261,7 @@ namespace Temiang.Avicenna.Module.RADT
             {
                 PopulateVisitNo();
                 SetVisitNoVisibility(); // Tampilkan VisitNo untuk RSI
+
             }
 
             //Service Unit & Paramedic
@@ -770,6 +771,31 @@ namespace Temiang.Avicenna.Module.RADT
             }
         }
 
+        private void PopulateVisitNoByRegistrationNo(string registrationNo)
+        {
+            txtVisitNo.Text = string.Empty;
+
+            if (string.IsNullOrEmpty(registrationNo))
+                return;
+
+            var coll = new VisitQueueCollection();
+
+            coll.Query.Where(
+                coll.Query.RegistrationNo == registrationNo
+            );
+
+            coll.Query.OrderBy(
+                coll.Query.LastUpdated.Descending
+            );
+
+            coll.LoadAll();
+
+            if (coll.Count > 0)
+            {
+                txtVisitNo.Text = coll[0].VisitNo ?? string.Empty;
+            }
+        }
+
         private void SetVisitNoVisibility()
         {
             var healthCareId = AppSession.Parameter.HealthcareID;
@@ -780,11 +806,12 @@ namespace Temiang.Avicenna.Module.RADT
                 StringComparison.OrdinalIgnoreCase
             );
 
-            // Hide jika IPR
-            if (string.Equals(
-                Request.QueryString["rt"],
-                "IPR",
-                StringComparison.OrdinalIgnoreCase))
+            // Hide jika IPR, EMR, atau MCU
+            string registrationType = Request.QueryString["rt"];
+
+            if (string.Equals(registrationType, "IPR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(registrationType, "EMR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(registrationType, "MCU", StringComparison.OrdinalIgnoreCase))
             {
                 isEnable = false;
             }
@@ -3729,6 +3756,8 @@ namespace Temiang.Avicenna.Module.RADT
             txtRegistrationDate.SelectedDate = reg.RegistrationDate;
             txtRegistrationTime.Text = reg.RegistrationTime;
             cboSRShift.SelectedValue = reg.SRShift;
+
+            PopulateVisitNoByRegistrationNo(reg.RegistrationNo);
 
             // Patient
             txtPatientID.Text = reg.PatientID;

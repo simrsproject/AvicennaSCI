@@ -8965,7 +8965,11 @@ namespace Temiang.Avicenna.Module.Charges
 
             if (eventArgument.Contains("addwithbarcode"))
             {
-                var barcode = eventArgument.Split('|')[1];
+                var barcode = eventArgument.Substring("addwithbarcode|".Length);
+
+                if (string.IsNullOrWhiteSpace(barcode))
+                    return;
+
                 if (AddItemDetailWithBarcode(barcode))
                 {
                     if (tblTemporaryBill.Visible)
@@ -9202,12 +9206,21 @@ namespace Temiang.Avicenna.Module.Charges
                                     (Helper.Tariff.GetItemTariff(tariffDate ?? (new DateTime()).NowAtSqlServer().Date, AppSession.Parameter.DefaultTariffType, reg.ChargeClassID, reg.ChargeClassID, itemID, reg.GuarantorID, false, reg.SRRegistrationType) ??
                                     Helper.Tariff.GetItemTariff(tariffDate ?? (new DateTime()).NowAtSqlServer().Date, AppSession.Parameter.DefaultTariffType, AppSession.Parameter.DefaultTariffClass, reg.ChargeClassID, itemID, reg.GuarantorID, false, reg.SRRegistrationType));
 
-                tariff.UpdateCitoFromStdRef(SRCitoPercentage);
+                if (tariff != null)
+                {
+                    tariff.UpdateCitoFromStdRef(SRCitoPercentage);
 
-                price = tariff.Price ?? 0;
-                isVariable = tariff.IsAllowVariable ?? false;
-                isCito = tariff.IsAllowCito ?? false;
-                isAdminCalculation = tariff.IsAdminCalculation ?? false;
+                    price = tariff.Price ?? 0;
+                    isVariable = tariff.IsAllowVariable ?? false;
+                    isCito = tariff.IsAllowCito ?? false;
+                    isAdminCalculation = tariff.IsAdminCalculation ?? false;
+                }else
+                {
+                    price = 0;
+                    isVariable = false;
+                    isCito = false;
+                    isAdminCalculation = false;
+                }
 
                 discountAmount = 0;
                 srDiscountReason = string.Empty;
