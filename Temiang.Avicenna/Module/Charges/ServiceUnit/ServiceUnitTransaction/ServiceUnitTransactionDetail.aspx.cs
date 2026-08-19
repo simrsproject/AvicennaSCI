@@ -1602,9 +1602,10 @@ namespace Temiang.Avicenna.Module.Charges
                             header.ExecutionDate = entity.ExecutionDate;
                             header.ReferenceNo = string.Empty;
                             header.ResponUnitID = String.Empty;
+                            var isPackageDetailApproved = pac.IsOrder || (entity.IsApproved ?? false);
                             header.FromServiceUnitID = (pac.IsOrder) ? entity.FromServiceUnitID : pac.ToServiceUnitID;
-                            header.IsBillProceed = false;
-                            header.IsApproved = pac.IsOrder;
+                            header.IsBillProceed = isPackageDetailApproved;
+                            header.IsApproved = isPackageDetailApproved;
                             if (header.IsApproved ?? false)
                             {
                                 header.ApprovedDateTime = entity.ApprovedDateTime ?? (new DateTime()).NowAtSqlServer();
@@ -1672,12 +1673,13 @@ namespace Temiang.Avicenna.Module.Charges
                                 detail.SRDiscountReason = tci.SRDiscountReason;
                                 detail.IsAssetUtilization = tci.IsAssetUtilization;
                                 detail.AssetID = tci.AssetID;
-                                detail.IsBillProceed = false;// (tci.IsVoid ?? false) ? false : pac.IsOrder;
+                                var isDetailApproved = !(tci.IsVoid ?? false) && isPackageDetailApproved;
+                                detail.IsBillProceed = isDetailApproved;
                                 //detail.IsBillProceed = AppParameter.GetParameterValue(AppParameter.ParameterItem.IsJobOrderRealizationNeedConfirm).ToLower() == "yes" ? false : pac.IsOrder;
                                 detail.IsOrderRealization = tci.IsOrderRealization;
                                 detail.IsPaymentConfirmed = tci.IsPaymentConfirmed;
                                 detail.IsPackage = tci.IsPackage;
-                                detail.IsApprove = (tci.IsVoid ?? false) ? false : pac.IsOrder;
+                                detail.IsApprove = isDetailApproved;
                                 detail.IsVoid = tci.IsVoid;
                                 detail.Notes = tci.Notes;
                                 detail.FilmNo = tci.FilmNo;
