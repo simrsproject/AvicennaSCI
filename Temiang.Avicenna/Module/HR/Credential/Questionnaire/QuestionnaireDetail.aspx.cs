@@ -32,14 +32,59 @@ namespace Temiang.Avicenna.Module.HR.Credential.Questionnaire
             }
         }
 
-        protected override void OnInitializeAjaxManagerSettingsCollection(AjaxSettingsCollection ajax)
+        protected override void OnInitializeAjaxManagerSettingsCollection(
+    AjaxSettingsCollection ajax)
         {
-            ajax.AddAjaxSetting(cboSRProfessionGroup, cboSRProfessionGroup);
-            ajax.AddAjaxSetting(cboSRProfessionGroup, cboSRClinicalWorkArea);
-            ajax.AddAjaxSetting(cboSRProfessionGroup, cboSRClinicalAuthorityLevel);
+            ajax.AddAjaxSetting(
+                cboSRProfessionGroup,
+                cboSRProfessionGroup
+            );
 
-            ajax.AddAjaxSetting(cboSRClinicalWorkArea, cboSRClinicalWorkArea);
-            ajax.AddAjaxSetting(cboSRClinicalWorkArea, cboSRClinicalAuthorityLevel);
+            ajax.AddAjaxSetting(
+                cboSRProfessionGroup,
+                cboSRClinicalWorkArea
+            );
+
+            ajax.AddAjaxSetting(
+                cboSRProfessionGroup,
+                cboSRClinicalAuthorityLevel
+            );
+
+            ajax.AddAjaxSetting(
+                cboSRClinicalWorkArea,
+                cboSRClinicalWorkArea
+            );
+
+            ajax.AddAjaxSetting(
+                cboSRClinicalWorkArea,
+                cboSRClinicalAuthorityLevel
+            );
+
+            // =========================================================
+            // Clinical Authority Level -> Questionnaire Code
+            // =========================================================
+            ajax.AddAjaxSetting(
+                cboSRClinicalAuthorityLevel,
+                txtQuestionnaireCode
+            );
+
+            ajax.AddAjaxSetting(
+                cboSRClinicalAuthorityLevel,
+                lblQuestionnaireCodeWarning
+            );
+
+            // =========================================================
+            // Questionnaire Code -> Warning
+            // =========================================================
+            ajax.AddAjaxSetting(
+                txtQuestionnaireCode,
+                txtQuestionnaireCode
+            );
+
+            ajax.AddAjaxSetting(
+                txtQuestionnaireCode,
+                lblQuestionnaireCodeWarning
+            );
         }
 
         protected override void OnMenuNewClick()
@@ -86,6 +131,11 @@ namespace Temiang.Avicenna.Module.HR.Credential.Questionnaire
                 args.IsCancel = true;
                 return;
             }
+            if (!ValidateQuestionnaireCode(args))
+            {
+                return;
+            }
+
             var entity = new CredentialQuestionnaire();
             entity.AddNew();
             SetEntityValue(entity);
@@ -114,6 +164,10 @@ namespace Temiang.Avicenna.Module.HR.Credential.Questionnaire
             }
 
             var entity = new CredentialQuestionnaire();
+            if (!ValidateQuestionnaireCode(args))
+            {
+                return;
+            }
             if (entity.LoadByPrimaryKey(ViewState["id"].ToInt()))
             {
                 SetEntityValue(entity);
@@ -283,6 +337,156 @@ namespace Temiang.Avicenna.Module.HR.Credential.Questionnaire
             entity.Load(que);
             OnPopulateEntryControl(entity);
         }
+
+        private bool IsQuestionnaireCodeExists(string questionnaireCode, int currentQuestionnaireID)
+        {
+            if (string.IsNullOrWhiteSpace(questionnaireCode))
+                return false;
+
+            questionnaireCode = questionnaireCode.Trim();
+
+            var query = new CredentialQuestionnaireQuery("a");
+
+            query.Where(
+                query.QuestionnaireCode == questionnaireCode
+            );
+
+            DataTable dt = query.LoadDataTable();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                int questionnaireID = Convert.ToInt32(row["QuestionnaireID"]);
+
+                // Saat Edit, record dirinya sendiri tidak dianggap duplicate
+                if (questionnaireID != currentQuestionnaireID)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected void txtQuestionnaireCode_TextChanged(
+    object sender,
+    EventArgs e)
+        {
+            string questionnaireCode =
+                txtQuestionnaireCode.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(questionnaireCode))
+            {
+                lblQuestionnaireCodeWarning.Text =
+                    "Warning: Questionnaire Code wajib diisi.";
+
+                lblQuestionnaireCodeWarning.Visible = true;
+
+                return;
+            }
+
+            int currentQuestionnaireID =
+                ViewState["id"].ToInt();
+
+            if (IsQuestionnaireCodeExists(
+                questionnaireCode,
+                currentQuestionnaireID))
+            {
+                lblQuestionnaireCodeWarning.Text =
+                    string.Format(
+                        "Warning: Questionnaire Code '{0}' sudah digunakan. Silakan gunakan code lain.",
+                        questionnaireCode
+                    );
+
+                lblQuestionnaireCodeWarning.Visible = true;
+            }
+            else
+            {
+                lblQuestionnaireCodeWarning.Text =
+                    "Code tersedia.";
+
+                lblQuestionnaireCodeWarning.Visible = true;
+            }
+        }
+
+        private bool ValidateQuestionnaireCode(ValidateArgs args)
+        {
+            string questionnaireCode = txtQuestionnaireCode.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(questionnaireCode))
+            {
+                args.MessageText = "Questionnaire Code required.";
+                args.IsCancel = true;
+                return false;
+            }
+
+            int currentQuestionnaireID = ViewState["id"].ToInt();
+
+            if (IsQuestionnaireCodeExists(questionnaireCode, currentQuestionnaireID))
+            {
+                args.MessageText =
+                    string.Format(
+                        "Questionnaire Code '{0}' sudah digunakan. Silakan gunakan code lain.",
+                        questionnaireCode
+                    );
+
+                args.IsCancel = true;
+
+                lblQuestionnaireCodeWarning.Text =
+                    string.Format(
+                        "Warning: Code '{0}' sudah digunakan.",
+                        questionnaireCode
+                    );
+
+                lblQuestionnaireCodeWarning.Visible = true;
+
+                return false;
+            }
+
+            lblQuestionnaireCodeWarning.Text = string.Empty;
+            lblQuestionnaireCodeWarning.Visible = false;
+
+            return true;
+        }
+
+        protected void cboSRClinicalAuthorityLevel_SelectedIndexChanged(
+            object sender,
+            RadComboBoxSelectedIndexChangedEventArgs e)
+                {
+                    // Hanya otomatis ketika New
+                    if (ViewState["id"].ToInt() == 0)
+                    {
+                        string authorityLevel =
+                            cboSRClinicalAuthorityLevel.SelectedValue;
+
+                        if (!string.IsNullOrWhiteSpace(authorityLevel))
+                        {
+                            txtQuestionnaireCode.Text = authorityLevel.Trim();
+
+                            // Cek apakah code default sudah digunakan
+                            if (IsQuestionnaireCodeExists(authorityLevel.Trim(), 0))
+                            {
+                                lblQuestionnaireCodeWarning.Text =
+                                    string.Format(
+                                        "Warning: Code '{0}' sudah digunakan. Silakan ubah Questionnaire Code.",
+                                        authorityLevel.Trim()
+                                    );
+
+                                lblQuestionnaireCodeWarning.Visible = true;
+                            }
+                            else
+                            {
+                                lblQuestionnaireCodeWarning.Text = string.Empty;
+                                lblQuestionnaireCodeWarning.Visible = false;
+                            }
+                        }
+                        else
+                        {
+                            txtQuestionnaireCode.Text = string.Empty;
+                            lblQuestionnaireCodeWarning.Text = string.Empty;
+                            lblQuestionnaireCodeWarning.Visible = false;
+                        }
+                    }
+                }
 
         #region Record Detail Method Function CredentialQuestionnaireItem
         private CredentialQuestionnaireItemCollection CredentialQuestionnaireItems

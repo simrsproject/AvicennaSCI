@@ -24,6 +24,15 @@ namespace Temiang.Avicenna.Module.HR.Credential.Questionnaire
         protected global::Telerik.Web.UI.RadTextBox txtQuestionnaireCode;
 
         /// <summary>
+        /// lblQuestionnaireCodeWarning control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblQuestionnaireCodeWarning;
+
+        /// <summary>
         /// rfvQuestionnaireCode control.
         /// </summary>
         /// <remarks>
