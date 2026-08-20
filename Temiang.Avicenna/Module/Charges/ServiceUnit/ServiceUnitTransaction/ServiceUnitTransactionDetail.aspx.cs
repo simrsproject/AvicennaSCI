@@ -1602,9 +1602,10 @@ namespace Temiang.Avicenna.Module.Charges
                             header.ExecutionDate = entity.ExecutionDate;
                             header.ReferenceNo = string.Empty;
                             header.ResponUnitID = String.Empty;
+                            var isPackageDetailApproved = pac.IsOrder || (entity.IsApproved ?? false);
                             header.FromServiceUnitID = (pac.IsOrder) ? entity.FromServiceUnitID : pac.ToServiceUnitID;
-                            header.IsBillProceed = false;
-                            header.IsApproved = pac.IsOrder;
+                            header.IsBillProceed = isPackageDetailApproved;
+                            header.IsApproved = isPackageDetailApproved;
                             if (header.IsApproved ?? false)
                             {
                                 header.ApprovedDateTime = entity.ApprovedDateTime ?? (new DateTime()).NowAtSqlServer();
@@ -1672,12 +1673,13 @@ namespace Temiang.Avicenna.Module.Charges
                                 detail.SRDiscountReason = tci.SRDiscountReason;
                                 detail.IsAssetUtilization = tci.IsAssetUtilization;
                                 detail.AssetID = tci.AssetID;
-                                detail.IsBillProceed = false;// (tci.IsVoid ?? false) ? false : pac.IsOrder;
+                                var isDetailApproved = !(tci.IsVoid ?? false) && isPackageDetailApproved;
+                                detail.IsBillProceed = isDetailApproved;
                                 //detail.IsBillProceed = AppParameter.GetParameterValue(AppParameter.ParameterItem.IsJobOrderRealizationNeedConfirm).ToLower() == "yes" ? false : pac.IsOrder;
                                 detail.IsOrderRealization = tci.IsOrderRealization;
                                 detail.IsPaymentConfirmed = tci.IsPaymentConfirmed;
                                 detail.IsPackage = tci.IsPackage;
-                                detail.IsApprove = (tci.IsVoid ?? false) ? false : pac.IsOrder;
+                                detail.IsApprove = isDetailApproved;
                                 detail.IsVoid = tci.IsVoid;
                                 detail.Notes = tci.Notes;
                                 detail.FilmNo = tci.FilmNo;
@@ -8965,7 +8967,11 @@ namespace Temiang.Avicenna.Module.Charges
 
             if (eventArgument.Contains("addwithbarcode"))
             {
-                var barcode = eventArgument.Split('|')[1];
+                var barcode = eventArgument.Substring("addwithbarcode|".Length);
+
+                if (string.IsNullOrWhiteSpace(barcode))
+                    return;
+
                 if (AddItemDetailWithBarcode(barcode))
                 {
                     if (tblTemporaryBill.Visible)
@@ -9202,12 +9208,21 @@ namespace Temiang.Avicenna.Module.Charges
                                     (Helper.Tariff.GetItemTariff(tariffDate ?? (new DateTime()).NowAtSqlServer().Date, AppSession.Parameter.DefaultTariffType, reg.ChargeClassID, reg.ChargeClassID, itemID, reg.GuarantorID, false, reg.SRRegistrationType) ??
                                     Helper.Tariff.GetItemTariff(tariffDate ?? (new DateTime()).NowAtSqlServer().Date, AppSession.Parameter.DefaultTariffType, AppSession.Parameter.DefaultTariffClass, reg.ChargeClassID, itemID, reg.GuarantorID, false, reg.SRRegistrationType));
 
-                tariff.UpdateCitoFromStdRef(SRCitoPercentage);
+                if (tariff != null)
+                {
+                    tariff.UpdateCitoFromStdRef(SRCitoPercentage);
 
-                price = tariff.Price ?? 0;
-                isVariable = tariff.IsAllowVariable ?? false;
-                isCito = tariff.IsAllowCito ?? false;
-                isAdminCalculation = tariff.IsAdminCalculation ?? false;
+                    price = tariff.Price ?? 0;
+                    isVariable = tariff.IsAllowVariable ?? false;
+                    isCito = tariff.IsAllowCito ?? false;
+                    isAdminCalculation = tariff.IsAdminCalculation ?? false;
+                }else
+                {
+                    price = 0;
+                    isVariable = false;
+                    isCito = false;
+                    isAdminCalculation = false;
+                }
 
                 discountAmount = 0;
                 srDiscountReason = string.Empty;

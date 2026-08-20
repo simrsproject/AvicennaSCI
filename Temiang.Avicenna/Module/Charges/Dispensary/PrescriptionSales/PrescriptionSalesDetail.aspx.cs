@@ -772,17 +772,20 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 //modified by wiliam 2026-05-15
 
 
-                var sepapol = new BpjsSEP();
-                if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
+                if(!string.IsNullOrEmpty(txtBpjsSepNo.Text))
                 {
-                    if (sepapol.TanggalSEP.HasValue)
+                    var sepapol = new BpjsSEP();
+                    if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
                     {
-                        txtTglSep.SelectedDate = sepapol.TanggalSEP.Value;
+                        if (sepapol.TanggalSEP.HasValue)
+                        {
+                            txtTglSep.SelectedDate = sepapol.TanggalSEP.Value;
+                        }
                     }
-                }
-                else
-                {
-                    txtTglSep.SelectedDate = null;
+                    else
+                    {
+                        txtTglSep.SelectedDate = null;
+                    }
                 }
 
 
@@ -6685,18 +6688,15 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
             try
             {
-                var service = new Common.BPJS.Apotek.Service();
+                var service = new Common.BPJS.VClaim.v11.Service();
                 var result = service.GetPoli(e.Text);
 
-                if (result != null &&
-                    result.MetaData != null &&
-                    result.MetaData.Code == "200" &&
-                    result.Response != null &&
-                    result.Response.List != null)
+                if (result != null && result.Response != null && result.Response.Poli != null)
                 {
-                    foreach (var poli in result.Response.List)
+                    foreach (var poli in result.Response.Poli)
                     {
                         RadComboBoxItem item = new RadComboBoxItem();
+
                         item.Text = poli.Nama;
                         item.Value = poli.Kode;
 

@@ -1056,6 +1056,12 @@ namespace Temiang.Avicenna.CustomControl.Phr
                 this.Controls.Add(new Literal() { Text = "<br/>" });
             }
 
+            // Setelah SEMUA question selesai dibuat
+            if (formID == "FSAII")
+            {
+                AddApacheIIPointControls();
+            }
+
             //Generate Formula Script
             //if (!IsPostBack)
             //{
@@ -1095,8 +1101,57 @@ namespace Temiang.Avicenna.CustomControl.Phr
             groupTable.Rows.Add(btnRow);
         }
 
+        private void UpdateApacheIIPoints()
+        {
+            var rangeCollection = new RangeScoreApacheIICollection();
+            rangeCollection.LoadAll();
+
+            var questionIDs = rangeCollection
+                .Select(x => x.QuestionID)
+                .Where(x =>
+                    !string.IsNullOrEmpty(x) &&
+                    x != "FSAII0016" &&
+                    x != "FSAII0022")
+                .Distinct()
+                .ToList();
+
+            foreach (string questionID in questionIDs)
+            {
+                var num = Helper.FindControlRecursive(
+                    this,
+                    "q_" + questionID
+                ) as RadNumericTextBox;
+
+                var pointLabel = Helper.FindControlRecursive(
+                    this,
+                    "lblPoint_" + questionID
+                ) as Label;
+
+                if (pointLabel == null)
+                    continue;
+
+                if (num == null || num.Value == null)
+                {
+                    pointLabel.Text = "Point: -";
+                    continue;
+                }
+
+                int point = RangeScoreApacheII.GetPoint(
+                    questionID,
+                    Convert.ToDecimal(num.Value)
+                );
+
+                pointLabel.Text = "Point: " + point;
+            }
+        }
+
         protected void btnCalculateApacheII_Click(object sender, EventArgs e)
         {
+            // ===========================
+            // UPDATE POINT PER QUESTION
+            // ===========================
+            UpdateApacheIIPoints();
+
             // ===========================
             // TOTAL ACUTE PHYSIOLOGY POINT
             // ===========================
@@ -1107,7 +1162,10 @@ namespace Temiang.Avicenna.CustomControl.Phr
             // ===========================
             decimal gcsActual = 0;
 
-            var gcs = Helper.FindControlRecursive(this, "q_FSAII0015") as RadNumericTextBox;
+            var gcs = Helper.FindControlRecursive(
+                this,
+                "q_FSAII0015"
+            ) as RadNumericTextBox;
 
             if (gcs != null && gcs.Value != null)
                 gcsActual = Convert.ToDecimal(gcs.Value);
@@ -1115,9 +1173,13 @@ namespace Temiang.Avicenna.CustomControl.Phr
             // ===========================
             // ACUTE PHYSIOLOGY SCORE (APS)
             // ===========================
-            decimal aps = (15 - gcsActual) + totalPoint;
+            // GCS langsung digunakan sebagai nilai APS
+            decimal aps = gcsActual + totalPoint;
 
-            var apsCtl = Helper.FindControlRecursive(this, "q_FSAII0019") as RadNumericTextBox;
+            var apsCtl = Helper.FindControlRecursive(
+                this,
+                "q_FSAII0019"
+            ) as RadNumericTextBox;
 
             if (apsCtl != null)
                 apsCtl.Value = Convert.ToDouble(aps);
@@ -1187,6 +1249,7 @@ namespace Temiang.Avicenna.CustomControl.Phr
             .Select(x => x.QuestionID)
             .Distinct()
             .Where(x =>
+                x != "FSAII0015" &&   // GCS
                 x != "FSAII0016" &&   // Age Point
                 x != "FSAII0022"      // Hasil Total APACHE II
             )
@@ -1206,6 +1269,54 @@ namespace Temiang.Avicenna.CustomControl.Phr
             }
 
             return total;
+        }
+
+        private void AddApacheIIPointControls()
+        {
+            var rangeCollection = new RangeScoreApacheIICollection();
+            rangeCollection.LoadAll();
+
+            var questionIDs = rangeCollection
+                .Select(x => x.QuestionID)
+                .Where(x =>
+                    !string.IsNullOrEmpty(x) &&
+                    x != "FSAII0016" &&
+                    x != "FSAII0022")
+                .Distinct()
+                .ToList();
+
+            foreach (string questionID in questionIDs)
+            {
+                // Cari textbox pertanyaan
+                var questionControl = Helper.FindControlRecursive(
+                    this,
+                    "q_" + questionID
+                );
+
+                if (questionControl == null)
+                    continue;
+
+                // Buat label Point
+                var pointLabel = new Label
+                {
+                    ID = "lblPoint_" + questionID,
+                    Text = "Point: -"
+                };
+
+                pointLabel.Style["display"] = "inline-block";
+                pointLabel.Style["margin-left"] = "10px";
+                pointLabel.Style["font-weight"] = "bold";
+                pointLabel.Style["vertical-align"] = "middle";
+                pointLabel.Style["white-space"] = "nowrap";
+
+                // Cari parent control
+                var parent = questionControl.Parent;
+
+                if (parent != null)
+                {
+                    parent.Controls.Add(pointLabel);
+                }
+            }
         }
 
         public void InitializedQuestionFromNursingDiagTemplate(int templateID)

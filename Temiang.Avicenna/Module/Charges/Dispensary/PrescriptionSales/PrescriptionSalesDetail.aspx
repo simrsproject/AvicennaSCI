@@ -1244,7 +1244,7 @@
                                                 <td><asp:TextBox ID="txtNoResep" runat="server" Width="220px" MaxLength="5" /></td>
                                             </tr>
                                             <tr>
-                                                <td class="label">Physician</td>
+                                                <td class="label">Physician Apol</td>
                                                 <td>
                                                     <telerik:RadComboBox ID="cboDokterApol" runat="server" Width="230px" EnableLoadOnDemand="true" AutoPostBack="true" AllowCustomText="false"
                                                         OnItemsRequested="cboDokterApol_ItemsRequested" OnSelectedIndexChanged="cboDokterApol_SelectedIndexChanged">
