@@ -620,6 +620,24 @@ namespace Temiang.Avicenna.WebService
                 if (reg.Query.Load()) registrationNo = reg.RegistrationNo;
             }
 
+            var fromRegistrationNo = Helper.MergeBilling.GetMergeBillingFrom(reg.RegistrationNo);
+            if (!string.IsNullOrEmpty(fromRegistrationNo))
+            {
+                registrationNo = fromRegistrationNo;
+                reg = new Registration();
+                reg.Query.Where(reg.Query.SRRegistrationType.In(AppConstant.RegistrationType.OutPatient, AppConstant.RegistrationType.EmergencyPatient), //regs.Query.RegistrationDate.Date() == DateTime.Now.Date,
+                    reg.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
+                    reg.Query.IsVoid == false,
+                    reg.Query.IsFromDispensary == false,
+                    reg.Query.GuarantorCardNo.IsNotNull(),
+                    reg.Query.GuarantorCardNo != string.Empty,
+                    reg.Query.BpjsSepNo.IsNotNull(),
+                    reg.Query.BpjsSepNo != string.Empty,
+                    reg.Query.BpjsSepNo != "0",
+                    reg.Query.RegistrationNo == registrationNo);
+                reg.Query.Load();
+            }
+
             var log = new WebServiceAPILog
             {
                 DateRequest = DateTime.Now,
