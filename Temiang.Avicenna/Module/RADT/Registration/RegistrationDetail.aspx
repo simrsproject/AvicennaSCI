@@ -1,4 +1,4 @@
-<%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterDialog.Master" AutoEventWireup="true" EnableEventValidation="true"
+ <%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterDialog.Master" AutoEventWireup="true" EnableEventValidation="true"
     CodeBehind="RegistrationDetail.aspx.cs" Inherits="Temiang.Avicenna.Module.RADT.RegistrationDetail" %>
 
 <%@ Register Src="~/CustomControl/AddressCtl.ascx" TagName="AddressCtl" TagPrefix="uc1" %>
@@ -1116,7 +1116,7 @@
                         <td width="20px"></td>
                     </tr>
                 </table>
-                <table id="tblVisitNo" runat="server" width="100%">
+                <table id="tblVisitNo" runat="server" width="100%" visible="false">
                  <tr>
                      <td class="label">Visit No</td>
                      <td class="entry300">
@@ -1132,7 +1132,7 @@
                      <td width="20px"></td>
                  </tr>
                 </table>
-                <table id="tblGenerateVisitNo" runat="server" width="100%">
+                <table id="tblGenerateVisitNo" runat="server" width="100%" visible="false">
                     <tr>
                         <td class="label">Generate Visit No</td>
                         <td class="entry300">
@@ -1144,7 +1144,7 @@
                                     <td width="5px"></td>
                                     <td>
                                         <asp:ImageButton ID="btnGetGenerateVisitNo" runat="server" ImageUrl="~/Images/Toolbar/download16.png"
-                                            OnClick="btnGenerateVisitNo_Click" CausesValidation="false" ToolTip="Get Generated Visit No" />
+                                            OnClick="btnGenerateVisitNo_Click" CausesValidation="false" ToolTip="Get Generated Visit No"/>
                                     </td>
                                 </tr>
                             </table>
