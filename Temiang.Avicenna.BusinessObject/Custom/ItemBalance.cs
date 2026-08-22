@@ -654,7 +654,12 @@ namespace Temiang.Avicenna.BusinessObject
             string parCostType = AppParameter.GetParameterValue(AppParameter.ParameterItem.ItemProductCostPriceType);
             itemNoStock = string.Empty;
 
-            var itemsX = (coll.Select(i => i.ItemID)).Distinct();
+            var itemsX = coll.Select(i => i.ItemID)
+                             .Where(i => !string.IsNullOrEmpty(i))
+                             .Distinct()
+                             .ToArray();
+            if (!itemsX.Any()) return;
+
             var itemColl = new ItemCollection();
             itemColl.Query.Where(
                 itemColl.Query.ItemID.In(itemsX),
