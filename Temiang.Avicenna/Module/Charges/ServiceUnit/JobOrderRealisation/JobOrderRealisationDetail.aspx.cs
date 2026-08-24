@@ -3898,7 +3898,12 @@ namespace Temiang.Avicenna.Module.Charges
                     (
                         query.TransactionNo == Request.QueryString["joNo"],
                         query.IsVoid == false,
-                        query.IsBillProceed == false,
+                        query.Or(
+                            query.IsBillProceed == false,
+                            query.IsBillProceed == true
+                            & query.Or(query.IsOrderRealization.IsNull(), query.IsOrderRealization == false)
+                            & query.RealizationDateTime.IsNull()
+                        ),
                         query.NotExists(tci)
                     );
                 query.Where(query.ParentNo == string.Empty);
