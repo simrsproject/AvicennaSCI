@@ -25,6 +25,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
                 txtInitialDiagnosis.Text = reg.InitialDiagnose;
                 txtSuggestion.Text = reg.Suggestion;
+                txtMppNote.Text = reg.MppNote;
 
                 var pat = new Patient();
                 pat.LoadByPrimaryKey(reg.PatientID);
@@ -253,6 +254,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     reg.BpjsPackageID = cboBpjsPackageID.SelectedValue;
                     reg.InitialDiagnose = txtInitialDiagnosis.Text;
                     reg.Suggestion = txtSuggestion.Text;
+                    reg.MppNote = txtMppNote.Text;
                     reg.BpjsSepNo = txtBpjsSepNo.Text;
                     reg.CoverageClassID = cboCoverageClass.SelectedValue;
                     reg.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
