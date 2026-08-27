@@ -1132,7 +1132,102 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
         private static string RichTextValidation(string richText, bool? isRichTextMode)
         {
             if (string.IsNullOrWhiteSpace(richText)) return string.Empty;
-            return (isRichTextMode ?? false) ? richText : HttpUtility.HtmlEncode(richText).Replace("\r\n", "<br/>");
+            
+            // If not rich text mode, just encode and return
+            if (!(isRichTextMode ?? false))
+            {
+                return HttpUtility.HtmlEncode(richText).Replace("\r\n", "<br/>");
+            }
+            
+            // Fix malformed HTML before returning
+            return FixMalformedHtml(richText);
+        }
+
+        /// <summary>
+        /// Fix malformed HTML content that may cause XML parsing errors
+        /// Handles truncated tags and unclosed span elements
+        /// </summary>
+        private static string FixMalformedHtml(string html)
+        {
+            if (string.IsNullOrWhiteSpace(html)) return string.Empty;
+
+            try
+            {
+                // Step 1: Truncate to last complete tag if HTML appears truncated
+                // Check if last character is NOT a closing tag character
+                string trimmed = html.TrimEnd();
+                if (!string.IsNullOrEmpty(trimmed) && !trimmed.EndsWith(">"))
+                {
+                    // Find last complete closing tag
+                    int lastCompleteTagIndex = trimmed.LastIndexOf('>');
+                    if (lastCompleteTagIndex > 0)
+                    {
+                        html = trimmed.Substring(0, lastCompleteTagIndex + 1);
+                    }
+                }
+
+                // Step 2: Balance unclosed <span> tags
+                int spanOpenCount = CountOccurrences(html, "<span");
+                int spanCloseCount = CountOccurrences(html, "</span>");
+                
+                if (spanOpenCount > spanCloseCount)
+                {
+                    // Add missing closing </span> tags
+                    int missingSpans = spanOpenCount - spanCloseCount;
+                    for (int i = 0; i < missingSpans; i++)
+                    {
+                        html += "</span>";
+                    }
+                }
+
+                // Step 3: Remove any invalid XML characters that could cause parsing errors
+                html = RemoveInvalidXmlChars(html);
+
+                return html;
+            }
+            catch (Exception)
+            {
+                // If any error occurs during fixing, return HTML-encoded version as safe fallback
+                return HttpUtility.HtmlEncode(html).Replace("\r\n", "<br/>");
+            }
+        }
+
+        /// <summary>
+        /// Count occurrences of a substring in a string (case-insensitive for HTML tags)
+        /// </summary>
+        private static int CountOccurrences(string text, string pattern)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(pattern)) return 0;
+            
+            int count = 0;
+            int index = 0;
+            while ((index = text.IndexOf(pattern, index, StringComparison.OrdinalIgnoreCase)) != -1)
+            {
+                count++;
+                index += pattern.Length;
+            }
+            return count;
+        }
+
+        /// <summary>
+        /// Remove invalid XML characters that would cause parsing errors
+        /// </summary>
+        private static string RemoveInvalidXmlChars(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+
+            var validChars = new System.Text.StringBuilder();
+            foreach (char c in text)
+            {
+                // Valid XML chars: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+                if (c == 0x9 || c == 0xA || c == 0xD ||
+                    (c >= 0x20 && c <= 0xD7FF) ||
+                    (c >= 0xE000 && c <= 0xFFFD))
+                {
+                    validChars.Append(c);
+                }
+            }
+            return validChars.ToString();
         }
 
         private class Diagnose
