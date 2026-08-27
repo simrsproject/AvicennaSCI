@@ -757,10 +757,10 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     hd.PrintNumber = 1;
                 else
                     hd.PrintNumber++;
-                
-                //modified by wiliam 2026-07-07
-                //hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
-                //hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
+
+                //modified by wiliam 2026 - 07 - 07
+                hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
+                hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
                 hd.Save();
             }
 
