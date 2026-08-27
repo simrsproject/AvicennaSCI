@@ -8,12 +8,8 @@ using Temiang.Dal.Interfaces;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
-using System.Web;
 using Temiang.Avicenna.BusinessObject.Reference;
-using DevExpress.Web.Internal.XmlProcessor;
-using static DevExpress.XtraEditors.ViewInfo.BaseListBoxViewInfo;
 using System.Text;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
@@ -753,15 +749,25 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             var hd = new ItemTransaction();
             if (hd.LoadByPrimaryKey(txtTransactionNo.Text) && hd.IsApproved == true)
             {
-                if (hd.PrintNumber == null)
-                    hd.PrintNumber = 1;
-                else
-                    hd.PrintNumber++;
+                //if (hd.PrintNumber == null)
+                //    hd.PrintNumber = 1;
+                //else
+                //    hd.PrintNumber++;
 
-                //modified by wiliam 2026 - 07 - 07
-                hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
-                hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
-                hd.Save();
+                ////modified by wiliam 2026 - 07 - 07
+                //hd.LastPrintedDateTime = (new DateTime()).NowAtSqlServer();
+                //hd.LastPrintedByUserID = AppSession.UserLogin.UserID;
+                //hd.Save();
+
+                //kenapa perlu membuat procedure? karena dengan method save biasa, pada base classnya otomatis update LastUpdateDateTime dan LastUpdateByUserID
+                //modified 2026-08-27 by Wiliam
+
+                var spParams = new esParameters();
+                spParams.Add("TransactionType", "PO");
+                spParams.Add("TransactionNo", txtTransactionNo.Text);
+                spParams.Add("LastPrintedByUserID", AppSession.UserLogin.UserID);
+
+                BusinessObject.Common.Utils.ExecuteNonQuery("sp_UpdatePrintNumber", spParams, 30);
             }
 
             printJobParameters.AddNew("p_TransactionNo", txtTransactionNo.Text);
