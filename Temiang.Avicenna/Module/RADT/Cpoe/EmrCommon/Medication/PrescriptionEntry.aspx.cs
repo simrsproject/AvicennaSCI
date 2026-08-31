@@ -552,7 +552,16 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             if (CheckRequeiredEntry(args))
             {
                 var newPrescriptionNo = SaveNewPrescription();
-                if (!string.IsNullOrEmpty(newPrescriptionNo) && AppSession.Parameter.IsAutoPrintPrescriptionOrder)
+                if (string.IsNullOrEmpty(newPrescriptionNo))
+                    return;
+
+                if (IsNonPpabPrescription(newPrescriptionNo))
+                {
+                    ShowMessageAfterPostback("Infeksi Non PPAB perlu persetujuan Tim PPRA/PGA. Resep ditahan dan diteruskan ke PPRA Desktop untuk verifikasi.");
+                    return;
+                }
+
+                if (AppSession.Parameter.IsAutoPrintPrescriptionOrder)
                     PrintPrescriptionOrderViaDirectPrinter(newPrescriptionNo);
             }
         }
@@ -1586,6 +1595,16 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                     ritem.Save();
                 }
             }
+        }
+
+        private static bool IsNonPpabPrescription(string prescriptionNo)
+        {
+            var presc = new TransPrescription();
+            if (!presc.LoadByPrimaryKey(prescriptionNo) || presc.RasproSeqNo == null)
+                return false;
+
+            var rr = new RegistrationRaspro();
+            return rr.LoadByPrimaryKey(presc.RegistrationNo, presc.RasproSeqNo ?? 0) && AbRestriction.IsNonPpab(rr);
         }
 
         private int RegistrationGyssensNewSeqNo(string regNo)

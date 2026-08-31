@@ -242,7 +242,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 return;
             }
 
-            if (cboAbRestrictionID.SelectedText.ToLower().Contains("non ppab") && string.IsNullOrWhiteSpace(txtOtherInfection.Text))
+            var selectedAbr = new AbRestriction();
+            if (selectedAbr.LoadByPrimaryKey(cboAbRestrictionID.SelectedValue) && AbRestriction.IsNonPpab(selectedAbr) && string.IsNullOrWhiteSpace(txtOtherInfection.Text))
             {
                 imgRfvOtherInfection.Visible = true;
                 args.IsValid = false;
@@ -253,8 +254,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             // Check selected AB restriction
             if (!string.IsNullOrWhiteSpace(cboAbRestrictionID.SelectedValue))
             {
-                var abr = new AbRestriction();
-                if (abr.LoadByPrimaryKey(cboAbRestrictionID.SelectedValue))
+                var abr = selectedAbr.es.IsAdded ? new AbRestriction() : selectedAbr;
+                if (!abr.es.IsAdded || abr.LoadByPrimaryKey(cboAbRestrictionID.SelectedValue))
                 {
                     // Check have child
                     var abrChild = new AbRestriction();
