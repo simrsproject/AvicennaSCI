@@ -863,7 +863,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             var amount = (p.PriceInCurrency.Value - p.DiscountInCurrency.Value) * (1 + (Convert.ToDecimal(txtTaxPercentage.Value) / 100));
                             if (chkIsAssets.Checked || p.IsAsset)
                             {
-                                // Asset must have amount >= limit AND economic life >= limit
+                                // Asset classification: BOTH amount >= limit AND economic life >= limit must be met
+                                // If either condition fails, item does not fit asset classification
                                 if ((amount < assetLimitAmount) || (p.EconomicLifeInYear ?? 0) < economicLifeInYearLimit)
                                 {
                                     if (assetValidationMsg == string.Empty)
@@ -874,7 +875,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                             }
                             else
                             {
-                                // Inventory warning: amount >= limit AND economic life >= limit (should be asset instead)
+                                // Inventory warning: item is classified as inventory but BOTH amount >= limit AND economic life >= limit
+                                // meaning it should be classified as asset instead
                                 if (chkIsInventoryItem.Checked && (amount >= assetLimitAmount) && ((p.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
                                 {
                                     if (inventoryValidationMsg == string.Empty)
@@ -888,14 +890,14 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                     if (assetValidationMsg.Length > 0 && inventoryValidationMsg.Length == 0)
                     {
-                        args.MessageText = string.Format("The following items do not fit the asset classification (price less than Rp. {0} or economic life less than {1} year(s)) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
+                        args.MessageText = string.Format("The following items do not fit the asset classification (requires price >= Rp. {0} AND economic life >= {1} year(s)) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
                         args.IsCancel = true;
                         return;
                     }
 
                     if (assetValidationMsg.Length == 0 && inventoryValidationMsg.Length > 0)
                     {
-                        args.MessageText = string.Format("The following items do not fit the inventory classification (price >= Rp. {0} and economic life >= {1} year(s), should be asset) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
+                        args.MessageText = string.Format("The following items do not fit the inventory classification (price >= Rp. {0} AND economic life >= {1} year(s), should be classified as asset) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
                         args.IsCancel = true;
                         return;
                     }
@@ -903,9 +905,9 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     if (assetValidationMsg.Length > 0 && inventoryValidationMsg.Length > 0)
                     {
                         var msgContent = new StringBuilder();
-                        msgContent.AppendFormat("The following items do not fit the asset classification (price less than Rp. {0} or economic life less than {1} year(s)) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
+                        msgContent.AppendFormat("The following items do not fit the asset classification (requires price >= Rp. {0} AND economic life >= {1} year(s)) : " + assetValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
                         msgContent.Append("<br />");
-                        msgContent.AppendFormat("The following items do not fit the inventory classification (price >= Rp. {0} and economic life >= {1} year(s), should be asset) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
+                        msgContent.AppendFormat("The following items do not fit the inventory classification (price >= Rp. {0} AND economic life >= {1} year(s), should be classified as asset) : " + inventoryValidationMsg, string.Format("{0:n2}", assetLimitAmount), economicLifeInYearLimit);
 
                         args.MessageText = msgContent.ToString();
                         args.IsCancel = true;

@@ -604,21 +604,23 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                             if (ChkIsAssets.Checked || (i.IsAsset ?? false))
                             {
-                                // Asset must have amount >= limit AND economic life >= limit
+                                // Asset classification: BOTH amount >= limit AND economic life >= limit must be met
+                                // If either condition fails, item does not fit asset classification
                                 if ((amount < assetLimitAmount) || (i.EconomicLifeInYear ?? 0) < economicLifeInYearLimit)
                                 {
                                     args.IsValid = false;
-                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the asset classification (price less than Rp. {0} or economic life less than {1} year(s)) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
+                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the asset classification (requires price >= Rp. {0} AND economic life >= {1} year(s)) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
                                     return;
                                 }
                             }
                             else
                             {
-                                // Inventory warning: amount >= limit AND economic life >= limit (should be asset instead)
+                                // Inventory warning: item is classified as inventory but BOTH amount >= limit AND economic life >= limit
+                                // meaning it should be classified as asset instead
                                 if (ChkIsInventoryItem.Checked && (amount >= assetLimitAmount) && ((i.EconomicLifeInYear ?? 0) >= economicLifeInYearLimit))
                                 {
                                     args.IsValid = false;
-                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price >= Rp. {0} and economic life >= {1} year(s), should be classified as asset) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
+                                    ((CustomValidator)source).ErrorMessage = string.Format("Selected item do not fit the inventory classification (price >= Rp. {0} AND economic life >= {1} year(s), should be classified as asset) ", assetLimitAmount.ToString("N2"), economicLifeInYearLimit);
                                     return;
                                 }
                             }
