@@ -6,6 +6,7 @@ namespace Temiang.Avicenna.BusinessObject
     public partial class AbRestriction
     {
         public const string NonPpabKeyword = "non ppab";
+        public const string NonPpabID = "NPPAB";
 
         public class AntibioticLevel
         {
@@ -166,15 +167,12 @@ namespace Temiang.Avicenna.BusinessObject
             if (rr == null || string.IsNullOrWhiteSpace(rr.AbRestrictionID))
                 return false;
 
-            var abr = new AbRestriction();
-            return abr.LoadByPrimaryKey(rr.AbRestrictionID) && IsNonPpab(abr);
+            return rr.AbRestrictionID == NonPpabID;
         }
 
         public static bool IsNonPpab(AbRestriction abr)
         {
-            return abr != null
-                   && !string.IsNullOrWhiteSpace(abr.AbRestrictionName)
-                   && abr.AbRestrictionName.ToLower().Contains(NonPpabKeyword);
+            return abr != null && abr.AbRestrictionID == NonPpabID;
         }
 
         #region AntibioticSuggestion
