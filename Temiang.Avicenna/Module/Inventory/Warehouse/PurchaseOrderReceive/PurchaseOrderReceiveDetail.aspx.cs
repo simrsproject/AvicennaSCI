@@ -1118,6 +1118,44 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             PopulateReferenceFromPurchasetOrder();
         }
 
+        private void SetBusinessPartner(string businessPartnerID)
+        {
+            if (string.IsNullOrEmpty(businessPartnerID))
+            {
+                cboBusinessPartnerID.Items.Clear();
+                cboBusinessPartnerID.ClearSelection();
+                cboBusinessPartnerID.Text = string.Empty;
+                return;
+            }
+
+            var supplier = new Supplier();
+
+            if (!supplier.LoadByPrimaryKey(businessPartnerID))
+            {
+                cboBusinessPartnerID.Items.Clear();
+                cboBusinessPartnerID.ClearSelection();
+                cboBusinessPartnerID.Text = string.Empty;
+                return;
+            }
+
+            cboBusinessPartnerID.Items.Clear();
+
+            var item = new RadComboBoxItem
+            {
+                Value = supplier.SupplierID,
+                Text = supplier.SupplierName
+            };
+
+            cboBusinessPartnerID.Items.Add(item);
+
+            cboBusinessPartnerID.ClearSelection();
+
+            item.Selected = true;
+
+            // Pastikan text yang ditampilkan sesuai selected item
+            cboBusinessPartnerID.Text = item.Text;
+        }
+
         private void PopulateReferenceFromPurchasetOrder()
         {
             object obj = Session["POR_W3TOT:ItemSelected" + Request.UserHostName];
@@ -1136,18 +1174,20 @@ namespace Temiang.Avicenna.Module.Inventory.Warehouse
             header.LoadByPrimaryKey(txtReferenceNo.Text);
             //txtBusinessPartnerID.Text = header.BusinessPartnerID;
 
-            var eArgs = new RadComboBoxItemsRequestedEventArgs();
-            eArgs.Text = header.BusinessPartnerID ?? "";
-            cboSupplier_ItemsRequested(cboBusinessPartnerID, eArgs);
-            var cboi = cboBusinessPartnerID.Items.FindItemByValue(header.BusinessPartnerID ?? "");
-            if (cboi != null)
-            {
-                cboBusinessPartnerID.SelectedValue = cboi.Value;
-            }
-            else
-            {
-                cboBusinessPartnerID.SelectedIndex = 0;
-            }
+            //var eArgs = new RadComboBoxItemsRequestedEventArgs();
+            //eArgs.Text = header.BusinessPartnerID ?? "";
+            //cboSupplier_ItemsRequested(cboBusinessPartnerID, eArgs);
+            //var cboi = cboBusinessPartnerID.Items.FindItemByValue(header.BusinessPartnerID ?? "");
+            //if (cboi != null)
+            //{
+            //    //cboBusinessPartnerID.SelectedValue = cboi.Value;
+            //    SetBusinessPartner(cboi.Value);
+            //}
+            //else
+            //{
+            //    cboBusinessPartnerID.SelectedIndex = 0;
+            //}
+            SetBusinessPartner(header.BusinessPartnerID);
 
             txtCurrencyRate.Value = Convert.ToDouble(header.CurrencyRate);
             cboCurrencyType.SelectedValue = header.CurrencyID;
