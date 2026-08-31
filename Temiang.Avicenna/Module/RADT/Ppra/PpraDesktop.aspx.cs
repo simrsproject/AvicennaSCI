@@ -262,7 +262,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             presc.Save();
 
             TransPrescription.SoapeUpdatePrescriptionHist(presc.ParamedicID, presc.RegistrationNo, presc.PrescriptionDate ?? DateTime.Now);
-            ShowMessageAfterPostback("Resep Non PPAB sudah disetujui PPRA dan diteruskan ke Farmasi.");
+            Helper.ShowMessageAfterPostback(this, "Resep Non PPAB sudah disetujui PPRA dan diteruskan ke Farmasi.");
         }
 
         private void RejectNonPpabPrescription(string prescriptionNo, string reason)
@@ -275,7 +275,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             presc.VoidReason = string.Format("Ditolak PPRA: {0}", reason);
             presc.Save();
 
-            ShowMessageAfterPostback("Resep Non PPAB ditolak PPRA. Alasan penolakan akan muncul pada resep pasien.");
+            Helper.ShowMessageAfterPostback(this, "Resep Non PPAB ditolak PPRA. Alasan penolakan akan muncul pada resep pasien.");
         }
 
         private void PopulateServiceUnit()
