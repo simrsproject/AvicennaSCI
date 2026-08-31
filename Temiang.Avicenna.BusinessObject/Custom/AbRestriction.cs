@@ -5,6 +5,8 @@ namespace Temiang.Avicenna.BusinessObject
 {
     public partial class AbRestriction
     {
+        public const string NonPpabKeyword = "non ppab";
+
         public class AntibioticLevel
         {
             // Samakan dengan yg di AppConstant
@@ -157,6 +159,22 @@ namespace Temiang.Avicenna.BusinessObject
                 messageResult = "This antibiotic not in suggestion, but system not restrict";
 
             return (isAntibioticRestriction ? false : true);
+        }
+
+        public static bool IsNonPpab(RegistrationRaspro rr)
+        {
+            if (rr == null || string.IsNullOrWhiteSpace(rr.AbRestrictionID))
+                return false;
+
+            var abr = new AbRestriction();
+            return abr.LoadByPrimaryKey(rr.AbRestrictionID) && IsNonPpab(abr);
+        }
+
+        public static bool IsNonPpab(AbRestriction abr)
+        {
+            return abr != null
+                   && !string.IsNullOrWhiteSpace(abr.AbRestrictionName)
+                   && abr.AbRestrictionName.ToLower().Contains(NonPpabKeyword);
         }
 
         #region AntibioticSuggestion

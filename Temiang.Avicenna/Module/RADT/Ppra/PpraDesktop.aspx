@@ -44,6 +44,26 @@
                 var url = '<%= Helper.UrlRoot() %>/Module/RADT/EmrIp/EmrIpCommon/Medication/MedicationHist.aspx?patid=' + patid + '&regno=' + regno + '&fregno=' + fregno;
                 openWindowMaxScreen(url);
             }
+
+            function approveNonPpabPrescription(prescNo) {
+                if (confirm("Approve resep Non PPAB ini dan kirim ke Farmasi?")) {
+                    __doPostBack("<%= grdList.UniqueID %>", "ppraapprove|" + prescNo);
+                }
+            }
+
+            function rejectNonPpabPrescription(prescNo) {
+                var reason = prompt("Alasan penolakan resep Non PPAB:");
+                if (reason == null)
+                    return;
+
+                reason = reason.replace(/^\s+|\s+$/g, "");
+                if (reason.length == 0) {
+                    alert("Alasan penolakan wajib diisi.");
+                    return;
+                }
+
+                __doPostBack("<%= grdList.UniqueID %>", "pprareject|" + prescNo + "|" + encodeURIComponent(reason));
+            }
         </script>
 
     </telerik:RadCodeBlock>
@@ -228,6 +248,15 @@
                     <HeaderStyle HorizontalAlign="Left" Width="100px" />
                     <ItemStyle HorizontalAlign="Left" />
                 </telerik:GridDateTimeColumn>
+                <telerik:GridTemplateColumn UniqueName="NonPpabVerification" HeaderText="Non PPAB">
+                    <ItemTemplate>
+                        <%# string.IsNullOrEmpty(Convert.ToString(DataBinder.Eval(Container.DataItem, "PendingNonPpabPrescriptionNo"))) ? string.Empty :
+                            string.Format("Pending PPRA<br />{0}<br /><a href=\"#\" onclick=\"approveNonPpabPrescription('{0}'); return false;\"><img src=\"../../../Images/Toolbar/post16.png\" border=\"0\" alt=\"Approve\" title=\"Approve PPRA\" /></a>&nbsp;<a href=\"#\" onclick=\"rejectNonPpabPrescription('{0}'); return false;\"><img src=\"../../../Images/Toolbar/delete16.png\" border=\"0\" alt=\"Reject\" title=\"Reject PPRA\" /></a>",
+                            DataBinder.Eval(Container.DataItem, "PendingNonPpabPrescriptionNo")) %>
+                    </ItemTemplate>
+                    <HeaderStyle HorizontalAlign="Center" Width="110px" />
+                    <ItemStyle HorizontalAlign="Center" />
+                </telerik:GridTemplateColumn>
                 <telerik:GridTemplateColumn UniqueName="Menu" HeaderText=" ">
                     <ItemTemplate>
                         <%# !DataBinder.Eval(Container.DataItem, "SRRegistrationType").Equals(AppConstant.RegistrationType.InPatient)? string.Empty: string.Format("<a href=\"#\" onclick=\"openMedicationHist('{0}','{1}','{2}'); return false;\"><img src=\"../../../Images/Toolbar/history16.png\" border=\"0\" alt=\"MedHist\" title=\"Service Unit Kardex\" /></a>",
