@@ -52,7 +52,8 @@
             }
 
             function rejectNonPpabPrescription(prescNo) {
-                var reason = prompt("Alasan penolakan resep Non PPAB:");
+                var defaultReason = "Diagnosa infeksi termasuk dalam PPAB, silahkan Revisi RASAL / RASLAN / RASPRAJA / RASPATUR / PROFILAKSIS";
+                var reason = prompt("Alasan penolakan resep Non PPAB:", defaultReason);
                 if (reason == null)
                     return;
 
