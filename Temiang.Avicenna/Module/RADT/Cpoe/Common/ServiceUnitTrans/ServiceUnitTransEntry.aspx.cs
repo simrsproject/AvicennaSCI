@@ -1288,9 +1288,10 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                             header.ExecutionDate = entity.ExecutionDate;
                             header.ReferenceNo = string.Empty;
                             header.ResponUnitID = String.Empty;
+                            var isPackageDetailApproved = isApproval || pac.IsOrder || (entity.IsApproved ?? false);
                             header.FromServiceUnitID = (pac.IsOrder) ? entity.FromServiceUnitID : pac.ToServiceUnitID;
-                            header.IsBillProceed = false;
-                            header.IsApproved = pac.IsOrder;
+                            header.IsBillProceed = isPackageDetailApproved;
+                            header.IsApproved = isPackageDetailApproved;
                             if (header.IsApproved ?? false)
                             {
                                 header.ApprovedDateTime = entity.ApprovedDateTime ?? (new DateTime()).NowAtSqlServer();
@@ -1350,12 +1351,13 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                                 detail.SRDiscountReason = tci.SRDiscountReason;
                                 detail.IsAssetUtilization = tci.IsAssetUtilization;
                                 detail.AssetID = tci.AssetID;
-                                detail.IsBillProceed = false;// (tci.IsVoid ?? false) ? false : pac.IsOrder;
+                                var isDetailApproved = !(tci.IsVoid ?? false) && isPackageDetailApproved;
+                                detail.IsBillProceed = isDetailApproved;
                                 //detail.IsBillProceed = AppParameter.GetParameterValue(AppParameter.ParameterItem.IsJobOrderRealizationNeedConfirm).ToLower() == "yes" ? false : pac.IsOrder;
                                 detail.IsOrderRealization = tci.IsOrderRealization;
                                 detail.IsPaymentConfirmed = tci.IsPaymentConfirmed;
                                 detail.IsPackage = tci.IsPackage;
-                                detail.IsApprove = (tci.IsVoid ?? false) ? false : pac.IsOrder;
+                                detail.IsApprove = isDetailApproved;
                                 detail.IsVoid = tci.IsVoid;
                                 detail.Notes = tci.Notes;
                                 detail.FilmNo = tci.FilmNo;
@@ -1455,11 +1457,12 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                                     detail2.SRDiscountReason = tci2.SRDiscountReason;
                                     detail2.IsAssetUtilization = tci2.IsAssetUtilization;
                                     detail2.AssetID = tci2.AssetID;
-                                    detail2.IsBillProceed = tci2.IsBillProceed;
+                                    var isDetail2Approved = !(tci2.IsVoid ?? false) && isPackageDetailApproved;
+                                    detail2.IsBillProceed = isDetail2Approved;
                                     detail2.IsOrderRealization = tci2.IsOrderRealization;
                                     detail2.IsPaymentConfirmed = tci2.IsPaymentConfirmed;
                                     detail2.IsPackage = tci2.IsPackage;
-                                    detail2.IsApprove = tci2.IsApprove;
+                                    detail2.IsApprove = isDetail2Approved;
                                     detail2.IsVoid = tci2.IsVoid;
                                     detail2.Notes = tci2.Notes;
                                     detail2.FilmNo = tci2.FilmNo;
@@ -1513,11 +1516,12 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                                         detail3.SRDiscountReason = tci3.SRDiscountReason;
                                         detail3.IsAssetUtilization = tci3.IsAssetUtilization;
                                         detail3.AssetID = tci3.AssetID;
-                                        detail3.IsBillProceed = tci3.IsBillProceed;
+                                        var isDetail3Approved = !(tci3.IsVoid ?? false) && isPackageDetailApproved;
+                                        detail3.IsBillProceed = isDetail3Approved;
                                         detail3.IsOrderRealization = tci3.IsOrderRealization;
                                         detail3.IsPaymentConfirmed = tci3.IsPaymentConfirmed;
                                         detail3.IsPackage = tci3.IsPackage;
-                                        detail3.IsApprove = tci3.IsApprove;
+                                        detail3.IsApprove = isDetail3Approved;
                                         detail3.IsVoid = tci3.IsVoid;
                                         detail3.Notes = tci3.Notes;
                                         detail3.FilmNo = tci3.FilmNo;

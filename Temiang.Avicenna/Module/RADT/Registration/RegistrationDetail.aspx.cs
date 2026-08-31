@@ -147,15 +147,30 @@ namespace Temiang.Avicenna.Module.RADT
 
         protected void cvVisitNo_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            if (string.Equals(
-                Request.QueryString["rt"],
-                "IPR",
+            var healthCareId = AppSession.Parameter.HealthcareID;
+
+            // Hanya HealthcareID RSI yang menggunakan validasi Visit No
+            if (!string.Equals(
+                healthCareId,
+                "RSI",
                 StringComparison.OrdinalIgnoreCase))
             {
                 args.IsValid = true;
                 return;
             }
 
+            string registrationType = Request.QueryString["rt"];
+
+            // IPR, EMR, dan MCU tidak wajib mengisi Visit No
+            if (string.Equals(registrationType, "IPR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(registrationType, "EMR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(registrationType, "MCU", StringComparison.OrdinalIgnoreCase))
+            {
+                args.IsValid = true;
+                return;
+            }
+
+            // Selain IPR, EMR, MCU -> Visit No wajib diisi
             args.IsValid =
                 !string.IsNullOrWhiteSpace(txtVisitNo.Text) ||
                 !string.IsNullOrWhiteSpace(txtGenerateVisitNo.Text);
@@ -261,6 +276,7 @@ namespace Temiang.Avicenna.Module.RADT
             {
                 PopulateVisitNo();
                 SetVisitNoVisibility(); // Tampilkan VisitNo untuk RSI
+
             }
 
             //Service Unit & Paramedic
@@ -770,6 +786,31 @@ namespace Temiang.Avicenna.Module.RADT
             }
         }
 
+        private void PopulateVisitNoByRegistrationNo(string registrationNo)
+        {
+            txtVisitNo.Text = string.Empty;
+
+            if (string.IsNullOrEmpty(registrationNo))
+                return;
+
+            var coll = new VisitQueueCollection();
+
+            coll.Query.Where(
+                coll.Query.RegistrationNo == registrationNo
+            );
+
+            coll.Query.OrderBy(
+                coll.Query.LastUpdated.Descending
+            );
+
+            coll.LoadAll();
+
+            if (coll.Count > 0)
+            {
+                txtVisitNo.Text = coll[0].VisitNo ?? string.Empty;
+            }
+        }
+
         private void SetVisitNoVisibility()
         {
             var healthCareId = AppSession.Parameter.HealthcareID;
@@ -780,11 +821,12 @@ namespace Temiang.Avicenna.Module.RADT
                 StringComparison.OrdinalIgnoreCase
             );
 
-            // Hide jika IPR
-            if (string.Equals(
-                Request.QueryString["rt"],
-                "IPR",
-                StringComparison.OrdinalIgnoreCase))
+            // Hide jika IPR, EMR, atau MCU
+            string registrationType = Request.QueryString["rt"];
+
+            if (string.Equals(registrationType, "IPR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(registrationType, "EMR", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(registrationType, "MCU", StringComparison.OrdinalIgnoreCase))
             {
                 isEnable = false;
             }
@@ -794,6 +836,9 @@ namespace Temiang.Avicenna.Module.RADT
 
             txtVisitNo.Enabled = isEnable;
             txtGenerateVisitNo.Enabled = isEnable;
+
+            // Tombol Generate hanya muncul jika RSI dan bukan IPR/EMR/MCU
+            btnGetGenerateVisitNo.Visible = isEnable;
 
             if (!isEnable)
             {
@@ -3729,6 +3774,8 @@ namespace Temiang.Avicenna.Module.RADT
             txtRegistrationDate.SelectedDate = reg.RegistrationDate;
             txtRegistrationTime.Text = reg.RegistrationTime;
             cboSRShift.SelectedValue = reg.SRShift;
+
+            PopulateVisitNoByRegistrationNo(reg.RegistrationNo);
 
             // Patient
             txtPatientID.Text = reg.PatientID;

@@ -456,8 +456,18 @@
                     <HeaderStyle HorizontalAlign="Center" Width="50px" />
                     <ItemStyle HorizontalAlign="Center" />
                 </telerik:GridBoundColumn>
-                <telerik:GridBoundColumn DataField="InitialDiagnose" HeaderText="Initial Diagnosis" UniqueName="InitialDiagnose"
+                <telerik:GridBoundColumn HeaderStyle-Width="250px" DataField="InitialDiagnose" HeaderText="Initial Diagnosis" UniqueName="InitialDiagnose"
                     SortExpression="InitialDiagnose">
+                    <HeaderStyle HorizontalAlign="Left" />
+                    <ItemStyle HorizontalAlign="Left" />
+                </telerik:GridBoundColumn>
+                <telerik:GridBoundColumn HeaderStyle-Width="250px" DataField="Suggestion" HeaderText="Suggestion" UniqueName="Suggestion"
+                    SortExpression="Suggestion">
+                    <HeaderStyle HorizontalAlign="Left" />
+                    <ItemStyle HorizontalAlign="Left" />
+                </telerik:GridBoundColumn>
+                <telerik:GridBoundColumn HeaderStyle-Width="250px" DataField="MppNote" HeaderText="MPP Note" UniqueName="MppNote"
+                    SortExpression="MppNote">
                     <HeaderStyle HorizontalAlign="Left" />
                     <ItemStyle HorizontalAlign="Left" />
                 </telerik:GridBoundColumn>

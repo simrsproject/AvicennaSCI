@@ -9,14 +9,40 @@
                     <tr>
                         <td class="label">Code</td>
                         <td class="entry">
-                            <telerik:RadTextBox ID="txtQuestionnaireCode" runat="server" Width="300px" MaxLength="50" /></td>
+                            <telerik:RadTextBox
+                                ID="txtQuestionnaireCode"
+                                runat="server"
+                                Width="300px"
+                                MaxLength="50"
+                                AutoPostBack="true"
+                                OnTextChanged="txtQuestionnaireCode_TextChanged" />
+
+                            <br />
+
+                            <asp:Label
+                                ID="lblQuestionnaireCodeWarning"
+                                runat="server"
+                                ForeColor="Red"
+                                Visible="false"
+                                Font-Bold="true" />
+                        </td>
+
                         <td width="20px">
-                            <asp:RequiredFieldValidator ID="rfvQuestionnaireCode" runat="server" ErrorMessage="Code required."
-                                ValidationGroup="entry" ControlToValidate="txtQuestionnaireCode" SetFocusOnError="True"
+                            <asp:RequiredFieldValidator
+                                ID="rfvQuestionnaireCode"
+                                runat="server"
+                                ErrorMessage="Code required."
+                                ValidationGroup="entry"
+                                ControlToValidate="txtQuestionnaireCode"
+                                SetFocusOnError="True"
                                 Width="100%">
-                                <asp:Image ID="Image1" runat="server" SkinID="rfvImage" />
+                                <asp:Image
+                                    ID="Image1"
+                                    runat="server"
+                                    SkinID="rfvImage" />
                             </asp:RequiredFieldValidator>
                         </td>
+
                         <td />
                     </tr>
                     <tr>
@@ -68,9 +94,17 @@
                     <tr>
                         <td class="label">Clinical Authority Level / Qualification</td>
                         <td class="entry">
-                            <telerik:RadComboBox ID="cboSRClinicalAuthorityLevel" runat="server" Width="300px" EnableLoadOnDemand="True"
-                                HighlightTemplatedItems="True" MarkFirstMatch="True" OnItemDataBound="cboSRClinicalAuthorityLevel_ItemDataBound"
-                                OnItemsRequested="cboSRClinicalAuthorityLevel_ItemsRequested">
+                            <telerik:RadComboBox
+                                ID="cboSRClinicalAuthorityLevel"
+                                runat="server"
+                                Width="300px"
+                                EnableLoadOnDemand="True"
+                                HighlightTemplatedItems="True"
+                                MarkFirstMatch="True"
+                                AutoPostBack="true"
+                                OnItemDataBound="cboSRClinicalAuthorityLevel_ItemDataBound"
+                                OnItemsRequested="cboSRClinicalAuthorityLevel_ItemsRequested"
+                                OnSelectedIndexChanged="cboSRClinicalAuthorityLevel_SelectedIndexChanged">
                             </telerik:RadComboBox>
                         </td>
                         <td width="20px">
