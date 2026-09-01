@@ -14,13 +14,13 @@ BEGIN
     INSERT INTO [dbo].[AppParameter]
         ([IsUsedBySystem], [LastUpdateByUserID], [LastUpdateDateTime], [Message], [ParameterID], [ParameterName], [ParameterType], [ParameterValue])
     VALUES
-        (0, 'imel', GETDATE(), NULL, 'IsNeedPpraApproval', 'Is Need PPRA Approval for Non PPAB Prescription', ' ', 'False')
+        (0, 'imel', GETDATE(), NULL, 'IsNeedPpraApproval', 'Is Need PPRA Approval for Non PPAB Prescription', ' ', 'No')
 END
 ELSE
 BEGIN
     UPDATE [dbo].[AppParameter]
     SET [ParameterName] = 'Is Need PPRA Approval for Non PPAB Prescription',
         [ParameterType] = ' ',
-        [ParameterValue] = CASE WHEN ISNULL([ParameterValue], '') = '' THEN 'False' ELSE [ParameterValue] END
+        [ParameterValue] = CASE WHEN ISNULL([ParameterValue], '') = '' THEN 'No' ELSE [ParameterValue] END
     WHERE [ParameterID] = 'IsNeedPpraApproval'
 END
