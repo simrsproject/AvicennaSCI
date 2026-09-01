@@ -923,6 +923,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
 
+            AddPpraRejectedPrescriptionNotificationSelect(reg);
+
             if (regTypes.Length == 1)
                 reg.Where(reg.SRRegistrationType == regTypes[0]);
             else if (regTypes.Length > 1)
@@ -1370,6 +1372,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
 
+            AddPpraRejectedPrescriptionNotificationSelect(reg);
+
             reg.InnerJoin(room).On(reg.RoomID == room.RoomID);
             reg.InnerJoin(patient).On(reg.PatientID == patient.PatientID);
             reg.InnerJoin(grr).On(reg.GuarantorID == grr.GuarantorID);
@@ -1407,6 +1411,19 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             var dtb = reg.LoadDataTable();
 
             return dtb; // DeleteInPatientBedStatusPendingAndNotInBed(dtb);
+        }
+
+        private static void AddPpraRejectedPrescriptionNotificationSelect(RegistrationQuery reg)
+        {
+            reg.Select(string.Format(@"<CAST(CASE WHEN EXISTS (
+                SELECT TOP 1 1
+                FROM TransPrescription tp
+                INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
+                WHERE tp.RegistrationNo = reg.RegistrationNo
+                  AND ISNULL(tp.IsVoid, 0) = 0
+                  AND ISNULL(tp.IsPpraRejected, 0) = 1
+                  AND rr.AbRestrictionID = '{0}'
+            ) THEN 1 ELSE 0 END AS BIT) AS HasPpraRejectedPrescription>", AbRestriction.NonPpabID));
         }
 
         private DataTable DeleteInPatientBedStatusPendingAndNotInBed(DataTable dtb)

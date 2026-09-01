@@ -1003,17 +1003,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         {
             var presc = new TransPrescriptionQuery("tp");
             var rr = new RegistrationRasproQuery("rr");
-            var abr = new AbRestrictionQuery("abr");
 
             presc.InnerJoin(rr).On(rr.RegistrationNo == presc.RegistrationNo & rr.SeqNo == presc.RasproSeqNo);
-            presc.InnerJoin(abr).On(abr.AbRestrictionID == rr.AbRestrictionID);
             presc.es.Top = 1;
             presc.Select(presc.PrescriptionNo, presc.PpraRejectionReason);
             presc.Where(
                 presc.RegistrationNo == RegistrationNo,
                 presc.Or(presc.IsVoid.IsNull(), presc.IsVoid == false),
                 presc.IsPpraRejected == true,
-                "<LOWER(abr.AbRestrictionName) LIKE '%non ppab%'>"
+                rr.AbRestrictionID == AbRestriction.NonPpabID
             );
             presc.OrderBy(presc.PrescriptionDate.Descending, presc.PrescriptionNo.Descending);
 

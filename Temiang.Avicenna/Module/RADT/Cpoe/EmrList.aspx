@@ -855,6 +855,13 @@
                     <HeaderStyle HorizontalAlign="Center" Width="40px" />
                     <ItemStyle HorizontalAlign="Center" />
                 </telerik:GridTemplateColumn>
+                <telerik:GridTemplateColumn UniqueName="PpraRejectedPrescription" HeaderText="">
+                    <ItemTemplate>
+                        <%# Convert.ToBoolean(DataBinder.Eval(Container.DataItem, "HasPpraRejectedPrescription")) ? "<img src=\"../../../Images/Toolbar/blacklist.png\" border=\"0\" alt=\"PPRA\" title=\"Ada resep Non PPAB ditolak PPRA\" />" : string.Empty%>
+                    </ItemTemplate>
+                    <HeaderStyle HorizontalAlign="Center" Width="35px" />
+                    <ItemStyle HorizontalAlign="Center" />
+                </telerik:GridTemplateColumn>
 
                 <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ParamedicID"
                     UniqueName="ParamedicID" SortExpression="ParamedicID" Visible="False">

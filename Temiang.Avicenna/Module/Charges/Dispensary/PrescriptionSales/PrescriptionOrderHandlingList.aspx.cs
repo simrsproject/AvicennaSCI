@@ -358,15 +358,14 @@ namespace Temiang.Avicenna.Module.Charges
 
                 if (AppSession.Parameter.IsNeedPpraApproval)
                 {
-                    presc.Where(@"<NOT EXISTS (
+                    presc.Where(string.Format(@"<NOT EXISTS (
                         SELECT TOP 1 1
                         FROM RegistrationRaspro rr
-                        INNER JOIN AbRestriction abr ON abr.AbRestrictionID = rr.AbRestrictionID
                         WHERE rr.RegistrationNo = a.RegistrationNo
                           AND rr.SeqNo = a.RasproSeqNo
-                          AND LOWER(abr.AbRestrictionName) LIKE '%non ppab%'
+                          AND rr.AbRestrictionID = '{0}'
                           AND ISNULL(a.IsPpraApproved, 0) = 0
-                    )>");
+                    )>", AbRestriction.NonPpabID));
                 }
 
                 if (Request.QueryString["rt"] == "ipr" &&

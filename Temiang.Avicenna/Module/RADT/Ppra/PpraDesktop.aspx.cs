@@ -102,16 +102,15 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                     rg.ItemName.As("ReferralGroupName"),
                     sal.ItemName.As("SalutationName"),
                     query.DischargeDate,
-                    AppSession.Parameter.IsNeedPpraApproval ? @"<(SELECT TOP 1 tp.PrescriptionNo
+                    AppSession.Parameter.IsNeedPpraApproval ? string.Format(@"<(SELECT TOP 1 tp.PrescriptionNo
                         FROM TransPrescription tp
                         INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
-                        INNER JOIN AbRestriction abr ON abr.AbRestrictionID = rr.AbRestrictionID
                         WHERE tp.RegistrationNo = e.RegistrationNo
                           AND ISNULL(tp.IsPpraApproved, 0) = 0
                           AND ISNULL(tp.IsVoid, 0) = 0
                           AND ISNULL(tp.IsPpraRejected, 0) = 0
-                          AND LOWER(abr.AbRestrictionName) LIKE '%non ppab%'
-                        ORDER BY tp.PrescriptionDate DESC, tp.PrescriptionNo DESC) AS PendingNonPpabPrescriptionNo>" :
+                          AND rr.AbRestrictionID = '{0}'
+                        ORDER BY tp.PrescriptionDate DESC, tp.PrescriptionNo DESC) AS PendingNonPpabPrescriptionNo>", AbRestriction.NonPpabID) :
                     @"<CAST('' AS varchar(20)) AS PendingNonPpabPrescriptionNo>"
                 );
 
@@ -181,9 +180,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             {
                 var sqPendingNonPpab = new TransPrescriptionQuery("pnp");
                 var sqPendingRaspro = new RegistrationRasproQuery("pnprr");
-                var sqPendingAbr = new AbRestrictionQuery("pnpabr");
                 sqPendingNonPpab.InnerJoin(sqPendingRaspro).On(sqPendingRaspro.RegistrationNo == sqPendingNonPpab.RegistrationNo & sqPendingRaspro.SeqNo == sqPendingNonPpab.RasproSeqNo);
-                sqPendingNonPpab.InnerJoin(sqPendingAbr).On(sqPendingAbr.AbRestrictionID == sqPendingRaspro.AbRestrictionID);
                 sqPendingNonPpab.es.Top = 1;
                 sqPendingNonPpab.Select(sqPendingNonPpab.RegistrationNo);
                 sqPendingNonPpab.Where(
@@ -191,7 +188,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraApproved.IsNull(), sqPendingNonPpab.IsPpraApproved == false),
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsVoid.IsNull(), sqPendingNonPpab.IsVoid == false),
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraRejected.IsNull(), sqPendingNonPpab.IsPpraRejected == false),
-                    "<LOWER(pnpabr.AbRestrictionName) LIKE '%non ppab%'>"
+                    sqPendingRaspro.AbRestrictionID == AbRestriction.NonPpabID
                 );
 
                 query.Where(query.Or(query.Exists(sqTpi), query.Exists(sqPendingNonPpab)));
