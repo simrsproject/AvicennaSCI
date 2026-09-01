@@ -104,7 +104,9 @@ namespace Temiang.Avicenna.Module.Emr.EmrCommon
                 "<(a.ParentNo + a.SequenceNo) as ORDERKEY>",
                 itemQuery.LineAmount,
                 itemQuery.Notes, presc.CompleteDateTime,
-                reg.Complaint
+                reg.Complaint,
+                presc.IsPpraRejected,
+                presc.PpraRejectionReason
                 );
 
 
@@ -164,7 +166,8 @@ namespace Temiang.Avicenna.Module.Emr.EmrCommon
                         prescItem.PrescriptionDateLabel = Convert.ToDateTime(r["PrescriptionDate"]).ToString(AppConstant.DisplayFormat.DateShortMonth);
                         prescItem.ParamedicName = r["ParamedicName"].ToString();
                         prescItem.ChiefComplaint = r["Complaint"].ToString();
-                        //prescriptionHeader = string.Format("Presc No: {0} Date:{1} Complete: {2}", r["PrescriptionNo"], Convert.ToDateTime(r["PrescriptionDate"]).ToString(AppConstant.DisplayFormat.DateShortMonth), Convert.ToDateTime(r["CompleteDateTime"]).ToString(AppConstant.DisplayFormat.DateHourMinute));
+                        prescItem.IsRejectedByPpra = r["IsPpraRejected"] != DBNull.Value && Convert.ToBoolean(r["IsPpraRejected"]);
+                        prescItem.RejectionReason = r["PpraRejectionReason"] != DBNull.Value ? r["PpraRejectionReason"].ToString() : string.Empty;
                     }
                     i++;
 
@@ -213,7 +216,8 @@ namespace Temiang.Avicenna.Module.Emr.EmrCommon
             public DateTime PrescriptionDate { get; set; }
             public string PrescriptionDateLabel { get; set; }
             public string ChiefComplaint { get; set; }
-            
+            public bool IsRejectedByPpra { get; set; }
+            public string RejectionReason { get; set; }
         }
     }
 }

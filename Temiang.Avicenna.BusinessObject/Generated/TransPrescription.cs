@@ -214,6 +214,8 @@ namespace Temiang.Avicenna.BusinessObject
 						case "IsUnapproved": this.str.IsUnapproved = (string)value; break;
 						case "UnapprovedDateTime": this.str.UnapprovedDateTime = (string)value; break;
 						case "UnapprovedByUserID": this.str.UnapprovedByUserID = (string)value; break;
+						case "IsPpraRejected": this.str.IsPpraRejected = (string)value; break;
+						case "PpraRejectionReason": this.str.PpraRejectionReason = (string)value; break;
 						case "SRKioskQueueType": this.str.SRKioskQueueType = (string)value; break;
 						case "KioskQueueNo": this.str.KioskQueueNo = (string)value; break;
 						case "IsVerified": this.str.IsVerified = (string)value; break;
@@ -366,6 +368,16 @@ namespace Temiang.Avicenna.BusinessObject
 
 							if (value == null || value is System.DateTime)
 								this.UnapprovedDateTime = (System.DateTime?)value;
+							break;
+						case "IsPpraRejected":
+
+							if (value == null || value is System.Boolean)
+								this.IsPpraRejected = (System.Boolean?)value;
+							break;
+						case "PpraRejectionReason":
+
+							if (value == null || value is System.String)
+								this.PpraRejectionReason = (System.String)value;
 							break;
 						case "IsVerified":
 
@@ -1146,6 +1158,36 @@ namespace Temiang.Avicenna.BusinessObject
 			set
 			{
 				base.SetSystemBoolean(TransPrescriptionMetadata.ColumnNames.IsUnapproved, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TransPrescription.IsPpraRejected
+		/// </summary>
+		virtual public System.Boolean? IsPpraRejected
+		{
+			get
+			{
+				return base.GetSystemBoolean(TransPrescriptionMetadata.ColumnNames.IsPpraRejected);
+			}
+
+			set
+			{
+				base.SetSystemBoolean(TransPrescriptionMetadata.ColumnNames.IsPpraRejected, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TransPrescription.PpraRejectionReason
+		/// </summary>
+		virtual public System.String PpraRejectionReason
+		{
+			get
+			{
+				return base.GetSystemString(TransPrescriptionMetadata.ColumnNames.PpraRejectionReason);
+			}
+
+			set
+			{
+				base.SetSystemString(TransPrescriptionMetadata.ColumnNames.PpraRejectionReason, value);
 			}
 		}
 		/// <summary>
@@ -2154,6 +2196,34 @@ namespace Temiang.Avicenna.BusinessObject
 					else entity.IsUnapproved = Convert.ToBoolean(value);
 				}
 			}
+			public System.String IsPpraRejected
+			{
+				get
+				{
+					System.Boolean? data = entity.IsPpraRejected;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.IsPpraRejected = null;
+					else entity.IsPpraRejected = Convert.ToBoolean(value);
+				}
+			}
+			public System.String PpraRejectionReason
+			{
+				get
+				{
+					System.String data = entity.PpraRejectionReason;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.PpraRejectionReason = null;
+					else entity.PpraRejectionReason = Convert.ToString(value);
+				}
+			}
 			public System.String UnapprovedDateTime
 			{
 				get
@@ -2847,6 +2917,20 @@ namespace Temiang.Avicenna.BusinessObject
 			get
 			{
 				return new esQueryItem(this, TransPrescriptionMetadata.ColumnNames.IsUnapproved, esSystemType.Boolean);
+			}
+		}
+		public esQueryItem IsPpraRejected
+		{
+			get
+			{
+				return new esQueryItem(this, TransPrescriptionMetadata.ColumnNames.IsPpraRejected, esSystemType.Boolean);
+			}
+		}
+		public esQueryItem PpraRejectionReason
+		{
+			get
+			{
+				return new esQueryItem(this, TransPrescriptionMetadata.ColumnNames.PpraRejectionReason, esSystemType.String);
 			}
 		}
 
@@ -3754,6 +3838,16 @@ namespace Temiang.Avicenna.BusinessObject
 			c.IsNullable = true;
 			_columns.Add(c);
 
+			c = new esColumnMetadata(TransPrescriptionMetadata.ColumnNames.IsPpraRejected, 67, typeof(System.Boolean), esSystemType.Boolean);
+			c.PropertyName = TransPrescriptionMetadata.PropertyNames.IsPpraRejected;
+			c.IsNullable = true;
+			_columns.Add(c);
+
+			c = new esColumnMetadata(TransPrescriptionMetadata.ColumnNames.PpraRejectionReason, 68, typeof(System.String), esSystemType.String);
+			c.PropertyName = TransPrescriptionMetadata.PropertyNames.PpraRejectionReason;
+			c.IsNullable = true;
+			_columns.Add(c);
+
 
 		}
 		#endregion
@@ -3848,6 +3942,8 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string CompleteByUserID = "CompleteByUserID";
 			public const string InProgressByUserID = "InProgressByUserID";
 			public const string InProgressDateTime = "InProgressDateTime";
+			public const string IsPpraRejected = "IsPpraRejected";
+			public const string PpraRejectionReason = "PpraRejectionReason";
 		}
 		#endregion
 
@@ -3921,6 +4017,8 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string CompleteByUserID = "CompleteByUserID";
 			public const string InProgressByUserID = "InProgressByUserID";
 			public const string InProgressDateTime = "InProgressDateTime";
+			public const string IsPpraRejected = "IsPpraRejected";
+			public const string PpraRejectionReason = "PpraRejectionReason";
 		}
 		#endregion
 
@@ -4031,6 +4129,8 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("CompleteByUserID", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("InProgressByUserID", new esTypeMap("varchar", "System.String"));
 				meta.AddTypeMap("InProgressDateTime", new esTypeMap("datetime", "System.DateTime"));
+				meta.AddTypeMap("IsPpraRejected", new esTypeMap("bit", "System.Boolean"));
+				meta.AddTypeMap("PpraRejectionReason", new esTypeMap("nvarchar", "System.String"));
 
 
 				meta.Source = "TransPrescription";

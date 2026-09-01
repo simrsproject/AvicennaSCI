@@ -109,6 +109,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                         WHERE tp.RegistrationNo = e.RegistrationNo
                           AND ISNULL(tp.IsApproval, 0) = 0
                           AND ISNULL(tp.IsVoid, 0) = 0
+                          AND ISNULL(tp.IsPpraRejected, 0) = 0
                           AND LOWER(abr.AbRestrictionName) LIKE '%non ppab%'
                         ORDER BY tp.PrescriptionDate DESC, tp.PrescriptionNo DESC) AS PendingNonPpabPrescriptionNo>"
                 );
@@ -186,6 +187,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                 sqPendingNonPpab.RegistrationNo == query.RegistrationNo,
                 sqPendingNonPpab.Or(sqPendingNonPpab.IsApproval.IsNull(), sqPendingNonPpab.IsApproval == false),
                 sqPendingNonPpab.Or(sqPendingNonPpab.IsVoid.IsNull(), sqPendingNonPpab.IsVoid == false),
+                sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraRejected.IsNull(), sqPendingNonPpab.IsPpraRejected == false),
                 "<LOWER(pnpabr.AbRestrictionName) LIKE '%non ppab%'>"
             );
 
@@ -243,7 +245,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
 
         private static bool IsPendingNonPpabPrescription(TransPrescription presc)
         {
-            if (presc == null || presc.RasproSeqNo == null || (presc.IsApproval ?? false) || (presc.IsVoid ?? false))
+            if (presc == null || presc.RasproSeqNo == null || (presc.IsApproval ?? false) || (presc.IsVoid ?? false) || (presc.IsPpraRejected ?? false))
                 return false;
 
             var rr = new RegistrationRaspro();
@@ -271,8 +273,9 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             if (!presc.LoadByPrimaryKey(prescriptionNo) || !IsPendingNonPpabPrescription(presc))
                 return;
 
-            presc.IsVoid = true;
-            presc.VoidReason = string.Format("Ditolak PPRA: {0}", reason);
+            presc.IsVoid = false;
+            presc.IsPpraRejected = true;
+            presc.PpraRejectionReason = reason;
             presc.Save();
 
             Helper.ShowMessageAfterPostback(this, "Resep Non PPAB ditolak PPRA. Alasan penolakan akan muncul pada resep pasien.");

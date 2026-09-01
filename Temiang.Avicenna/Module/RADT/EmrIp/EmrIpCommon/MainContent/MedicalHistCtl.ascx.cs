@@ -130,7 +130,9 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.MainContent
                 @"<ISNULL(a.OriSRConsumeUnit, a.SRConsumeUnit) AS SRConsumeUnit>",
                 "<(a.ParentNo + a.SequenceNo) as ORDERKEY>",
                 prescItemQr.LineAmount,
-                prescItemQr.Notes
+                prescItemQr.Notes,
+                prescQr.IsPpraRejected,
+                prescQr.PpraRejectionReason
                 );
 
             prescQr.LeftJoin(prescItemQr).On(prescItemQr.PrescriptionNo == prescQr.PrescriptionNo);
@@ -206,7 +208,8 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.MainContent
                         }
 
                         var isApproved = Convert.ToBoolean(row["IsApproval"]);
-                        //var isUnitDosePrescription = Convert.ToBoolean(row["IsUnitDosePrescription"]);
+                        var isPpraRejected = row.Table.Columns.Contains("IsPpraRejected") && row["IsPpraRejected"] != DBNull.Value && Convert.ToBoolean(row["IsPpraRejected"]);
+                        var ppraRejectionReason = row.Table.Columns.Contains("PpraRejectionReason") && row["PpraRejectionReason"] != DBNull.Value ? row["PpraRejectionReason"].ToString() : string.Empty;
 
                         // End detail Item
                         sbItem.Append("</tr></table>");
@@ -216,6 +219,13 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.MainContent
                         sbItem.AppendFormat("<td style='font-weight: bold;'><div style=\"float:left;color: {0}; \">[APPR]&nbsp;</div></td>", isApproved ? "red" : "gray");
                         sbItem.AppendFormat("<td align=\"right\" style=\"width: 80px;\">{0}&nbsp;&nbsp;{1}&nbsp;&nbsp;{2}</td>", printMenu, editMenu, deleteMenu);
                         sbItem.Append("</tr></table>");
+
+                        if (isPpraRejected)
+                        {
+                            sbItem.AppendFormat(
+                                "<div style='background-color:#fff0f0;border-left:4px solid #d9534f;padding:6px 10px;margin:4px 0;color:#d9534f;font-weight:bold;'>&#9888; Ditolak PPRA: {0}</div>",
+                                System.Web.HttpUtility.HtmlEncode(ppraRejectionReason));
+                        }
 
                         // Start detail Item
                         sbItem.Append("<table style=\"width: 100%;\"><tr>");
