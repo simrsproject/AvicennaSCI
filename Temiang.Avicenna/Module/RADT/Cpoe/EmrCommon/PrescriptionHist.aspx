@@ -24,7 +24,7 @@
                     <div class="k-card-description">
                         # if (data.IsRejectedByPpra) { #
                         <div style="background-color:#fff0f0;border-left:4px solid #d9534f;padding:6px 10px;margin-bottom:6px;color:#d9534f;font-weight:bold;">
-                            &#9888; #= data.RejectionReason #
+                            &#9888; Ditolak PPRA: #: data.RejectionReason #
                         </div>
                         # } #
                         #= data.PrescriptionItem #

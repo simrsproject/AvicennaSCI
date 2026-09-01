@@ -1648,6 +1648,13 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
             header.IsForTakeItHome = AppParameter.GetParameterValue(AppParameter.ParameterItem.PrescriptionCategoryHomePresID).Equals(cboSRPrescriptionCategory.SelectedValue);
             header.SRPrescriptionCategory = cboSRPrescriptionCategory.SelectedValue;
+
+            if ((header.IsPpraRejected ?? false) && IsNonPpabPrescription(header.PrescriptionNo))
+            {
+                header.IsPpraRejected = false;
+                header.PpraRejectionReason = string.Empty;
+            }
+
             using (var trans = new esTransactionScope())
             {
                 header.Save();

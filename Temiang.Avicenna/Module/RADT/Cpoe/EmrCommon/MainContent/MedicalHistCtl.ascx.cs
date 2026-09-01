@@ -513,7 +513,23 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                 sbItem.AppendFormat("{0}<br/>", presc.Note);
             }
 
+            AppendPpraRejectionInfo(sbItem, presc);
+
             return prescriptionHeader;
+        }
+
+        private static void AppendPpraRejectionInfo(StringBuilder sbItem, TransPrescription presc)
+        {
+            if (presc == null || !(presc.IsPpraRejected ?? false))
+                return;
+
+            var rejectionReason = presc.PpraRejectionReason ?? string.Empty;
+
+            sbItem.AppendFormat(
+                "<div style=\"background-color:#fff0f0;border-left:4px solid #d9534f;padding:6px 10px;margin:4px 0;color:#d9534f;font-weight:bold;white-space:normal;\">&#9888; Ditolak PPRA{0}</div>",
+                string.IsNullOrWhiteSpace(rejectionReason)
+                    ? string.Empty
+                    : string.Format(": {0}", HttpUtility.HtmlEncode(rejectionReason)));
         }
 
         protected void grdDiagAndPrescription_ItemCommand(object sender, GridCommandEventArgs e)
