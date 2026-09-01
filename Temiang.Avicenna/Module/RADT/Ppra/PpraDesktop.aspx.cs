@@ -271,6 +271,9 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             presc.IsPpraApproved = true;
             presc.IsPpraRejected = false;
             presc.PpraRejectionReason = string.Empty;
+            presc.IsApproval = true;
+            presc.ApprovalDateTime = (new DateTime()).NowAtSqlServer();
+            presc.ApprovedByUserID = AppSession.UserLogin.UserID;
             presc.Save();
 
             TransPrescription.SoapeUpdatePrescriptionHist(presc.ParamedicID, presc.RegistrationNo, presc.PrescriptionDate ?? DateTime.Now);
