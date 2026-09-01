@@ -855,13 +855,7 @@
                     <HeaderStyle HorizontalAlign="Center" Width="40px" />
                     <ItemStyle HorizontalAlign="Center" />
                 </telerik:GridTemplateColumn>
-                <telerik:GridTemplateColumn UniqueName="PpraRejectedPrescription" HeaderText="">
-                    <ItemTemplate>
-                        <%# Convert.ToBoolean(DataBinder.Eval(Container.DataItem, "HasPpraRejectedPrescription")) ? "<img src=\"../../../Images/Toolbar/blacklist.png\" border=\"0\" alt=\"PPRA\" title=\"Ada resep Non PPAB ditolak PPRA\" />" : string.Empty%>
-                    </ItemTemplate>
-                    <HeaderStyle HorizontalAlign="Center" Width="35px" />
-                    <ItemStyle HorizontalAlign="Center" />
-                </telerik:GridTemplateColumn>
+
 
                 <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ParamedicID"
                     UniqueName="ParamedicID" SortExpression="ParamedicID" Visible="False">
@@ -1119,6 +1113,16 @@
                         <%# DataBinder.Eval(Container.DataItem, "RowSource").ToString() %>
                         <%# DataBinder.Eval(Container.DataItem, "SRBedStatus").ToString() %>
                     </ItemTemplate>
+                </telerik:GridTemplateColumn>
+                <telerik:GridTemplateColumn HeaderText="PPRA" UniqueName="PpraRejectedPrescription" HeaderStyle-Width="80px">
+                    <ItemTemplate>
+                        <%# Convert.ToBoolean(DataBinder.Eval(Container.DataItem, "HasPpraRejectedPrescription")) 
+                            ? string.Format("<span style='color:#d9534f;font-size:10px;font-weight:bold;'>&#9888; Ditolak PPRA</span><br/><span style='font-size:10px;color:#333;'>{0}</span>", 
+                                System.Web.HttpUtility.HtmlEncode(DataBinder.Eval(Container.DataItem, "PpraRejectionReason") != DBNull.Value ? DataBinder.Eval(Container.DataItem, "PpraRejectionReason").ToString() : string.Empty))
+                            : string.Empty %>
+                    </ItemTemplate>
+                    <HeaderStyle HorizontalAlign="Center" Width="80px" />
+                    <ItemStyle HorizontalAlign="Left" VerticalAlign="Middle" Wrap="True" />
                 </telerik:GridTemplateColumn>
 
                 <telerik:GridTemplateColumn></telerik:GridTemplateColumn>
