@@ -403,6 +403,33 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
         protected global::System.Web.UI.WebControls.Label lblClinicalPathway;
 
         /// <summary>
+        /// divPpraRejectedPrescription control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divPpraRejectedPrescription;
+
+        /// <summary>
+        /// imgPpraRejectedPrescription control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Image imgPpraRejectedPrescription;
+
+        /// <summary>
+        /// lblPpraRejectedPrescription control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblPpraRejectedPrescription;
+
+        /// <summary>
         /// cpnPhyTeam control.
         /// </summary>
         /// <remarks>

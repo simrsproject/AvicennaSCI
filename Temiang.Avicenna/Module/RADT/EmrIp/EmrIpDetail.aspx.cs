@@ -779,6 +779,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
 
             lblClinicalPathway.Text = Registration.GetRegistrationPathwayName(RegistrationNo);
             divClinicalPathway.Visible = AppSession.Parameter.ClinicalPathwayRegistrationType.Contains(RegistrationType);
+            PopulatePpraRejectedPrescriptionNotification();
 
             /**
              * Last Ranap Date
@@ -987,6 +988,46 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp
             litInitialDiagnose.Text = RegistrationCurrent.InitialDiagnose;
             fsSuggestion.Visible = AppSession.Parameter.IsUsingSuggestion;
             litSuggestion.Text = RegistrationCurrent.Suggestion;
+        }
+
+        private void PopulatePpraRejectedPrescriptionNotification()
+        {
+            var notificationText = PpraRejectedPrescriptionNotificationText();
+            divPpraRejectedPrescription.Visible = !string.IsNullOrWhiteSpace(notificationText);
+            lblPpraRejectedPrescription.Text = notificationText;
+            imgPpraRejectedPrescription.ToolTip = notificationText;
+            lblPpraRejectedPrescription.ToolTip = notificationText;
+        }
+
+        private string PpraRejectedPrescriptionNotificationText()
+        {
+            var presc = new TransPrescriptionQuery("tp");
+            var rr = new RegistrationRasproQuery("rr");
+            var abr = new AbRestrictionQuery("abr");
+
+            presc.InnerJoin(rr).On(rr.RegistrationNo == presc.RegistrationNo & rr.SeqNo == presc.RasproSeqNo);
+            presc.InnerJoin(abr).On(abr.AbRestrictionID == rr.AbRestrictionID);
+            presc.es.Top = 1;
+            presc.Select(presc.PrescriptionNo, presc.PpraRejectionReason);
+            presc.Where(
+                presc.RegistrationNo == RegistrationNo,
+                presc.Or(presc.IsVoid.IsNull(), presc.IsVoid == false),
+                presc.IsPpraRejected == true,
+                "<LOWER(abr.AbRestrictionName) LIKE '%non ppab%'>"
+            );
+            presc.OrderBy(presc.PrescriptionDate.Descending, presc.PrescriptionNo.Descending);
+
+            var table = presc.LoadDataTable();
+            if (table.Rows.Count == 0)
+                return string.Empty;
+
+            var row = table.Rows[0];
+            var prescriptionNo = row["PrescriptionNo"].ToString();
+            var reason = row["PpraRejectionReason"] == DBNull.Value ? string.Empty : row["PpraRejectionReason"].ToString();
+
+            return string.IsNullOrWhiteSpace(reason)
+                ? string.Format("Resep Non PPAB {0} ditolak PPRA.", prescriptionNo)
+                : string.Format("Resep Non PPAB {0} ditolak PPRA: {1}", prescriptionNo, reason);
         }
 
         private void PopulateImmunizationHistory()

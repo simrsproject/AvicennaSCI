@@ -1696,6 +1696,10 @@
                 <div runat="server" id="divClinicalPathway" style="background-color: green; text-align: center; color: black; font-weight: bold;">
                     Clinical Pathway :<asp:Label runat="server" ID="lblClinicalPathway" Width="100%" Font-Bold="true" />
                 </div>
+                <div runat="server" id="divPpraRejectedPrescription" visible="false" onclick="openPrescriptionHist(); return false;" style="background-color: #fff0f0; border-left: 4px solid #d9534f; padding: 6px 8px; color: #d9534f; font-weight: bold; cursor: pointer;">
+                    <asp:Image runat="server" ID="imgPpraRejectedPrescription" ImageUrl="~/Images/Toolbar/blacklist.png" AlternateText="PPRA" Style="border: 0px; vertical-align: middle; margin-right: 4px;" />
+                    <asp:Label runat="server" ID="lblPpraRejectedPrescription" />
+                </div>
                 <cc:CollapsePanel ID="cpnPhyTeam" runat="server" Width="100%" Title="Physician Team">
                     <fieldset>
                         <asp:Label runat="server" ID="lblPhysicianTeam" />
