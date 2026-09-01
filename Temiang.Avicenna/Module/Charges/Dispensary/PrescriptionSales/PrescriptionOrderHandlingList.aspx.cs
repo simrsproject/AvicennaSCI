@@ -356,6 +356,19 @@ namespace Temiang.Avicenna.Module.Charges
                             presc.IsPrescriptionReturn == false,
                             presc.Or(presc.IsUnitDosePrescription.IsNull(), presc.IsUnitDosePrescription == false));
 
+                if (AppSession.Parameter.IsNeedPpraApproval)
+                {
+                    presc.Where(@"<NOT EXISTS (
+                        SELECT TOP 1 1
+                        FROM RegistrationRaspro rr
+                        INNER JOIN AbRestriction abr ON abr.AbRestrictionID = rr.AbRestrictionID
+                        WHERE rr.RegistrationNo = a.RegistrationNo
+                          AND rr.SeqNo = a.RasproSeqNo
+                          AND LOWER(abr.AbRestrictionName) LIKE '%non ppab%'
+                          AND ISNULL(a.IsPpraApproved, 0) = 0
+                    )>");
+                }
+
                 if (Request.QueryString["rt"] == "ipr" &&
                     AppParameter.IsYes(AppParameter.ParameterItem.IsPrescriptionMustVerifyByDpjp))
                 {

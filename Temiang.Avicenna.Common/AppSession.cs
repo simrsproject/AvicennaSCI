@@ -3763,6 +3763,13 @@ namespace Temiang.Avicenna.Common
                     return IsYes(AppParameter.ParameterItem.IsRasproEnable);
                 }
             }
+            public static bool IsNeedPpraApproval
+            {
+                get
+                {
+                    return IsYes(AppParameter.ParameterItem.IsNeedPpraApproval);
+                }
+            }
 
             public static string FoodGroupOneCarbohydrate
             {
@@ -6011,4 +6018,3 @@ namespace Temiang.Avicenna.Common
         }
     }
 }
-

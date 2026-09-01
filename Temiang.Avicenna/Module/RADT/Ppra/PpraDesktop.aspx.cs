@@ -102,16 +102,17 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                     rg.ItemName.As("ReferralGroupName"),
                     sal.ItemName.As("SalutationName"),
                     query.DischargeDate,
-                    @"<(SELECT TOP 1 tp.PrescriptionNo
+                    AppSession.Parameter.IsNeedPpraApproval ? @"<(SELECT TOP 1 tp.PrescriptionNo
                         FROM TransPrescription tp
                         INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
                         INNER JOIN AbRestriction abr ON abr.AbRestrictionID = rr.AbRestrictionID
                         WHERE tp.RegistrationNo = e.RegistrationNo
-                          AND ISNULL(tp.IsApproval, 0) = 0
+                          AND ISNULL(tp.IsPpraApproved, 0) = 0
                           AND ISNULL(tp.IsVoid, 0) = 0
                           AND ISNULL(tp.IsPpraRejected, 0) = 0
                           AND LOWER(abr.AbRestrictionName) LIKE '%non ppab%'
-                        ORDER BY tp.PrescriptionDate DESC, tp.PrescriptionNo DESC) AS PendingNonPpabPrescriptionNo>"
+                        ORDER BY tp.PrescriptionDate DESC, tp.PrescriptionNo DESC) AS PendingNonPpabPrescriptionNo>" :
+                    @"<CAST('' AS varchar(20)) AS PendingNonPpabPrescriptionNo>"
                 );
 
             query.LeftJoin(room).On(query.RoomID == room.RoomID);
@@ -176,22 +177,29 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             sqTpi.Where(sqTp.RegistrationNo == query.RegistrationNo);
             // End subquery
 
-            var sqPendingNonPpab = new TransPrescriptionQuery("pnp");
-            var sqPendingRaspro = new RegistrationRasproQuery("pnprr");
-            var sqPendingAbr = new AbRestrictionQuery("pnpabr");
-            sqPendingNonPpab.InnerJoin(sqPendingRaspro).On(sqPendingRaspro.RegistrationNo == sqPendingNonPpab.RegistrationNo & sqPendingRaspro.SeqNo == sqPendingNonPpab.RasproSeqNo);
-            sqPendingNonPpab.InnerJoin(sqPendingAbr).On(sqPendingAbr.AbRestrictionID == sqPendingRaspro.AbRestrictionID);
-            sqPendingNonPpab.es.Top = 1;
-            sqPendingNonPpab.Select(sqPendingNonPpab.RegistrationNo);
-            sqPendingNonPpab.Where(
-                sqPendingNonPpab.RegistrationNo == query.RegistrationNo,
-                sqPendingNonPpab.Or(sqPendingNonPpab.IsApproval.IsNull(), sqPendingNonPpab.IsApproval == false),
-                sqPendingNonPpab.Or(sqPendingNonPpab.IsVoid.IsNull(), sqPendingNonPpab.IsVoid == false),
-                sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraRejected.IsNull(), sqPendingNonPpab.IsPpraRejected == false),
-                "<LOWER(pnpabr.AbRestrictionName) LIKE '%non ppab%'>"
-            );
+            if (AppSession.Parameter.IsNeedPpraApproval)
+            {
+                var sqPendingNonPpab = new TransPrescriptionQuery("pnp");
+                var sqPendingRaspro = new RegistrationRasproQuery("pnprr");
+                var sqPendingAbr = new AbRestrictionQuery("pnpabr");
+                sqPendingNonPpab.InnerJoin(sqPendingRaspro).On(sqPendingRaspro.RegistrationNo == sqPendingNonPpab.RegistrationNo & sqPendingRaspro.SeqNo == sqPendingNonPpab.RasproSeqNo);
+                sqPendingNonPpab.InnerJoin(sqPendingAbr).On(sqPendingAbr.AbRestrictionID == sqPendingRaspro.AbRestrictionID);
+                sqPendingNonPpab.es.Top = 1;
+                sqPendingNonPpab.Select(sqPendingNonPpab.RegistrationNo);
+                sqPendingNonPpab.Where(
+                    sqPendingNonPpab.RegistrationNo == query.RegistrationNo,
+                    sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraApproved.IsNull(), sqPendingNonPpab.IsPpraApproved == false),
+                    sqPendingNonPpab.Or(sqPendingNonPpab.IsVoid.IsNull(), sqPendingNonPpab.IsVoid == false),
+                    sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraRejected.IsNull(), sqPendingNonPpab.IsPpraRejected == false),
+                    "<LOWER(pnpabr.AbRestrictionName) LIKE '%non ppab%'>"
+                );
 
-            query.Where(query.Or(query.Exists(sqTpi), query.Exists(sqPendingNonPpab)));
+                query.Where(query.Or(query.Exists(sqTpi), query.Exists(sqPendingNonPpab)));
+            }
+            else
+            {
+                query.Where(query.Exists(sqTpi));
+            }
 
             query.OrderBy
                 (
@@ -245,7 +253,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
 
         private static bool IsPendingNonPpabPrescription(TransPrescription presc)
         {
-            if (presc == null || presc.RasproSeqNo == null || (presc.IsApproval ?? false) || (presc.IsVoid ?? false) || (presc.IsPpraRejected ?? false))
+            if (!AppSession.Parameter.IsNeedPpraApproval || presc == null || presc.RasproSeqNo == null || (presc.IsPpraApproved ?? false) || (presc.IsVoid ?? false) || (presc.IsPpraRejected ?? false))
                 return false;
 
             var rr = new RegistrationRaspro();
@@ -258,9 +266,9 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             if (!presc.LoadByPrimaryKey(prescriptionNo) || !IsPendingNonPpabPrescription(presc))
                 return;
 
-            presc.IsApproval = true;
-            presc.ApprovalDateTime = (new DateTime()).NowAtSqlServer();
-            presc.ApprovedByUserID = AppSession.UserLogin.UserID;
+            presc.IsPpraApproved = true;
+            presc.IsPpraRejected = false;
+            presc.PpraRejectionReason = string.Empty;
             presc.Save();
 
             TransPrescription.SoapeUpdatePrescriptionHist(presc.ParamedicID, presc.RegistrationNo, presc.PrescriptionDate ?? DateTime.Now);
@@ -275,6 +283,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
 
             presc.IsVoid = false;
             presc.IsPpraRejected = true;
+            presc.IsPpraApproved = false;
             presc.PpraRejectionReason = reason;
             presc.Save();
 

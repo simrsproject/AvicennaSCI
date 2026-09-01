@@ -1415,6 +1415,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             else
                 tp.str.RasproSeqNo = string.Empty; //set null
 
+            if (AppSession.Parameter.IsNeedPpraApproval && IsNonPpabRaspro(tp.RegistrationNo, tp.RasproSeqNo))
+                tp.IsPpraApproved = false;
+
             var room = new ServiceRoom();
             if (room.LoadByPrimaryKey(reg.RoomID))
                 tp.SRFloor = room.SRFloor;
@@ -1605,8 +1608,16 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             if (!presc.LoadByPrimaryKey(prescriptionNo) || presc.RasproSeqNo == null)
                 return false;
 
+            return IsNonPpabRaspro(presc.RegistrationNo, presc.RasproSeqNo);
+        }
+
+        private static bool IsNonPpabRaspro(string registrationNo, int? rasproSeqNo)
+        {
+            if (string.IsNullOrWhiteSpace(registrationNo) || rasproSeqNo == null)
+                return false;
+
             var rr = new RegistrationRaspro();
-            return rr.LoadByPrimaryKey(presc.RegistrationNo, presc.RasproSeqNo ?? 0) && AbRestriction.IsNonPpab(rr);
+            return rr.LoadByPrimaryKey(registrationNo, rasproSeqNo ?? 0) && AbRestriction.IsNonPpab(rr);
         }
 
         private int RegistrationGyssensNewSeqNo(string regNo)
@@ -1649,10 +1660,16 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             header.IsForTakeItHome = AppParameter.GetParameterValue(AppParameter.ParameterItem.PrescriptionCategoryHomePresID).Equals(cboSRPrescriptionCategory.SelectedValue);
             header.SRPrescriptionCategory = cboSRPrescriptionCategory.SelectedValue;
 
-            if ((header.IsPpraRejected ?? false) && IsNonPpabPrescription(header.PrescriptionNo))
+            if (IsNonPpabPrescription(header.PrescriptionNo))
             {
-                header.IsPpraRejected = false;
-                header.PpraRejectionReason = string.Empty;
+                if (header.IsPpraRejected ?? false)
+                {
+                    header.IsPpraRejected = false;
+                    header.PpraRejectionReason = string.Empty;
+                }
+
+                if (AppSession.Parameter.IsNeedPpraApproval)
+                    header.IsPpraApproved = false;
             }
 
             using (var trans = new esTransactionScope())
