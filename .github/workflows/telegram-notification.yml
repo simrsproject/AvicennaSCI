@@ -35,41 +35,45 @@ jobs:
         run: |
           set -e
 
+          escape_html() {
+            printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
+          }
+
           if [ "$EVENT_NAME" = "push" ]; then
 
-            MESSAGE=$(cat <<EOF
-🚀 <b>GitHub Push</b>
+            COMMIT_URL="${COMMIT_URL:-https://github.com/${REPOSITORY}/commit/${GITHUB_SHA}}"
 
-📦 <b>Repository:</b> $REPOSITORY
-🌿 <b>Branch:</b> $BRANCH_NAME
-👤 <b>Author:</b> $ACTOR
-
-📝 <b>Commit:</b>
-$COMMIT_MESSAGE
-
-🔗 <a href="$COMMIT_URL">View Commit</a>
-EOF
-)
+            MESSAGE=$(printf '%s\n' \
+              '🚀 <b>GitHub Push</b>' \
+              '' \
+              "📦 <b>Repository:</b> $REPOSITORY" \
+              "🌿 <b>Branch:</b> $BRANCH_NAME" \
+              "👤 <b>Author:</b> $ACTOR" \
+              '' \
+              '📝 <b>Commit:</b>' \
+              "$(escape_html "$COMMIT_MESSAGE")" \
+              '' \
+              "🔗 <a href=\"$(escape_html "$COMMIT_URL")\">View Commit</a>")
 
           elif [ "$EVENT_NAME" = "pull_request" ] && [ "$PR_MERGED" = "true" ]; then
 
-            MESSAGE=$(cat <<EOF
-🔀 <b>Pull Request Merged</b>
+            PR_URL="${PR_URL:-https://github.com/${REPOSITORY}/pull/${PR_NUMBER}}"
 
-📦 <b>Repository:</b> $REPOSITORY
-🔢 <b>PR:</b> #$PR_NUMBER
-
-📝 <b>$PR_TITLE</b>
-
-👤 <b>Merged by:</b> $ACTOR
-
-🌿 $PR_HEAD_BRANCH
-↓
-🌿 $PR_BASE_BRANCH
-
-🔗 <a href="$PR_URL">View Pull Request</a>
-EOF
-)
+            MESSAGE=$(printf '%s\n' \
+              '🔀 <b>Pull Request Merged</b>' \
+              '' \
+              "📦 <b>Repository:</b> $REPOSITORY" \
+              "🔢 <b>PR:</b> #$PR_NUMBER" \
+              '' \
+              "📝 <b>$(escape_html "$PR_TITLE")</b>" \
+              '' \
+              "👤 <b>Merged by:</b> $ACTOR" \
+              '' \
+              "🌿 $PR_HEAD_BRANCH" \
+              '↓' \
+              "🌿 $PR_BASE_BRANCH" \
+              '' \
+              "🔗 <a href=\"$(escape_html "$PR_URL")\">View Pull Request</a>")
 
           else
             exit 0
@@ -87,10 +91,16 @@ EOF
           echo ""
           echo "========================================"
 
-          curl --fail-with-body \
-            --request POST \
-            "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${CHAT_ID}" \
-            --data-urlencode "message_thread_id=${THREAD_ID}" \
-            --data-urlencode "parse_mode=HTML" \
+          CURL_ARGS=(
+            --request POST
+            "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage"
+            --data-urlencode "chat_id=${CHAT_ID}"
+            --data-urlencode "parse_mode=HTML"
             --data-urlencode "text=${MESSAGE}"
+          )
+
+          if [ -n "$THREAD_ID" ]; then
+            CURL_ARGS+=(--data-urlencode "message_thread_id=${THREAD_ID}")
+          fi
+
+          curl --fail-with-body "${CURL_ARGS[@]}"
