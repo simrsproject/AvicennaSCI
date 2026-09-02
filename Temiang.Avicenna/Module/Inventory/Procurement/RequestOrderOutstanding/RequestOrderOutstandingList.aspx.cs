@@ -163,6 +163,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                                             INNER JOIN ItemTransaction hd
                                                 ON dt.TransactionNo = hd.TransactionNo
                                             WHERE dt.ReferenceNo = a.TransactionNo
+                                                AND dt.SequenceNo =  a.SequenceNo
                                                 AND dt.ItemID = a.ItemID
                                                 AND hd.IsApproved = 1), 0) AS Quantity>",
                     query.Quantity,
