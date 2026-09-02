@@ -17,42 +17,56 @@ jobs:
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
         shell: bash
+
         run: |
           set -e
 
           if [ "${{ github.event_name }}" = "push" ]; then
 
             MESSAGE="🚀 <b>GitHub Push</b>
-            
-                    🌿 <b>Branch:</b> ${{ github.ref_name }}
-                    
-                    👤 <b>Author:</b> ${{ github.actor }}
-                    
-                    📝 <b>Commit:</b>
-                    ${{ github.event.head_commit.message }}
-                    
-                    🔗 <a href=\"${{ github.event.head_commit.html_url }}\">View Commit</a>"
+
+📦 <b>Repository:</b> ${{ github.repository }}
+🌿 <b>Branch:</b> ${{ github.ref_name }}
+👤 <b>Author:</b> ${{ github.actor }}
+
+📝 <b>Commit:</b>
+${{ github.event.head_commit.message }}
+
+🔗 <a href=\"${{ github.event.head_commit.html_url }}\">View Commit</a>"
 
           elif [ "${{ github.event_name }}" = "pull_request" ] && \
                [ "${{ github.event.pull_request.merged }}" = "true" ]; then
 
             MESSAGE="🔀 <b>Pull Request Merged</b>
-                    
-                    🔢 <b>PR:</b> #${{ github.event.pull_request.number }}
-                    
-                    📝 <b>${{ github.event.pull_request.title }}</b>
-                    
-                    👤 <b>Merged by:</b> ${{ github.actor }}
-                    
-                    🌿 ${{ github.event.pull_request.head.ref }}
-                    ↓
-                    🌿 ${{ github.event.pull_request.base.ref }}
-                    
-                    🔗 <a href=\"${{ github.event.pull_request.html_url }}\">View Pull Request</a>"
+
+📦 <b>Repository:</b> ${{ github.repository }}
+🔢 <b>PR:</b> #${{ github.event.pull_request.number }}
+
+📝 <b>${{ github.event.pull_request.title }}</b>
+
+👤 <b>Merged by:</b> ${{ github.actor }}
+
+🌿 ${{ github.event.pull_request.head.ref }}
+↓
+🌿 ${{ github.event.pull_request.base.ref }}
+
+🔗 <a href=\"${{ github.event.pull_request.html_url }}\">View Pull Request</a>"
 
           else
             exit 0
           fi
+
+          echo "========================================"
+          echo "Telegram Notification"
+          echo "========================================"
+          echo ""
+          echo "Event: ${{ github.event_name }}"
+          echo "Repository: ${{ github.repository }}"
+          echo ""
+          echo "Message:"
+          echo "$MESSAGE"
+          echo ""
+          echo "========================================"
 
           curl --fail-with-body \
             --request POST \
