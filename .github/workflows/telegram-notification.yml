@@ -16,41 +16,57 @@ jobs:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           THREAD_ID: ${{ secrets.TELEGRAM_THREAD_ID }}
+
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          COMMIT_URL: ${{ github.event.head_commit.html_url }}
+
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+
         shell: bash
 
         run: |
           set -e
 
-          if [ "${{ github.event_name }}" = "push" ]; then
+          if [ "$EVENT_NAME" = "push" ]; then
 
             MESSAGE="🚀 <b>GitHub Push</b>
 
-📦 <b>Repository:</b> ${{ github.repository }}
-🌿 <b>Branch:</b> ${{ github.ref_name }}
-👤 <b>Author:</b> ${{ github.actor }}
+📦 <b>Repository:</b> $REPOSITORY
+🌿 <b>Branch:</b> $BRANCH_NAME
+👤 <b>Author:</b> $ACTOR
 
 📝 <b>Commit:</b>
-${{ github.event.head_commit.message }}
+$COMMIT_MESSAGE
 
-🔗 <a href=\"${{ github.event.head_commit.html_url }}\">View Commit</a>"
+🔗 <a href=\"$COMMIT_URL\">View Commit</a>"
 
-          elif [ "${{ github.event_name }}" = "pull_request" ] && \
-               [ "${{ github.event.pull_request.merged }}" = "true" ]; then
+          elif [ "$EVENT_NAME" = "pull_request" ] && \
+               [ "$PR_MERGED" = "true" ]; then
 
             MESSAGE="🔀 <b>Pull Request Merged</b>
 
-📦 <b>Repository:</b> ${{ github.repository }}
-🔢 <b>PR:</b> #${{ github.event.pull_request.number }}
+📦 <b>Repository:</b> $REPOSITORY
+🔢 <b>PR:</b> #$PR_NUMBER
 
-📝 <b>${{ github.event.pull_request.title }}</b>
+📝 <b>$PR_TITLE</b>
 
-👤 <b>Merged by:</b> ${{ github.actor }}
+👤 <b>Merged by:</b> $ACTOR
 
-🌿 ${{ github.event.pull_request.head.ref }}
+🌿 $PR_HEAD_BRANCH
 ↓
-🌿 ${{ github.event.pull_request.base.ref }}
+🌿 $PR_BASE_BRANCH
 
-🔗 <a href=\"${{ github.event.pull_request.html_url }}\">View Pull Request</a>"
+🔗 <a href=\"$PR_URL\">View Pull Request</a>"
 
           else
             exit 0
@@ -60,8 +76,8 @@ ${{ github.event.head_commit.message }}
           echo "Telegram Notification"
           echo "========================================"
           echo ""
-          echo "Event: ${{ github.event_name }}"
-          echo "Repository: ${{ github.repository }}"
+          echo "Event: $EVENT_NAME"
+          echo "Repository: $REPOSITORY"
           echo ""
           echo "Message:"
           echo "$MESSAGE"
