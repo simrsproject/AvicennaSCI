@@ -914,8 +914,25 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             rqr.Where(rqr.RegistrationNo == regno);
             reg.Load(rqr);
 
-            if (!GuarantorBpjs.Contains(reg.GuarantorID))
+            var healthcareId = AppSession.Parameter.HealthcareID;
+
+            bool isP2548ForRsi =
+                string.Equals(
+                    healthcareId,
+                    "RSI",
+                    StringComparison.OrdinalIgnoreCase
+                )
+                &&
+                string.Equals(
+                    reg.GuarantorID,
+                    "P2548",
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+            if (!GuarantorBpjs.Contains(reg.GuarantorID) && !isP2548ForRsi)
+            {
                 return 0;
+            }
 
             decimal cobPlafond = AdditionalPlafond(regno);
             totalPlafond = TotalPlafond(reg.SRRegistrationType, reg.PlavonAmount, reg.GuarantorID, reg.ApproximatePlafondAmount, cobPlafond);

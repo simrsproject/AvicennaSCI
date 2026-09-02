@@ -135,6 +135,8 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                         qr.PlavonAmount,
                         qr.ApproximatePlafondAmount,
                         qr.InitialDiagnose,
+                        qr.Suggestion,
+                        qr.MppNote,
                         bpjsp.PackageName,
                         sal.ItemName.As("SalutationName"),
                         cls.ClassName.As("ChargeClassName"),
@@ -207,7 +209,11 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                     string searchPatient = "%" + txtInitialDiagnosis.Text + "%";
                     qr.Where
                         (
-                          string.Format("<r.InitialDiagnose LIKE '{0}'>", searchPatient)
+                          qr.Or(
+                              qr.InitialDiagnose.Like(searchPatient),
+                              qr.Suggestion.Like(searchPatient),
+                              qr.MppNote.Like(searchPatient)
+                          )
                         );
                 }
 
