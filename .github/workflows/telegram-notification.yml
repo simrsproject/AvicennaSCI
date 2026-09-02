@@ -32,14 +32,13 @@ jobs:
           PR_HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
           PR_BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
 
-        shell: bash
-
         run: |
           set -e
 
           if [ "$EVENT_NAME" = "push" ]; then
 
-            MESSAGE="🚀 <b>GitHub Push</b>
+            MESSAGE=$(cat <<EOF
+🚀 <b>GitHub Push</b>
 
 📦 <b>Repository:</b> $REPOSITORY
 🌿 <b>Branch:</b> $BRANCH_NAME
@@ -48,12 +47,14 @@ jobs:
 📝 <b>Commit:</b>
 $COMMIT_MESSAGE
 
-🔗 <a href=\"$COMMIT_URL\">View Commit</a>"
+🔗 <a href="$COMMIT_URL">View Commit</a>
+EOF
+)
 
-          elif [ "$EVENT_NAME" = "pull_request" ] && \
-               [ "$PR_MERGED" = "true" ]; then
+          elif [ "$EVENT_NAME" = "pull_request" ] && [ "$PR_MERGED" = "true" ]; then
 
-            MESSAGE="🔀 <b>Pull Request Merged</b>
+            MESSAGE=$(cat <<EOF
+🔀 <b>Pull Request Merged</b>
 
 📦 <b>Repository:</b> $REPOSITORY
 🔢 <b>PR:</b> #$PR_NUMBER
@@ -66,7 +67,9 @@ $COMMIT_MESSAGE
 ↓
 🌿 $PR_BASE_BRANCH
 
-🔗 <a href=\"$PR_URL\">View Pull Request</a>"
+🔗 <a href="$PR_URL">View Pull Request</a>
+EOF
+)
 
           else
             exit 0
