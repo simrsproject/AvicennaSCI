@@ -29,7 +29,7 @@ jobs:
             📝 <b>Commit:</b>
             ${{ github.event.head_commit.message }}
 
-            🔗 <a href='${{ github.event.head_commit.html_url }}'>View Commit</a>"
+            🔗 <a href=\"${{ github.event.head_commit.html_url }}\">View Commit</a>
 
           elif [ "${{ github.event_name }}" = "pull_request" ] && \
                [ "${{ github.event.pull_request.merged }}" = "true" ]; then
@@ -45,7 +45,7 @@ jobs:
             ↓
             🌿 ${{ github.event.pull_request.base.ref }}
 
-            🔗 <a href='${{ github.event.pull_request.html_url }}'>View Pull Request</a>"
+            🔗 <a href=\"${{ github.event.pull_request.html_url }}\">View Pull Request</a>
 
           else
             exit 0
