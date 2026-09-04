@@ -679,8 +679,10 @@ namespace Temiang.Avicenna.Module.RADT
                                 } else
                                 { //jika tidak ada ambil dari API BPJS
 
+                                    lblNoRujukan.Text = sep.NoRujukan;
+
                                     var svc = new Common.BPJS.VClaim.v11.Service();
-                                    var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
+                                    var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
                                     if (rujukan.MetaData.IsValid && rujukan.Response != null)
                                     {
                                         if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
