@@ -682,7 +682,7 @@ namespace Temiang.Avicenna.Module.RADT
                                     lblNoRujukan.Text = sep.NoRujukan;
 
                                     var svc = new Common.BPJS.VClaim.v11.Service();
-                                    var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
+                                    var rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.Faskes_1);
                                     if (rujukan.MetaData.IsValid && rujukan.Response != null)
                                     {
                                         if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
@@ -695,6 +695,26 @@ namespace Temiang.Avicenna.Module.RADT
 
                                             sep.PoliRujukan = rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Kode;
                                             sep.Save();
+                                        }
+                                    }
+
+                                    if(string.IsNullOrEmpty(lblPoliRujukan.Text))
+                                    {
+                                        svc = new Common.BPJS.VClaim.v11.Service();
+                                        rujukan = svc.GetRujukan(sep.NomorKartu, Enum.JenisFaskes.RS);
+                                        if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                        {
+                                            if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan) != null)
+                                            {
+                                                lblNoRujukan.Text =
+                                                    rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)
+                                                        ?.NoKunjungan ?? string.Empty;
+                                                lblPoliRujukan.Text = rujukan.Response.Rujukan
+                                                    .SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Nama;
+
+                                                sep.PoliRujukan = rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == sep.NoRujukan)?.PoliRujukan.Kode;
+                                                sep.Save();
+                                            }
                                         }
                                     }
                                 }

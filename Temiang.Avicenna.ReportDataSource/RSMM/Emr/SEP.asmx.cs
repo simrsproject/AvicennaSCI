@@ -65,6 +65,8 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                             }
                         }else
                         {
+                            var sep = new BpjsSEP();
+
                             var svc = new Temiang.Avicenna.Common.BPJS.VClaim.v11.Service();
                             var rujukan = svc.GetRujukan(nomorKartu, Temiang.Avicenna.Common.BPJS.VClaim.Enum.JenisFaskes.Faskes_1);
                             var kodePoli = string.Empty;
@@ -78,11 +80,35 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                                                     .SingleOrDefault(r => r.NoKunjungan == nomorRujukan)?.PoliRujukan.Kode;
                                 }
 
-                                var sep = new BpjsSEP();
+                                
                                 if (sep.LoadByPrimaryKey(noSep) && !string.IsNullOrEmpty(kodePoli))
                                 {
                                     sep.PoliRujukan = kodePoli;
                                     sep.Save();
+                                }
+                            }
+
+                            if(string.IsNullOrEmpty(kodePoli))
+                            {
+                                svc = new Temiang.Avicenna.Common.BPJS.VClaim.v11.Service();
+                                rujukan = svc.GetRujukan(nomorKartu, Temiang.Avicenna.Common.BPJS.VClaim.Enum.JenisFaskes.RS);
+
+                                if (rujukan.MetaData.IsValid && rujukan.Response != null)
+                                {
+                                    if (rujukan.Response.Rujukan.SingleOrDefault(r => r.NoKunjungan == nomorRujukan) != null)
+                                    {
+                                        poliRujukan = rujukan.Response.Rujukan
+                                                        .SingleOrDefault(r => r.NoKunjungan == nomorRujukan)?.PoliRujukan.Nama;
+                                        kodePoli = rujukan.Response.Rujukan
+                                                        .SingleOrDefault(r => r.NoKunjungan == nomorRujukan)?.PoliRujukan.Kode;
+                                    }
+
+
+                                    if (sep.LoadByPrimaryKey(noSep) && !string.IsNullOrEmpty(kodePoli))
+                                    {
+                                        sep.PoliRujukan = kodePoli;
+                                        sep.Save();
+                                    }
                                 }
                             }
 
