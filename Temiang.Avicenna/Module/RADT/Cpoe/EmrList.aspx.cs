@@ -1409,30 +1409,6 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             return dtb; // DeleteInPatientBedStatusPendingAndNotInBed(dtb);
         }
 
-        private static void AddPpraRejectedPrescriptionNotificationSelect(RegistrationQuery reg)
-        {
-            reg.Select(string.Format(@"<CAST(CASE WHEN EXISTS (
-                SELECT TOP 1 1
-                FROM TransPrescription tp
-                INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
-                WHERE tp.RegistrationNo = reg.RegistrationNo
-                  AND ISNULL(tp.IsVoid, 0) = 0
-                  AND ISNULL(tp.IsPpraRejected, 0) = 1
-                  AND rr.AbRestrictionID = '{0}'
-            ) THEN 1 ELSE 0 END AS BIT) AS HasPpraRejectedPrescription>", AbRestriction.NonPpabID));
-
-            reg.Select(string.Format(@"<(
-                SELECT TOP 1 tp.PpraRejectionReason
-                FROM TransPrescription tp
-                INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
-                WHERE tp.RegistrationNo = reg.RegistrationNo
-                  AND ISNULL(tp.IsVoid, 0) = 0
-                  AND ISNULL(tp.IsPpraRejected, 0) = 1
-                  AND rr.AbRestrictionID = '{0}'
-                ORDER BY tp.PrescriptionDate DESC
-            ) AS PpraRejectionReason>", AbRestriction.NonPpabID));
-        }
-
         private DataTable DeleteInPatientBedStatusPendingAndNotInBed(DataTable dtb)
         {
             // Bersihkan row pasien rawat inap
