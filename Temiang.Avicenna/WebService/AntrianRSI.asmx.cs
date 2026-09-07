@@ -3454,22 +3454,22 @@ namespace Temiang.Avicenna.WebService
             Digunakan untuk mengambil nomor antrian pada farmasi
 
             PARAMETER:
-            - RegistrationNo (required)
+            - VisitQueueNo (required)
             - ServiceUnitID (required)
             - UserID (optional)
             - TransDate (optional)
 
             RESPONSE:
             200 = Berhasil mengambil antrian farmasi
-            400 = Parameter tidak valid (RegistrationNo wajib diisi / ServiceUnitID wajib diisi)
+            400 = Parameter tidak valid (VisitQueueNo wajib diisi / ServiceUnitID wajib diisi)
             500 = Server error
         ")]
         public void TakeQueueVisitNumberForFarmasi()
         {
             try
             {
-                string registrationNo =
-                    (Context.Request["RegistrationNo"] ?? "")
+                string visitQueueNo =
+                    (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
                 string serviceUnitID =
@@ -3491,13 +3491,15 @@ namespace Temiang.Avicenna.WebService
                     transDate = Convert.ToDateTime(transDateString);
                 }
 
+                // =========================================
                 // VALIDASI
+                // =========================================
 
-                if (string.IsNullOrEmpty(registrationNo))
+                if (string.IsNullOrEmpty(visitQueueNo))
                 {
                     ApiResponeForAntrian.Error(
                         Context,
-                        "RegistrationNo wajib diisi",
+                        "VisitQueueNo wajib diisi",
                         400
                     );
 
@@ -3515,11 +3517,13 @@ namespace Temiang.Avicenna.WebService
                     return;
                 }
 
+                // =========================================
                 // EXECUTE
+                // =========================================
 
                 var result =
                     VisitQueue.TakeQueueVisitNumberForFarmasi(
-                        registrationNo,
+                        visitQueueNo,
                         serviceUnitID,
                         userID,
                         transDate
@@ -3535,6 +3539,10 @@ namespace Temiang.Avicenna.WebService
 
                     return;
                 }
+
+                // =========================================
+                // SUCCESS
+                // =========================================
 
                 ApiResponeForAntrian.Success(
                     Context,

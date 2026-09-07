@@ -3341,7 +3341,7 @@ namespace Temiang.Avicenna.BusinessObject
         }
 
         public static object TakeQueueVisitNumberForFarmasi(
-            string registrationNo,
+            string visitQueueNo,
             string serviceUnitID,
             string userID = "KIOSK_FARMASI",
             DateTime? transDate = null
@@ -3352,8 +3352,8 @@ namespace Temiang.Avicenna.BusinessObject
             var parameters = new esParameters();
 
             parameters.Add(
-                "RegistrationNo",
-                registrationNo,
+                "VisitQueueNo",
+                visitQueueNo,
                 esParameterDirection.Input,
                 DbType.String,
                 50
@@ -3383,14 +3383,6 @@ namespace Temiang.Avicenna.BusinessObject
                 0
             );
 
-            parameters.Add(
-                "VisitQueueNo",
-                "",
-                esParameterDirection.Output,
-                DbType.String,
-                50
-            );
-
             using (var reader = entity.ExecuteReader(
                 esQueryType.StoredProcedure,
                 "TakeQueueVisitNumberForFarmasi",
@@ -3406,6 +3398,7 @@ namespace Temiang.Avicenna.BusinessObject
                     VisitNo = reader["VisitNo"]?.ToString(),
                     RegistrationNo = reader["RegistrationNo"]?.ToString(),
                     ServiceUnitID = reader["ServiceUnitID"]?.ToString(),
+                    PatientID = reader["PatientID"]?.ToString(),
                     CurrentStage = reader["CurrentStage"]?.ToString(),
                     StageID = reader["StageID"]?.ToString(),
                     QueueSequence = reader["QueueSequence"] == DBNull.Value

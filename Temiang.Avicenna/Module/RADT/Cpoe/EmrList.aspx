@@ -855,8 +855,6 @@
                     <HeaderStyle HorizontalAlign="Center" Width="40px" />
                     <ItemStyle HorizontalAlign="Center" />
                 </telerik:GridTemplateColumn>
-
-
                 <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ParamedicID"
                     UniqueName="ParamedicID" SortExpression="ParamedicID" Visible="False">
                     <HeaderStyle HorizontalAlign="Center" Width="140px" />

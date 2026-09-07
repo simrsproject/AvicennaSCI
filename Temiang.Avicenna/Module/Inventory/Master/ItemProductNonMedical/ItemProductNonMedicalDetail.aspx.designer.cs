@@ -933,15 +933,6 @@ namespace Temiang.Avicenna.Module.Inventory.Master
         protected global::System.Web.UI.WebControls.CheckBox chkIsNeedToBeLaundered;
 
         /// <summary>
-        /// chkIsEconomicLifeMoreThanOneYear control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkIsEconomicLifeMoreThanOneYear;
-
-        /// <summary>
         /// lblEconomicLifeInYear control.
         /// </summary>
         /// <remarks>

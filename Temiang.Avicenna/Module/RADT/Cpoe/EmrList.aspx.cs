@@ -923,8 +923,6 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
 
-            AddPpraRejectedPrescriptionNotificationSelect(reg);
-
             if (regTypes.Length == 1)
                 reg.Where(reg.SRRegistrationType == regTypes[0]);
             else if (regTypes.Length > 1)
@@ -1371,8 +1369,6 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 reg.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
-
-            AddPpraRejectedPrescriptionNotificationSelect(reg);
 
             reg.InnerJoin(room).On(reg.RoomID == room.RoomID);
             reg.InnerJoin(patient).On(reg.PatientID == patient.PatientID);
