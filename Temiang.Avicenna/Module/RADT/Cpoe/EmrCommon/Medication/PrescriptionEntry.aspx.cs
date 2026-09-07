@@ -555,8 +555,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 if (string.IsNullOrEmpty(newPrescriptionNo))
                     return;
 
-                var isNonPpab = IsNonPpabPrescription(newPrescriptionNo);
-                if (isNonPpab)
+                if (AppSession.Parameter.IsNeedPpraApproval && IsNonPpabPrescription(newPrescriptionNo))
                 {
                     ScriptManager.RegisterStartupScript(this, GetType(), "nonPpabWarning",
                         "alert('Infeksi Non PPAB perlu persetujuan Tim PPRA/PGA. Resep ditahan dan diteruskan ke PPRA Desktop untuk verifikasi.');", true);
