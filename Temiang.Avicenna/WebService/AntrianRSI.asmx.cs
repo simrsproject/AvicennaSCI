@@ -3476,6 +3476,9 @@ namespace Temiang.Avicenna.WebService
         ")]
         public void TakeQueueVisitNumberForFarmasi()
         {
+            Context.Response.TrySkipIisCustomErrors = true;
+            Context.Response.ContentType = "application/json";
+
             try
             {
                 // =========================================
@@ -3720,6 +3723,9 @@ namespace Temiang.Avicenna.WebService
             }
             catch (Exception ex)
             {
+                Context.Response.TrySkipIisCustomErrors = true;
+                Context.Response.ContentType = "application/json";
+
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,
