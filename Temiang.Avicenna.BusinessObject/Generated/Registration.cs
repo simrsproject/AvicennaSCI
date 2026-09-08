@@ -335,7 +335,8 @@ namespace Temiang.Avicenna.BusinessObject
 						case "FinishedAttendanceDateTime": this.str.FinishedAttendanceDateTime = (string)value; break;
                         case "SRPatientRiskColor": this.str.SRPatientRiskColor = (string)value; break;
                         case "Suggestion": this.str.Suggestion = (string)value; break;
-                    }
+                        case "MppNote": this.str.MppNote = (string)value; break;
+					}
 				}
 				else
 				{
@@ -3311,6 +3312,22 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
+        /// <summary>
+        /// Maps to Registration.MppNote
+        /// </summary>
+        virtual public System.String MppNote
+        {
+            get
+            {
+                return base.GetSystemString(RegistrationMetadata.ColumnNames.MppNote);
+            }
+
+            set
+            {
+                base.SetSystemString(RegistrationMetadata.ColumnNames.MppNote, value);
+            }
+        }
+
         #endregion
 
         #region String Properties
@@ -5754,6 +5771,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.Suggestion = Convert.ToString(value);
                 }
             }
+            public System.String MppNote
+            {
+                get
+                {
+                    System.String data = entity.MppNote;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.MppNote = null;
+                    else entity.MppNote = Convert.ToString(value);
+                }
+            }
             private esRegistration entity;
 		}
 		#endregion
@@ -7165,6 +7196,14 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, RegistrationMetadata.ColumnNames.Suggestion, esSystemType.String);
+            }
+        }
+
+        public esQueryItem MppNote
+        {
+            get
+            {
+                return new esQueryItem(this, RegistrationMetadata.ColumnNames.MppNote, esSystemType.String);
             }
         }
 
@@ -8641,6 +8680,14 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
+            c = new esColumnMetadata(RegistrationMetadata.ColumnNames.MppNote, 171, typeof(System.String), esSystemType.String);
+            c.PropertyName = RegistrationMetadata.PropertyNames.MppNote;
+            c.CharacterMaxLength = 2147483647;
+            c.HasDefault = true;
+            c.Default = @"('')";
+            c.IsNullable = true;
+            _columns.Add(c);
+
 
         }
 		#endregion
@@ -8839,6 +8886,7 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string FinishedAttendanceDateTime = "FinishedAttendanceDateTime";
             public const string SRPatientRiskColor = "SRPatientRiskColor";
             public const string Suggestion = "Suggestion";
+            public const string MppNote = "MppNote";
         }
 		#endregion
 
@@ -9016,6 +9064,7 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string FinishedAttendanceDateTime = "FinishedAttendanceDateTime";
             public const string SRPatientRiskColor = "SRPatientRiskColor";
             public const string Suggestion = "Suggestion";
+            public const string MppNote = "MppNote";
         }
 		#endregion
 
@@ -9230,6 +9279,7 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("FinishedAttendanceDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("SRPatientRiskColor", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("Suggestion", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("MppNote", new esTypeMap("varchar", "System.String"));
 
 
                 meta.Source = "Registration";

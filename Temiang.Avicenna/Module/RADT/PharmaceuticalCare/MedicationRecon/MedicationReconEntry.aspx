@@ -269,7 +269,7 @@
                                     <tr>
                                         <td class="label">Status</td>
                                         <td class="entry">
-                                            <asp:CheckBox runat="server" ID="chkIsFinish" Text="Finish" /></td>
+                                            <asp:CheckBox runat="server" ID="chkIsFinish" Text="No Previous Medication History" /></td>
                                     </tr>
                                 </table>
                             </fieldset>
