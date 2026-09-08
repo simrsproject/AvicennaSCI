@@ -70,6 +70,11 @@
                 var url = '<%= Helper.UrlRoot() %>/Module/RADT/Ppra/PpraReview.aspx?prescno=' + prescNo;
                 openWindowMaxScreen(url);
             }
+
+            function onDialogClose(sender, args) {
+                var grid = $find("<%= grdList.ClientID %>");
+                if (grid) grid.get_masterTableView().rebind();
+            }
         </script>
 
     </telerik:RadCodeBlock>
@@ -107,7 +112,8 @@
     </telerik:RadAjaxLoadingPanel>
 
     <telerik:RadWindow ID="winDialog" Width="900px" Height="600px" runat="server" VisibleStatusbar="false"
-        ShowContentDuringLoad="false" Behaviors="Maximize, Close,Move" Modal="True" ShowOnTopWhenMaximized="true">
+        ShowContentDuringLoad="false" Behaviors="Maximize, Close,Move" Modal="True" ShowOnTopWhenMaximized="true"
+        OnClientClose="onDialogClose">
     </telerik:RadWindow>
     <telerik:RadWindow ID="winPrint" Animation="None" Width="1000px" Height="500px" runat="server"
         ShowContentDuringLoad="false" Behavior="Maximize,Close" VisibleStatusbar="false"

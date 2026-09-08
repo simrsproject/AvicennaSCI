@@ -390,15 +390,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
         {
             const string script =
                 "var oWnd = GetRadWindow();" +
-                "if(oWnd){" +
-                "  var opener = oWnd.BrowserWindow;" +
-                "  if(opener && opener.__doPostBack){" +
-                "    oWnd.close();" +
-                "    opener.__doPostBack('grdList','rebind');" +
-                "  } else {" +
-                "    oWnd.close();" +
-                "  }" +
-                "}";
+                "if(oWnd){ oWnd.close(); }";
             this.RegisterStartupScriptExt("closeRefresh", script);
         }
 
