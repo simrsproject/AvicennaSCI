@@ -116,22 +116,17 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
         {
             var tpQuery = new TransPrescriptionQuery("tp");
             var rrQuery = new RegistrationRasproQuery("rr");
-            var itemQuery = new TransPrescriptionItemQuery("tpi");
-            var medicQuery = new ItemQuery("itm");
 
             tpQuery.InnerJoin(rrQuery).On(
                 rrQuery.RegistrationNo == tpQuery.RegistrationNo
                 & rrQuery.SeqNo == tpQuery.RasproSeqNo);
-            tpQuery.LeftJoin(itemQuery).On(itemQuery.PrescriptionNo == tpQuery.PrescriptionNo);
-            tpQuery.LeftJoin(medicQuery).On(medicQuery.ItemID == itemQuery.ItemID);
 
             tpQuery.Select(
                 tpQuery.PrescriptionNo,
                 tpQuery.PrescriptionDate,
                 tpQuery.Note,
                 tpQuery.IsPpraRejected,
-                tpQuery.PpraRejectionReason,
-                "<ISNULL(STRING_AGG(itm.ItemName, ', '), '-') AS AntibioticList>"
+                tpQuery.PpraRejectionReason
             );
 
             tpQuery.Where(
@@ -141,13 +136,6 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                 tpQuery.Or(tpQuery.IsVoid.IsNull(), tpQuery.IsVoid == false),
                 tpQuery.Or(tpQuery.IsPpraRejected.IsNull(), tpQuery.IsPpraRejected == false),
                 rrQuery.AbRestrictionID == AbRestriction.NonPpabID
-            );
-            tpQuery.GroupBy(
-                tpQuery.PrescriptionNo,
-                tpQuery.PrescriptionDate,
-                tpQuery.Note,
-                tpQuery.IsPpraRejected,
-                tpQuery.PpraRejectionReason
             );
             tpQuery.OrderBy(tpQuery.PrescriptionDate.Descending);
 
@@ -163,21 +151,67 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             var sb = new StringBuilder();
             foreach (DataRow row in dtb.Rows)
             {
-                var prescNo       = row["PrescriptionNo"].ToString();
-                var prescDate     = row["PrescriptionDate"] != DBNull.Value
+                var prescNo   = row["PrescriptionNo"].ToString();
+                var prescDate = row["PrescriptionDate"] != DBNull.Value
                     ? Convert.ToDateTime(row["PrescriptionDate"]).ToString(AppConstant.DisplayFormat.DateShortMonthHourMinute)
                     : string.Empty;
-                var note          = row["Note"] != DBNull.Value ? row["Note"].ToString() : string.Empty;
-                var abList        = row["AntibioticList"].ToString();
+                var note = row["Note"] != DBNull.Value ? row["Note"].ToString() : string.Empty;
+
+                // Load prescription items detail
+                var tpiQuery  = new TransPrescriptionItemQuery("a");
+                var itemQuery = new ItemQuery("i");
+                var consumeQuery = new ConsumeMethodQuery("cm");
+
+                tpiQuery.LeftJoin(itemQuery).On(itemQuery.ItemID == tpiQuery.ItemID);
+                tpiQuery.LeftJoin(consumeQuery).On(consumeQuery.SRConsumeMethod == tpiQuery.SRConsumeMethod);
+
+                tpiQuery.Select(
+                    itemQuery.ItemName,
+                    tpiQuery.ResultQty,
+                    tpiQuery.SRItemUnit,
+                    consumeQuery.SRConsumeMethodName,
+                    tpiQuery.ConsumeQty,
+                    tpiQuery.SRConsumeUnit,
+                    tpiQuery.Notes
+                );
+                tpiQuery.Where(tpiQuery.PrescriptionNo == prescNo);
+                tpiQuery.OrderBy(tpiQuery.SequenceNo.Ascending);
+
+                var dtbItems = tpiQuery.LoadDataTable();
 
                 sb.Append("<table style='width:100%;background:#f9f9f9;border:1px solid #ddd;margin-bottom:6px;'>");
                 sb.AppendFormat("<tr style='background:#e8f0fe;'><td colspan='2' style='padding:5px 8px;font-weight:bold;'>{0} &nbsp; <span style='color:#555;font-weight:normal;'>{1}</span></td></tr>",
                     HttpUtility.HtmlEncode(prescNo), prescDate);
-                sb.AppendFormat("<tr><td class='label' style='width:140px;padding:4px 8px;'>Antibiotic(s)</td><td style='padding:4px 8px;color:#d9534f;font-weight:bold;'>{0}</td></tr>",
-                    HttpUtility.HtmlEncode(abList));
+
+                // Prescription items
+                sb.Append("<tr><td class='label' style='width:140px;padding:4px 8px;vertical-align:top;'>Item</td><td style='padding:4px 8px;'>");
+                sb.Append("<table style='width:100%;'>");
+                foreach (DataRow itemRow in dtbItems.Rows)
+                {
+                    var itemName    = itemRow["ItemName"] != DBNull.Value ? itemRow["ItemName"].ToString() : string.Empty;
+                    var qty         = itemRow["ResultQty"] != DBNull.Value ? itemRow["ResultQty"].ToString() : string.Empty;
+                    var unit        = itemRow["SRItemUnit"] != DBNull.Value ? itemRow["SRItemUnit"].ToString() : string.Empty;
+                    var consumeMethod = itemRow["SRConsumeMethodName"] != DBNull.Value ? itemRow["SRConsumeMethodName"].ToString() : string.Empty;
+                    var consumeQty  = itemRow["ConsumeQty"] != DBNull.Value ? itemRow["ConsumeQty"].ToString() : string.Empty;
+                    var consumeUnit = itemRow["SRConsumeUnit"] != DBNull.Value ? itemRow["SRConsumeUnit"].ToString() : string.Empty;
+                    var itemNotes   = itemRow["Notes"] != DBNull.Value ? itemRow["Notes"].ToString() : string.Empty;
+
+                    sb.AppendFormat(
+                        "<tr><td style='padding:2px 0;color:#d9534f;font-weight:bold;'>" +
+                        "<b>R/</b> {0} {1} {2} ({3} @{4} {5}{6})" +
+                        "</td></tr>",
+                        HttpUtility.HtmlEncode(itemName),
+                        qty, unit,
+                        HttpUtility.HtmlEncode(consumeMethod),
+                        consumeQty, consumeUnit,
+                        string.IsNullOrWhiteSpace(itemNotes) ? string.Empty : " - " + HttpUtility.HtmlEncode(itemNotes));
+                }
+                sb.Append("</table></td></tr>");
+
                 if (!string.IsNullOrWhiteSpace(note))
                     sb.AppendFormat("<tr><td class='label' style='padding:4px 8px;'>Note</td><td style='padding:4px 8px;'>{0}</td></tr>",
                         HttpUtility.HtmlEncode(note));
+
                 sb.AppendFormat(
                     "<tr><td colspan='2' style='padding:6px 8px;'>" +
                     "<a href='#' onclick=\"approveNonPpabPrescription('{0}'); return false;\" style='margin-right:10px;'>" +
