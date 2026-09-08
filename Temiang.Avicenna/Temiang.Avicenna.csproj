@@ -3240,6 +3240,7 @@
     <Content Include="Module\RADT\Ppra\Gyssens\GyssensProccess.aspx" />
     <Content Include="Module\RADT\Ppra\PpraDesktop.aspx" />
     <Content Include="Module\RADT\Ppra\Gyssens\GyssensEntry.aspx" />
+    <Content Include="Module\RADT\Ppra\PpraReview.aspx" />
     <Content Include="Module\RADT\Ppra\RasproFormView.aspx" />
     <Content Include="Module\RADT\QualityIndicator\Apd\ApdDetail.aspx" />
     <Content Include="Module\RADT\QualityIndicator\Apd\ApdItemDetail.ascx" />
@@ -20424,6 +20425,13 @@
     </Compile>
     <Compile Include="Module\RADT\Ppra\Gyssens\GyssensEntry.aspx.designer.cs">
       <DependentUpon>GyssensEntry.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Ppra\PpraReview.aspx.cs">
+      <DependentUpon>PpraReview.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Ppra\PpraReview.aspx.designer.cs">
+      <DependentUpon>PpraReview.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Ppra\RasproFormView.aspx.cs">
       <DependentUpon>RasproFormView.aspx</DependentUpon>

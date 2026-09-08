@@ -132,7 +132,9 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.MainContent
                 prescItemQr.LineAmount,
                 prescItemQr.Notes,
                 prescQr.IsPpraRejected,
-                prescQr.PpraRejectionReason
+                prescQr.PpraRejectionReason,
+                prescQr.IsPpraApproved,
+                prescQr.RasproSeqNo
                 );
 
             prescQr.LeftJoin(prescItemQr).On(prescItemQr.PrescriptionNo == prescQr.PrescriptionNo);
@@ -210,6 +212,8 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.MainContent
                         var isApproved = Convert.ToBoolean(row["IsApproval"]);
                         var isPpraRejected = row.Table.Columns.Contains("IsPpraRejected") && row["IsPpraRejected"] != DBNull.Value && Convert.ToBoolean(row["IsPpraRejected"]);
                         var ppraRejectionReason = row.Table.Columns.Contains("PpraRejectionReason") && row["PpraRejectionReason"] != DBNull.Value ? row["PpraRejectionReason"].ToString() : string.Empty;
+                        var isPpraApproved = row.Table.Columns.Contains("IsPpraApproved") && row["IsPpraApproved"] != DBNull.Value && Convert.ToBoolean(row["IsPpraApproved"]);
+                        var rasproSeqNo = row.Table.Columns.Contains("RasproSeqNo") && row["RasproSeqNo"] != DBNull.Value ? Convert.ToInt32(row["RasproSeqNo"]) : 0;
 
                         // End detail Item
                         sbItem.Append("</tr></table>");
@@ -220,11 +224,50 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.MainContent
                         sbItem.AppendFormat("<td align=\"right\" style=\"width: 80px;\">{0}&nbsp;&nbsp;{1}&nbsp;&nbsp;{2}</td>", printMenu, editMenu, deleteMenu);
                         sbItem.Append("</tr></table>");
 
-                        if (isPpraRejected)
+                        if (AppSession.Parameter.IsNeedPpraApproval)
                         {
-                            sbItem.AppendFormat(
-                                "<div style='background-color:#fff0f0;border-left:4px solid #d9534f;padding:6px 10px;margin:4px 0;color:#d9534f;font-weight:bold;'>&#9888; Ditolak PPRA: {0}</div>",
-                                System.Web.HttpUtility.HtmlEncode(ppraRejectionReason));
+                            if (isPpraRejected)
+                            {
+                                sbItem.AppendFormat(
+                                    "<div style='background-color:#fff0f0;border-left:4px solid #d9534f;padding:6px 10px;margin:4px 0;color:#d9534f;font-weight:bold;'>&#9888; Ditolak PPRA: {0}</div>",
+                                    System.Web.HttpUtility.HtmlEncode(ppraRejectionReason));
+                            }
+                            else if (isPpraApproved)
+                            {
+                                var isNonPpabMatchingSuggestion = false;
+                                if (rasproSeqNo > 0)
+                                {
+                                    var rr = new RegistrationRaspro();
+                                    if (rr.LoadByPrimaryKey(registrationNo, rasproSeqNo) && AbRestriction.IsNonPpab(rr))
+                                    {
+                                        var rrItem = new RegistrationRasproItem();
+                                        rrItem.Query.Where(
+                                            rrItem.Query.RegistrationNo == registrationNo,
+                                            rrItem.Query.RasproSeqNo == rasproSeqNo);
+                                        rrItem.Query.es.Top = 1;
+                                        isNonPpabMatchingSuggestion = rrItem.Query.Load();
+                                    }
+                                }
+
+                                if (isNonPpabMatchingSuggestion)
+                                {
+                                    sbItem.Append(
+                                        "<div style='background-color:#f0fff4;border-left:4px solid #5cb85c;padding:6px 10px;margin:4px 0;color:#3c763d;font-weight:bold;'>" +
+                                        "&#10003; disetujui Tim PGA (Antibiotik sesuai PPAB)" +
+                                        "</div>");
+                                }
+                            }
+                            else if (!isApproved && !isPpraRejected && rasproSeqNo > 0)
+                            {
+                                var rr = new RegistrationRaspro();
+                                if (rr.LoadByPrimaryKey(registrationNo, rasproSeqNo) && AbRestriction.IsNonPpab(rr))
+                                {
+                                    sbItem.Append(
+                                        "<div style='background-color:#fff8e1;border-left:4px solid #f0ad4e;padding:6px 10px;margin:4px 0;color:#8a6d3b;font-weight:bold;'>" +
+                                        "&#9203; Menunggu persetujuan Tim PGA (Non PPAB)" +
+                                        "</div>");
+                                }
+                            }
                         }
 
                         // Start detail Item
