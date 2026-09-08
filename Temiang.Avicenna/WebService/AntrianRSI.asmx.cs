@@ -3455,26 +3455,35 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - VisitQueueNo (required)
-            - ServiceUnitID (required)
+            - ServiceUnitFarmasi (required: PD / PM)
             - UserID (optional)
             - TransDate (optional)
 
+            MAPPING:
+            - PD = D3.0.01.2
+            - PM = D3.0.01.2S
+
             RESPONSE:
             200 = Berhasil mengambil antrian farmasi
-            400 = Parameter tidak valid (VisitQueueNo wajib diisi / ServiceUnitID wajib diisi)
+            400 = Parameter tidak valid
             500 = Server error
         ")]
         public void TakeQueueVisitNumberForFarmasi()
         {
             try
             {
+                // =========================================
+                // AMBIL PARAMETER
+                // =========================================
+
                 string visitQueueNo =
                     (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                string serviceUnitID =
-                    (Context.Request["ServiceUnitID"] ?? "")
-                    .Trim();
+                string serviceUnitFarmasi =
+                    (Context.Request["ServiceUnitFarmasi"] ?? "")
+                    .Trim()
+                    .ToUpper();
 
                 string userID =
                     (Context.Request["UserID"] ?? "KIOSK_FARMASI")
@@ -3484,18 +3493,12 @@ namespace Temiang.Avicenna.WebService
                     (Context.Request["TransDate"] ?? "")
                     .Trim();
 
-                DateTime? transDate = null;
-
-                if (!string.IsNullOrEmpty(transDateString))
-                {
-                    transDate = Convert.ToDateTime(transDateString);
-                }
 
                 // =========================================
-                // VALIDASI
+                // VALIDASI VisitQueueNo
                 // =========================================
 
-                if (string.IsNullOrEmpty(visitQueueNo))
+                if (string.IsNullOrWhiteSpace(visitQueueNo))
                 {
                     ApiResponeForAntrian.Error(
                         Context,
@@ -3506,16 +3509,62 @@ namespace Temiang.Avicenna.WebService
                     return;
                 }
 
-                if (string.IsNullOrEmpty(serviceUnitID))
+
+                // =========================================
+                // VALIDASI SERVICE UNIT FARMASI
+                // =========================================
+
+                if (string.IsNullOrWhiteSpace(serviceUnitFarmasi))
                 {
                     ApiResponeForAntrian.Error(
                         Context,
-                        "ServiceUnitID wajib diisi",
+                        "ServiceUnitFarmasi wajib diisi (PD / PM)",
                         400
                     );
 
                     return;
                 }
+
+
+                if (serviceUnitFarmasi != "PD" &&
+                    serviceUnitFarmasi != "PM")
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "ServiceUnitFarmasi hanya boleh PD atau PM",
+                        400
+                    );
+
+                    return;
+                }
+
+
+                // =========================================
+                // PARSING TRANSDATE
+                // =========================================
+
+                DateTime? transDate = null;
+
+                if (!string.IsNullOrWhiteSpace(transDateString))
+                {
+                    DateTime parsedDate;
+
+                    if (!DateTime.TryParse(
+                        transDateString,
+                        out parsedDate))
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            "Format TransDate tidak valid. Gunakan format yyyy-MM-dd",
+                            400
+                        );
+
+                        return;
+                    }
+
+                    transDate = parsedDate;
+                }
+
 
                 // =========================================
                 // EXECUTE
@@ -3524,10 +3573,15 @@ namespace Temiang.Avicenna.WebService
                 var result =
                     VisitQueue.TakeQueueVisitNumberForFarmasi(
                         visitQueueNo,
-                        serviceUnitID,
+                        serviceUnitFarmasi,
                         userID,
                         transDate
                     );
+
+
+                // =========================================
+                // VALIDASI RESULT
+                // =========================================
 
                 if (result == null)
                 {
@@ -3539,6 +3593,7 @@ namespace Temiang.Avicenna.WebService
 
                     return;
                 }
+
 
                 // =========================================
                 // SUCCESS
@@ -3552,6 +3607,10 @@ namespace Temiang.Avicenna.WebService
             }
             catch (Exception ex)
             {
+                // =========================================
+                // SERVER ERROR
+                // =========================================
+
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,
