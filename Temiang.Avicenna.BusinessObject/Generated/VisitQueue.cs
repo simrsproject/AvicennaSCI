@@ -3342,7 +3342,7 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static object TakeQueueVisitNumberForFarmasi(
             string visitQueueNo,
-            string serviceUnitID,
+            string serviceUnitFarmasi,
             string userID = "KIOSK_FARMASI",
             DateTime? transDate = null
         )
@@ -3360,11 +3360,11 @@ namespace Temiang.Avicenna.BusinessObject
             );
 
             parameters.Add(
-                "ServiceUnitID",
-                serviceUnitID,
+                "ServiceUnitFarmasi",
+                serviceUnitFarmasi,
                 esParameterDirection.Input,
                 DbType.String,
-                50
+                10
             );
 
             parameters.Add(

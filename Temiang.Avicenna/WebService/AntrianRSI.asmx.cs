@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.Http;
 using System.Web.Script.Services;
 using System.Web.Services;
@@ -3455,47 +3456,165 @@ namespace Temiang.Avicenna.WebService
 
             PARAMETER:
             - VisitQueueNo (required)
-            - ServiceUnitID (required)
+            - ServiceUnitFarmasi (required: PD / PM)
             - UserID (optional)
             - TransDate (optional)
 
+            MAPPING:
+            - PD = D3.0.01.2
+            - PM = D3.0.01.2S
+
+            SUPPORT:
+            - GET Query String
+            - POST x-www-form-urlencoded
+            - POST raw JSON
+
             RESPONSE:
             200 = Berhasil mengambil antrian farmasi
-            400 = Parameter tidak valid (VisitQueueNo wajib diisi / ServiceUnitID wajib diisi)
+            400 = Parameter tidak valid
             500 = Server error
         ")]
         public void TakeQueueVisitNumberForFarmasi()
         {
+            Context.Response.TrySkipIisCustomErrors = true;
+            Context.Response.ContentType = "application/json";
+
             try
             {
-                string visitQueueNo =
+                // =========================================
+                // VARIABLE
+                // =========================================
+
+                string visitQueueNo = "";
+                string serviceUnitFarmasi = "";
+                string userID = "KIOSK_FARMASI";
+                string transDateString = "";
+
+
+                // =========================================
+                // 1. AMBIL DARI QUERY STRING / FORM
+                // =========================================
+
+                visitQueueNo =
                     (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                string serviceUnitID =
-                    (Context.Request["ServiceUnitID"] ?? "")
-                    .Trim();
+                serviceUnitFarmasi =
+                    (Context.Request["ServiceUnitFarmasi"] ?? "")
+                    .Trim()
+                    .ToUpper();
 
-                string userID =
+                userID =
                     (Context.Request["UserID"] ?? "KIOSK_FARMASI")
                     .Trim();
 
-                string transDateString =
+                transDateString =
                     (Context.Request["TransDate"] ?? "")
                     .Trim();
 
-                DateTime? transDate = null;
 
-                if (!string.IsNullOrEmpty(transDateString))
+                // =========================================
+                // 2. JIKA RAW JSON
+                // =========================================
+
+                string contentType =
+                    (Context.Request.ContentType ?? "")
+                    .ToLower();
+
+                if (contentType.Contains("application/json"))
                 {
-                    transDate = Convert.ToDateTime(transDateString);
+                    string requestBody = "";
+
+                    using (var reader =
+                        new System.IO.StreamReader(
+                            Context.Request.InputStream))
+                    {
+                        requestBody = reader.ReadToEnd();
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(requestBody))
+                    {
+                        var serializer =
+                            new JavaScriptSerializer();
+
+                        Dictionary<string, object> jsonData = null;
+
+                        try
+                        {
+                            jsonData =
+                                serializer.Deserialize<
+                                    Dictionary<string, object>
+                                >(requestBody);
+                        }
+                        catch
+                        {
+                            ApiResponeForAntrian.Error(
+                                Context,
+                                "Format JSON request tidak valid",
+                                400
+                            );
+
+                            return;
+                        }
+
+
+                        // =========================================
+                        // AMBIL VALUE DARI JSON
+                        // HANYA JIKA BELUM ADA DARI REQUEST
+                        // =========================================
+
+                        if (string.IsNullOrWhiteSpace(visitQueueNo) &&
+                            jsonData.ContainsKey("VisitQueueNo") &&
+                            jsonData["VisitQueueNo"] != null)
+                        {
+                            visitQueueNo =
+                                jsonData["VisitQueueNo"]
+                                .ToString()
+                                .Trim();
+                        }
+
+
+                        if (string.IsNullOrWhiteSpace(serviceUnitFarmasi) &&
+                            jsonData.ContainsKey("ServiceUnitFarmasi") &&
+                            jsonData["ServiceUnitFarmasi"] != null)
+                        {
+                            serviceUnitFarmasi =
+                                jsonData["ServiceUnitFarmasi"]
+                                .ToString()
+                                .Trim()
+                                .ToUpper();
+                        }
+
+
+                        if (jsonData.ContainsKey("UserID") &&
+                            jsonData["UserID"] != null &&
+                            !string.IsNullOrWhiteSpace(
+                                jsonData["UserID"].ToString()))
+                        {
+                            userID =
+                                jsonData["UserID"]
+                                .ToString()
+                                .Trim();
+                        }
+
+
+                        if (jsonData.ContainsKey("TransDate") &&
+                            jsonData["TransDate"] != null)
+                        {
+                            transDateString =
+                                jsonData["TransDate"]
+                                .ToString()
+                                .Trim();
+                        }
+                    }
                 }
 
+
                 // =========================================
-                // VALIDASI
+                // 3. VALIDASI VisitQueueNo
                 // =========================================
 
-                if (string.IsNullOrEmpty(visitQueueNo))
+                if (string.IsNullOrWhiteSpace(visitQueueNo))
                 {
                     ApiResponeForAntrian.Error(
                         Context,
@@ -3506,28 +3625,79 @@ namespace Temiang.Avicenna.WebService
                     return;
                 }
 
-                if (string.IsNullOrEmpty(serviceUnitID))
+
+                // =========================================
+                // 4. VALIDASI SERVICE UNIT FARMASI
+                // =========================================
+
+                if (string.IsNullOrWhiteSpace(serviceUnitFarmasi))
                 {
                     ApiResponeForAntrian.Error(
                         Context,
-                        "ServiceUnitID wajib diisi",
+                        "ServiceUnitFarmasi wajib diisi (PD / PM)",
                         400
                     );
 
                     return;
                 }
 
+
+                if (serviceUnitFarmasi != "PD" &&
+                    serviceUnitFarmasi != "PM")
+                {
+                    ApiResponeForAntrian.Error(
+                        Context,
+                        "ServiceUnitFarmasi hanya boleh PD atau PM",
+                        400
+                    );
+
+                    return;
+                }
+
+
                 // =========================================
-                // EXECUTE
+                // 5. PARSING TRANSDATE
+                // =========================================
+
+                DateTime? transDate = null;
+
+                if (!string.IsNullOrWhiteSpace(transDateString))
+                {
+                    DateTime parsedDate;
+
+                    if (!DateTime.TryParse(
+                        transDateString,
+                        out parsedDate))
+                    {
+                        ApiResponeForAntrian.Error(
+                            Context,
+                            "Format TransDate tidak valid. Gunakan format yyyy-MM-dd",
+                            400
+                        );
+
+                        return;
+                    }
+
+                    transDate = parsedDate;
+                }
+
+
+                // =========================================
+                // 6. EXECUTE BO
                 // =========================================
 
                 var result =
                     VisitQueue.TakeQueueVisitNumberForFarmasi(
                         visitQueueNo,
-                        serviceUnitID,
+                        serviceUnitFarmasi,
                         userID,
                         transDate
                     );
+
+
+                // =========================================
+                // 7. VALIDASI RESULT
+                // =========================================
 
                 if (result == null)
                 {
@@ -3540,8 +3710,9 @@ namespace Temiang.Avicenna.WebService
                     return;
                 }
 
+
                 // =========================================
-                // SUCCESS
+                // 8. SUCCESS
                 // =========================================
 
                 ApiResponeForAntrian.Success(
@@ -3552,6 +3723,9 @@ namespace Temiang.Avicenna.WebService
             }
             catch (Exception ex)
             {
+                Context.Response.TrySkipIisCustomErrors = true;
+                Context.Response.ContentType = "application/json";
+
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,
