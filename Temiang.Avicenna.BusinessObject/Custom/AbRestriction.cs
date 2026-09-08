@@ -175,6 +175,23 @@ namespace Temiang.Avicenna.BusinessObject
             return abr != null && abr.AbRestrictionID == NonPpabID;
         }
 
+        /// <summary>
+        /// Cek apakah resep ini masih pending review PPRA (belum diapprove/reject, belum diproses farmasi, belum void)
+        /// </summary>
+        public static bool IsPendingNonPpab(TransPrescription presc)
+        {
+            if (presc == null
+                || presc.RasproSeqNo == null
+                || (presc.IsApproval    ?? false)
+                || (presc.IsPpraApproved ?? false)
+                || (presc.IsVoid        ?? false)
+                || (presc.IsPpraRejected ?? false))
+                return false;
+
+            var rr = new RegistrationRaspro();
+            return rr.LoadByPrimaryKey(presc.RegistrationNo, presc.RasproSeqNo ?? 0) && IsNonPpab(rr);
+        }
+
         #region AntibioticSuggestion
         //internal static string AntibioticSuggestion(bool isShowEditMenu, string regNo, int rasproSeqNo, ref int abLevel, ref string abRestrictionID)
         public static string AntibioticSuggestion(RegistrationRaspro rr, ref int useRasproSeqNo)
