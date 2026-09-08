@@ -7,11 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Temiang.Avicenna.Module.Charges.Dispensary.PrescriptionSales {
-    
-    
-    public partial class PrescriptionReview {
-        
+namespace Temiang.Avicenna.Module.Charges.Dispensary.PrescriptionSales
+{
+
+
+    public partial class PrescriptionReview
+    {
+
         /// <summary>
         /// hdfReturnValue control.
         /// </summary>
@@ -20,7 +22,7 @@ namespace Temiang.Avicenna.Module.Charges.Dispensary.PrescriptionSales {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HiddenField hdfReturnValue;
-        
+
         /// <summary>
         /// lblReview control.
         /// </summary>
@@ -29,7 +31,25 @@ namespace Temiang.Avicenna.Module.Charges.Dispensary.PrescriptionSales {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblReview;
-        
+
+        /// <summary>
+        /// btnCheckAll control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnCheckAll;
+
+        /// <summary>
+        /// btnUncheckAll control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnUncheckAll;
+
         /// <summary>
         /// grdPrescriptionReview control.
         /// </summary>
