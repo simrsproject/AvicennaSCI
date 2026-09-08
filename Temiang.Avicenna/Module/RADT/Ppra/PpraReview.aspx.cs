@@ -388,8 +388,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
 
         private void CloseAndRefreshParent()
         {
-            // Setelah alert di-dismiss, tutup popup dan rebind grid di parent (PpraDesktop)
-            const string script = "function f(){" +
+            const string script =
                 "var oWnd = GetRadWindow();" +
                 "if(oWnd){" +
                 "  var opener = oWnd.BrowserWindow;" +
@@ -399,10 +398,8 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                 "  } else {" +
                 "    oWnd.close();" +
                 "  }" +
-                "}" +
-                "Sys.Application.remove_load(f);}" +
-                "Sys.Application.add_load(f);";
-            ScriptManager.RegisterStartupScript(this, GetType(), "closeRefresh", script, true);
+                "}";
+            this.RegisterStartupScriptExt("closeRefresh", script);
         }
 
         private static bool IsPendingNonPpabPrescription(TransPrescription presc)

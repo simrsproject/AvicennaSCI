@@ -89,7 +89,7 @@
 
     <%-- Section: Pending Non PPAB Prescriptions --%>
     <fieldset style="margin-bottom:8px;">
-        <legend><strong>Antibiotic Non PPAB — Pending PPRA Review</strong></legend>
+        <legend><strong>Antibiotic Non PPAB - Pending PPRA Review</strong></legend>
         <asp:Literal runat="server" ID="litPendingPrescriptions" />
     </fieldset>
 
