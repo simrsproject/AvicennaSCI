@@ -65,6 +65,11 @@
 
                 __doPostBack("<%= grdList.UniqueID %>", "pprareject|" + prescNo + "|" + encodeURIComponent(reason));
             }
+
+            function openPpraReview(prescNo) {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Ppra/PpraReview.aspx?prescno=' + prescNo;
+                openWindowMaxScreen(url);
+            }
         </script>
 
     </telerik:RadCodeBlock>
@@ -252,11 +257,17 @@
                 <telerik:GridTemplateColumn UniqueName="NonPpabVerification" HeaderText="Non PPAB">
                     <ItemTemplate>
                         <%# string.IsNullOrEmpty(Convert.ToString(DataBinder.Eval(Container.DataItem, "PendingNonPpabPrescriptionNo"))) ? string.Empty :
-                            string.Format("Pending PPRA<br />{0}<br /><a href=\"#\" onclick=\"approveNonPpabPrescription('{0}'); return false;\"><img src=\"../../../Images/Toolbar/post16.png\" border=\"0\" alt=\"Approve\" title=\"Approve PPRA\" /></a>&nbsp;<a href=\"#\" onclick=\"rejectNonPpabPrescription('{0}'); return false;\"><img src=\"../../../Images/Toolbar/delete16.png\" border=\"0\" alt=\"Reject\" title=\"Reject PPRA\" /></a>",
-                            DataBinder.Eval(Container.DataItem, "PendingNonPpabPrescriptionNo")) %>
+                            string.Format(
+                                "<div style='font-size:11px;'>" +
+                                "<span style='color:#d9534f;font-weight:bold;'>Pending PPRA</span><br/>" +
+                                "<span style='color:#555;'>{0}</span><br/>" +
+                                "<a href='#' onclick=\"openPpraReview('{0}'); return false;\" style='color:#1a73e8;font-weight:bold;'>" +
+                                "<img src='../../../Images/Toolbar/views16.png' border='0' /> Review &amp; Approve</a>" +
+                                "</div>",
+                                DataBinder.Eval(Container.DataItem, "PendingNonPpabPrescriptionNo")) %>
                     </ItemTemplate>
-                    <HeaderStyle HorizontalAlign="Center" Width="110px" />
-                    <ItemStyle HorizontalAlign="Center" />
+                    <HeaderStyle HorizontalAlign="Center" Width="140px" />
+                    <ItemStyle HorizontalAlign="Left" VerticalAlign="Middle" />
                 </telerik:GridTemplateColumn>
                 <telerik:GridTemplateColumn UniqueName="Menu" HeaderText=" ">
                     <ItemTemplate>
