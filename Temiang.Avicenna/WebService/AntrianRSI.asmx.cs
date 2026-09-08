@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.Http;
 using System.Web.Script.Services;
 using System.Web.Services;
@@ -3463,6 +3464,11 @@ namespace Temiang.Avicenna.WebService
             - PD = D3.0.01.2
             - PM = D3.0.01.2S
 
+            SUPPORT:
+            - GET Query String
+            - POST x-www-form-urlencoded
+            - POST raw JSON
+
             RESPONSE:
             200 = Berhasil mengambil antrian farmasi
             400 = Parameter tidak valid
@@ -3473,29 +3479,136 @@ namespace Temiang.Avicenna.WebService
             try
             {
                 // =========================================
-                // AMBIL PARAMETER
+                // VARIABLE
                 // =========================================
 
-                string visitQueueNo =
+                string visitQueueNo = "";
+                string serviceUnitFarmasi = "";
+                string userID = "KIOSK_FARMASI";
+                string transDateString = "";
+
+
+                // =========================================
+                // 1. AMBIL DARI QUERY STRING / FORM
+                // =========================================
+
+                visitQueueNo =
                     (Context.Request["VisitQueueNo"] ?? "")
                     .Trim();
 
-                string serviceUnitFarmasi =
+                serviceUnitFarmasi =
                     (Context.Request["ServiceUnitFarmasi"] ?? "")
                     .Trim()
                     .ToUpper();
 
-                string userID =
+                userID =
                     (Context.Request["UserID"] ?? "KIOSK_FARMASI")
                     .Trim();
 
-                string transDateString =
+                transDateString =
                     (Context.Request["TransDate"] ?? "")
                     .Trim();
 
 
                 // =========================================
-                // VALIDASI VisitQueueNo
+                // 2. JIKA RAW JSON
+                // =========================================
+
+                string contentType =
+                    (Context.Request.ContentType ?? "")
+                    .ToLower();
+
+                if (contentType.Contains("application/json"))
+                {
+                    string requestBody = "";
+
+                    using (var reader =
+                        new System.IO.StreamReader(
+                            Context.Request.InputStream))
+                    {
+                        requestBody = reader.ReadToEnd();
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(requestBody))
+                    {
+                        var serializer =
+                            new JavaScriptSerializer();
+
+                        Dictionary<string, object> jsonData = null;
+
+                        try
+                        {
+                            jsonData =
+                                serializer.Deserialize<
+                                    Dictionary<string, object>
+                                >(requestBody);
+                        }
+                        catch
+                        {
+                            ApiResponeForAntrian.Error(
+                                Context,
+                                "Format JSON request tidak valid",
+                                400
+                            );
+
+                            return;
+                        }
+
+
+                        // =========================================
+                        // AMBIL VALUE DARI JSON
+                        // HANYA JIKA BELUM ADA DARI REQUEST
+                        // =========================================
+
+                        if (string.IsNullOrWhiteSpace(visitQueueNo) &&
+                            jsonData.ContainsKey("VisitQueueNo") &&
+                            jsonData["VisitQueueNo"] != null)
+                        {
+                            visitQueueNo =
+                                jsonData["VisitQueueNo"]
+                                .ToString()
+                                .Trim();
+                        }
+
+
+                        if (string.IsNullOrWhiteSpace(serviceUnitFarmasi) &&
+                            jsonData.ContainsKey("ServiceUnitFarmasi") &&
+                            jsonData["ServiceUnitFarmasi"] != null)
+                        {
+                            serviceUnitFarmasi =
+                                jsonData["ServiceUnitFarmasi"]
+                                .ToString()
+                                .Trim()
+                                .ToUpper();
+                        }
+
+
+                        if (jsonData.ContainsKey("UserID") &&
+                            jsonData["UserID"] != null &&
+                            !string.IsNullOrWhiteSpace(
+                                jsonData["UserID"].ToString()))
+                        {
+                            userID =
+                                jsonData["UserID"]
+                                .ToString()
+                                .Trim();
+                        }
+
+
+                        if (jsonData.ContainsKey("TransDate") &&
+                            jsonData["TransDate"] != null)
+                        {
+                            transDateString =
+                                jsonData["TransDate"]
+                                .ToString()
+                                .Trim();
+                        }
+                    }
+                }
+
+
+                // =========================================
+                // 3. VALIDASI VisitQueueNo
                 // =========================================
 
                 if (string.IsNullOrWhiteSpace(visitQueueNo))
@@ -3511,7 +3624,7 @@ namespace Temiang.Avicenna.WebService
 
 
                 // =========================================
-                // VALIDASI SERVICE UNIT FARMASI
+                // 4. VALIDASI SERVICE UNIT FARMASI
                 // =========================================
 
                 if (string.IsNullOrWhiteSpace(serviceUnitFarmasi))
@@ -3540,7 +3653,7 @@ namespace Temiang.Avicenna.WebService
 
 
                 // =========================================
-                // PARSING TRANSDATE
+                // 5. PARSING TRANSDATE
                 // =========================================
 
                 DateTime? transDate = null;
@@ -3567,7 +3680,7 @@ namespace Temiang.Avicenna.WebService
 
 
                 // =========================================
-                // EXECUTE
+                // 6. EXECUTE BO
                 // =========================================
 
                 var result =
@@ -3580,7 +3693,7 @@ namespace Temiang.Avicenna.WebService
 
 
                 // =========================================
-                // VALIDASI RESULT
+                // 7. VALIDASI RESULT
                 // =========================================
 
                 if (result == null)
@@ -3596,7 +3709,7 @@ namespace Temiang.Avicenna.WebService
 
 
                 // =========================================
-                // SUCCESS
+                // 8. SUCCESS
                 // =========================================
 
                 ApiResponeForAntrian.Success(
@@ -3607,10 +3720,6 @@ namespace Temiang.Avicenna.WebService
             }
             catch (Exception ex)
             {
-                // =========================================
-                // SERVER ERROR
-                // =========================================
-
                 ApiResponeForAntrian.Error(
                     Context,
                     ex.Message,
