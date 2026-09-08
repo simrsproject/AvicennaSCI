@@ -405,19 +405,12 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             ScriptManager.RegisterStartupScript(this, GetType(), "closeRefresh", script, true);
         }
 
-        private static bool IsPendingNonPpabPrescription(TransPrescription presc)        {
-            if (!AppSession.Parameter.IsNeedPpraApproval
-                || presc == null
-                || presc.RasproSeqNo == null
-                || (presc.IsApproval   ?? false)
-                || (presc.IsPpraApproved ?? false)
-                || (presc.IsVoid       ?? false)
-                || (presc.IsPpraRejected ?? false))
+        private static bool IsPendingNonPpabPrescription(TransPrescription presc)
+        {
+            if (!AppSession.Parameter.IsNeedPpraApproval)
                 return false;
 
-            var rr = new RegistrationRaspro();
-            return rr.LoadByPrimaryKey(presc.RegistrationNo, presc.RasproSeqNo ?? 0)
-                   && AbRestriction.IsNonPpab(rr);
+            return AbRestriction.IsPendingNonPpab(presc);
         }
 
         #endregion
