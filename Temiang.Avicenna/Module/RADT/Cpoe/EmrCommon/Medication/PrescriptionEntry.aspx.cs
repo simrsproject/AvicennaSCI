@@ -555,11 +555,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 if (string.IsNullOrEmpty(newPrescriptionNo))
                     return;
 
-                var isNonPpab = IsNonPpabPrescription(newPrescriptionNo);
-                if (isNonPpab && AppSession.Parameter.IsNeedPpraApproval)
+                if (AppSession.Parameter.IsNeedPpraApproval && IsNonPpabPrescription(newPrescriptionNo))
                 {
-                    ScriptManager.RegisterStartupScript(this, GetType(), "nonPpabWarning",
-                        "alert('Infeksi Non PPAB perlu persetujuan Tim PPRA/PGA. Resep ditahan dan diteruskan ke PPRA Desktop untuk verifikasi.');", true);
+                    ShowNonPpabWarning();
                     return;
                 }
 
@@ -571,7 +569,17 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         protected override void OnMenuSaveEditClick(ValidateArgs args)
         {
             if (CheckRequeiredEntry(args))
-                SaveEditedPrescription();
+            {
+                var prescriptionNo = SaveEditedPrescription();
+                if (!string.IsNullOrEmpty(prescriptionNo) && AppSession.Parameter.IsNeedPpraApproval && IsNonPpabPrescription(prescriptionNo))
+                    ShowNonPpabWarning();
+            }
+        }
+
+        private void ShowNonPpabWarning()
+        {
+            ScriptManager.RegisterStartupScript(this, GetType(), "nonPpabWarning",
+                "alert('Infeksi Non PPAB perlu persetujuan Tim PPRA/PGA. Resep ditahan dan diteruskan ke PPRA Desktop untuk verifikasi.');", true);
         }
 
         protected override void OnMenuPrintClick(ValidateArgs args, string programID, PrintJobParameterCollection printJobParameters)
@@ -1641,7 +1649,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             if (header.IsApproval == true)
             {
                 ScriptManager.RegisterStartupScript(this, GetType(), "validated", "alert('Prescription already validated by dispensary');", true);
-                return txtPrescriptionNo.Text;
+                return string.Empty;
             }
 
             // Sebelum update IsForTakeItHome, cek dan kurangi receive qty MedicationReceive jika resep yg diedit adalah tipe hom presc

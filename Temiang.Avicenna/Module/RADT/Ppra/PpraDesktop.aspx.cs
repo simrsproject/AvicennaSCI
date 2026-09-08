@@ -186,6 +186,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                 sqPendingNonPpab.Where(
                     sqPendingNonPpab.RegistrationNo == query.RegistrationNo,
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraApproved.IsNull(), sqPendingNonPpab.IsPpraApproved == false),
+                    sqPendingNonPpab.Or(sqPendingNonPpab.IsApproval.IsNull(), sqPendingNonPpab.IsApproval == false),
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsVoid.IsNull(), sqPendingNonPpab.IsVoid == false),
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraRejected.IsNull(), sqPendingNonPpab.IsPpraRejected == false),
                     sqPendingRaspro.AbRestrictionID == AbRestriction.NonPpabID
@@ -250,7 +251,11 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
 
         private static bool IsPendingNonPpabPrescription(TransPrescription presc)
         {
-            if (!AppSession.Parameter.IsNeedPpraApproval || presc == null || presc.RasproSeqNo == null || (presc.IsPpraApproved ?? false) || (presc.IsVoid ?? false) || (presc.IsPpraRejected ?? false))
+            if (!AppSession.Parameter.IsNeedPpraApproval || presc == null || presc.RasproSeqNo == null
+                || (presc.IsApproval ?? false)
+                || (presc.IsPpraApproved ?? false)
+                || (presc.IsVoid ?? false)
+                || (presc.IsPpraRejected ?? false))
                 return false;
 
             var rr = new RegistrationRaspro();
@@ -266,6 +271,9 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
             presc.IsPpraApproved = true;
             presc.IsPpraRejected = false;
             presc.PpraRejectionReason = string.Empty;
+            presc.IsApproval = true;
+            presc.ApprovalDateTime = (new DateTime()).NowAtSqlServer();
+            presc.ApprovedByUserID = AppSession.UserLogin.UserID;
             presc.Save();
 
             TransPrescription.SoapeUpdatePrescriptionHist(presc.ParamedicID, presc.RegistrationNo, presc.PrescriptionDate ?? DateTime.Now);
