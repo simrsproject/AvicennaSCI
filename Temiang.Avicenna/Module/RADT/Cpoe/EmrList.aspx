@@ -976,11 +976,11 @@
                         </table>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>--%>
-                <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderText="Menu">
-                    <HeaderStyle HorizontalAlign="Center" Width="170px"></HeaderStyle>
-                    <ItemStyle HorizontalAlign="Center"></ItemStyle>
-                    <ItemTemplate>
-                        <table width="170px">
+	                <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderText="Menu">
+	                    <HeaderStyle HorizontalAlign="Center" Width="190px"></HeaderStyle>
+	                    <ItemStyle HorizontalAlign="Center"></ItemStyle>
+	                    <ItemTemplate>
+	                        <table width="190px">
                             <tr>
                                 <td style="width: 50px">
                                     <%# DataBinder.Eval(Container.DataItem, "IsConfirmedAttendance").Equals(true) || DataBinder.Eval(Container.DataItem, "SRRegistrationType").Equals("IPR") ? "<img src=\"../../../Images/Toolbar/post16_d.png\" border=\"0\" alt=\"Confirmed\" title=\"\" />" :
@@ -995,6 +995,8 @@
                                         "<img src=\"../../../Images/Toolbar/post16_d.png\" border=\"0\" alt=\"Finished\" title=\"\" />"%>--%>
                                 </td>
                                 <td style="width: 20px"><%# RegistrationNoteCount(Container)%>
+                                </td>
+                                <td style="width: 20px"><%# PpabApprovalNotificationCount(Container)%>
                                 </td>
                                 <td style="width: 20px"><%# string.Format("<a href=\"#\" onclick=\"javascript:openMedicationReceiveOpt('{0}','{1}'); return false;\"><img src=\"../../../Images/Toolbar/drugs16.png\" border=\"0\" alt=\"Confirmed\" title=\"Medication Menu\" /></a>",
                                             DataBinder.Eval(Container.DataItem, "RegistrationNo"),DataBinder.Eval(Container.DataItem, "PatientID"))%></td>

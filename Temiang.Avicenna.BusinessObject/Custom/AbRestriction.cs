@@ -175,6 +175,84 @@ namespace Temiang.Avicenna.BusinessObject
             return abr != null && abr.AbRestrictionID == NonPpabID;
         }
 
+        public static string PpabApprovalNotificationCountSql(string registrationAlias, string abrForLine)
+        {
+            if (string.IsNullOrWhiteSpace(registrationAlias))
+                registrationAlias = "reg";
+
+            var antibioticLine = (abrForLine ?? string.Empty).Replace("'", "''");
+            var antibioticLineFilter = string.IsNullOrWhiteSpace(antibioticLine)
+                ? string.Empty
+                : string.Format(" AND ipm.SRAntibioticLine = '{0}'", antibioticLine);
+
+            var antibioticScope = string.Format("ISNULL(ipm.IsAntibiotic, 0) = 1{0}", antibioticLineFilter);
+            return string.Format(@"
+                (
+                    SELECT COUNT(1)
+                    FROM TransPrescription tp
+                        INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo
+                            AND rr.SeqNo = tp.RasproSeqNo
+                    WHERE tp.RegistrationNo = {0}.RegistrationNo
+                        AND {0}.SRRegistrationType = 'IPR'
+                        AND ISNULL(tp.IsVoid, 0) = 0
+                        AND ISNULL(tp.IsPrescriptionReturn, 0) = 0
+                        AND ISNULL(rr.AbRestrictionID, '') <> '{1}'
+                        AND EXISTS
+                        (
+                            SELECT 1
+                            FROM TransPrescriptionItem tpi
+                                INNER JOIN ItemProductMedic ipm ON ipm.ItemID = tpi.ItemID
+                            WHERE tpi.PrescriptionNo = tp.PrescriptionNo
+                                AND ISNULL(tpi.IsVoid, 0) = 0
+                                AND {2}
+                        )
+                        AND NOT EXISTS
+                        (
+                            SELECT 1
+                            FROM TransPrescriptionItem tpi
+                                INNER JOIN ItemProductMedic ipm ON ipm.ItemID = tpi.ItemID
+                            WHERE tpi.PrescriptionNo = tp.PrescriptionNo
+                                AND ISNULL(tpi.IsVoid, 0) = 0
+                                AND {2}
+                                AND NOT
+                                (
+                                    EXISTS
+                                    (
+                                        SELECT 1
+                                        FROM RegistrationRasproItem rri
+                                        WHERE rri.RegistrationNo = rr.RegistrationNo
+                                            AND rri.ItemID = tpi.ItemID
+                                            AND
+                                            (
+                                                (rr.SRRaspro = '{3}' AND rri.RasprajaSeqNo = rr.SeqNo)
+                                                OR (ISNULL(rr.SRRaspro, '') <> '{3}' AND rri.RasproSeqNo = rr.SeqNo)
+                                            )
+                                    )
+                                    OR rr.AntibioticLevel = {4}
+                                    OR
+                                    (
+                                        rr.AntibioticLevel > 0
+                                        AND rr.AntibioticLevel < {4}
+                                        AND EXISTS
+                                        (
+                                            SELECT 1
+                                            FROM AbRestrictionItem ari
+                                                INNER JOIN ItemProductMedicZatActive zam ON zam.ZatActiveID = ari.ZatActiveID
+                                            WHERE ari.AbRestrictionID = rr.AbRestrictionID
+                                                AND ari.AbLevel = rr.AntibioticLevel
+                                                AND zam.ItemID = tpi.ItemID
+                                        )
+                                    )
+                                )
+                        )
+                ) AS PpabApprovalNotificationCount",
+                registrationAlias,
+                NonPpabID,
+                antibioticScope,
+                RasproType.Raspraja,
+                AntibioticLevel.AllAntibiotic);
+        }
+
         /// <summary>
         /// Cek apakah resep ini masih pending review PPRA (belum diapprove/reject, belum diproses farmasi, belum void)
         /// </summary>

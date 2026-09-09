@@ -3770,6 +3770,13 @@ namespace Temiang.Avicenna.Common
                     return IsYes(AppParameter.ParameterItem.IsNeedPpraApproval);
                 }
             }
+            public static bool IsShowPpabApprovalNotification
+            {
+                get
+                {
+                    return IsYes(AppParameter.ParameterItem.IsShowPpabApprovalNotification);
+                }
+            }
 
             public static string FoodGroupOneCarbohydrate
             {

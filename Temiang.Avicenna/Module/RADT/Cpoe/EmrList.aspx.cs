@@ -913,7 +913,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                     "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                     reg.SRPatientRiskColor,
                     patient.IsAlive,
-                    patient.DeceasedDateTime
+                    patient.DeceasedDateTime,
+                    PpabApprovalNotificationCountSelect()
                 );
 
             // IsDoctorOnDuty untuk kondisi popup konfirmasi mengambil alih pasien (takeover)
@@ -1363,7 +1364,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                     "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                     reg.SRPatientRiskColor,
                     patient.IsAlive,
-                    patient.DeceasedDateTime
+                    patient.DeceasedDateTime,
+                    PpabApprovalNotificationCountSelect()
                 );
             if (AppSession.Parameter.IsCrmMembershipActive)
                 reg.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
@@ -1579,7 +1581,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                 reg.SRPatientRiskColor,
                 patient.IsAlive,
-                patient.DeceasedDateTime
+                patient.DeceasedDateTime,
+                PpabApprovalNotificationCountSelect()
             );
             if (AppSession.Parameter.IsCrmMembershipActive)
                 query.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
@@ -1788,7 +1791,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                  "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                 reg.SRPatientRiskColor,
                 patient.IsAlive,
-                patient.DeceasedDateTime
+                patient.DeceasedDateTime,
+                PpabApprovalNotificationCountSelect()
                 );
             if (AppSession.Parameter.IsCrmMembershipActive)
                 tc.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
@@ -2054,7 +2058,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                 reg.SRPatientRiskColor,
                 patient.IsAlive,
-                patient.DeceasedDateTime
+                patient.DeceasedDateTime,
+                PpabApprovalNotificationCountSelect()
                 );
             if (AppSession.Parameter.IsCrmMembershipActive)
                 tc.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
@@ -2245,7 +2250,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                 reg.SRPatientRiskColor,
                 patient.IsAlive,
-                patient.DeceasedDateTime
+                patient.DeceasedDateTime,
+                PpabApprovalNotificationCountSelect()
                 );
             if (AppSession.Parameter.IsCrmMembershipActive)
                 tc.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
@@ -2562,7 +2568,8 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                     "<ISNULL(reg.IsFinishedAttendance, 0) AS IsFinishedAttendance>",
                     reg.SRPatientRiskColor,
                     patient.IsAlive,
-                    patient.DeceasedDateTime
+                    patient.DeceasedDateTime,
+                    PpabApprovalNotificationCountSelect()
                 );
             if (AppSession.Parameter.IsCrmMembershipActive)
                 reg.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
@@ -2922,7 +2929,44 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 noteCount += pi.NoteCount;
 
             return (string.Format("<a href=\"#\" title=\"Note\" class=\"noti_Container\" onclick=\"openWinRegistrationInfo('{0}'); return false;\"><span id=\"noti_{0}\" class=\"noti_bubble\">{1}</span></a>",
-                                                                    regNo, noteCount > 0 ? noteCount.ToString() : string.Empty));
+                                                                            regNo, noteCount > 0 ? noteCount.ToString() : string.Empty));
+        }
+
+        private string PpabApprovalNotificationCountSelect()
+        {
+            if (!AppSession.Parameter.IsShowPpabApprovalNotification)
+                return "<CAST(0 AS INT) AS PpabApprovalNotificationCount>";
+
+            return string.Format("<{0}>", AbRestriction.PpabApprovalNotificationCountSql("reg", AppParameter.GetParameterValue(AppParameter.ParameterItem.AntibioticRestrictionForLine)));
+        }
+
+        protected string PpabApprovalNotificationCount(GridItem container)
+        {
+            if (!AppSession.Parameter.IsShowPpabApprovalNotification)
+                return string.Empty;
+
+            var count = 0;
+            object rawCount;
+            try
+            {
+                rawCount = DataBinder.Eval(container.DataItem, "PpabApprovalNotificationCount");
+            }
+            catch
+            {
+                return string.Empty;
+            }
+
+            if (rawCount == null || rawCount == DBNull.Value || !int.TryParse(Convert.ToString(rawCount), out count) || count <= 0)
+                return string.Empty;
+
+            var regNo = Convert.ToString(DataBinder.Eval(container.DataItem, "RegistrationNo"));
+            if (string.IsNullOrWhiteSpace(regNo))
+                return string.Empty;
+
+            var elementId = string.Format("ppab_{0}", regNo.Replace("/", "_").Replace("-", "_"));
+            return string.Format("<a href=\"#\" title=\"Disetujui Tim PGA (Antibiotik sesuai PPAB)\" class=\"noti_Container\" onclick=\"return false;\"><span id=\"{0}\" class=\"noti_bubble\">{1}</span></a>",
+                HttpUtility.HtmlAttributeEncode(elementId),
+                count);
         }
 
         //Dipindah ke EmrWebService (Handono 230327)

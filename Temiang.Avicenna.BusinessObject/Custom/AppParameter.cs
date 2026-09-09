@@ -1143,6 +1143,7 @@ namespace Temiang.Avicenna.BusinessObject
             DayLimitEmployeeLicenseWarning,
             IsFeeTaxBeforeDiscount,
             IsNeedPpraApproval,
+            IsShowPpabApprovalNotification,
             IsRasproEnable,
             RasproEnableForRegistrationTypes,
             QuestionFormEmployeeSafetyCultureIncidentReports,
@@ -2413,6 +2414,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string DayLimitEmployeeLicenseWarning = "Day Limit Employee License Warning|180| |False";
             public const string IsFeeTaxBeforeDiscount = "Is Fee Tax Before Discount? (Yes/No)|No| |True";
             public const string IsNeedPpraApproval = "Is Need PPRA Approval for Non PPAB Prescription (Yes/No)|No| |False";
+            public const string IsShowPpabApprovalNotification = "Is Show PPAB Approval Notification (Yes/No)|No| |False";
             public const string IsRasproEnable = "Is Antibiotic Suggestion Enable (RASPRO)? (Yes/No)|No| |True";
             public const string RasproEnableForRegistrationTypes = "Raspro Enable For Inpatient and Registration Types (ex. IGD;OPR)|| |false";
             public const string QuestionFormEmployeeSafetyCultureIncidentReports = "Question Form : Employee Safety Culture Incident Reports|KEHRS| |True";
