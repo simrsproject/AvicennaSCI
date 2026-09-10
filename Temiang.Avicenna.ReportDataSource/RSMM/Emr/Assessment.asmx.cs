@@ -667,6 +667,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 DiagnosaNotes = asses.AnamnesisNotes,
                 //SignImgUrl = asses.SignImg,
                 SignImgUrl = !string.IsNullOrEmpty(Convert.ToString(au.SignatureImage)) ? Encoding.UTF8.GetBytes(Convert.ToString(au.SignatureImage)) : asses.SignImg,
+                SignImgByte = au.SignatureImage != null ? au.SignatureImage : asses.SignImg,
                 PatientSignImg = asses.PatientSignImg,
 
                 //Tambahan Assessment IGD RSYS
