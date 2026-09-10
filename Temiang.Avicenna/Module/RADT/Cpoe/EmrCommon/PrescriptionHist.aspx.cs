@@ -163,11 +163,38 @@ namespace Temiang.Avicenna.Module.Emr.EmrCommon
                     {
                         prescItem.Title = r["PrescriptionNo"].ToString();
                         prescItem.PrescriptionDate = Convert.ToDateTime(r["PrescriptionDate"]);
-                        prescItem.PrescriptionDateLabel = Convert.ToDateTime(r["PrescriptionDate"]).ToString(AppConstant.DisplayFormat.DateShortMonth);
+                        prescItem.PrescriptionDateLabel = Convert.ToDateTime(r["PrescriptionDate"])
+                            .ToString(AppConstant.DisplayFormat.DateShortMonth);
+
                         prescItem.ParamedicName = r["ParamedicName"].ToString();
                         prescItem.ChiefComplaint = r["Complaint"].ToString();
-                        prescItem.IsRejectedByPpra = r["IsPpraRejected"] != DBNull.Value && Convert.ToBoolean(r["IsPpraRejected"]);
-                        prescItem.RejectionReason = r["PpraRejectionReason"] != DBNull.Value ? r["PpraRejectionReason"].ToString() : string.Empty;
+
+                        prescItem.IsRejectedByPpra =
+                            r["IsPpraRejected"] != DBNull.Value &&
+                            Convert.ToBoolean(r["IsPpraRejected"]);
+
+                        prescItem.RejectionReason =
+                            r["PpraRejectionReason"] != DBNull.Value
+                                ? r["PpraRejectionReason"].ToString()
+                                : string.Empty;
+
+                        if (prescItem.IsRejectedByPpra)
+                        {
+                            prescItem.RejectionHtml =
+                                "<div style=\"background-color:rgb(255,240,240);" +
+                                "border-left:4px solid rgb(217,83,79);" +
+                                "padding:6px 10px;" +
+                                "margin-bottom:6px;" +
+                                "color:rgb(217,83,79);" +
+                                "font-weight:bold;\">" +
+                                "&#9888; Ditolak PPRA: " +
+                                HttpUtility.HtmlEncode(prescItem.RejectionReason) +
+                                "</div>";
+                        }
+                        else
+                        {
+                            prescItem.RejectionHtml = string.Empty;
+                        }
                     }
                     i++;
 
@@ -218,6 +245,7 @@ namespace Temiang.Avicenna.Module.Emr.EmrCommon
             public string ChiefComplaint { get; set; }
             public bool IsRejectedByPpra { get; set; }
             public string RejectionReason { get; set; }
+            public string RejectionHtml { get; set; }
         }
     }
 }
