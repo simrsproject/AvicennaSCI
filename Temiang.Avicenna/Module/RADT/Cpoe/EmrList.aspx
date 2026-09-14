@@ -243,6 +243,11 @@
                 openWindowMaxScreen(url);
             }
 
+            function openPpraHistory(regNo) {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Ppra/PpraHistoryPopup.aspx?regno=' + regNo;
+                openWindow(url, 700, 450);
+            }
+
             function winDialog_ClientClose(oWnd, args) {                startAutofresh();
 
                 oWnd.setUrl("about:blank"); // Sets url to blank for release variable

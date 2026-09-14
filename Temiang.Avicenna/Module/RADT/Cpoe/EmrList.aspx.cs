@@ -3011,17 +3011,11 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 ? "Ditolak PPRA: " + System.Web.HttpUtility.HtmlAttributeEncode(Convert.ToString(reason))
                 : "Ada resep Non PPAB ditolak PPRA";
 
-            var prescNo = DataBinder.Eval(container.DataItem, "PpraRejectedPrescriptionNo");
-            if (prescNo != null && !string.IsNullOrEmpty(Convert.ToString(prescNo)))
-                return string.Format(
-                    "<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"openPpraReview('{1}'); return false;\">" +
-                    "<span class=\"noti_bubble\" style=\"background-color:#d9534f;\">!</span></a>",
-                    tooltip, prescNo);
-
+            var regNo = DataBinder.Eval(container.DataItem, "RegistrationNo");
             return string.Format(
-                "<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"return false;\">" +
+                "<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"openPpraHistory('{1}'); return false;\">" +
                 "<span class=\"noti_bubble\" style=\"background-color:#d9534f;\">!</span></a>",
-                tooltip);
+                tooltip, regNo);
         }
 
         //Dipindah ke EmrWebService (Handono 230327)
