@@ -238,8 +238,12 @@
                 oWnd.show();
                 oWnd.maximize();
             }
-            function winDialog_ClientClose(oWnd, args) {
-                startAutofresh();
+            function openPpraReview(prescNo) {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Ppra/PpraReview.aspx?prescno=' + prescNo;
+                openWindowMaxScreen(url);
+            }
+
+            function winDialog_ClientClose(oWnd, args) {                startAutofresh();
 
                 oWnd.setUrl("about:blank"); // Sets url to blank for release variable
                 var arg = args.get_argument();
@@ -855,18 +859,6 @@
                     <HeaderStyle HorizontalAlign="Center" Width="40px" />
                     <ItemStyle HorizontalAlign="Center" />
                 </telerik:GridTemplateColumn>
-                <telerik:GridTemplateColumn UniqueName="PpraRejectedPrescription" HeaderText="">
-                    <ItemTemplate>
-                        <%# Convert.ToBoolean(DataBinder.Eval(Container.DataItem, "HasPpraRejectedPrescription"))
-                            ? string.Format("<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"return false;\"><span class=\"noti_bubble\" style=\"background-color:#d9534f;\">!</span></a>",
-                                System.Web.HttpUtility.HtmlAttributeEncode(DataBinder.Eval(Container.DataItem, "PpraRejectionReason") != DBNull.Value && !string.IsNullOrEmpty(Convert.ToString(DataBinder.Eval(Container.DataItem, "PpraRejectionReason")))
-                                    ? "Ditolak PPRA: " + Convert.ToString(DataBinder.Eval(Container.DataItem, "PpraRejectionReason"))
-                                    : "Ada resep Non PPAB ditolak PPRA"))
-                            : string.Empty %>
-                    </ItemTemplate>
-                    <HeaderStyle HorizontalAlign="Center" Width="30px" />
-                    <ItemStyle HorizontalAlign="Center" VerticalAlign="Middle" />
-                </telerik:GridTemplateColumn>
                 <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ParamedicID"
                     UniqueName="ParamedicID" SortExpression="ParamedicID" Visible="False">
                     <HeaderStyle HorizontalAlign="Center" Width="140px" />
@@ -1008,6 +1000,7 @@
                                 </td>
                                 <td style="width: 20px"><%# RegistrationNoteCount(Container)%>
                                 </td>
+                                <td style="width: 20px"><%# PpraRejectedNoteHtml(Container) %></td>
                                 <td style="width: 20px"><%# string.Format("<a href=\"#\" onclick=\"javascript:openMedicationReceiveOpt('{0}','{1}'); return false;\"><img src=\"../../../Images/Toolbar/drugs16.png\" border=\"0\" alt=\"Confirmed\" title=\"Medication Menu\" /></a>",
                                             DataBinder.Eval(Container.DataItem, "RegistrationNo"),DataBinder.Eval(Container.DataItem, "PatientID"))%></td>
                                 <td style="width: 20px"><%# !DataBinder.Eval(Container.DataItem, "SRRegistrationType").Equals(AppConstant.RegistrationType.InPatient)? string.Empty: string.Format("<a href=\"#\" onclick=\"openMedicationHist('{0}','{1}','{2}'); return false;\"><img src=\"../../../Images/Toolbar/ordering16.png\" border=\"0\" alt=\"MedHist\" title=\"Medication History\" /></a>",

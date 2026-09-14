@@ -72,7 +72,6 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 grdList.Columns.FindByUniqueName("ExternalQueNo").Visible = AppSession.Parameter.IsEmrListUsingExternalQueNo;
                 grdList.Columns.FindByUniqueName("ClinicalPathway").Visible = hdnIsClinicalPathwayActive.Value == "y";
                 grdList.Columns.FindByUniqueName("IsVipMember").Visible = AppSession.Parameter.IsCrmMembershipActive;
-                grdList.Columns.FindByUniqueName("PpraRejectedPrescription").Visible = AppSession.Parameter.IsNeedPpraApproval;
 
                 if (trSmfFilter.Visible)
                 {
@@ -2978,9 +2977,35 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                                                                     regNo, noteCount > 0 ? noteCount.ToString() : string.Empty));
         }
 
+        protected string PpraRejectedNoteHtml(GridItem container)
+        {
+            if (!AppSession.Parameter.IsNeedPpraApproval)
+                return string.Empty;
+
+            var hasRejected = DataBinder.Eval(container.DataItem, "HasPpraRejectedPrescription");
+            if (hasRejected == null || !Convert.ToBoolean(hasRejected))
+                return string.Empty;
+
+            var prescNo = DataBinder.Eval(container.DataItem, "PendingNonPpabPrescriptionNo");
+            var reason = DataBinder.Eval(container.DataItem, "PpraRejectionReason");
+            var tooltip = reason != DBNull.Value && !string.IsNullOrEmpty(Convert.ToString(reason))
+                ? "Ditolak PPRA: " + System.Web.HttpUtility.HtmlAttributeEncode(Convert.ToString(reason))
+                : "Ada resep Non PPAB ditolak PPRA";
+
+            if (prescNo != null && !string.IsNullOrEmpty(Convert.ToString(prescNo)))
+                return string.Format(
+                    "<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"openPpraReview('{1}'); return false;\">" +
+                    "<span class=\"noti_bubble\" style=\"background-color:#d9534f;\">!</span></a>",
+                    tooltip, prescNo);
+
+            return string.Format(
+                "<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"return false;\">" +
+                "<span class=\"noti_bubble\" style=\"background-color:#d9534f;\">!</span></a>",
+                tooltip);
+        }
+
         //Dipindah ke EmrWebService (Handono 230327)
-        //protected string EwsScoreLevelHtml(GridItem container)
-        //{
+        //protected string EwsScoreLevelHtml(GridItem container)        //{
         //    if (!DataBinder.Eval(container.DataItem, "SRRegistrationType")
         //        .Equals(AppConstant.RegistrationType.InPatient))
         //        return string.Empty;
