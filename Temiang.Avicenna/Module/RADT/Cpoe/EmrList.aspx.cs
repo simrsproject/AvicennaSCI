@@ -72,6 +72,7 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 grdList.Columns.FindByUniqueName("ExternalQueNo").Visible = AppSession.Parameter.IsEmrListUsingExternalQueNo;
                 grdList.Columns.FindByUniqueName("ClinicalPathway").Visible = hdnIsClinicalPathwayActive.Value == "y";
                 grdList.Columns.FindByUniqueName("IsVipMember").Visible = AppSession.Parameter.IsCrmMembershipActive;
+                grdList.Columns.FindByUniqueName("PpraRejectedPrescription").Visible = AppSession.Parameter.IsNeedPpraApproval;
 
                 if (trSmfFilter.Visible)
                 {
@@ -923,6 +924,32 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
 
+            if (AppSession.Parameter.IsNeedPpraApproval)
+            {
+                reg.Select(string.Format(@"<CAST(CASE WHEN EXISTS (
+                    SELECT TOP 1 1 FROM TransPrescription tp
+                    INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
+                    WHERE tp.RegistrationNo = reg.RegistrationNo
+                      AND ISNULL(tp.IsVoid, 0) = 0
+                      AND ISNULL(tp.IsPpraRejected, 0) = 1
+                      AND rr.AbRestrictionID LIKE '{0}%'
+                ) THEN 1 ELSE 0 END AS BIT) AS HasPpraRejectedPrescription>", AbRestriction.NonPpabID));
+                reg.Select(string.Format(@"<(SELECT TOP 1 tp.PpraRejectionReason
+                    FROM TransPrescription tp
+                    INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
+                    WHERE tp.RegistrationNo = reg.RegistrationNo
+                      AND ISNULL(tp.IsVoid, 0) = 0
+                      AND ISNULL(tp.IsPpraRejected, 0) = 1
+                      AND rr.AbRestrictionID LIKE '{0}%'
+                    ORDER BY tp.PrescriptionDate DESC
+                ) AS PpraRejectionReason>", AbRestriction.NonPpabID));
+            }
+            else
+            {
+                reg.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+                reg.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            }
+
             if (regTypes.Length == 1)
                 reg.Where(reg.SRRegistrationType == regTypes[0]);
             else if (regTypes.Length > 1)
@@ -1369,6 +1396,32 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 reg.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
+
+            if (AppSession.Parameter.IsNeedPpraApproval)
+            {
+                reg.Select(string.Format(@"<CAST(CASE WHEN EXISTS (
+                    SELECT TOP 1 1 FROM TransPrescription tp
+                    INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
+                    WHERE tp.RegistrationNo = reg.RegistrationNo
+                      AND ISNULL(tp.IsVoid, 0) = 0
+                      AND ISNULL(tp.IsPpraRejected, 0) = 1
+                      AND rr.AbRestrictionID LIKE '{0}%'
+                ) THEN 1 ELSE 0 END AS BIT) AS HasPpraRejectedPrescription>", AbRestriction.NonPpabID));
+                reg.Select(string.Format(@"<(SELECT TOP 1 tp.PpraRejectionReason
+                    FROM TransPrescription tp
+                    INNER JOIN RegistrationRaspro rr ON rr.RegistrationNo = tp.RegistrationNo AND rr.SeqNo = tp.RasproSeqNo
+                    WHERE tp.RegistrationNo = reg.RegistrationNo
+                      AND ISNULL(tp.IsVoid, 0) = 0
+                      AND ISNULL(tp.IsPpraRejected, 0) = 1
+                      AND rr.AbRestrictionID LIKE '{0}%'
+                    ORDER BY tp.PrescriptionDate DESC
+                ) AS PpraRejectionReason>", AbRestriction.NonPpabID));
+            }
+            else
+            {
+                reg.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+                reg.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            }
 
             reg.InnerJoin(room).On(reg.RoomID == room.RoomID);
             reg.InnerJoin(patient).On(reg.PatientID == patient.PatientID);
