@@ -135,7 +135,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                 tpQuery.Or(tpQuery.IsApproval.IsNull(), tpQuery.IsApproval == false),
                 tpQuery.Or(tpQuery.IsVoid.IsNull(), tpQuery.IsVoid == false),
                 tpQuery.Or(tpQuery.IsPpraRejected.IsNull(), tpQuery.IsPpraRejected == false),
-                rrQuery.AbRestrictionID == AbRestriction.NonPpabID
+                rrQuery.AbRestrictionID.Like(AbRestriction.NonPpabID + "%")
             );
             tpQuery.OrderBy(tpQuery.PrescriptionDate.Descending);
 
