@@ -1715,14 +1715,20 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                 var referralName = string.Empty;
                 var referralAddress = string.Empty;
-                var stdi = new AppStandardReferenceItem();
-                stdi.LoadByPrimaryKey("ReferralGroup", reg.SRReferralGroup);
-                if (stdi.ReferenceID.Contains("dokter") || stdi.ReferenceID.Contains("bidan"))
+
+                if(!string.IsNullOrEmpty(reg.SRReferralGroup))
                 {
-                    referralName = reg.ReferralName;
-                    referralAddress = "Tempat";
+                    var stdi = new AppStandardReferenceItem();
+                    stdi.LoadByPrimaryKey("ReferralGroup", reg.SRReferralGroup);
+                    if (stdi.ReferenceID.Contains("dokter") || stdi.ReferenceID.Contains("bidan"))
+                    {
+                        referralName = reg.ReferralName;
+                        referralAddress = "Tempat";
+                    }
                 }
-                else
+
+                
+                if(string.IsNullOrEmpty(referralName) && string.IsNullOrEmpty(referralAddress))
                 {
                     if (!string.IsNullOrWhiteSpace(reg.ReferralID))
                     {
