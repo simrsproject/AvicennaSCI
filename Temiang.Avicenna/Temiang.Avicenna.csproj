@@ -1934,6 +1934,7 @@
     <Content Include="Document\2026\07\create_sp_GetTariffComponentByItemID.sql" />
     <Content Include="Document\2026\08\07\INSERT_INTO_AppParamter_IsAllowZeroNewPriceForTariff.sql" />
     <Content Include="Document\2026\08\27\sp_UpdatePrintNumber.sql" />
+    <Content Include="Document\2026\09\01\01. PPRA Non PPAB Approval Parameter and Flag.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
