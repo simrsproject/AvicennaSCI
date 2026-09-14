@@ -986,10 +986,10 @@
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>--%>
                 <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderText="Menu">
-                    <HeaderStyle HorizontalAlign="Center" Width="170px"></HeaderStyle>
+                    <HeaderStyle HorizontalAlign="Center" Width="190px"></HeaderStyle>
                     <ItemStyle HorizontalAlign="Center"></ItemStyle>
                     <ItemTemplate>
-                        <table width="170px">
+                        <table width="190px">
                             <tr>
                                 <td style="width: 50px">
                                     <%# DataBinder.Eval(Container.DataItem, "IsConfirmedAttendance").Equals(true) || DataBinder.Eval(Container.DataItem, "SRRegistrationType").Equals("IPR") ? "<img src=\"../../../Images/Toolbar/post16_d.png\" border=\"0\" alt=\"Confirmed\" title=\"\" />" :

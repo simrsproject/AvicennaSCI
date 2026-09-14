@@ -1657,6 +1657,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 query.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 query.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
+            query.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+            query.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            query.Select(@"<CAST('' AS nvarchar(20)) AS PpraRejectedPrescriptionNo>");
 
             query.LeftJoin(room).On(query.RoomID == room.RoomID);
             query.InnerJoin(reg).On(query.RegistrationNo == reg.RegistrationNo);
@@ -1866,6 +1869,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 tc.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 tc.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
+            tc.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+            tc.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            tc.Select(@"<CAST('' AS nvarchar(20)) AS PpraRejectedPrescriptionNo>");
 
             tc.InnerJoin(reg).On(tc.RegistrationNo == reg.RegistrationNo);
             tc.InnerJoin(medic).On(reg.ParamedicID == medic.ParamedicID); // Yg dimunculkan nama dokter waktu reg
@@ -2132,6 +2138,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 tc.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 tc.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
+            tc.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+            tc.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            tc.Select(@"<CAST('' AS nvarchar(20)) AS PpraRejectedPrescriptionNo>");
 
             tc.InnerJoin(chargesComp).On(tc.TransactionNo == chargesComp.TransactionNo);
             tc.InnerJoin(joFromUnit).On(tc.FromServiceUnitID == joFromUnit.ServiceUnitID);
@@ -2323,6 +2332,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 tc.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 tc.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
+            tc.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+            tc.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            tc.Select(@"<CAST('' AS nvarchar(20)) AS PpraRejectedPrescriptionNo>");
 
             tc.InnerJoin(chargesComp).On(tc.TransactionNo == chargesComp.TransactionNo);
             tc.InnerJoin(joToUnit).On(tc.ToServiceUnitID == joToUnit.ServiceUnitID);
@@ -2640,6 +2652,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                 reg.Select(@"<CASE WHEN ISNULL(reg.MembershipNo, '') = '' THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS 'IsVipMember'>");
             else
                 reg.Select(@"<CAST(0 AS BIT) AS 'IsVipMember'>");
+            reg.Select(@"<CAST(0 AS BIT) AS HasPpraRejectedPrescription>");
+            reg.Select(@"<CAST('' AS nvarchar(500)) AS PpraRejectionReason>");
+            reg.Select(@"<CAST('' AS nvarchar(20)) AS PpraRejectedPrescriptionNo>");
 
             reg.LeftJoin(room).On(reg.RoomID == room.RoomID);
             reg.LeftJoin(medic).On(reg.ParamedicID == medic.ParamedicID);
@@ -3014,7 +3029,7 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
             var regNo = DataBinder.Eval(container.DataItem, "RegistrationNo");
             return string.Format(
                 "<a href=\"#\" title=\"{0}\" class=\"noti_Container\" onclick=\"openPpraHistory('{1}'); return false;\">" +
-                "<span class=\"noti_bubble\" style=\"background-color:#d9534f;\">!</span></a>",
+                "<span class=\"noti_bubble\">!</span></a>",
                 tooltip, regNo);
         }
 
