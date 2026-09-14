@@ -558,7 +558,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 if (AppSession.Parameter.IsNeedPpraApproval && IsNonPpabPrescription(newPrescriptionNo))
                 {
                     ShowNonPpabWarning();
-                    // Tetap close dan refresh parent meski resep ditahan PPRA
                     this.RegisterStartupScriptExt("closeAfterNonPpab", "CloseAndApply();");
                     return;
                 }
