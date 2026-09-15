@@ -169,8 +169,9 @@ namespace Temiang.Avicenna.Module.Reports
                 regNo = pat.RegistrationNo;
             }
 
-            fileName = "PATDOC_" + fileName;
-            filePath = Reports.ReportViewer.GuarantorDocumentFilePath(regNo, string.Empty, fileName, string.Empty, ref regType, ref guarantorID, id);
+            fileName = "PATDOC_" + regNo.Replace("/","") + "_" + id + ".pdf";
+            filePath = AppParameter.GetParameterValue(AppParameter.ParameterItem.SepFolder);
+            filePath = Path.Combine(filePath, fileName);
 
             try
             {
