@@ -243,13 +243,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
 
             var selectedAbr = new AbRestriction();
-            if (selectedAbr.LoadByPrimaryKey(cboAbRestrictionID.SelectedValue) && AbRestriction.IsNonPpab(selectedAbr) && string.IsNullOrWhiteSpace(txtOtherInfection.Text))
-            {
-                imgRfvOtherInfection.Visible = true;
-                args.IsValid = false;
-                ((CustomValidator)source).ErrorMessage = string.Format("{0} must fill Description", cboAbRestrictionID.SelectedText);
-                return;
-            }
+            selectedAbr.LoadByPrimaryKey(cboAbRestrictionID.SelectedValue);
 
             // Check selected AB restriction
             if (!string.IsNullOrWhiteSpace(cboAbRestrictionID.SelectedValue))

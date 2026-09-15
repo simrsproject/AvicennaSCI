@@ -238,8 +238,17 @@
                 oWnd.show();
                 oWnd.maximize();
             }
-            function winDialog_ClientClose(oWnd, args) {
-                startAutofresh();
+            function openPpraReview(prescNo) {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Ppra/PpraReview.aspx?prescno=' + prescNo;
+                openWindowMaxScreen(url);
+            }
+
+            function openPpraHistory(regNo) {
+                var url = '<%= Helper.UrlRoot() %>/Module/RADT/Ppra/PpraHistoryPopup.aspx?regno=' + regNo;
+                openWindow(url, 700, 450);
+            }
+
+            function winDialog_ClientClose(oWnd, args) {                startAutofresh();
 
                 oWnd.setUrl("about:blank"); // Sets url to blank for release variable
                 var arg = args.get_argument();
@@ -977,10 +986,10 @@
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>--%>
                 <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderText="Menu">
-                    <HeaderStyle HorizontalAlign="Center" Width="170px"></HeaderStyle>
+                    <HeaderStyle HorizontalAlign="Center" Width="190px"></HeaderStyle>
                     <ItemStyle HorizontalAlign="Center"></ItemStyle>
                     <ItemTemplate>
-                        <table width="170px">
+                        <table width="190px">
                             <tr>
                                 <td style="width: 50px">
                                     <%# DataBinder.Eval(Container.DataItem, "IsConfirmedAttendance").Equals(true) || DataBinder.Eval(Container.DataItem, "SRRegistrationType").Equals("IPR") ? "<img src=\"../../../Images/Toolbar/post16_d.png\" border=\"0\" alt=\"Confirmed\" title=\"\" />" :
@@ -996,6 +1005,7 @@
                                 </td>
                                 <td style="width: 20px"><%# RegistrationNoteCount(Container)%>
                                 </td>
+                                <td style="width: 20px"><%# PpraRejectedNoteHtml(Container) %></td>
                                 <td style="width: 20px"><%# string.Format("<a href=\"#\" onclick=\"javascript:openMedicationReceiveOpt('{0}','{1}'); return false;\"><img src=\"../../../Images/Toolbar/drugs16.png\" border=\"0\" alt=\"Confirmed\" title=\"Medication Menu\" /></a>",
                                             DataBinder.Eval(Container.DataItem, "RegistrationNo"),DataBinder.Eval(Container.DataItem, "PatientID"))%></td>
                                 <td style="width: 20px"><%# !DataBinder.Eval(Container.DataItem, "SRRegistrationType").Equals(AppConstant.RegistrationType.InPatient)? string.Empty: string.Format("<a href=\"#\" onclick=\"openMedicationHist('{0}','{1}','{2}'); return false;\"><img src=\"../../../Images/Toolbar/ordering16.png\" border=\"0\" alt=\"MedHist\" title=\"Medication History\" /></a>",

@@ -363,7 +363,7 @@ namespace Temiang.Avicenna.Module.Charges
                         FROM RegistrationRaspro rr
                         WHERE rr.RegistrationNo = a.RegistrationNo
                           AND rr.SeqNo = a.RasproSeqNo
-                          AND rr.AbRestrictionID = '{0}'
+                          AND rr.AbRestrictionID LIKE '{0}%'
                           AND ISNULL(a.IsPpraApproved, 0) = 0
                     )>", AbRestriction.NonPpabID));
                 }

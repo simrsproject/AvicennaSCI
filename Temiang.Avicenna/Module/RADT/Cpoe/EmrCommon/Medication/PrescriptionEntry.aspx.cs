@@ -558,6 +558,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 if (AppSession.Parameter.IsNeedPpraApproval && IsNonPpabPrescription(newPrescriptionNo))
                 {
                     ShowNonPpabWarning();
+                    this.RegisterStartupScriptExt("closeAfterNonPpab", "CloseAndApply();");
                     return;
                 }
 

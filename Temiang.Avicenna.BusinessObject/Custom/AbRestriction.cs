@@ -167,12 +167,15 @@ namespace Temiang.Avicenna.BusinessObject
             if (rr == null || string.IsNullOrWhiteSpace(rr.AbRestrictionID))
                 return false;
 
-            return rr.AbRestrictionID == NonPpabID;
+            return rr.AbRestrictionID == NonPpabID || rr.AbRestrictionID.StartsWith(NonPpabID + ".");
         }
 
         public static bool IsNonPpab(AbRestriction abr)
         {
-            return abr != null && abr.AbRestrictionID == NonPpabID;
+            if (abr == null || string.IsNullOrWhiteSpace(abr.AbRestrictionID))
+                return false;
+
+            return abr.AbRestrictionID == NonPpabID || abr.AbRestrictionID.StartsWith(NonPpabID + ".");
         }
 
         /// <summary>

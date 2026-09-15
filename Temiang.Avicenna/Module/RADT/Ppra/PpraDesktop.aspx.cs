@@ -109,7 +109,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                           AND ISNULL(tp.IsPpraApproved, 0) = 0
                           AND ISNULL(tp.IsVoid, 0) = 0
                           AND ISNULL(tp.IsPpraRejected, 0) = 0
-                          AND rr.AbRestrictionID = '{0}'
+                          AND rr.AbRestrictionID LIKE '{0}%'
                         ORDER BY tp.PrescriptionDate DESC, tp.PrescriptionNo DESC) AS PendingNonPpabPrescriptionNo>", AbRestriction.NonPpabID) :
                     @"<CAST('' AS varchar(20)) AS PendingNonPpabPrescriptionNo>"
                 );
@@ -189,7 +189,7 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsApproval.IsNull(), sqPendingNonPpab.IsApproval == false),
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsVoid.IsNull(), sqPendingNonPpab.IsVoid == false),
                     sqPendingNonPpab.Or(sqPendingNonPpab.IsPpraRejected.IsNull(), sqPendingNonPpab.IsPpraRejected == false),
-                    sqPendingRaspro.AbRestrictionID == AbRestriction.NonPpabID
+                    sqPendingRaspro.AbRestrictionID.Like(AbRestriction.NonPpabID + "%")
                 );
 
                 query.Where(query.Or(query.Exists(sqTpi), query.Exists(sqPendingNonPpab)));
