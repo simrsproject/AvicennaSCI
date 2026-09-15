@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Services;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
-using System.Net;
-using System.IO;
-using System.Web.Services;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.Module.Reports
 {
@@ -146,9 +147,69 @@ namespace Temiang.Avicenna.Module.Reports
         //    return null;
         //}
 
+        public static string SaveToPatientFolderDoc()
+        {
+            string filePath = string.Empty;
+            string path = string.Empty;
+
+            string fileName = null;
+            var programCategory = string.Empty;
+
+            var id = HttpContext.Current.Request.QueryString["id"];
+            var isInteger = int.TryParse(id, out var idd);
+            var datas = PdfUrlViewerHandler.LoadToPdf("patdoc", isInteger ? id.ToInt() : 0, id, string.Empty, string.Empty, ref fileName);
+
+            string regType = null;
+            string guarantorID = null;
+            var regNo = string.Empty;
+
+            var pat = new PatientDocument();
+            if (pat.LoadByPrimaryKey(id.ToInt()))
+            {
+                regNo = pat.RegistrationNo;
+            }
+
+            fileName = "PATDOC_" + fileName;
+            filePath = Reports.ReportViewer.GuarantorDocumentFilePath(regNo, string.Empty, fileName, string.Empty, ref regType, ref guarantorID, id);
+
+            try
+            {
+
+                path = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                // Save File
+                File.WriteAllBytes(filePath, datas);
+                return string.Format("File has save to {0}", filePath);
+            }
+            catch (Exception ex)
+            {
+                var log = new WebServiceAPILog();
+                log.DateRequest = DateTime.Now;
+                log.IPAddress = string.Empty;
+                log.UrlAddress = "PdfUrlViewer";
+                log.Params = JsonConvert.SerializeObject(new
+                {
+                    filePath,
+                    path
+                });
+                log.Response = ex.Message;
+                log.Save();
+
+                return ex.Message;
+            }
+        }
+
         [WebMethod()]
         public static string SaveToGuarantorDoc(string mode, string id)
         {
+            var healthcareInitial = AppSession.Parameter.HealthcareInitial;
+            if (healthcareInitial.ToUpper() != "KPSILASIH" && mode.ToUpper() == "PATDOC")
+            {
+                return SaveToPatientFolderDoc();
+            }
+
             var regNo = string.Empty;
             var sepNo = string.Empty;
             if (mode == "eklaim")
