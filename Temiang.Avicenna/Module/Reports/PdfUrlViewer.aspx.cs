@@ -159,8 +159,6 @@ namespace Temiang.Avicenna.Module.Reports
             var isInteger = int.TryParse(id, out var idd);
             var datas = PdfUrlViewerHandler.LoadToPdf("patdoc", isInteger ? id.ToInt() : 0, id, string.Empty, string.Empty, ref fileName);
 
-            string regType = null;
-            string guarantorID = null;
             var regNo = string.Empty;
 
             var pat = new PatientDocument();
@@ -201,6 +199,7 @@ namespace Temiang.Avicenna.Module.Reports
                 return ex.Message;
             }
         }
+
 
         [WebMethod()]
         public static string SaveToGuarantorDoc(string mode, string id)
