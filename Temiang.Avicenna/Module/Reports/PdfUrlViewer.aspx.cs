@@ -147,55 +147,96 @@ namespace Temiang.Avicenna.Module.Reports
         //    return null;
         //}
 
-        public static string SaveToPatientFolderDoc()
+        public static string SaveToPatientFolderDoc(string docid)
         {
             string filePath = string.Empty;
             string path = string.Empty;
 
-            string fileName = null;
-            var programCategory = string.Empty;
-
-            var id = HttpContext.Current.Request.QueryString["id"];
-            var isInteger = int.TryParse(id, out var idd);
-            var datas = PdfUrlViewerHandler.LoadToPdf("patdoc", isInteger ? id.ToInt() : 0, id, string.Empty, string.Empty, ref fileName);
-
-            string regType = null;
-            string guarantorID = null;
-            var regNo = string.Empty;
-
-            var pat = new PatientDocument();
-            if (pat.LoadByPrimaryKey(id.ToInt()))
-            {
-                regNo = pat.RegistrationNo;
-            }
-
-            fileName = "PATDOC_" + regNo.Replace("/","") + "_" + id + ".pdf";
-            filePath = AppParameter.GetParameterValue(AppParameter.ParameterItem.SepFolder);
-            filePath = Path.Combine(filePath, regNo, fileName);
-
             try
             {
+                // Validate docid
+                if (!int.TryParse(docid, out int documentId))
+                {
+                    return "Invalid document ID";
+                }
 
-                path = Path.GetDirectoryName(filePath);
+                string fileName = null;
+
+                // Load PDF - method pemanggilan tetap dipertahankan
+                var datas = PdfUrlViewerHandler.LoadToPdf(
+                    "patdoc",
+                    documentId,
+                    docid,
+                    string.Empty,
+                    string.Empty,
+                    ref fileName);
+
+                if (datas == null || datas.Length == 0)
+                {
+                    return "PDF document is empty or not found";
+                }
+
+                // Load Patient Document
+                var pat = new PatientDocument();
+
+                if (!pat.LoadByPrimaryKey(documentId))
+                {
+                    return "Patient document not found";
+                }
+
+                string regNo = pat.RegistrationNo;
+
+                if (string.IsNullOrWhiteSpace(regNo))
+                {
+                    return "Registration number is empty";
+                }
+
+                // Get main folder
+                string mainFolder = AppParameter.GetParameterValue(
+                    AppParameter.ParameterItem.SepFolder);
+
+                if (string.IsNullOrWhiteSpace(mainFolder))
+                {
+                    return "Main folder is not configured";
+                }
+
+                // Remove "/" from registration number
+                string safeRegNo = regNo.Replace("/", string.Empty);
+                string fileNameToSave =
+                    "PATDOC_" + safeRegNo + "_" + docid + ".pdf";
+
+                // Build file path
+                path = Path.Combine(mainFolder, pat.PatientID);
+
+                filePath = Path.Combine(path, fileNameToSave);
+
+                // Create directory if not exists
                 if (!Directory.Exists(path))
+                {
                     Directory.CreateDirectory(path);
+                }
 
-                // Save File
+                // Save file
                 File.WriteAllBytes(filePath, datas);
-                return string.Format("File has save to {0}", filePath);
+
+                return string.Format(
+                    "File has save to {0}",
+                    filePath);
             }
             catch (Exception ex)
             {
                 var log = new WebServiceAPILog();
+
                 log.DateRequest = DateTime.Now;
                 log.IPAddress = string.Empty;
                 log.UrlAddress = "PdfUrlViewer";
                 log.Params = JsonConvert.SerializeObject(new
                 {
+                    docid,
                     filePath,
                     path
                 });
-                log.Response = ex.Message;
+                log.Response = ex.ToString();
                 log.Save();
 
                 return ex.Message;
@@ -203,12 +244,13 @@ namespace Temiang.Avicenna.Module.Reports
         }
 
         [WebMethod()]
-        public static string SaveToGuarantorDoc(string mode, string id)
+        public static string SaveToGuarantorDoc(string mode, string id, string docid = "")
         {
-            var healthcareInitial = AppSession.Parameter.HealthcareInitial;
-            if (healthcareInitial.ToUpper() != "KPSILASIH" && mode.ToUpper() == "PATDOC")
+            var healthcareInitial = AppParameter.GetParameterValue(AppParameter.ParameterItem.HealthcareInitial);
+
+            if (healthcareInitial.ToUpper() == "KPSILASIH" && mode.ToUpper() == "PATDOC")
             {
-                return SaveToPatientFolderDoc();
+                return SaveToPatientFolderDoc(docid);
             }
 
             var regNo = string.Empty;
