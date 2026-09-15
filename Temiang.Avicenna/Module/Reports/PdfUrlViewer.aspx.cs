@@ -159,6 +159,8 @@ namespace Temiang.Avicenna.Module.Reports
             var isInteger = int.TryParse(id, out var idd);
             var datas = PdfUrlViewerHandler.LoadToPdf("patdoc", isInteger ? id.ToInt() : 0, id, string.Empty, string.Empty, ref fileName);
 
+            string regType = null;
+            string guarantorID = null;
             var regNo = string.Empty;
 
             var pat = new PatientDocument();
@@ -169,7 +171,7 @@ namespace Temiang.Avicenna.Module.Reports
 
             fileName = "PATDOC_" + regNo.Replace("/","") + "_" + id + ".pdf";
             filePath = AppParameter.GetParameterValue(AppParameter.ParameterItem.SepFolder);
-            filePath = Path.Combine(filePath, fileName);
+            filePath = Path.Combine(filePath, regNo, fileName);
 
             try
             {
@@ -199,7 +201,6 @@ namespace Temiang.Avicenna.Module.Reports
                 return ex.Message;
             }
         }
-
 
         [WebMethod()]
         public static string SaveToGuarantorDoc(string mode, string id)
