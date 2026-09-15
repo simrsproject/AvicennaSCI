@@ -9,7 +9,7 @@
     <telerik:RadTimeline runat="server" ID="timelinePrescription" CollapsibleEvents="true"
         DataDateField="PrescriptionDate" AlternatingMode="true"
         DataTitleField="Title"
-        DataKeyNames="ParamedicName, PrescriptionDateLabel, PrescriptionItem, Url, IsRejectedByPpra, RejectionReason">
+        DataKeyNames="ParamedicName, PrescriptionDateLabel, PrescriptionItem, Url, IsRejectedByPpra, RejectionReason, RejectionHtml">
         <ClientEvents OnDataBound="OnDataBound" />
         <EventTemplate>
             <div class="k-card-header">
@@ -29,9 +29,9 @@
             <div class="k-card-body">
                 <div class="k-card-description">
 
-                    #= data.RejectionHtml #
+                   #= data.RejectionHtml || '' #
 
-                    #= data.PrescriptionItem #
+                   #= data.PrescriptionItem || '' #
 
                 </div>
             </div>
