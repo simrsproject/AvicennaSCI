@@ -39,6 +39,7 @@ namespace Temiang.Avicenna.CustomControl.Phr
         private const int _spacer = 10;
         private CultureInfo _dateCultureInfo = AppConstant.DisplayFormat.DateCultureInfo;
         private CultureInfo _numericCultureInfo = AppConstant.DisplayFormat.NumericCultureInfo;
+        private List<RangeScoreApacheII> _apacheIIRanges;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -1046,12 +1047,6 @@ namespace Temiang.Avicenna.CustomControl.Phr
 
                 InitializedQuestion(questionRows, groupTable, row, formulas, questionGroup.QuestionGroupID, dateTimeNow, qf.IsModeMapping ?? false);
 
-                // TOMBOL CALCULATE TOTAL SKOR APACHE II
-                if (formID == "FSAII")
-                {
-                    AddCalculateApacheButton(groupTable);
-                }
-
                 this.Controls.Add(groupTable);
                 this.Controls.Add(new Literal() { Text = "<br/>" });
             }
@@ -1060,6 +1055,8 @@ namespace Temiang.Avicenna.CustomControl.Phr
             if (formID == "FSAII")
             {
                 AddApacheIIPointControls();
+                AddCalculateApacheButton();
+
             }
 
             //Generate Formula Script
@@ -1074,15 +1071,49 @@ namespace Temiang.Avicenna.CustomControl.Phr
             //}
         }
 
-        private void AddCalculateApacheButton(Table groupTable)
+        private int GetApacheIIPoint(
+        string questionID,
+        decimal value)
+            {
+                var range = ApacheIIRanges
+                    .FirstOrDefault(x =>
+                        x.QuestionID == questionID &&
+                        value >= x.MinValue &&
+                        value <= x.MaxValue);
+
+                return range?.Point ?? 0;
+        }
+
+
+        private List<RangeScoreApacheII> ApacheIIRanges
         {
-            var btnRow = new TableRow();
+            get
+            {
+                if (_apacheIIRanges == null)
+                {
+                    var collection = new RangeScoreApacheIICollection();
+                    collection.LoadAll();
 
-            // Kolom label kosong
-            btnRow.Cells.Add(new TableCell());
+                    _apacheIIRanges = collection.ToList();
+                }
 
-            var btnCell = new TableCell();
-            btnCell.ColumnSpan = 2;
+                return _apacheIIRanges;
+            }
+        }
+
+        private void AddCalculateApacheButton()
+        {
+            var table = new Table
+            {
+                Width = Unit.Percentage(100)
+            };
+
+            var row = new TableRow();
+
+            var cell = new TableCell
+            {
+                ColumnSpan = 3
+            };
 
             var btn = new RadButton
             {
@@ -1092,21 +1123,19 @@ namespace Temiang.Avicenna.CustomControl.Phr
             };
 
             btn.Click += btnCalculateApacheII_Click;
-
             btn.OnClientClicked = "calculateApacheII";
 
-            btnCell.Controls.Add(btn);
-            btnRow.Cells.Add(btnCell);
+            cell.Controls.Add(btn);
+            row.Cells.Add(cell);
 
-            groupTable.Rows.Add(btnRow);
+            table.Rows.Add(row);
+
+            this.Controls.Add(table);
         }
 
         private void UpdateApacheIIPoints()
         {
-            var rangeCollection = new RangeScoreApacheIICollection();
-            rangeCollection.LoadAll();
-
-            var questionIDs = rangeCollection
+            var questionIDs = ApacheIIRanges
                 .Select(x => x.QuestionID)
                 .Where(x =>
                     !string.IsNullOrEmpty(x) &&
@@ -1136,7 +1165,7 @@ namespace Temiang.Avicenna.CustomControl.Phr
                     continue;
                 }
 
-                int point = RangeScoreApacheII.GetPoint(
+                int point = GetApacheIIPoint(
                     questionID,
                     Convert.ToDecimal(num.Value)
                 );
@@ -1242,22 +1271,21 @@ namespace Temiang.Avicenna.CustomControl.Phr
         {
             int total = 0;
 
-            var rangeCollection = new RangeScoreApacheIICollection();
-            rangeCollection.LoadAll();
-
-            var questionIDs = rangeCollection
-            .Select(x => x.QuestionID)
-            .Distinct()
-            .Where(x =>
-                x != "FSAII0015" &&   // GCS
-                x != "FSAII0016" &&   // Age Point
-                x != "FSAII0022"      // Hasil Total APACHE II
-            )
-            .ToList();
+            var questionIDs = ApacheIIRanges
+                .Select(x => x.QuestionID)
+                .Distinct()
+                .Where(x =>
+                    x != "FSAII0015" &&
+                    x != "FSAII0016" &&
+                    x != "FSAII0022")
+                .ToList();
 
             foreach (string questionID in questionIDs)
             {
-                var num = Helper.FindControlRecursive(this, "q_" + questionID) as RadNumericTextBox;
+                var num = Helper.FindControlRecursive(
+                    this,
+                    "q_" + questionID
+                ) as RadNumericTextBox;
 
                 if (num == null || num.Value == null)
                     continue;
@@ -1273,10 +1301,7 @@ namespace Temiang.Avicenna.CustomControl.Phr
 
         private void AddApacheIIPointControls()
         {
-            var rangeCollection = new RangeScoreApacheIICollection();
-            rangeCollection.LoadAll();
-
-            var questionIDs = rangeCollection
+            var questionIDs = ApacheIIRanges
                 .Select(x => x.QuestionID)
                 .Where(x =>
                     !string.IsNullOrEmpty(x) &&
@@ -1287,7 +1312,6 @@ namespace Temiang.Avicenna.CustomControl.Phr
 
             foreach (string questionID in questionIDs)
             {
-                // Cari textbox pertanyaan
                 var questionControl = Helper.FindControlRecursive(
                     this,
                     "q_" + questionID
@@ -1296,7 +1320,6 @@ namespace Temiang.Avicenna.CustomControl.Phr
                 if (questionControl == null)
                     continue;
 
-                // Buat label Point
                 var pointLabel = new Label
                 {
                     ID = "lblPoint_" + questionID,
@@ -1309,13 +1332,10 @@ namespace Temiang.Avicenna.CustomControl.Phr
                 pointLabel.Style["vertical-align"] = "middle";
                 pointLabel.Style["white-space"] = "nowrap";
 
-                // Cari parent control
                 var parent = questionControl.Parent;
 
                 if (parent != null)
-                {
                     parent.Controls.Add(pointLabel);
-                }
             }
         }
 
@@ -3518,31 +3538,79 @@ namespace Temiang.Avicenna.CustomControl.Phr
         }
 
 
-        public void Save(Patient pat, Registration reg, Dictionary<string, esEntityWAuditLog> othRelatedEntities, PatientHealthRecord entity, PatientHealthRecordLineCollection collValue, string lastRegistrationNo)
+        public void Save(
+    Patient pat,
+    Registration reg,
+    Dictionary<string, esEntityWAuditLog> othRelatedEntities,
+    PatientHealthRecord entity,
+    PatientHealthRecordLineCollection collValue,
+    string lastRegistrationNo)
         {
+            System.Diagnostics.Debug.WriteLine("=== PHR SAVE START ===");
+
             using (var trans = new esTransactionScope())
             {
-                SetEntityValue(pat, reg, othRelatedEntities, entity, collValue, lastRegistrationNo);
+                System.Diagnostics.Debug.WriteLine("1. BEFORE SetEntityValue");
 
+                SetEntityValue(
+                    pat,
+                    reg,
+                    othRelatedEntities,
+                    entity,
+                    collValue,
+                    lastRegistrationNo
+                );
+
+                System.Diagnostics.Debug.WriteLine("2. AFTER SetEntityValue");
+
+                System.Diagnostics.Debug.WriteLine("3. BEFORE entity.Save()");
                 entity.Save();
+                System.Diagnostics.Debug.WriteLine("4. AFTER entity.Save()");
+
+                System.Diagnostics.Debug.WriteLine("5. BEFORE collValue.Save()");
                 collValue.Save();
+                System.Diagnostics.Debug.WriteLine("6. AFTER collValue.Save()");
 
                 if (pat.es.IsModified)
+                {
+                    System.Diagnostics.Debug.WriteLine("7. BEFORE pat.Save()");
                     pat.Save();
+                    System.Diagnostics.Debug.WriteLine("8. AFTER pat.Save()");
+                }
 
                 if (reg.es.IsModified)
+                {
+                    System.Diagnostics.Debug.WriteLine("9. BEFORE reg.Save()");
                     reg.Save();
+                    System.Diagnostics.Debug.WriteLine("10. AFTER reg.Save()");
+                }
 
-                // othRelatedEntities
                 foreach (var othRelatedEntity in othRelatedEntities.Values)
                 {
                     if (othRelatedEntity.es.IsModified || othRelatedEntity.es.IsAdded)
+                    {
+                        System.Diagnostics.Debug.WriteLine(
+                            "11. BEFORE related entity.Save() : " +
+                            othRelatedEntity.GetType().Name
+                        );
+
                         othRelatedEntity.Save();
+
+                        System.Diagnostics.Debug.WriteLine(
+                            "12. AFTER related entity.Save() : " +
+                            othRelatedEntity.GetType().Name
+                        );
+                    }
                 }
 
-                //Commit if success, Rollback if failed
+                System.Diagnostics.Debug.WriteLine("13. BEFORE trans.Complete()");
+
                 trans.Complete();
+
+                System.Diagnostics.Debug.WriteLine("14. AFTER trans.Complete()");
             }
+
+            System.Diagnostics.Debug.WriteLine("=== PHR SAVE END ===");
         }
 
         #endregion
