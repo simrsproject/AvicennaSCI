@@ -299,7 +299,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                 PrintJobParameter jobParameter;
 
                 jobParameter = jobParameters.AddNew();
-                jobParameter.Name = "TransactionNo";
+                jobParameter.Name = "p_TransactionNo";
                 jobParameter.ValueString = e.CommandArgument.ToString();
 
                 AppSession.PrintJobParameters = jobParameters;
