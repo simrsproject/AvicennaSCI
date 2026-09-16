@@ -167,7 +167,8 @@ namespace Temiang.Avicenna.BusinessObject
             if (rr == null || string.IsNullOrWhiteSpace(rr.AbRestrictionID))
                 return false;
 
-            return rr.AbRestrictionID == NonPpabID || rr.AbRestrictionID.StartsWith(NonPpabID + ".");
+            // Check both old format (NONPPAB.) and new format (NONPPAB01, NONPPAB02, etc.)
+            return rr.AbRestrictionID.StartsWith(NonPpabID);
         }
 
         public static bool IsNonPpab(AbRestriction abr)
@@ -175,7 +176,8 @@ namespace Temiang.Avicenna.BusinessObject
             if (abr == null || string.IsNullOrWhiteSpace(abr.AbRestrictionID))
                 return false;
 
-            return abr.AbRestrictionID == NonPpabID || abr.AbRestrictionID.StartsWith(NonPpabID + ".");
+            // Check both old format (NONPPAB.) and new format (NONPPAB01, NONPPAB02, etc.)
+            return abr.AbRestrictionID.StartsWith(NonPpabID);
         }
 
         /// <summary>
