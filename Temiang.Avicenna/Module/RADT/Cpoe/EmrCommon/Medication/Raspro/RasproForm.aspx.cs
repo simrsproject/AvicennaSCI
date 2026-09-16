@@ -350,6 +350,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
             inf.Select(inf.AbRestrictionID, inf.ParentID, inf.AbRestrictionName);
             inf.Where(inf.SRAbRestrictionType == "INF");
+            inf.Where(inf.AbRestrictionID.NotLike("99%"));
             if (RasproID != AppConstant.RasproType.Rasal)
                 inf.Where(inf.AbRestrictionID.NotLike(AbRestriction.NonPpabID + "%"));
             inf.OrderBy(inf.AbRestrictionID.Ascending);
