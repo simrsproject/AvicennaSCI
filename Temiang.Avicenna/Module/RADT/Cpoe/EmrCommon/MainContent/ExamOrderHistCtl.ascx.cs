@@ -306,7 +306,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                 AppSession.PrintJobReportID = AppConstant.Report.LaboratoryResult;
 
                 ShowPrintPreview();
-
             }
         }
         [Obsolete("Lakukan di detil", true)]
