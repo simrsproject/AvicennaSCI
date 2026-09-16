@@ -237,16 +237,20 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                     {
                         row["IsAttention"] = true;
                         row["AttentionNotes"] = "Reserved / Booked";
-                        var status = string.Empty;
-                        foreach (var x in bm)
+
+                        var statusList = bm
+                            .Select(x => x.SRBedStatus)
+                            .Where(x => !string.IsNullOrEmpty(x))
+                            .Distinct()
+                            .ToList();
+
+                        row["SRBedStatusDetail"] = string.Join(",", statusList);
+
+                        // Reserved menjadi effective status header
+                        if (statusList.Contains("BedStatus-06"))
                         {
-                            if (status != x.SRBedStatus)
-                            {
-                                status = x.SRBedStatus;
-                                if (row["SRBedStatusDetail"].ToString() == string.Empty)
-                                    row["SRBedStatusDetail"] = status;
-                                else row["SRBedStatusDetail"] = row["SRBedStatusDetail"].ToString() + "," + status;
-                            }
+                            row["SRBedStatus"] = "BedStatus-06";
+                            row["ItemName"] = "Reserved";
                         }
                     }
                     else
