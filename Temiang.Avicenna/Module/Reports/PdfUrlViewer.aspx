@@ -52,19 +52,23 @@
                 }
             }
 
+
             function saveToGuarantorDoc() {
                 $.ajax({
                     type: 'POST',
-                    url: "PdfUrlViewer.aspx/SaveToGuarantorDoc",
-                    contentType: "application/json;charset=utf-8",
-                    datatype: "json",
-                    data: "{'mode':'<%= Request.QueryString["mode"] %>','id':'<%= Request.QueryString["trno"] %>'}",
+                    url: 'PdfUrlViewer.aspx/SaveToGuarantorDoc',
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        mode: '<%= HttpUtility.JavaScriptStringEncode(Request.QueryString["mode"] ?? "") %>',
+                        id: '<%= HttpUtility.JavaScriptStringEncode(Request.QueryString["trno"] ?? "") %>',
+                        docid: '<%= HttpUtility.JavaScriptStringEncode(Request.QueryString["id"] ?? "") %>'
+                    }),
                     success: function (response) {
-                        obj = JSON.parse(response);
-                        alert(obj.d);
+                        alert(response.d);
                     },
                     error: function (xhr, status, error) {
-                        var errorMessage = xhr.status + ': ' + xhr.statusText
+                        var errorMessage = xhr.status + ': ' + xhr.statusText;
                         alert('Error - ' + errorMessage);
                     }
                 });

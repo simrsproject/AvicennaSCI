@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Web;
+using System.Web.Services;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
-using System.Net;
-using System.IO;
-using System.Web.Services;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.Module.Reports
 {
@@ -146,9 +147,112 @@ namespace Temiang.Avicenna.Module.Reports
         //    return null;
         //}
 
-        [WebMethod()]
-        public static string SaveToGuarantorDoc(string mode, string id)
+        public static string SaveToPatientFolderDoc(string docid)
         {
+            string filePath = string.Empty;
+            string path = string.Empty;
+
+            try
+            {
+                // Validate docid
+                if (!int.TryParse(docid, out int documentId))
+                {
+                    return "Invalid document ID";
+                }
+
+                string fileName = null;
+
+                // Load PDF - method pemanggilan tetap dipertahankan
+                var datas = PdfUrlViewerHandler.LoadToPdf(
+                    "patdoc",
+                    documentId,
+                    docid,
+                    string.Empty,
+                    string.Empty,
+                    ref fileName);
+
+                if (datas == null || datas.Length == 0)
+                {
+                    return "PDF document is empty or not found";
+                }
+
+                // Load Patient Document
+                var pat = new PatientDocument();
+
+                if (!pat.LoadByPrimaryKey(documentId))
+                {
+                    return "Patient document not found";
+                }
+
+                string regNo = pat.RegistrationNo;
+
+                if (string.IsNullOrWhiteSpace(regNo))
+                {
+                    return "Registration number is empty";
+                }
+
+                // Get main folder
+                string mainFolder = AppParameter.GetParameterValue(
+                    AppParameter.ParameterItem.SepFolder);
+
+                if (string.IsNullOrWhiteSpace(mainFolder))
+                {
+                    return "Main folder is not configured";
+                }
+
+                // Remove "/" from registration number
+                string safeRegNo = regNo.Replace("/", string.Empty);
+                string fileNameToSave =
+                    "PATDOC_" + safeRegNo + "_" + docid + ".pdf";
+
+                // Build file path
+                path = Path.Combine(mainFolder, pat.PatientID);
+
+                filePath = Path.Combine(path, fileNameToSave);
+
+                // Create directory if not exists
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                // Save file
+                File.WriteAllBytes(filePath, datas);
+
+                return string.Format(
+                    "File has save to {0}",
+                    filePath);
+            }
+            catch (Exception ex)
+            {
+                var log = new WebServiceAPILog();
+
+                log.DateRequest = DateTime.Now;
+                log.IPAddress = string.Empty;
+                log.UrlAddress = "PdfUrlViewer";
+                log.Params = JsonConvert.SerializeObject(new
+                {
+                    docid,
+                    filePath,
+                    path
+                });
+                log.Response = ex.ToString();
+                log.Save();
+
+                return ex.Message;
+            }
+        }
+
+        [WebMethod()]
+        public static string SaveToGuarantorDoc(string mode, string id, string docid = "")
+        {
+            var healthcareInitial = AppParameter.GetParameterValue(AppParameter.ParameterItem.HealthcareInitial);
+
+            if (healthcareInitial.ToUpper() == "KPSILASIH" && mode.ToUpper() == "PATDOC")
+            {
+                return SaveToPatientFolderDoc(docid);
+            }
+
             var regNo = string.Empty;
             var sepNo = string.Empty;
             if (mode == "eklaim")

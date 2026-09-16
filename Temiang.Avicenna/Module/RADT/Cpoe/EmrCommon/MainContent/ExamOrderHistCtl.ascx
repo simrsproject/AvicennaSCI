@@ -192,6 +192,13 @@
                                                     <img src="<%=Helper.UrlRoot()%>/Images/Toolbar/print16.png" border="0" />
                             </asp:LinkButton>
                             <div style="height: 10px">&nbsp;</div>
+                            <asp:LinkButton ID="lbtnPrintResult" runat="server"
+                                CommandName="PrintResult"
+                                ToolTip="Print Result"
+                                CommandArgument='<%# DataBinder.Eval(Container.DataItem, "TransactionNo")%>'>
+                                <img src="<%=Helper.UrlRoot()%>/Images/Toolbar/print_preview16.png" border="0" />
+                            </asp:LinkButton>
+                            <div style="height: 10px">&nbsp;</div>
                             <a href='#' onclick="showLabPdfFile('<%#DataBinder.Eval(Container.DataItem, "TransactionNo")%>');return false;">
                                 <img src="<%=Helper.UrlRoot()%>/Images/Toolbar/imp_exp_pdf16.png" border="0" /></a>
                             <div style="height: 10px">&nbsp;</div>
