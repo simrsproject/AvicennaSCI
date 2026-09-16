@@ -245,6 +245,22 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             var selectedAbr = new AbRestriction();
             selectedAbr.LoadByPrimaryKey(cboAbRestrictionID.SelectedValue);
 
+            // Parent NON PPAB cannot be selected directly - must select a child
+            if (selectedAbr.AbRestrictionID == AbRestriction.NonPpabID)
+            {
+                args.IsValid = false;
+                ((CustomValidator)source).ErrorMessage = "Please select specific infection type from \"" + cboAbRestrictionID.SelectedText + "\"";
+                return;
+            }
+
+            if (selectedAbr.AbRestrictionID == AbRestriction.NonPpabID + ".09" && string.IsNullOrWhiteSpace(txtOtherInfection.Text))
+            {
+                imgRfvOtherInfection.Visible = true;
+                args.IsValid = false;
+                ((CustomValidator)source).ErrorMessage = "Please fill Other Bacterial Infection Description";
+                return;
+            }
+
             // Check selected AB restriction
             if (!string.IsNullOrWhiteSpace(cboAbRestrictionID.SelectedValue))
             {
@@ -334,6 +350,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
             inf.Select(inf.AbRestrictionID, inf.ParentID, inf.AbRestrictionName);
             inf.Where(inf.SRAbRestrictionType == "INF");
+            inf.Where(inf.AbRestrictionID.NotLike("99%"));
+            if (RasproID != AppConstant.RasproType.Rasal)
+                inf.Where(inf.AbRestrictionID.NotLike(AbRestriction.NonPpabID + "%"));
             inf.OrderBy(inf.AbRestrictionID.Ascending);
             var dtbInf = inf.LoadDataTable();
 

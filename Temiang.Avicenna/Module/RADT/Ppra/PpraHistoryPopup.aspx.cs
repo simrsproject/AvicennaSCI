@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Text;
 using System.Web;
+using System.Web.UI.WebControls;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 
@@ -18,11 +19,19 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
         {
             ProgramID = AppConstant.Program.Ppra;
 
+            // Hide OK button and change Cancel to "Tutup" (consistent with other view-only dialogs)
+            var btnOk = (Button)Helper.FindControlRecursive(Master, "btnOk");
+            btnOk.Visible = false;
+            var btnCancel = (Button)Helper.FindControlRecursive(Master, "btnCancel");
+            btnCancel.Text = "Tutup";
+
             if (!IsPostBack)
                 PopulateHistory();
         }
 
-        protected void Page_Load(object sender, EventArgs e) { }
+        protected void Page_Load(object sender, EventArgs e)
+        {
+        }
 
         private void PopulateHistory()
         {
