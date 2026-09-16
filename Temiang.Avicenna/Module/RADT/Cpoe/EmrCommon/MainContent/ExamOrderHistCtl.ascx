@@ -184,6 +184,12 @@
                                                     <img style="border: 0px; vertical-align: middle;" src="<%=Helper.UrlRoot()%>/Images/Toolbar/row_delete16.png" />
                                 <div style="height:10px" >&nbsp;</div>
                             </asp:LinkButton>--%>
+                            <asp:LinkButton ID="lbtnPrintResult" runat="server"
+                                CommandName="PrintResult"
+                                ToolTip="Print Result"
+                                CommandArgument='<%# DataBinder.Eval(Container.DataItem, "TransactionNo")%>'>
+                                <img src="<%=Helper.UrlRoot()%>/Images/Toolbar/print_preview16.png" border="0" />
+                            </asp:LinkButton>
                             <%# string.Format("<a href=\"#\" onclick=\"openSpecimenCRDetail('{0}','{1}'); return false;\"><img src=\"{2}/Images/Toolbar/details16.png\" border=\"0\" title=\"Specimen and Collect Method\" /></a>",
                                                   DataBinder.Eval(Container.DataItem, "TransactionNo"),DataBinder.Eval(Container.DataItem, "RegistrationNo"),Helper.UrlRoot())%>
                             <div style="height: 10px">&nbsp;</div>

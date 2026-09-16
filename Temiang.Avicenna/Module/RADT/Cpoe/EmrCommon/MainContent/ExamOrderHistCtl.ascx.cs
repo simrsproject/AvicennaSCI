@@ -126,6 +126,10 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
             grdLaboratory.DataBind();
         }
 
+        public bool IsPrintResultVisible
+        {
+            get { return AppSession.Parameter.HealthcareInitial == "RSRG"; }
+        }
 
         //protected bool IsUserCanNotAddExamOrder()
         //{
@@ -288,6 +292,21 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
             else if (e.CommandName == "RebindOth")
             {
                 grdExamOrderOther.Rebind();
+            }
+            else if (e.CommandName == "PrintResult")
+            {
+                PrintJobParameterCollection jobParameters = new PrintJobParameterCollection();
+                PrintJobParameter jobParameter;
+
+                jobParameter = jobParameters.AddNew();
+                jobParameter.Name = "TransactionNo";
+                jobParameter.ValueString = e.CommandArgument.ToString();
+
+                AppSession.PrintJobParameters = jobParameters;
+                AppSession.PrintJobReportID = AppConstant.Report.LaboratoryResult;
+
+                ShowPrintPreview();
+
             }
         }
         [Obsolete("Lakukan di detil", true)]
@@ -1061,6 +1080,15 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
             {
                 //var dataItem = e.Item as GridDataItem;
                 var grdResult = (RadGrid)e.Item.FindControl("grdLaboratoryResult");
+
+                // Set visibility tombol Print Result
+                var lbtnPrintResult =
+                    (e.Item as GridDataItem).FindControl("lbtnPrintResult") as LinkButton;
+
+                if (lbtnPrintResult != null)
+                {
+                    lbtnPrintResult.Visible = IsPrintResultVisible;
+                }
 
                 // InitializeCultureGrid manual krn tidak terjangkau oleh fungsi di basepage
                 grdResult.InitializeCultureGrid();
