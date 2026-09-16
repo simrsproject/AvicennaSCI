@@ -84,9 +84,23 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
 
                     // Triage
                     var reg = new Registration();
+
                     if (reg.LoadByPrimaryKey(assessment.RegistrationNo))
                     {
-                        ComboBox.SelectedValue(ddlTriage, reg.SRTriage);
+                        if (!string.IsNullOrWhiteSpace(reg.SRTriage))
+                        {
+                            ComboBox.SelectedValue(ddlTriage, reg.SRTriage);
+                        }
+                        else if (!string.IsNullOrWhiteSpace(igd.TriageText))
+                        {
+                            var triageItem = ddlTriage.Items
+                                .FirstOrDefault(x => x.Text.Equals(
+                                    igd.TriageText,
+                                    StringComparison.OrdinalIgnoreCase));
+
+                            if (triageItem != null)
+                                ddlTriage.SelectedValue = triageItem.Value;
+                        }
                     }
                 }
 
