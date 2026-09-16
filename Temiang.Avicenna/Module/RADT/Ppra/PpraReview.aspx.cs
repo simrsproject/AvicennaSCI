@@ -27,6 +27,9 @@ namespace Temiang.Avicenna.Module.RADT.Ppra
         {
             ProgramID = AppConstant.Program.Ppra;
 
+            ButtonOk.Visible = false;
+            ButtonCancel.Text = "Tutup";
+
             if (!IsPostBack)
                 PopulateAll();
         }
