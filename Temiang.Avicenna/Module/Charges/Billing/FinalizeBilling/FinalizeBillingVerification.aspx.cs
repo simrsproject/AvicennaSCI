@@ -4167,13 +4167,27 @@ namespace Temiang.Avicenna.Module.Charges
                         var bedColl = new BedCollection();
                         bedColl.Query.Where(bedColl.Query.RegistrationNo == reg.RegistrationNo, bedColl.Query.SRBedStatus == AppSession.Parameter.BedStatusOccupied.ToString());
                         bedColl.LoadAll();
+
+                        var histBed = new BedStatusHistoryCollection();
+                        
                         foreach (var bed in bedColl)
                         {
+                            //create history first
+                            var newHist = histBed.AddNew();
+                            newHist.BedID = bed.BedID;
+                            newHist.RegistrationNo = bed.RegistrationNo;
+                            newHist.SRBedStatusFrom = bed.SRBedStatus;
+                            newHist.SRBedStatusTo = "BedStatus-08";
+                            newHist.TransferNo = "";
+                            newHist.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                            newHist.LastUpdateByUserID = AppSession.UserLogin.UserID;
+
                             bed.SRBedStatus = "BedStatus-08";
                             bed.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
                             bed.LastUpdateByUserID = AppSession.UserLogin.UserID;
                         }
 
+                        histBed.Save();
                         bedColl.Save();
                     }
                 }
