@@ -4170,7 +4170,7 @@ namespace Temiang.Avicenna.Module.Charges
                         foreach (var bed in bedColl)
                         {
                             bed.SRBedStatus = "BedStatus-08";
-                            bed.LastUpdateDateTime = (new DateTime()).NowAtSqlServer(); ;
+                            bed.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
                             bed.LastUpdateByUserID = AppSession.UserLogin.UserID;
                         }
 
