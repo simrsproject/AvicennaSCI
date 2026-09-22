@@ -246,7 +246,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
 
                         row["SRBedStatusDetail"] = string.Join(",", statusList);
 
-                        // Reserved menjadi effective status header
+                        // Reserved takes precedence for the displayed bed status.
                         if (statusList.Contains("BedStatus-06"))
                         {
                             row["SRBedStatus"] = "BedStatus-06";
@@ -701,39 +701,54 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                 query.Where(query.ClassID == cboClassID.SelectedValue);
             query.Where(query.IsActive == true);
 
-            query.Select(query.SRBedStatus, query.BedID.Count().As("NumberOfBeds"));
-            query.GroupBy(query.SRBedStatus);
+            query.Select(query.BedID, query.SRBedStatus);
             DataTable dtb = query.LoadDataTable();
+
+            var bmQ = new BedManagementQuery("a");
+            var resQ = new ReservationQuery("b");
+            bmQ.LeftJoin(resQ).On(resQ.ReservationNo == bmQ.ReservationNo);
+            bmQ.Where(bmQ.IsVoid == false, bmQ.SRBedStatus == "BedStatus-06",
+                bmQ.Or(bmQ.IsReleased == false, resQ.ReservationDate > (new DateTime()).NowAtSqlServer())
+                );
+            bmQ.Select(bmQ.BedID);
+            bmQ.es.Distinct = true;
+
+            var bm = new BedManagementCollection();
+            bm.Load(bmQ);
+            var reservedBedIDs = bm.Select(x => x.BedID).ToList();
 
             int allBed = 0, ready = 0, occupied = 0, booked = 0, pending = 0, cleaning = 0, reserved = 0, repaired = 0, sip = 0;
             foreach (DataRow row in dtb.Rows)
             {
-                allBed += row["NumberOfBeds"].ToInt();
-                switch (row["SRBedStatus"].ToString())
+                allBed++;
+                // Apply the same Reserved precedence as the bed list.
+                var bedStatus = reservedBedIDs.Contains(row["BedID"].ToString())
+                    ? "BedStatus-06" : row["SRBedStatus"].ToString();
+                switch (bedStatus)
                 {
                     case "BedStatus-01":
-                        ready += row["NumberOfBeds"].ToInt();
+                        ready++;
                         break;
                     case "BedStatus-02":
-                        occupied += row["NumberOfBeds"].ToInt();
+                        occupied++;
                         break;
                     case "BedStatus-03":
-                        booked += row["NumberOfBeds"].ToInt();
+                        booked++;
                         break;
                     case "BedStatus-04":
-                        pending += row["NumberOfBeds"].ToInt();
+                        pending++;
                         break;
                     case "BedStatus-05":
-                        cleaning += row["NumberOfBeds"].ToInt();
+                        cleaning++;
                         break;
                     case "BedStatus-06":
-                        reserved += row["NumberOfBeds"].ToInt();
+                        reserved++;
                         break;
                     case "BedStatus-07":
-                        repaired += row["NumberOfBeds"].ToInt();
+                        repaired++;
                         break;
                     case "BedStatus-08":
-                        sip += row["NumberOfBeds"].ToInt();
+                        sip++;
                         break;
                 }
             }
