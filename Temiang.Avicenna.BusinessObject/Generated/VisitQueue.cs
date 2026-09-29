@@ -2154,13 +2154,13 @@ namespace Temiang.Avicenna.BusinessObject
         }
 
         public static object GetQueueForAllServieUnitAdmin(
-            DateTime queueDate,
-            string status,
-            string stageID,
-            string serviceUnitID,
-            string paramedicID,
-            string categoryID
-        )
+             DateTime queueDate,
+             string status,
+             string stageID,
+             string serviceUnitID,
+             string paramedicID,
+             string categoryID
+         )
         {
             var collection = new VisitQueueCollection();
             var query = new VisitQueueQuery("v");
@@ -2273,10 +2273,17 @@ namespace Temiang.Avicenna.BusinessObject
                 patients.Query.Load();
             }
 
+            // =========================================
+            // PATIENT DICTIONARY
+            // =========================================
             var patientDict =
                 patients.ToDictionary(
                     x => x.PatientID,
-                    x => x.FirstName
+                    x => new
+                    {
+                        x.FirstName,
+                        x.MedicalNo
+                    }
                 );
 
             // =========================================
@@ -2289,11 +2296,19 @@ namespace Temiang.Avicenna.BusinessObject
                     x.VisitNo,
                     x.RegistrationNo,
                     x.PatientID,
+
+                    MedicalNo =
+                        !string.IsNullOrEmpty(x.PatientID)
+                        && patientDict.ContainsKey(x.PatientID)
+                            ? patientDict[x.PatientID].MedicalNo
+                            : null,
+
                     FirstName =
                         !string.IsNullOrEmpty(x.PatientID)
                         && patientDict.ContainsKey(x.PatientID)
-                            ? patientDict[x.PatientID]
+                            ? patientDict[x.PatientID].FirstName
                             : null,
+
                     x.QueueDate,
                     x.Status,
                     x.QueueSequence,
@@ -2302,6 +2317,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.RecallCount,
 
                     x.ServiceUnitID,
+
                     ServiceUnitName =
                         !string.IsNullOrEmpty(x.ServiceUnitID)
                         && serviceUnitDict.ContainsKey(x.ServiceUnitID)
