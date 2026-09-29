@@ -252,7 +252,7 @@ GROUP BY c.BpjsClassID, sr.RoomID, sr.RoomName
                                     AND ISNULL(b.RegistrationNo, '') = ''
                                     AND b.IsVisibleTo3rdParty = 1
                                     AND b.IsActive = 1
-                                    AND b.SRBedStatus <> 'BedStatus-07'
+                                    AND b.SRBedStatus = 'BedStatus-01'
                                     AND ISNULL(b.IsTemporary, 0) = 0
                                 INNER JOIN Class AS c
                                     ON c.ClassID = b.ClassID
