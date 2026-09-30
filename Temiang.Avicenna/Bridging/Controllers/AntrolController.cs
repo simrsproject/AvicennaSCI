@@ -195,7 +195,9 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 appt.Query.AppointmentTime <= jam[1].Trim()
                 );
             //if (AppSession.Parameter.HealthcareID != "RSES") // kerinci
-            appt.Query.Where(appt.Query.SRAppointmentStatus.NotIn(AppSession.Parameter.AppointmentStatusCancel));
+            appt.Query.Where(
+                appt.Query.SRAppointmentStatus != "03"
+            );
             var apptAvailable = appt.Query.Load();
 
             return Request.CreateResponse(HttpStatusCode.OK, new Antrol.StatusAntrean.Response.Root
