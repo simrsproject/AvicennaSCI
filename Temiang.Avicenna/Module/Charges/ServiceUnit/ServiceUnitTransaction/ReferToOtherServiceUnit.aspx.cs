@@ -871,7 +871,15 @@ namespace Temiang.Avicenna.Module.Charges
                     var visitQueue = new VisitQueue();
                     var query = new VisitQueueQuery();
 
-                    query.Where(query.RegistrationNo == txtRegistrationNo.Text);
+                    query.es.Top = 1;
+
+                    query.Where(
+                        query.RegistrationNo == txtRegistrationNo.Text
+                    );
+
+                    query.OrderBy(
+                        query.LastUpdated.Descending
+                    );
 
                     if (visitQueue.Load(query))
                     {
@@ -879,10 +887,12 @@ namespace Temiang.Avicenna.Module.Charges
                         visitQueue.ParamedicID = entity.ParamedicID;
 
                         // Update QueueKey
-                        visitQueue.QueueKey = string.Format("{0}|{1}|{2}",
+                        visitQueue.QueueKey = string.Format(
+                            "{0}|{1}|{2}",
                             entity.ServiceUnitID,
                             visitQueue.StageID,
-                            entity.ParamedicID);
+                            entity.ParamedicID
+                        );
 
                         visitQueue.LastUpdated = DateTime.Now;
                         visitQueue.UpdatedBy = AppSession.UserLogin.UserID;
