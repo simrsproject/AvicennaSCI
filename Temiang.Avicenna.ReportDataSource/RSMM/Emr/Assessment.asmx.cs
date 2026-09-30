@@ -1520,9 +1520,9 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 IsKawin = phrlines.FindInSingleGroup("RM23.10.27").QuestionAnswerSelectionLineID == "2",
                 IsBelumkawin = phrlines.FindInSingleGroup("RM23.10.27").QuestionAnswerSelectionLineID == "1",
                 IsJanda = phrlines.FindInSingleGroup("RM23.10.27").QuestionAnswerSelectionLineID == "3",
-                JmlKawinIstri = phrlines.FindInSingleGroup("DSR.MR.XW").QuestionAnswerText,
-                JmlKawinSuami = phrlines.FindInSingleGroup("DSR.MR.XH").QuestionAnswerText,
-                UsiaPerkwn = phrlines.FindInSingleGroup("UP0001").QuestionAnswerText
+                JmlKawinIstri = string.IsNullOrEmpty(phrlines.FindInSingleGroup("DSR.MR.XW").QuestionAnswerText) ? "0" : phrlines.FindInSingleGroup("DSR.MR.XW").QuestionAnswerText,
+                JmlKawinSuami = string.IsNullOrEmpty(phrlines.FindInSingleGroup("DSR.MR.XH").QuestionAnswerText) ? "0" : phrlines.FindInSingleGroup("DSR.MR.XH").QuestionAnswerText,
+                UsiaPerkwn = string.IsNullOrEmpty(phrlines.FindInSingleGroup("UP0001").QuestionAnswerText) ? "0" : phrlines.FindInSingleGroup("UP0001").QuestionAnswerText
             };
             var kehamilanDulu = new
             {

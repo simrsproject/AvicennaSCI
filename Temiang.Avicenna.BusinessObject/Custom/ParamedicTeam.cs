@@ -195,6 +195,21 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static Paramedic DPJP(string regNo)
         {
+            var healthcareInitial = AppParameter.GetParameterValue(AppParameter.ParameterItem.HealthcareInitial);
+            if(healthcareInitial.ToUpper() == "KPSILASIH")
+            {
+                var reg = new Registration();
+                if (reg.LoadByPrimaryKey(regNo))
+                {
+                    var par = new Paramedic();
+                    if (par.LoadByPrimaryKey(reg.ParamedicID))
+                    {
+                        return par;
+                    }
+                }
+            }
+
+
             var ptq = new ParamedicTeamQuery();
             ptq.Where(ptq.RegistrationNo == regNo,
                 ptq.SRParamedicTeamStatus ==

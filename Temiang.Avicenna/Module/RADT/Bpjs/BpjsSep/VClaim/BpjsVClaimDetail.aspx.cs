@@ -3233,7 +3233,12 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
                     {
                         if (riwayat.Response.Histori != null)
                         {
-                            var list = riwayat.Response.Histori.ToDataTable<Common.BPJS.VClaim.v11.Monitoring.HistoriPelayananPeserta.Histori>();
+                            var histori = riwayat.Response.Histori
+                                .OrderByDescending(t => ParseBpjsDate(t.TglSep))
+                                .ThenBy(t => string.IsNullOrWhiteSpace(t.Poli) ? 0 : 1)
+                                .ThenByDescending(t => t.NoSep)
+                                .ToList();
+                            var list = histori.ToDataTable<Common.BPJS.VClaim.v11.Monitoring.HistoriPelayananPeserta.Histori>();
                             grdList.DataSource = list;
                             if (cboPelayanan.SelectedValue == "2")
                             {
@@ -3288,6 +3293,14 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
                 grdList.DataSource = list.ToDataTable<Common.BPJS.VClaim.v11.Monitoring.HistoriPelayananPeserta.Histori>();
                 grdList.DataBind();
             }
+        }
+
+        private static DateTime ParseBpjsDate(string value)
+        {
+            DateTime result;
+            return DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                ? result
+                : DateTime.MinValue;
         }
 
         protected void cboFlagProcedure_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)

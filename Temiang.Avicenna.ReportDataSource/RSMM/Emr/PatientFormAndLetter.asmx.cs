@@ -1715,16 +1715,22 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                 var referralName = string.Empty;
                 var referralAddress = string.Empty;
-                var stdi = new AppStandardReferenceItem();
-                stdi.LoadByPrimaryKey("ReferralGroup", reg.SRReferralGroup);
-                if (stdi.ReferenceID.Contains("dokter") || stdi.ReferenceID.Contains("bidan"))
+
+                if(!string.IsNullOrEmpty(reg.SRReferralGroup))
                 {
-                    referralName = reg.ReferralName;
-                    referralAddress = "Tempat";
+                    var stdi = new AppStandardReferenceItem();
+                    stdi.LoadByPrimaryKey("ReferralGroup", reg.SRReferralGroup);
+                    if (stdi.ReferenceID.Contains("dokter") || stdi.ReferenceID.Contains("bidan"))
+                    {
+                        referralName = reg.ReferralName;
+                        referralAddress = "Tempat";
+                    }
                 }
-                else
+
+                
+                if(string.IsNullOrEmpty(referralName) && string.IsNullOrEmpty(referralAddress))
                 {
-                    if (!string.IsNullOrWhiteSpace(reg.ReferralID))
+                    if (!string.IsNullOrEmpty(reg.ReferralID))
                     {
                         var rfr = new Referral();
                         rfr.LoadByPrimaryKey(reg.ReferralID);
@@ -1746,8 +1752,8 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     PastMedicalHist = medsum.PastMedicalHistory,
                     PhysicalExam = medsum.PhysicalExam,
                     AncillaryExam = medsum.AncillaryExam,
-                    MedicalProcedures = medsum.MedicalProcedures.Replace("â€¢", "\u2022"),
-                    Medications = medsum.Medications.Replace("â€¢", "\u2022"),
+                    MedicalProcedures = string.IsNullOrEmpty(medsum.MedicalProcedures) ? string.Empty : medsum.MedicalProcedures.Replace("â€¢", "\u2022"),
+                    Medications =  string.IsNullOrEmpty(medsum.Medications) ? string.Empty : medsum.Medications.Replace("â€¢", "\u2022"),
                     KondisiPulang = StandardReference.GetItemName(AppEnum.StandardReference.DischargeCondition, medsum.SRDischargeCondition),
                     SuggestionFollowUp = medsum.SuggestionFollowUp,
                     AlasanPulang = StandardReference.GetItemName(AppEnum.StandardReference.DischargeMethod, medsum.SRDischargeMethod),
