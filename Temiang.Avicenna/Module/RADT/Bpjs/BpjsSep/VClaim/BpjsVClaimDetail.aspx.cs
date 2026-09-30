@@ -2274,40 +2274,7 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
                         reg.Save();
                     }
 
-                    if (Helper.IsBpjsAntrolIntegration)
-                    {
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(entity.NoTransaksi) && entity.JenisPelayanan == "2")
-                            {
-                                log = new WebServiceAPILog();
-                                log.DateRequest = DateTime.Now;
-                                log.IPAddress = string.Empty;
-                                log.UrlAddress = "BpjsVClaimDetail";
-                                log.Params = JsonConvert.SerializeObject(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
-                                {
-                                    Kodebooking = entity.NoTransaksi,
-                                    Taskid = 3,
-                                    Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                });
-
-                                var svcAntrol = new Common.BPJS.Antrian.Service();
-                                var responseAntrol = svcAntrol.UpdateWaktuAntrian(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
-                                {
-                                    Kodebooking = entity.NoTransaksi,
-                                    Taskid = 3,
-                                    Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                });
-
-                                log.Response = JsonConvert.SerializeObject(response);
-                                log.Save();
-                            }
-                        }
-                        catch (Exception e)
-                        {
-
-                        }
-                    }
+                    SendAntrolOutpatientSepTasks(entity, cboRegistrasi.SelectedValue);
 
                     ScriptManager.RegisterStartupScript(this, GetType(), "insert", string.Format("alert('Code : {0}, Message : {1}');", "000", "Pembuatan SEP berhasil, No SEP : " + entity.NoSEP), true);
 
@@ -3001,6 +2968,97 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs.VClaim
         protected override void OnMenuPrintClick(ValidateArgs args, ref string programID, PrintJobParameterCollection printJobParameters)
         {
             printJobParameters.AddNew("p_NoSep", txtNoSep.Text);
+        }
+
+        private void SendAntrolOutpatientSepTasks(BpjsSEP entity, string registrationNo)
+        {
+            if (!Helper.IsBpjsAntrolIntegration) return;
+            if (entity == null) return;
+            if (string.IsNullOrEmpty(entity.NoTransaksi) || entity.JenisPelayanan != "2") return;
+
+            try
+            {
+                var reg = LoadRegistrationForAntrol(entity.NoTransaksi, registrationNo);
+                var existingTaskIds = GetExistingAntrolTaskIds(entity.NoTransaksi);
+                var time = DateTime.Now;
+
+                if (reg != null && (reg.IsNewPatient ?? false))
+                {
+                    if (!existingTaskIds.Contains(1) && SendAntrolTask(entity.NoTransaksi, 1, time).Metadata.IsAntrolValid)
+                        time = time.AddMinutes(2);
+                    if (!existingTaskIds.Contains(2) && SendAntrolTask(entity.NoTransaksi, 2, time).Metadata.IsAntrolValid)
+                        time = time.AddMinutes(2);
+                }
+
+                if (!existingTaskIds.Contains(3))
+                    SendAntrolTask(entity.NoTransaksi, 3, time);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
+        private Registration LoadRegistrationForAntrol(string appointmentNo, string registrationNo)
+        {
+            var reg = new Registration();
+            if (!string.IsNullOrWhiteSpace(registrationNo) && reg.LoadByPrimaryKey(registrationNo))
+                return reg;
+
+            if (!string.IsNullOrWhiteSpace(appointmentNo))
+            {
+                reg = new Registration();
+                reg.Query.es.Top = 1;
+                reg.Query.Where(reg.Query.AppointmentNo == appointmentNo, reg.Query.IsVoid == false);
+                if (reg.Query.Load()) return reg;
+            }
+
+            return null;
+        }
+
+        private List<int> GetExistingAntrolTaskIds(string kodebooking)
+        {
+            try
+            {
+                var svc = new Common.BPJS.Antrian.Service();
+                var response = svc.GetListWaktuTaskId(new Common.BPJS.Antrian.List.TaskId.Request.Root()
+                {
+                    Kodebooking = kodebooking
+                });
+
+                if (response != null && response.Metadata != null && response.Metadata.IsAntrolValid && response.Response != null)
+                    return response.Response.Select(x => x.Taskid).ToList();
+            }
+            catch (Exception)
+            {
+
+            }
+
+            return new List<int>();
+        }
+
+        private Common.BPJS.MetadataResponse SendAntrolTask(string kodebooking, int taskId, DateTime waktu)
+        {
+            var request = new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+            {
+                Kodebooking = kodebooking,
+                Taskid = taskId,
+                Waktu = Convert.ToInt64(new DateTimeOffset(waktu).ToUnixTimeMilliseconds())
+            };
+
+            var log = new WebServiceAPILog();
+            log.DateRequest = DateTime.Now;
+            log.IPAddress = string.Empty;
+            log.UrlAddress = "BpjsVClaimDetail";
+            log.Params = JsonConvert.SerializeObject(request);
+
+            var svc = new Common.BPJS.Antrian.Service();
+            var response = svc.UpdateWaktuAntrian(request);
+
+            log.Response = JsonConvert.SerializeObject(response);
+            log.Save();
+
+            return response;
         }
 
         protected void chkPenjaminKLLSep_CheckedChanged(object sender, EventArgs e)
