@@ -1403,7 +1403,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             medsum.PpaSign = asses.SignImg;
             medsum.Save();
 
-            SaveRegistrationInfoMedicMDS(reg.RegistrationNo, reg.ServiceUnitID);
+            var mdsRegistrationInfoMedicID = SaveRegistrationInfoMedicMDS(reg.RegistrationNo, reg.ServiceUnitID);
+            SaveMdsSourceRelation(reg.RegistrationNo, mdsRegistrationInfoMedicID, asses.RegistrationInfoMedicID);
             SaveDiagnoseFromEpisodeDiagnose(reg.RegistrationNo);
             SaveProcedureFromEpisodeProcedure(reg.RegistrationNo);
 
@@ -1924,7 +1925,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
         }
 
-        private void SaveRegistrationInfoMedicMDS(string refNo, string serviceUnitID)
+        private string SaveRegistrationInfoMedicMDS(string refNo, string serviceUnitID)
         {
             var ent = new RegistrationInfoMedic();
             var qr = new RegistrationInfoMedicQuery();
@@ -1956,6 +1957,74 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             ent.ReferenceNo = refNo;
             ent.ReferenceType = "MDS";
             ent.Save();
+
+            return ent.RegistrationInfoMedicID;
+        }
+
+        private void SaveMdsSourceRelation(string registrationNo, string mdsRegistrationInfoMedicID, string sourceRegistrationInfoMedicID)
+        {
+            if (string.IsNullOrWhiteSpace(mdsRegistrationInfoMedicID) || string.IsNullOrWhiteSpace(sourceRegistrationInfoMedicID))
+                return;
+
+            if (!IsMdsSourceRelationTableExists())
+                return;
+
+            var cmd = @"
+MERGE dbo.MedicalDischargeSummarySource AS target
+USING
+(
+    SELECT
+        @RegistrationNo AS RegistrationNo,
+        @MDSRegistrationInfoMedicID AS MDSRegistrationInfoMedicID,
+        @SourceRegistrationInfoMedicID AS SourceRegistrationInfoMedicID
+) AS source
+ON target.MDSRegistrationInfoMedicID = source.MDSRegistrationInfoMedicID
+    AND target.SourceRegistrationInfoMedicID = source.SourceRegistrationInfoMedicID
+    AND target.IsDeleted = 0
+WHEN MATCHED THEN
+    UPDATE SET
+        target.LastUpdateDateTime = GETDATE(),
+        target.LastUpdateByUserID = @UserID
+WHEN NOT MATCHED THEN
+    INSERT
+    (
+        RegistrationNo,
+        MDSRegistrationInfoMedicID,
+        SourceRegistrationInfoMedicID,
+        SourceType,
+        IsDeleted,
+        CreatedDateTime,
+        CreatedByUserID,
+        LastUpdateDateTime,
+        LastUpdateByUserID
+    )
+    VALUES
+    (
+        source.RegistrationNo,
+        source.MDSRegistrationInfoMedicID,
+        source.SourceRegistrationInfoMedicID,
+        'SOAP',
+        0,
+        GETDATE(),
+        @UserID,
+        GETDATE(),
+        @UserID
+    );";
+
+            var pars = new esParameters();
+            pars.Add("RegistrationNo", registrationNo);
+            pars.Add("MDSRegistrationInfoMedicID", mdsRegistrationInfoMedicID);
+            pars.Add("SourceRegistrationInfoMedicID", sourceRegistrationInfoMedicID);
+            pars.Add("UserID", AppSession.UserLogin.UserID);
+
+            var entity = new RegistrationInfoMedic();
+            entity.ExecuteNonQuery(esQueryType.Text, cmd, pars);
+        }
+
+        private bool IsMdsSourceRelationTableExists()
+        {
+            var dt = Utils.LoadDataTable("SELECT OBJECT_ID('dbo.MedicalDischargeSummarySource', 'U') AS ObjectID");
+            return dt.Rows.Count > 0 && dt.Rows[0]["ObjectID"] != DBNull.Value;
         }
 
         private MedicalDischargeSummaryDiagnose CreateNewMdsDiagnose(MedicalDischargeSummaryDiagnoseCollection mdsDiags)

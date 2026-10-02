@@ -250,6 +250,11 @@
                                                                             DataBinder.Eval(Container.DataItem, "PatientDocumentID"))%>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
+                <telerik:GridTemplateColumn UniqueName="colEdit" HeaderText="" HeaderStyle-Width="30px">
+                    <ItemTemplate>
+                        <%# PatientDocumentEditLink(DataBinder.Eval(Container.DataItem, "PatientDocumentID"))%>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridTemplateColumn UniqueName="File" HeaderText="File">
                     <ItemTemplate>
                         <%# DataBinder.Eval(Container.DataItem, "FileAttachName").ToString() == string.Empty ? string.Empty : string.Format("<a href=\"#\" onclick=\"$.download('PatientDocumentDownload.aspx','id={0}'); return false;\"><img src=\"../../../../../Images/Toolbar/download16.png\" border=\"0\" /></a>",

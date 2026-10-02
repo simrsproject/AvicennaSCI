@@ -13,6 +13,7 @@ using Temiang.Avicenna.BusinessObject.Common;
 using Temiang.Avicenna.Module.RADT.EmrIp;
 using System.Configuration;
 using Temiang.Avicenna.Common.BPJS.VClaim.v11;
+using Temiang.Dal.DynamicQuery;
 using Enum = Temiang.Avicenna.Common.BPJS.VClaim.Enum;
 
 namespace Temiang.Avicenna.Module.RADT
@@ -1278,6 +1279,7 @@ namespace Temiang.Avicenna.Module.RADT
 
                 entity.IsDeleted = !(entity.IsDeleted ?? false);
                 entity.Save();
+                SyncOutpatientMdsDeleteStatus(entity.RegistrationInfoMedicID, entity.IsDeleted ?? false);
 
                 var pa = new PatientAssessment();
                 if (pa.LoadByPrimaryKey(keys[0]))
@@ -1303,6 +1305,42 @@ namespace Temiang.Avicenna.Module.RADT
             grdAssessment.DataSource = null;
             grdAssessment.Rebind();
 
+        }
+
+        private void SyncOutpatientMdsDeleteStatus(string sourceRegistrationInfoMedicID, bool isDeleted)
+        {
+            if (string.IsNullOrWhiteSpace(sourceRegistrationInfoMedicID))
+                return;
+
+            if (!IsMdsSourceRelationTableExists())
+                return;
+
+            var cmd = @"
+UPDATE rim
+SET
+    rim.IsDeleted = @IsDeleted,
+    rim.LastUpdateDateTime = GETDATE(),
+    rim.LastUpdateByUserID = @UserID
+FROM dbo.RegistrationInfoMedic rim
+INNER JOIN dbo.MedicalDischargeSummarySource src
+    ON src.MDSRegistrationInfoMedicID = rim.RegistrationInfoMedicID
+    AND src.IsDeleted = 0
+WHERE src.SourceRegistrationInfoMedicID = @SourceRegistrationInfoMedicID
+    AND rim.SRMedicalNotesInputType = 'MDS';";
+
+            var pars = new esParameters();
+            pars.Add("SourceRegistrationInfoMedicID", sourceRegistrationInfoMedicID);
+            pars.Add("IsDeleted", isDeleted);
+            pars.Add("UserID", AppSession.UserLogin.UserID);
+
+            var entity = new RegistrationInfoMedic();
+            entity.ExecuteNonQuery(esQueryType.Text, cmd, pars);
+        }
+
+        private bool IsMdsSourceRelationTableExists()
+        {
+            var dt = Utils.LoadDataTable("SELECT OBJECT_ID('dbo.MedicalDischargeSummarySource', 'U') AS ObjectID");
+            return dt.Rows.Count > 0 && dt.Rows[0]["ObjectID"] != DBNull.Value;
         }
 
         protected void grdAssessment_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
