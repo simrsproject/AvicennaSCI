@@ -57,6 +57,7 @@ namespace Temiang.Avicenna.BusinessObject
 
             PatientDocumentScanCompression,
             IsLogProgramAccess,
+            WebServiceAPILogRetentionInMonths,
             vs_HeartRateID,
             vs_SystolicID,
             vs_DiastolicID,
@@ -1366,6 +1367,7 @@ namespace Temiang.Avicenna.BusinessObject
 
             public const string PatientDocumentScanCompression = "Patient Document Scan Compression|200| |False";
             public const string IsLogProgramAccess = "Is Log Program Access|No| |True";
+            public const string WebServiceAPILogRetentionInMonths = "WebService API Log Retention In Months|1| |True";
             public const string vs_HeartRateID = "VitalSignID  for Heart Rate|HEART| |False";
             public const string vs_SystolicID = "VitalSignID  for Blood Pressure - Systolic|BP2| |False";
             public const string vs_DiastolicID = "VitalSignID  for Blood Pressure - Diastolic|BP1| |False";

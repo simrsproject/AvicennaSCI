@@ -254,7 +254,8 @@
     </table>
     <telerik:RadGrid ID="grdItemTransactionItem" runat="server" OnNeedDataSource="grdItemTransactionItem_NeedDataSource"
         AutoGenerateColumns="False" GridLines="None" AllowPaging="true" AllowSorting="false"
-        PageSize="100">
+        PageSize="200">
+         <PagerStyle PageSizes="10,20,50,100,200,300" />
         <HeaderContextMenu>
         </HeaderContextMenu>
         <MasterTableView CommandItemDisplay="Top" DataKeyNames="TransactionNo, SequenceNo">
