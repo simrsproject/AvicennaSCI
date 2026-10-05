@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,7 +15,7 @@ namespace Temiang.Avicenna.Module.RADT.MedicationStatus
     /// Drug consume realization step per Patient
     /// </summary>
     /// Create by: Handono
-    /// 
+    ///
     /// Modif Hist:
     /// ===========
     /// [2003-03-17 Handono]
@@ -51,6 +51,7 @@ namespace Temiang.Avicenna.Module.RADT.MedicationStatus
         {
             ButtonOk.Visible = false;
             ButtonCancel.Text = "Close";
+
             if (!IsPostBack)
             {
                 txtStartDate.SelectedDate = (new DateTime()).NowAtSqlServer();
@@ -68,7 +69,12 @@ namespace Temiang.Avicenna.Module.RADT.MedicationStatus
                 {
                     case "S":
                         this.Title = "Medication Setup";
-                        txtStartDate.Enabled = false;
+                        // Set default date to today in recovery mode
+                        var isRecoveryMode = AppParameter.IsYes(AppParameter.ParameterItem.BackDateRecoveryModeEnabled);
+                        if (isRecoveryMode)
+                        {
+                            txtStartDate.SelectedDate = DateTime.Now.Date;
+                        }
                         break;
                     case "H":
                         this.Title = "Medication Handovers";
@@ -100,6 +106,28 @@ namespace Temiang.Avicenna.Module.RADT.MedicationStatus
 
                     cboServiceUnitID.Items.Clear();
                     cboServiceUnitID.Items.AddRange(itemSelecteds);
+                }
+            }
+        }
+
+        protected override void OnInitComplete(EventArgs e)
+        {
+            base.OnInitComplete(e);
+
+            // Apply after BasePage initializes culture, which resets the picker MinDate.
+            if (MedicationStep == "S")
+            {
+                var isRecoveryMode = AppParameter.IsYes(AppParameter.ParameterItem.BackDateRecoveryModeEnabled);
+                if (isRecoveryMode)
+                {
+                    txtStartDate.Enabled = true;
+                    var limitDays = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.BackDateRecoveryLimitDays).ToInt();
+                    txtStartDate.MinDate = DateTime.Now.Date.AddDays(-limitDays);
+                    txtStartDate.MaxDate = DateTime.Now.Date;
+                }
+                else
+                {
+                    txtStartDate.Enabled = false;
                 }
             }
         }

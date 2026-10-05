@@ -1488,7 +1488,7 @@ namespace Temiang.Avicenna.Common
 
         protected bool IsMedicalRecordOpen(int deadlineHour, Registration reg)
         {
-            // 4. Ketentuan RM, pengisian max 1x24 jam. Kelengkapan 2x24 jam setelah pasien pulang. 
+            // Ketentuan RM: pengisian max 1x24 jam. Kelengkapan 2x24 jam setelah pasien pulang.
 
             // Bisa diedit jika tidak dibatasi deadline-nya
             if (deadlineHour == 0) return true;
@@ -1499,11 +1499,36 @@ namespace Temiang.Avicenna.Common
             // Untuk rawat inap jika belum discharge berarti masih bisa edit
             if (reg.SRRegistrationType == "IPR" && reg.DischargeDate == null) return true;
 
-            // Check Deadline
-            var date = reg.SRRegistrationType == "IPR" ? reg.DischargeDate.Value : reg.RegistrationDate.Value;
+            // Check Back Date Recovery Mode - untuk recovery data kena virus
+            var isBackDateRecoveryEnabled = AppParameter.IsYes(AppParameter.ParameterItem.BackDateRecoveryModeEnabled);
+            if (isBackDateRecoveryEnabled)
+            {
+                var backDateLimitDays = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.BackDateRecoveryLimitDays).ToInt();
+                if (backDateLimitDays > 0)
+                {
+                    // Hitung tanggal minimum yang diizinkan untuk back date
+                    var minimumAllowedDate = DateTime.Now.Date.AddDays(-backDateLimitDays);
+                    
+                    // Untuk IPR, cek DischargeDate jika ada. Untuk non-IPR atau IPR yang belum discharge, cek RegistrationDate
+                    DateTime? checkDate = null;
+                    if (reg.SRRegistrationType == "IPR" && reg.DischargeDate != null)
+                        checkDate = reg.DischargeDate.Value;
+                    else if (reg.RegistrationDate != null)
+                        checkDate = reg.RegistrationDate.Value;
+                    
+                    // Jika tanggal discharge/registration masih dalam range back date recovery, allow edit/add
+                    if (checkDate != null && checkDate.Value.Date >= minimumAllowedDate)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            // Check Deadline Normal
+            var date2 = reg.SRRegistrationType == "IPR" ? reg.DischargeDate.Value : reg.RegistrationDate.Value;
             var time = reg.SRRegistrationType == "IPR" ? reg.DischargeTime : reg.RegistrationTime;
             var times = time.Contains(":") ? time.Split(':') : "0:0".Split(':');
-            var deadlineTime = (new DateTime(date.Year, date.Month, date.Day, times[0].ToInt(), times[1].ToInt(), 0)).AddHours(deadlineHour);
+            var deadlineTime = (new DateTime(date2.Year, date2.Month, date2.Day, times[0].ToInt(), times[1].ToInt(), 0)).AddHours(deadlineHour);
             return DateTime.Now <= deadlineTime;
         }
 

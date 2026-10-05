@@ -94,6 +94,22 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             txtSequenceNo.Value = NewSequenceNo();
             txtIwlForHour.Value = 24;
 
+            // Enable date picker for recovery mode
+            var isRecoveryMode = AppParameter.IsYes(AppParameter.ParameterItem.BackDateRecoveryModeEnabled);
+            if (isRecoveryMode)
+            {
+                // Allow user to manually set date for back date recovery
+                txtInOutDate.Enabled = true;
+                var limitDays = AppSession.Parameter.GetParameterValue(AppParameter.ParameterItem.BackDateRecoveryLimitDays).ToInt();
+                txtInOutDate.MinDate = DateTime.Now.Date.AddDays(-limitDays);
+                txtInOutDate.MaxDate = DateTime.Now.Date;
+            }
+            else
+            {
+                // Normal mode: date auto-set, tidak bisa diubah
+                txtInOutDate.Enabled = false;
+            }
+
             var lastTemp = VitalSign.LastVitalSignValue(RegistrationNo, FromRegistrationNo, VitalSign.VitalSignEnum.Temperature, timeNow);
             txtLastTemp.Value = lastTemp == 0 ? AppParameter.GetParameterValue(AppParameter.ParameterItem.NormalTemperature).ToDouble() : lastTemp;
 

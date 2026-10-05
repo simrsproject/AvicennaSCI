@@ -796,7 +796,7 @@ namespace Temiang.Avicenna.Common
                     break;
                 case "new":
                     if (!string.IsNullOrWhiteSpace(RegistrationNo) && IsMedicalRecordEntry)
-                        MedicalRecordEditableValidate(args, RegistrationNo);
+                        MedicalRecordAddableValidate(args, RegistrationNo); // Fixed: use Addable for NEW
 
                     if (!args.IsCancel)
                     {

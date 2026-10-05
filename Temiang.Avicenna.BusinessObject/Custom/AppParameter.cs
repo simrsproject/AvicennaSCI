@@ -1009,6 +1009,8 @@ namespace Temiang.Avicenna.BusinessObject
             IsAllowEditEmployeeAnnualLeaveEndPeriod,
             DeadlineMedicalRecordEditableAfterDischarge,
             DeadlineMedicalRecordAddableAfterDischarge,
+            BackDateRecoveryModeEnabled,
+            BackDateRecoveryLimitDays,
             DefaultValueSpecimenTakenBy,
             IsUserTypeDoctorNoSaveConfirm,
             IsCentralizedCssd,
@@ -2276,6 +2278,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsUsingBKUModule = "Is Using BKU Module? (Yes/No)|No| |true";
             public const string DeadlineMedicalRecordEditableAfterDischarge = "Deadline Medical Record Editable After Discharge (Hour)|48| |false|Edit this data not allowed because this patient has discharge over than {0} hour ago, please contact IT";
             public const string DeadlineMedicalRecordAddableAfterDischarge = "Deadline Medical Record Addable After Discharge (Hour)|24| |false|Add data not allowed because this patient has discharge over than {0} hour ago, please contact IT";
+            public const string BackDateRecoveryModeEnabled = "Back Date Recovery Mode Enabled (for data recovery only)|No| |false|WARNING: Back Date Recovery Mode is currently ACTIVE. This mode allows data entry with past dates for recovery purposes only.";
+            public const string BackDateRecoveryLimitDays = "Back Date Recovery Limit (Days)|2| |false|Maximum back date allowed for recovery is {0} days from current date";
             public const string DefaultValueSpecimenTakenBy = "Exam Order default value specimen taken by|lab| |false";
             public const string IsUserTypeDoctorNoSaveConfirm = "Is User Type Doctor No Need Save Confirm|No| |false";
             public const string IsCentralizedCssd = "Is Centralized CSSD? (Yes/No)|No;;RSISB:Yes| |true";
