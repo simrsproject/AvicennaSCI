@@ -3751,13 +3751,15 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        //FOR PASIEN TITIPAN
+        // FOR PASIEN TITIPAN
         public static string TakeQueueVisitPasienTitipan
         (
             string guarantorID,
             string serviceUnitID,
             string userID,
-            DateTime transDate
+            DateTime transDate,
+            string appointmentNo,
+            string patientID
         )
         {
             esParameters prms =
@@ -3797,6 +3799,22 @@ namespace Temiang.Avicenna.BusinessObject
                 esParameterDirection.Input,
                 DbType.Date,
                 0
+            );
+
+            prms.Add(
+                "AppointmentNo",
+                appointmentNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "PatientID",
+                patientID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
             );
 
             // =========================================
