@@ -6305,7 +6305,9 @@ namespace Temiang.Avicenna.Bridging.Controllers
                             reg.GuarantorID,
                             reg.ServiceUnitID,
                             userID,
-                            DateTime.Now.Date
+                            DateTime.Now.Date,
+                            appt.AppointmentNo,
+                            reg.PatientID
                         );
 
                     if (!string.IsNullOrEmpty(visitNo))
