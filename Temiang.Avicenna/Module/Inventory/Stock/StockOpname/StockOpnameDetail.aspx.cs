@@ -47,6 +47,14 @@ namespace Temiang.Avicenna.Module.Inventory.Stock
             }
         }
 
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                grdItemTransactionItem.PageSize = 200;
+                grdItemTransactionItem.PagerStyle.PageSizes = new int[] { 10,20,50,100,200,300 };
+            }
+        }
 
         #endregion
 
