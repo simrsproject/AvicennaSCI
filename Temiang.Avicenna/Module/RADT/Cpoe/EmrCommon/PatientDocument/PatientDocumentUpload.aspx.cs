@@ -14,8 +14,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 {
     public partial class PatientDocumentUpload : BasePageDialogEntry
     {
-        private bool? _canEditPatientDocumentByMedicalRecord;
-
         protected long PatientDocumentID
         {
             get
@@ -121,13 +119,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         }
         protected override void OnMenuSaveEditClick(ValidateArgs args)
         {
-            if (!CanEditPatientDocumentByMedicalRecord())
-            {
-                args.IsCancel = true;
-                args.MessageText = "Edit attachment hanya dapat dilakukan oleh Rekam Medis level Manajer/Pengatur.";
-                return;
-            }
-
             var entity = new PatientDocument();
             if (entity.LoadByPrimaryKey(PatientDocumentID))
             {
@@ -156,21 +147,12 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
         public override bool OnGetStatusMenuEdit()
         {
-            return CanEditPatientDocumentByMedicalRecord();
+            return true;
         }
 
         protected override bool HasEditAccess
         {
-            get { return CanEditPatientDocumentByMedicalRecord(); }
-        }
-
-        protected override void OnBeforeMenuEditClick(ValidateArgs args)
-        {
-            if (!CanEditPatientDocumentByMedicalRecord())
-            {
-                args.IsCancel = true;
-                args.MessageText = "Edit attachment hanya dapat dilakukan oleh Rekam Medis level Manajer/Pengatur.";
-            }
+            get { return true; }
         }
 
         private void SetEntityValue(PatientDocument entity)
@@ -265,18 +247,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             var oldFilePath = System.IO.Path.Combine(fileFolder, oldFileAttachName);
             if (System.IO.File.Exists(oldFilePath))
                 System.IO.File.Delete(oldFilePath);
-        }
-
-        private bool CanEditPatientDocumentByMedicalRecord()
-        {
-            if (!_canEditPatientDocumentByMedicalRecord.HasValue)
-            {
-                var query = new AppUserUserGroupQuery("a");
-                query.Where(query.UserID == AppSession.UserLogin.UserID, query.UserGroupID.In("RM.01", "RM.02"));
-                _canEditPatientDocumentByMedicalRecord = query.LoadDataTable().Rows.Count > 0;
-            }
-
-            return _canEditPatientDocumentByMedicalRecord.Value;
         }
 
         protected override void OnMenuDeleteClick(ValidateArgs args)

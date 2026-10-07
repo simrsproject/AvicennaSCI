@@ -14,7 +14,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 {
     public partial class PatientDocumentHist : BasePageDialog
     {
-        private bool? _canEditPatientDocumentByMedicalRecord;
         private List<string> _patientRelateds;
         protected List<string> PatientRelateds
         {
@@ -184,23 +183,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
         protected string PatientDocumentEditLink(object patientDocumentId)
         {
-            if (!CanEditPatientDocumentByMedicalRecord())
-                return string.Empty;
-
             return string.Format("<a href=\"#\" onclick=\"showDetail('edit', '{0}')\"><img src=\"../../../../../Images/Toolbar/edit16.png\" border=\"0\" /></a>",
                 patientDocumentId);
-        }
-
-        private bool CanEditPatientDocumentByMedicalRecord()
-        {
-            if (!_canEditPatientDocumentByMedicalRecord.HasValue)
-            {
-                var query = new AppUserUserGroupQuery("a");
-                query.Where(query.UserID == AppSession.UserLogin.UserID, query.UserGroupID.In("RM.01", "RM.02"));
-                _canEditPatientDocumentByMedicalRecord = query.LoadDataTable().Rows.Count > 0;
-            }
-
-            return _canEditPatientDocumentByMedicalRecord.Value;
         }
 
     }
