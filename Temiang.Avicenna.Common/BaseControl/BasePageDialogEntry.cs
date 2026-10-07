@@ -332,6 +332,17 @@ namespace Temiang.Avicenna.Common
                 ViewState["fw_mre"] = value;
             }
         }
+
+        protected virtual string MedicalRecordEntryServiceUnitID
+        {
+            get { return string.Empty; }
+        }
+
+        private void MedicalRecordEditableValidateForEntry(ValidateArgs args)
+        {
+            MedicalRecordEditableValidate(args, RegistrationCurrent);
+            MedicalRecordUnitCorrectionValidate(args, RegistrationCurrent, MedicalRecordEntryServiceUnitID);
+        }
         public AppEnum.DataMode DataModeCurrent
         {
             get
@@ -866,7 +877,7 @@ namespace Temiang.Avicenna.Common
                         break;
                     case "edit":
                         if (IsMedicalRecordEntry)
-                            MedicalRecordEditableValidate(args, RegistrationCurrent);
+                            MedicalRecordEditableValidateForEntry(args);
                         if (!args.IsCancel)
                         {
                             OnBeforeMenuEditClick(args);
@@ -885,7 +896,11 @@ namespace Temiang.Avicenna.Common
                             var notif = string.Empty;
                             if (DataModeCurrent == AppEnum.DataMode.Edit)
                             {
-                                OnMenuSaveEditClick(args);
+                                if (IsMedicalRecordEntry)
+                                    MedicalRecordEditableValidateForEntry(args);
+
+                                if (!args.IsCancel)
+                                    OnMenuSaveEditClick(args);
                                 if (!args.IsCancel && string.IsNullOrWhiteSpace(args.MessageText))
                                     notif = "Current Record has saved";
                             }
@@ -934,7 +949,7 @@ namespace Temiang.Avicenna.Common
                         if (Page.IsValid)
                         {
                             if (IsMedicalRecordEntry)
-                                MedicalRecordEditableValidate(args, RegistrationCurrent);
+                                MedicalRecordEditableValidateForEntry(args);
 
                             if (!args.IsCancel)
                             {
@@ -1000,7 +1015,7 @@ namespace Temiang.Avicenna.Common
                         break;
                     case "approval":
                         if (IsMedicalRecordEntry)
-                            MedicalRecordEditableValidate(args, RegistrationCurrent);
+                            MedicalRecordEditableValidateForEntry(args);
 
                         if (!args.IsCancel)
                         {
@@ -1014,7 +1029,7 @@ namespace Temiang.Avicenna.Common
                         break;
                     case "unapproval":
                         if (IsMedicalRecordEntry)
-                            MedicalRecordEditableValidate(args, RegistrationCurrent);
+                            MedicalRecordEditableValidateForEntry(args);
 
                         if (!args.IsCancel)
                         {
@@ -1028,7 +1043,7 @@ namespace Temiang.Avicenna.Common
                         break;
                     case "void":
                         if (IsMedicalRecordEntry)
-                            MedicalRecordEditableValidate(args, RegistrationCurrent);
+                            MedicalRecordEditableValidateForEntry(args);
 
                         if (!args.IsCancel)
                         {
@@ -1042,7 +1057,7 @@ namespace Temiang.Avicenna.Common
                         break;
                     case "unvoid":
                         if (IsMedicalRecordEntry)
-                            MedicalRecordEditableValidate(args, RegistrationCurrent);
+                            MedicalRecordEditableValidateForEntry(args);
 
                         if (!args.IsCancel)
                         {
@@ -1056,7 +1071,7 @@ namespace Temiang.Avicenna.Common
                         break;
                     case "rejournal":
                         if (IsMedicalRecordEntry)
-                            MedicalRecordEditableValidate(args, RegistrationCurrent);
+                            MedicalRecordEditableValidateForEntry(args);
 
                         if (!args.IsCancel)
                         {
@@ -1328,7 +1343,7 @@ namespace Temiang.Avicenna.Common
                 OnPopulateEntryControl(args);
 
                 if (!string.IsNullOrWhiteSpace(RegistrationNo) && IsMedicalRecordEntry)
-                    MedicalRecordAddableValidate(args, RegistrationCurrent);
+                    MedicalRecordEditableValidateForEntry(args);
 
                 if (!args.IsCancel)
                 {

@@ -1011,7 +1011,43 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
 
         private void AddFilterServiceUnitAndParamedic(RegistrationQuery reg, bool isInPatient)
         {
-            if (cboServiceUnitID.SelectedValue == string.Empty)
+            var isTransferredRegistrationSearch = isInPatient &&
+                                                  AppSession.UserLogin.SRUserType == AppUser.UserType.Nurse &&
+                                                  !string.IsNullOrWhiteSpace(txtRegistrationNo.Text) &&
+                                                  txtRegistrationNo.Text.Contains("REG");
+
+            if (isTransferredRegistrationSearch)
+            {
+                var userUnit = new AppUserServiceUnitQuery("mrUserUnit");
+                userUnit.Select(userUnit.ServiceUnitID);
+                userUnit.Where(
+                    userUnit.UserID == AppSession.UserLogin.UserID,
+                    userUnit.Or(userUnit.IsDiscontinue.IsNull(), userUnit.IsDiscontinue == false));
+
+                var transfer = new PatientTransferQuery("mrTransfer");
+                var transferUserUnit = new AppUserServiceUnitQuery("mrTransferUserUnit");
+                transfer.InnerJoin(transferUserUnit).On(
+                    transfer.FromServiceUnitID == transferUserUnit.ServiceUnitID &&
+                    transferUserUnit.UserID == AppSession.UserLogin.UserID);
+                transfer.Select(transfer.RegistrationNo);
+                transfer.Where(
+                    transfer.IsApprove == true,
+                    transfer.IsVoid == false,
+                    transferUserUnit.Or(transferUserUnit.IsDiscontinue.IsNull(), transferUserUnit.IsDiscontinue == false));
+
+                if (!string.IsNullOrWhiteSpace(cboServiceUnitID.SelectedValue))
+                {
+                    userUnit.Where(userUnit.ServiceUnitID == cboServiceUnitID.SelectedValue);
+                    transfer.Where(transfer.FromServiceUnitID == cboServiceUnitID.SelectedValue);
+                }
+
+                reg.Where(reg.Or(
+                    reg.ServiceUnitID.In(userUnit),
+                    reg.And(
+                        reg.RegistrationNo.In(transfer),
+                        reg.IsOpenEntryMR == true)));
+            }
+            else if (cboServiceUnitID.SelectedValue == string.Empty)
             {
                 if (AppSession.UserLogin.SRUserType == AppUser.UserType.Nurse || AppSession.UserLogin.SRUserType == AppUser.UserType.Physiotherapy) // Hanya yg diset di Usernya
                 {

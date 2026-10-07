@@ -39,6 +39,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
         }
 
+        protected override string MedicalRecordEntryServiceUnitID
+        {
+            get { return hdnServiceUnitID.Value; }
+        }
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);

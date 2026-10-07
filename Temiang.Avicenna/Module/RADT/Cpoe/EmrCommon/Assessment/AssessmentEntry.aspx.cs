@@ -1347,6 +1347,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 return Request.QueryString["unit"];
             }
         }
+
+        protected override string MedicalRecordEntryServiceUnitID
+        {
+            get { return ServiceUnitID; }
+        }
         private RegistrationInfoMedic CreateNewSoapRegistrationInfoMedic(DateTime dateTime, string rimid)
         {
             var ent = new RegistrationInfoMedic();

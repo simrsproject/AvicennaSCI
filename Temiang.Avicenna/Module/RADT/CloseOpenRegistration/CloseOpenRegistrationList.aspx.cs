@@ -225,8 +225,16 @@ namespace Temiang.Avicenna.Module.RADT
                 }
                 else
                 {
-                    qr.Select(@"<CASE WHEN (r.SRRegistrationType = 'IPR' AND (DATEDIFF(HOUR, CAST(CONVERT(VARCHAR(11), r.DischargeDate, 113) + ' ' + r.DischargeTime AS DATETIME), GETDATE()) > 24)) THEN CAST(1 AS BIT) 
-                            WHEN (r.SRRegistrationType <> 'IPR' AND (DATEDIFF(HOUR, CAST(CONVERT(VARCHAR(11), r.RegistrationDate, 113) + ' ' + r.RegistrationTime AS DATETIME), GETDATE()) > 24)) THEN CAST(1 AS BIT) 
+                    qr.Select(@"<CASE WHEN (r.SRRegistrationType = 'IPR' AND EXISTS
+                            (
+                                SELECT 1
+                                FROM PatientTransfer pt
+                                WHERE pt.RegistrationNo = r.RegistrationNo
+                                    AND ISNULL(pt.IsVoid, 0) = 0
+                                    AND pt.FromServiceUnitID <> pt.ToServiceUnitID
+                            )) THEN CAST(1 AS BIT)
+                            WHEN (r.SRRegistrationType = 'IPR' AND (DATEDIFF(HOUR, CAST(CONVERT(VARCHAR(11), r.DischargeDate, 113) + ' ' + r.DischargeTime AS DATETIME), GETDATE()) > 24)) THEN CAST(1 AS BIT)
+                            WHEN (r.SRRegistrationType <> 'IPR' AND (DATEDIFF(HOUR, CAST(CONVERT(VARCHAR(11), r.RegistrationDate, 113) + ' ' + r.RegistrationTime AS DATETIME), GETDATE()) > 24)) THEN CAST(1 AS BIT)
                             ELSE CAST(0 AS BIT) END AS 'IsAllowMr'>");
                     qr.Where(qr.SRRegistrationType == cboSRRegistrationType.SelectedValue);
                 }

@@ -23,6 +23,14 @@ CR ini tidak seluruhnya bisa selesai hanya dengan modifikasi UI. Ada bagian yang
 
 ## Implementasi yang sudah dilakukan
 
+### Koreksi setelah pasien pindah unit
+
+- Registrasi rawat inap yang mempunyai riwayat transfer dapat dibuka untuk koreksi melalui kolom MR pada menu Close/Open Registration, termasuk ketika pasien belum discharge.
+- Setelah pasien pindah unit, koreksi catatan lama wajib menunggu `Registration.IsOpenEntryMR = 1`.
+- User yang mengoreksi harus masih terdaftar pada unit pembuat catatan melalui `AppUserServiceUnit`.
+- Validasi diterapkan pada Assessment/SOAP, Integrated Notes, dan PPA Notes, baik saat mulai edit maupun saat menyimpan agar tidak dapat dilewati melalui request langsung.
+- Setelah Rekam Medis membuka MR, worklist EMR unit asal dapat menemukan pasien yang sudah pindah dengan pencarian nomor registrasi lengkap. Pasien tidak terlihat di unit asal sebelum MR dibuka dan tidak ditambahkan ke daftar harian agar flow worklist existing tetap terjaga.
+
 1. Tambah tombol Edit pada list Attachment EMR.
    - Tombol hanya muncul untuk user yang berada di group `RM.01` atau `RM.02`.
    - Ini mengikuti jawaban user bahwa Edit Attachment hanya untuk Rekam Medis level Manajer dan Pengatur.

@@ -1529,6 +1529,34 @@ namespace Temiang.Avicenna.Common
             MedicalRecordValidate(args, reg, false);
         }
 
+        protected void MedicalRecordUnitCorrectionValidate(ValidateArgs args, Registration reg, string sourceServiceUnitID)
+        {
+            if (args.IsCancel || reg == null || reg.SRRegistrationType != "IPR" ||
+                string.IsNullOrWhiteSpace(sourceServiceUnitID) ||
+                sourceServiceUnitID.Equals(reg.ServiceUnitID, StringComparison.OrdinalIgnoreCase))
+                return;
+
+            if (!(reg.IsOpenEntryMR ?? false))
+            {
+                args.IsCancel = true;
+                args.MessageText = "Akses koreksi rekam medis harus dibuka terlebih dahulu oleh Rekam Medis.";
+                return;
+            }
+
+            var userUnit = new AppUserServiceUnitQuery();
+            userUnit.Where(
+                userUnit.UserID == AppSession.UserLogin.UserID,
+                userUnit.ServiceUnitID == sourceServiceUnitID,
+                userUnit.Or(userUnit.IsDiscontinue.IsNull(), userUnit.IsDiscontinue == false));
+            userUnit.es.Top = 1;
+
+            if (userUnit.LoadDataTable().Rows.Count == 0)
+            {
+                args.IsCancel = true;
+                args.MessageText = "Data hanya dapat dikoreksi oleh unit layanan yang membuat data tersebut.";
+            }
+        }
+
         private void MedicalRecordValidate(ValidateArgs args, Registration reg, bool isAdd = false)
         {
             // 4. Ketentuan RM, pengisian max 1x24 jam. Kelengkapan 2x24 jam setelah pasien pulang. 

@@ -171,6 +171,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
             // Check IsOpenMR & deadline Edit  (Handono 20230925)
             MedicalRecordEditableValidate(args, reg);
+            MedicalRecordUnitCorrectionValidate(args, reg, ServiceUnitID);
             if (args.IsCancel)
             {
                 msg = args.MessageText;
@@ -886,6 +887,16 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             if (!Page.IsValid)
             {
                 gridListImplementasi.Rebind(); // kalau tidak rebind muncul semua tombol edit walau user lain yang create 
+                return;
+            }
+
+            var correctionArgs = new ValidateArgs();
+            var correctionRegistration = new Registration();
+            correctionRegistration.LoadByPrimaryKey(RegistrationNo);
+            MedicalRecordUnitCorrectionValidate(correctionArgs, correctionRegistration, ServiceUnitID);
+            if (correctionArgs.IsCancel)
+            {
+                ShowInformationStatus(correctionArgs.MessageText);
                 return;
             }
 
