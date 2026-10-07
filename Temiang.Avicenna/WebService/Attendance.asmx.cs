@@ -306,7 +306,21 @@ namespace Temiang.Avicenna.WebService
         {
             if (_cutOffDateAvailable)
             {
-                var cutOffDate = DateTime.ParseExact(ConfigurationManager.AppSettings["AttendanceCutOff"], "yyyy-MM-dd", null, DateTimeStyles.None);
+                DateTime cutOffDate = DateTime.MinValue;
+
+                var cutOffValue = ConfigurationManager.AppSettings["AttendanceCutOff"];
+
+                if (!string.IsNullOrWhiteSpace(cutOffValue))
+                {
+                    DateTime.TryParseExact(
+                        cutOffValue.Trim(),
+                        "yyyy-MM-dd",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out cutOffDate
+                    );
+                }
+
                 if (cutOffDate.Date <= now.Date) return (true, now.Date);
             }
 
@@ -358,231 +372,137 @@ namespace Temiang.Avicenna.WebService
             else return (true, now.Date);
         }
 
+        private bool TryParseTime(string value, out TimeSpan result)
+        {
+            result = TimeSpan.Zero;
+
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            return TimeSpan.TryParseExact(
+                value.Trim(),
+                new[] { @"hh\:mm", @"h\:mm", @"HH\:mm", @"H\:mm" },
+                CultureInfo.InvariantCulture,
+                out result
+            );
+        }
+
+        private TimeSpan ParseTimeOrZero(string value)
+        {
+            TimeSpan result;
+
+            if (TryParseTime(value, out result))
+                return result;
+
+            return TimeSpan.Zero;
+        }
+
         [WebMethod]
         public string ValidateAttendance(string employeeNo, string dateTime)
         {
             string format = "yyyyMMdd-HHmm";
-            DateTime.TryParseExact(dateTime, format, null, DateTimeStyles.None, out var now);
+
+            DateTime now;
+
+            if (string.IsNullOrWhiteSpace(employeeNo))
+            {
+                return JsonConvert.SerializeObject(new
+                {
+                    status = false,
+                    message = "Employee number tidak boleh kosong"
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(dateTime) ||
+                !DateTime.TryParseExact(
+                    dateTime.Trim(),
+                    format,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None,
+                    out now))
+            {
+                return JsonConvert.SerializeObject(new
+                {
+                    status = false,
+                    message = "Format tanggal attendance tidak valid"
+                });
+            }
 
             try
             {
-                var log = new WebServiceAPILog()
                 {
-                    DateRequest = DateTime.Now,
-                    IPAddress = string.Empty,
-                    UrlAddress = string.Empty,
-                    Params = JsonConvert.SerializeObject(new
+                    var log = new WebServiceAPILog()
                     {
-                        employeeNo = employeeNo,
-                        dateTime = dateTime
-                    }),
-                    Response = employeeNo,
-                    Totalms = 0
-                };
-                log.Save();
-
-                var emp = new VwEmployeeTable();
-                emp.Query.Where(emp.Query.EmployeeNumber == employeeNo);
-                if (!emp.Query.Load())
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        status = false,
-                        message = "Kartu tidak terbaca;silahkan lapor ke SDM"
-                    });
-                }
-
-                var period = new PayrollPeriod();
-                period.Query.Where(period.Query.SPTMonth == now.Month && period.Query.SPTYear == now.Year);
-                if (!period.Query.Load())
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        status = false,
-                        message = $"Halo {emp.EmployeeName};anda tidak dijadwalkan;silahkan lapor ke SDM"
-                    });
-                }
-
-                if (emp.SREmployeeType == "01") // medis, dokter
-                {
-                    AddHeader(period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
-                    return NotValidated(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
-                }
-
-                var hour = new WorkingHour();
-
-                var isCheckIn = true;
-                var history = new MonthlyAttendanceDetailHistory();
-                var cutOffDate = DateTime.ParseExact(ConfigurationManager.AppSettings["AttendanceCutOff"], "yyyy-MM-dd", null, DateTimeStyles.None);
-                if (_cutOffDateAvailable && now.AddDays(-1).Date == cutOffDate.Date)
-                {
-                    history = new MonthlyAttendanceDetailHistory();
-                    history.Query.es.Top = 1;
-                    history.Query.Where(history.Query.PersonID == emp.PersonID && history.Query.CheckInDateTime.Date() == now.Date && history.Query.CheckInDateTime < now);
-                    history.Query.OrderBy(history.Query.CheckInDateTime.Descending);
-                    if (history.Query.Load())
-                    {
-                        hour = new WorkingHour();
-                        hour.LoadByPrimaryKey(history.WorkingHourID ?? -1);
-
-                        if (hour.SRShift != "ShiftID-013") isCheckIn = false;
-                        else
+                        DateRequest = DateTime.Now,
+                        IPAddress = string.Empty,
+                        UrlAddress = string.Empty,
+                        Params = JsonConvert.SerializeObject(new
                         {
-                            if (history.CheckOutDateTime == null) isCheckIn = false;
+                            employeeNo = employeeNo,
+                            dateTime = dateTime
+                        }),
+                        Response = employeeNo,
+                        Totalms = 0
+                    };
+                    log.Save();
+
+                    var emp = new VwEmployeeTable();
+                    emp.Query.Where(emp.Query.EmployeeNumber == employeeNo);
+                    if (!emp.Query.Load())
+                    {
+                        return JsonConvert.SerializeObject(new
+                        {
+                            status = false,
+                            message = "Kartu tidak terbaca;silahkan lapor ke SDM"
+                        });
+                    }
+
+                    var period = new PayrollPeriod();
+                    period.Query.Where(period.Query.SPTMonth == now.Month && period.Query.SPTYear == now.Year);
+                    if (!period.Query.Load())
+                    {
+                        return JsonConvert.SerializeObject(new
+                        {
+                            status = false,
+                            message = $"Halo {emp.EmployeeName};anda tidak dijadwalkan;silahkan lapor ke SDM"
+                        });
+                    }
+
+                    if (emp.SREmployeeType == "01") // medis, dokter
+                    {
+                        AddHeader(period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
+                        return NotValidated(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
+                    }
+
+                    var hour = new WorkingHour();
+
+                    var isCheckIn = true;
+                    var history = new MonthlyAttendanceDetailHistory();
+
+                    DateTime cutOffDate = DateTime.MinValue;
+
+                    if (_cutOffDateAvailable)
+                    {
+                        var cutOffValue = ConfigurationManager.AppSettings["AttendanceCutOff"];
+
+                        if (!DateTime.TryParseExact(
+                            cutOffValue?.Trim(),
+                            "yyyy-MM-dd",
+                            CultureInfo.InvariantCulture,
+                            DateTimeStyles.None,
+                            out cutOffDate))
+                        {
+                            cutOffDate = DateTime.MinValue;
                         }
                     }
-                    else
-                    {
-                        hour = new WorkingHour();
-                        hour = GetWorkingHour(emp.PersonID ?? -1, now);
-                    }
-                }
-                else
-                {
-                    history = new MonthlyAttendanceDetailHistory();
-                    history.Query.es.Top = 1;
-                    history.Query.Where(history.Query.PersonID == emp.PersonID && history.Query.CheckInDateTime < now &&
-                                        history.Query.CheckOutDateTime.IsNull());
-                    history.Query.OrderBy(history.Query.CheckInDateTime.Descending);
-                    if (history.Query.Load())
-                    {
-                        hour = new WorkingHour();
-                        hour.LoadByPrimaryKey(history.WorkingHourID ?? -1);
 
-                        if (new string[]
-                            {
-                                /*"ShiftID-023", */"ShiftID-013", "ShiftID-003"
-                            }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false))
-                        {
-                            if (now.Day == 1) // cek setiap awal bulan, karyawan yg masuk malam dan pulang pagi
-                            {
-                                period = new PayrollPeriod();
-                                period.Query.Where(period.Query.SPTMonth == now.Month - 1 &&
-                                                   period.Query.SPTYear == now.Year);
-                                if (!period.Query.Load())
-                                {
-                                    period = new PayrollPeriod();
-                                    period.Query.Where(
-                                        period.Query.SPTMonth == (now.Month - 1 == 0 ? 12 : now.Month - 1) &&
-                                        period.Query.SPTYear == now.Year - 1);
-                                    period.Query.Load();
-                                }
-
-                                // cek tgl sebelumnya, jika jadwalnya 2 shift pagi malam
-                                var mad = new MonthlyAttendanceDetail();
-                                mad.Query.es.Top = 1;
-                                mad.Query.Where(mad.Query.PayrollPeriodID == period.PayrollPeriodID,
-                                    mad.Query.PersonID == emp.PersonID,
-                                    mad.Query.ScheduleInDate.Date() == now.Date.AddDays(-1).Date,
-                                    mad.Query.CheckOutDate.IsNull(), mad.Query.CheckOutTime.IsNull());
-                                if (mad.Query.Load())
-                                {
-                                    hour = new WorkingHour();
-                                    if (hour.LoadByPrimaryKey(mad.WorkingHourID ?? 0))
-                                    {
-                                        if (!new string[]
-                                            {
-                                                /*"ShiftID-023", */"ShiftID-013", "ShiftID-003"
-                                            }.Contains(hour.SRShift) && !(hour.IsCrossDay ?? false))
-                                        {
-                                            period = new PayrollPeriod();
-                                            period.Query.Where(period.Query.SPTMonth == now.Month &&
-                                                               period.Query.SPTYear == now.Year);
-                                            period.Query.Load();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    period = new PayrollPeriod();
-                                    period.Query.Where(period.Query.SPTMonth == now.Month &&
-                                                       period.Query.SPTYear == now.Year);
-                                    period.Query.Load();
-                                }
-                            }
-                        }
-
-                        isCheckIn = false;
-
-                        {
-                            var mad = new MonthlyAttendanceDetail();
-                            mad.Query.Where(mad.Query.PayrollPeriodID == period.PayrollPeriodID,
-                                mad.Query.PersonID == emp.PersonID,
-                                mad.Query.ScheduleInDate.Date() == history.CheckInDateTime?.Date,
-                                mad.Query.CheckOutDate.IsNotNull(),
-                                mad.Query.CheckOutTime.Coalesce("''") != string.Empty,
-                                mad.Query.WorkingHourID == hour.WorkingHourID);
-                            if (mad.Query.Load())
-                            {
-                                if (!new string[]
-                                    {
-                                        /*"ShiftID-023", */"ShiftID-013"
-                                    }.Contains(hour.SRShift))
-                                {
-                                    history.CheckOutDateTime =
-                                        mad.CheckOutDate?.Date.Add(TimeSpan.ParseExact(mad.CheckOutTime, "hh\\:mm",
-                                            null));
-                                    history.Save();
-
-                                    return ValidateAttendance(emp.EmployeeNumber, now.ToString("yyyyMMdd-HHmm"));
-                                }
-                            }
-                        }
-
-                        //mad = new MonthlyAttendanceDetail();
-                        //mad.Query.Where(mad.Query.PayrollPeriodID == period.PayrollPeriodID, mad.Query.PersonID == emp.PersonID, mad.Query.ScheduleInDate.Date() == history.CheckInDateTime?.Date,
-                        //    mad.Query.WorkingHourID == hour.WorkingHourID);
-                        //if (!mad.Query.Load())
-                        //{
-                        //    history.MarkAsDeleted();
-                        //    history.Save();
-
-                        //    return ValidateAttendance(emp.EmployeeNumber, now.ToString("yyyyMMdd-HHmm"));
-                        //}
-
-                        if (new string[] { "ShiftID-001", "ShiftID-002" /*, "ShiftID-012"*/ }.Contains(hour.SRShift) &&
-                            !(hour.IsCrossDay ?? false))
-                        {
-                            //var schCheckOut = history.CheckInDateTime.Value.Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
-                            var maxCheckOut =
-                                history.CheckInDateTime.Value.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime,
-                                    "hh\\:mm", null));
-                            if (now > maxCheckOut)
-                            {
-                                return JsonConvert.SerializeObject(new
-                                {
-                                    status = false,
-                                    message =
-                                        $"Halo {emp.EmployeeName};anda belum absen pulang {maxCheckOut.ToString("dd/MM/yyyy")};silahkan lapor ke SDM"
-                                });
-                            }
-                        }
-                        else if (new string[]
-                                 {
-                                     /*"ShiftID-023", */"ShiftID-013", "ShiftID-003"
-                                 }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false))
-                        {
-                            //var schCheckOut = history.CheckInDateTime.Value.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
-                            var maxCheckOut = history.CheckInDateTime.Value.AddDays(1).Date
-                                .Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null));
-                            if (now > maxCheckOut)
-                            {
-                                return JsonConvert.SerializeObject(new
-                                {
-                                    status = false,
-                                    message =
-                                        $"Halo {emp.EmployeeName};anda belum absen pulang {maxCheckOut.ToString("dd/MM/yyyy")};silahkan lapor ke SDM"
-                                });
-                            }
-                        }
-                    }
-                    else
+                    if (_cutOffDateAvailable &&
+                        cutOffDate != DateTime.MinValue &&
+                        now.AddDays(-1).Date == cutOffDate.Date)
                     {
                         history = new MonthlyAttendanceDetailHistory();
                         history.Query.es.Top = 1;
-                        history.Query.Where(history.Query.PersonID == emp.PersonID &&
-                                            history.Query.CheckInDateTime.Date() == now.Date &&
-                                            history.Query.CheckInDateTime < now);
+                        history.Query.Where(history.Query.PersonID == emp.PersonID && history.Query.CheckInDateTime.Date() == now.Date && history.Query.CheckInDateTime < now);
                         history.Query.OrderBy(history.Query.CheckInDateTime.Descending);
                         if (history.Query.Load())
                         {
@@ -601,36 +521,219 @@ namespace Temiang.Avicenna.WebService
                             hour = GetWorkingHour(emp.PersonID ?? -1, now);
                         }
                     }
-                }
-
-                {
-                    // cek apabila ada yg bolos tidak absen
-                    var bolos = ValidateNoTap(emp.PersonID ?? -1, now.AddDays(-1));
-                    if (!bolos.status)
+                    else
                     {
-                        return JsonConvert.SerializeObject(new
+                        history = new MonthlyAttendanceDetailHistory();
+                        history.Query.es.Top = 1;
+                        history.Query.Where(history.Query.PersonID == emp.PersonID && history.Query.CheckInDateTime < now &&
+                                            history.Query.CheckOutDateTime.IsNull());
+                        history.Query.OrderBy(history.Query.CheckInDateTime.Descending);
+                        if (history.Query.Load())
                         {
-                            status = false,
-                            message = $"Halo {emp.EmployeeName};anda belum absen {bolos.date.ToString("dd/MM/yyyy")};silahkan lapor ke SDM"
-                        });
+                            hour = new WorkingHour();
+                            hour.LoadByPrimaryKey(history.WorkingHourID ?? -1);
+
+                            if (new string[]
+                                {
+                                /*"ShiftID-023", */"ShiftID-013", "ShiftID-003"
+                                }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false))
+                            {
+                                if (now.Day == 1) // cek setiap awal bulan, karyawan yg masuk malam dan pulang pagi
+                                {
+                                    period = new PayrollPeriod();
+                                    period.Query.Where(period.Query.SPTMonth == now.Month - 1 &&
+                                                       period.Query.SPTYear == now.Year);
+                                    if (!period.Query.Load())
+                                    {
+                                        period = new PayrollPeriod();
+                                        period.Query.Where(
+                                            period.Query.SPTMonth == (now.Month - 1 == 0 ? 12 : now.Month - 1) &&
+                                            period.Query.SPTYear == now.Year - 1);
+                                        period.Query.Load();
+                                    }
+
+                                    // cek tgl sebelumnya, jika jadwalnya 2 shift pagi malam
+                                    var mad = new MonthlyAttendanceDetail();
+                                    mad.Query.es.Top = 1;
+                                    mad.Query.Where(mad.Query.PayrollPeriodID == period.PayrollPeriodID,
+                                        mad.Query.PersonID == emp.PersonID,
+                                        mad.Query.ScheduleInDate.Date() == now.Date.AddDays(-1).Date,
+                                        mad.Query.CheckOutDate.IsNull(), mad.Query.CheckOutTime.IsNull());
+                                    if (mad.Query.Load())
+                                    {
+                                        hour = new WorkingHour();
+                                        if (hour.LoadByPrimaryKey(mad.WorkingHourID ?? 0))
+                                        {
+                                            if (!new string[]
+                                                {
+                                                /*"ShiftID-023", */"ShiftID-013", "ShiftID-003"
+                                                }.Contains(hour.SRShift) && !(hour.IsCrossDay ?? false))
+                                            {
+                                                period = new PayrollPeriod();
+                                                period.Query.Where(period.Query.SPTMonth == now.Month &&
+                                                                   period.Query.SPTYear == now.Year);
+                                                period.Query.Load();
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        period = new PayrollPeriod();
+                                        period.Query.Where(period.Query.SPTMonth == now.Month &&
+                                                           period.Query.SPTYear == now.Year);
+                                        period.Query.Load();
+                                    }
+                                }
+                            }
+
+                            isCheckIn = false;
+
+                            {
+                                var mad = new MonthlyAttendanceDetail();
+                                mad.Query.Where(mad.Query.PayrollPeriodID == period.PayrollPeriodID,
+                                    mad.Query.PersonID == emp.PersonID,
+                                    mad.Query.ScheduleInDate.Date() == history.CheckInDateTime?.Date,
+                                    mad.Query.CheckOutDate.IsNotNull(),
+                                    mad.Query.CheckOutTime.Coalesce("''") != string.Empty,
+                                    mad.Query.WorkingHourID == hour.WorkingHourID);
+                                if (mad.Query.Load())
+                                {
+                                    if (!new string[]
+                                        {
+                                        /*"ShiftID-023", */"ShiftID-013"
+                                        }.Contains(hour.SRShift))
+                                    {
+                                        TimeSpan madCheckOutTime;
+
+                                        if (!TryParseTime(mad.CheckOutTime, out madCheckOutTime))
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = "Data jam pulang pada attendance tidak valid;silahkan lapor ke SDM"
+                                            });
+                                        }
+
+                                        history.CheckOutDateTime =
+                                            mad.CheckOutDate?.Date.Add(madCheckOutTime);
+                                        history.Save();
+
+                                        return ValidateAttendance(emp.EmployeeNumber, now.ToString("yyyyMMdd-HHmm"));
+                                    }
+                                }
+                            }
+
+                            //mad = new MonthlyAttendanceDetail();
+                            //mad.Query.Where(mad.Query.PayrollPeriodID == period.PayrollPeriodID, mad.Query.PersonID == emp.PersonID, mad.Query.ScheduleInDate.Date() == history.CheckInDateTime?.Date,
+                            //    mad.Query.WorkingHourID == hour.WorkingHourID);
+                            //if (!mad.Query.Load())
+                            //{
+                            //    history.MarkAsDeleted();
+                            //    history.Save();
+
+                            //    return ValidateAttendance(emp.EmployeeNumber, now.ToString("yyyyMMdd-HHmm"));
+                            //}
+
+                            if (new string[] { "ShiftID-001", "ShiftID-002" /*, "ShiftID-012"*/ }.Contains(hour.SRShift) &&
+                                !(hour.IsCrossDay ?? false))
+                            {
+                                //var schCheckOut = history.CheckInDateTime.Value.Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
+                                TimeSpan maxCheckOutTime;
+
+                                if (!TryParseTime(hour.MaximumEndTime, out maxCheckOutTime))
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message = $"message = \"Jam maksimum pulang untuk jadwal tidak valid;silahkan lapor ke SDM"
+                                    });
+                                }
+
+                                var maxCheckOut =
+                                    history.CheckInDateTime.Value.Date.Add(maxCheckOutTime);
+                                if (now > maxCheckOut)
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message =
+                                            $"Halo {emp.EmployeeName};anda belum absen pulang {maxCheckOut.ToString("dd/MM/yyyy")};silahkan lapor ke SDM"
+                                    });
+                                }
+                            }
+                            else if (new string[]
+                                     {
+                                     /*"ShiftID-023", */"ShiftID-013", "ShiftID-003"
+                                     }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false))
+                            {
+                                //var schCheckOut = history.CheckInDateTime.Value.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
+                                TimeSpan maxCheckOutTime;
+
+                                if (!TryParseTime(hour.MaximumEndTime, out maxCheckOutTime))
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message = $"message = \"Jam maksimum pulang untuk jadwal tidak valid;silahkan lapor ke SDM"
+                                    });
+                                }
+
+                                var maxCheckOut =
+                                    history.CheckInDateTime.Value.AddDays(1).Date
+                                        .Add(maxCheckOutTime);
+                                if (now > maxCheckOut)
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message =
+                                            $"Halo {emp.EmployeeName};anda belum absen pulang {maxCheckOut.ToString("dd/MM/yyyy")};silahkan lapor ke SDM"
+                                    });
+                                }
+                            }
+                        }
+                        else
+                        {
+                            history = new MonthlyAttendanceDetailHistory();
+                            history.Query.es.Top = 1;
+                            history.Query.Where(history.Query.PersonID == emp.PersonID &&
+                                                history.Query.CheckInDateTime.Date() == now.Date &&
+                                                history.Query.CheckInDateTime < now);
+                            history.Query.OrderBy(history.Query.CheckInDateTime.Descending);
+                            if (history.Query.Load())
+                            {
+                                hour = new WorkingHour();
+                                hour.LoadByPrimaryKey(history.WorkingHourID ?? -1);
+
+                                if (hour.SRShift != "ShiftID-013") isCheckIn = false;
+                                else
+                                {
+                                    if (history.CheckOutDateTime == null) isCheckIn = false;
+                                }
+                            }
+                            else
+                            {
+                                hour = new WorkingHour();
+                                hour = GetWorkingHour(emp.PersonID ?? -1, now);
+                            }
+                        }
                     }
 
-                    // cuti
-                    var leave = ValidateLeave(now, emp.PersonID ?? -1);
-                    if (leave != null)
                     {
-                        return JsonConvert.SerializeObject(new
+                        // cek apabila ada yg bolos tidak absen
+                        var bolos = ValidateNoTap(emp.PersonID ?? -1, now.AddDays(-1));
+                        if (!bolos.status)
                         {
-                            status = false,
-                            message = $"Halo {emp.EmployeeName};anda tidak dijadwalkan;silahkan lapor ke SDM"
-                        });
-                    }
+                            return JsonConvert.SerializeObject(new
+                            {
+                                status = false,
+                                message = $"Halo {emp.EmployeeName};anda belum absen {bolos.date.ToString("dd/MM/yyyy")};silahkan lapor ke SDM"
+                            });
+                        }
 
-                    // jadwal
-                    if (isCheckIn)
-                    {
-                        hour = GetWorkingHour(emp.PersonID ?? -1, period.PayrollPeriodID ?? -1, now, isCheckIn);
-                        if (hour == null)
+                        // cuti
+                        var leave = ValidateLeave(now, emp.PersonID ?? -1);
+                        if (leave != null)
                         {
                             return JsonConvert.SerializeObject(new
                             {
@@ -638,421 +741,640 @@ namespace Temiang.Avicenna.WebService
                                 message = $"Halo {emp.EmployeeName};anda tidak dijadwalkan;silahkan lapor ke SDM"
                             });
                         }
-                    }
 
-                    // tidak divalidasi
-                    if (hour.IsNotValidated ?? false)
-                    {
-                        AddHeader(period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
-                        return NotValidated(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
-                    }
-
-                    // libur
-                    if (hour.IsOffDay ?? false)
-                    {
-                        // cek lembur di hari libur
-                        var overtime = GetOvertime((hour.IsCrossDay ?? false) ? now.AddDays(-1) : now, emp.PersonID ?? -1);
-                        if (overtime != null)
+                        // jadwal
+                        if (isCheckIn)
                         {
-                            hour = new WorkingHour();
-                            hour.LoadByPrimaryKey(overtime.WorkingHourID ?? -1);
-                            hour.IsOvertimeWorkingHour = true;
-                            hour.OvertimeValueInMinutes = Convert.ToInt32(overtime.Amount ?? 0);
-                        }
-                    }
-                    else
-                    // lembur di hari kerja
-                    {
-                        var overtime = GetOvertime((hour.IsCrossDay ?? false) ? now.AddDays(-1) : now, emp.PersonID ?? -1);
-                        if (overtime != null)
-                        {
-                            var minCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime, "hh\\:mm", null));
-                            var schCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
-                            var maxCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null));
-
-                            //hour.MinimumEndTime = minCheckOut.AddHours(Convert.ToDouble(overtime.Amount ?? 0)).ToString("HH:mm");
-                            hour.EndTime = schCheckOut.AddHours(Convert.ToDouble(overtime.Amount ?? 0)).ToString("HH:mm");
-                            hour.MaximumEndTime = maxCheckOut.AddHours(Convert.ToDouble(overtime.Amount ?? 0)).ToString("HH:mm");
-                            hour.IsOvertimeWorkingHour = true;
-                            hour.OvertimeValueInMinutes = Convert.ToInt32(overtime.Amount ?? 0);
-                        }
-                    }
-
-                    // ijin plg cepat atw ijin masuk terlambat
-                    {
-                        var permission = new EmployeePermission();
-                        permission.Query.Where(permission.Query.PersonID == (emp.PersonID ?? -1), permission.Query.PermissionDateFrom.Date() == now.Date, permission.Query.PermissionDateTo.Date() == now.Date,
-                            permission.Query.SRPermissionType == "01", permission.Query.IsApproved == true, permission.Query.IsVerified == true);
-                        if (permission.Query.Load())
-                        {
-                            var ijinEnd = permission.PermissionDateFrom.Value.Date.Add(TimeSpan.ParseExact(permission.PermissionTimeTo, "hh\\:mm", null));
-
-                            if (new string[] { "ShiftID-001", "ShiftID-002", "ShiftID-003", "ShiftID-012", "ShiftID-023", }.Contains(hour.SRShift))
+                            hour = GetWorkingHour(emp.PersonID ?? -1, period.PayrollPeriodID ?? -1, now, isCheckIn);
+                            if (hour == null)
                             {
-                                hour.StartTime = permission.PermissionTimeTo;
-                                hour.MaximumStartTime = permission.PermissionTimeTo;
+                                return JsonConvert.SerializeObject(new
+                                {
+                                    status = false,
+                                    message = $"Halo {emp.EmployeeName};anda tidak dijadwalkan;silahkan lapor ke SDM"
+                                });
                             }
-                            else if (new string[] { "ShiftID-013", }.Contains(hour.SRShift))
-                            {
-                                var schCheckIn = now.Date.Add(TimeSpan.ParseExact(hour.StartTime, "hh\\:mm", null));
-                                var schCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
+                        }
 
-                                if (ijinEnd >= schCheckIn && ijinEnd <= schCheckOut)
+                        // tidak divalidasi
+                        if (hour.IsNotValidated ?? false)
+                        {
+                            AddHeader(period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
+                            return NotValidated(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
+                        }
+
+                        // libur
+                        if (hour.IsOffDay ?? false)
+                        {
+                            // cek lembur di hari libur
+                            var overtime = GetOvertime((hour.IsCrossDay ?? false) ? now.AddDays(-1) : now, emp.PersonID ?? -1);
+                            if (overtime != null)
+                            {
+                                hour = new WorkingHour();
+                                hour.LoadByPrimaryKey(overtime.WorkingHourID ?? -1);
+                                hour.IsOvertimeWorkingHour = true;
+                                hour.OvertimeValueInMinutes = Convert.ToInt32(overtime.Amount ?? 0);
+                            }
+                        }
+                        else
+                        // lembur di hari kerja
+                        {
+                            var overtime = GetOvertime((hour.IsCrossDay ?? false) ? now.AddDays(-1) : now, emp.PersonID ?? -1);
+                            if (overtime != null)
+                            {
+                                TimeSpan minCheckOutTime;
+                                TimeSpan schCheckOutTime;
+                                TimeSpan maxCheckOutTime;
+
+                                if (!TryParseTime(hour.MinimumEndTime, out minCheckOutTime) ||
+                                    !TryParseTime(hour.EndTime, out schCheckOutTime) ||
+                                    !TryParseTime(hour.MaximumEndTime, out maxCheckOutTime))
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message = $"Data jam kerja WorkingHourID {hour.WorkingHourID} tidak valid;silahkan lapor ke SDM"
+                                    });
+                                }
+
+                                var minCheckOut = now.Date.Add(minCheckOutTime);
+                                var schCheckOut = now.Date.Add(schCheckOutTime);
+                                var maxCheckOut = now.Date.Add(maxCheckOutTime);
+
+                                //hour.MinimumEndTime = minCheckOut.AddHours(Convert.ToDouble(overtime.Amount ?? 0)).ToString("HH:mm");
+                                hour.EndTime = schCheckOut.AddHours(Convert.ToDouble(overtime.Amount ?? 0)).ToString("HH:mm");
+                                hour.MaximumEndTime = maxCheckOut.AddHours(Convert.ToDouble(overtime.Amount ?? 0)).ToString("HH:mm");
+                                hour.IsOvertimeWorkingHour = true;
+                                hour.OvertimeValueInMinutes = Convert.ToInt32(overtime.Amount ?? 0);
+                            }
+                        }
+
+                        // ijin plg cepat atw ijin masuk terlambat
+                        {
+                            var permission = new EmployeePermission();
+                            permission.Query.Where(permission.Query.PersonID == (emp.PersonID ?? -1), permission.Query.PermissionDateFrom.Date() == now.Date, permission.Query.PermissionDateTo.Date() == now.Date,
+                                permission.Query.SRPermissionType == "01", permission.Query.IsApproved == true, permission.Query.IsVerified == true);
+                            if (permission.Query.Load())
+                            {
+                                TimeSpan permissionTimeTo;
+
+                                if (!TryParseTime(permission.PermissionTimeTo, out permissionTimeTo))
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message = $"Data jam izin masuk/keluar tidak valid;silahkan lapor ke SDM"
+                                    });
+                                }
+
+                                var ijinEnd = permission.PermissionDateFrom.Value.Date
+                                    .Add(permissionTimeTo);
+
+                                if (new string[] { "ShiftID-001", "ShiftID-002", "ShiftID-003", "ShiftID-012", "ShiftID-023", }.Contains(hour.SRShift))
                                 {
                                     hour.StartTime = permission.PermissionTimeTo;
                                     hour.MaximumStartTime = permission.PermissionTimeTo;
                                 }
-                                else
+                                else if (new string[] { "ShiftID-013", }.Contains(hour.SRShift))
                                 {
-                                    hour.StartTime2 = permission.PermissionTimeTo;
-                                    hour.MaximumStartTime2 = permission.PermissionTimeTo;
+                                    TimeSpan startTime;
+                                    TimeSpan endTime;
+
+                                    if (!TryParseTime(hour.StartTime, out startTime) ||
+                                        !TryParseTime(hour.EndTime, out endTime))
+                                    {
+                                        return JsonConvert.SerializeObject(new
+                                        {
+                                            status = false,
+                                            message = $"Data jam kerja WorkingHourID {hour.WorkingHourID} tidak valid;silahkan lapor ke SDM"
+                                        });
+                                    }
+
+                                    var schCheckIn = now.Date.Add(startTime);
+                                    var schCheckOut = now.Date.Add(endTime);
+
+                                    if (ijinEnd >= schCheckIn && ijinEnd <= schCheckOut)
+                                    {
+                                        hour.StartTime = permission.PermissionTimeTo;
+                                        hour.MaximumStartTime = permission.PermissionTimeTo;
+                                    }
+                                    else
+                                    {
+                                        hour.StartTime2 = permission.PermissionTimeTo;
+                                        hour.MaximumStartTime2 = permission.PermissionTimeTo;
+                                    }
                                 }
                             }
-                        }
-                        permission = new EmployeePermission();
-                        permission.Query.Where(permission.Query.PersonID == (emp.PersonID ?? -1), permission.Query.PermissionDateFrom.Date() == now.Date, permission.Query.PermissionDateTo.Date() == now.Date,
-                            permission.Query.SRPermissionType == "02", permission.Query.IsApproved == true, permission.Query.IsVerified == true);
-                        if (permission.Query.Load())
-                        {
-                            var ijinStart = permission.PermissionDateFrom.Value.Date.Add(TimeSpan.ParseExact(permission.PermissionTimeFrom, "hh\\:mm", null));
-
-                            if (new string[] { "ShiftID-001", "ShiftID-002", "ShiftID-003", "ShiftID-012", "ShiftID-023", }.Contains(hour.SRShift))
+                            permission = new EmployeePermission();
+                            permission.Query.Where(permission.Query.PersonID == (emp.PersonID ?? -1), permission.Query.PermissionDateFrom.Date() == now.Date, permission.Query.PermissionDateTo.Date() == now.Date,
+                                permission.Query.SRPermissionType == "02", permission.Query.IsApproved == true, permission.Query.IsVerified == true);
+                            if (permission.Query.Load())
                             {
-                                hour.EndTime = permission.PermissionTimeFrom;
-                                hour.MaximumEndTime = permission.PermissionTimeFrom;
-                            }
-                            else if (new string[] { "ShiftID-013", }.Contains(hour.SRShift))
-                            {
-                                var schCheckIn = now.Date.Add(TimeSpan.ParseExact(hour.StartTime, "hh\\:mm", null));
-                                var schCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.EndTime, "hh\\:mm", null));
+                                TimeSpan permissionTimeFrom;
 
-                                if (ijinStart >= schCheckIn && ijinStart <= schCheckOut)
+                                if (!TryParseTime(permission.PermissionTimeFrom, out permissionTimeFrom))
+                                {
+                                    return JsonConvert.SerializeObject(new
+                                    {
+                                        status = false,
+                                        message = $"Data jam izin masuk/keluar tidak valid;silahkan lapor ke SDM"
+                                    });
+                                }
+
+                                var ijinStart = permission.PermissionDateFrom.Value.Date
+                                    .Add(permissionTimeFrom);
+
+                                if (new string[] { "ShiftID-001", "ShiftID-002", "ShiftID-003", "ShiftID-012", "ShiftID-023", }.Contains(hour.SRShift))
                                 {
                                     hour.EndTime = permission.PermissionTimeFrom;
                                     hour.MaximumEndTime = permission.PermissionTimeFrom;
                                 }
+                                else if (new string[] { "ShiftID-013", }.Contains(hour.SRShift))
+                                {
+                                    TimeSpan startTime;
+                                    TimeSpan endTime;
+
+                                    if (!TryParseTime(hour.StartTime, out startTime) ||
+                                        !TryParseTime(hour.EndTime, out endTime))
+                                    {
+                                        return JsonConvert.SerializeObject(new
+                                        {
+                                            status = false,
+                                            message = $"Data jam kerja WorkingHourID {hour.WorkingHourID} tidak valid;silahkan lapor ke SDM"
+                                        });
+                                    }
+
+                                    var schCheckIn = now.Date.Add(startTime);
+                                    var schCheckOut = now.Date.Add(endTime);
+
+                                    if (ijinStart >= schCheckIn && ijinStart <= schCheckOut)
+                                    {
+                                        hour.EndTime = permission.PermissionTimeFrom;
+                                        hour.MaximumEndTime = permission.PermissionTimeFrom;
+                                    }
+                                    else
+                                    {
+                                        hour.EndTime2 = permission.PermissionTimeFrom;
+                                        hour.MaximumEndTime2 = permission.PermissionTimeFrom;
+                                    }
+                                }
+                            }
+                        }
+
+                        // cek apabila sdh tap in dan out
+                        //if (hour.SRShift != "ShiftID-013") // diluar pagi malam
+                        {
+                            var tapHistory = new MonthlyAttendanceDetailHistory();
+                            tapHistory.Query.es.Top = 1;
+                            tapHistory.Query.Where(tapHistory.Query.PersonID == emp.PersonID && tapHistory.Query.WorkingHourID == hour.WorkingHourID);
+                            //if (hour.SRShift == "ShiftID-003")
+                            //    history.Query.Where(history.Query.CheckInDateTime.Date() == now.Date);
+                            //else
+                            //    history.Query.Where($"<'{now.Date.ToString("yyyyMMdd")}' BETWEEN CONVERT(VARCHAR(MAX), {history.Query.CheckInDateTime}, 112) AND CONVERT(VARCHAR(MAX), {history.Query.CheckOutDateTime}, 112)>");
+                            //if (history.Query.Load())
+                            //{
+                            //    return JsonConvert.SerializeObject(new
+                            //    {
+                            //        status = false,
+                            //        message = "Anda tidak dijadwalkan;silahkan lapor ke SDM"
+                            //    });
+                            //}
+
+                            if (isCheckIn)
+                            {
+                                tapHistory.Query.OrderBy(tapHistory.Query.CheckInDateTime.Descending);
+
+                                if (hour.SRShift != "ShiftID-013")
+                                {
+                                    TimeSpan maxCheckInTime;
+
+                                    if (!TryParseTime(hour.MaximumStartTime, out maxCheckInTime))
+                                    {
+                                        return JsonConvert.SerializeObject(new
+                                        {
+                                            status = false,
+                                            message = $"Jam maksimum masuk untuk WorkingHourID {hour.WorkingHourID} tidak valid;silahkan lapor ke SDM"
+                                        });
+                                    }
+
+                                    var maxCheckIn =
+                                        now.Date.Add(maxCheckInTime);
+
+                                    tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckInDateTime <= now);
+                                    if (tapHistory.Query.Load())
+                                    {
+                                        if (now <= maxCheckIn)
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = $"Halo {emp.EmployeeName};anda sudah absen masuk pada {tapHistory.CheckInDateTime?.ToString("HH:mm")}",
+                                            });
+                                        }
+                                        else
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
+                                            });
+                                        }
+                                    }
+                                }
                                 else
                                 {
-                                    hour.EndTime2 = permission.PermissionTimeFrom;
-                                    hour.MaximumEndTime2 = permission.PermissionTimeFrom;
+                                    TimeSpan minimumStartTime;
+                                    TimeSpan maximumStartTime;
+                                    TimeSpan minimumStartTime2;
+                                    TimeSpan maximumStartTime2;
+
+                                    if (!TryParseTime(hour.MinimumStartTime, out minimumStartTime) ||
+                                        !TryParseTime(hour.MaximumStartTime, out maximumStartTime) ||
+                                        !TryParseTime(hour.MinimumStartTime2, out minimumStartTime2) ||
+                                        !TryParseTime(hour.MaximumStartTime2, out maximumStartTime2))
+                                    {
+                                        return JsonConvert.SerializeObject(new
+                                        {
+                                            status = false,
+                                            message = $"Data jam shift WorkingHourID {hour.WorkingHourID} tidak lengkap atau tidak valid;silahkan lapor ke SDM"
+                                        });
+                                    }
+
+                                    var minCheckIn =
+                                        now.Date.Add(minimumStartTime);
+
+                                    var maxCheckIn =
+                                        now.Date.Add(maximumStartTime);
+
+                                    var minCheckIn2 =
+                                        now.Date.Add(minimumStartTime2);
+
+                                    var maxCheckIn2 =
+                                        now.Date.Add(maximumStartTime2);
+
+                                    tapHistory.Query.Where(history.Query.CheckInDateTime.Date() == now.Date && history.Query.CheckOutDateTime <= now);
+                                    if (tapHistory.Query.Load())
+                                    {
+                                        tapHistory = new MonthlyAttendanceDetailHistory();
+                                        tapHistory.Query.es.Top = 1;
+                                        tapHistory.Query.Where(tapHistory.Query.PersonID == emp.PersonID && tapHistory.Query.WorkingHourID == hour.WorkingHourID);
+                                        tapHistory.Query.OrderBy(tapHistory.Query.CheckInDateTime.Descending);
+
+                                        if (now >= minCheckIn && now <= maxCheckIn)
+                                        {
+                                            tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckInDateTime.Between(minCheckIn, maxCheckIn));
+                                            if (tapHistory.Query.Load())
+                                            {
+                                                return JsonConvert.SerializeObject(new
+                                                {
+                                                    status = false,
+                                                    message = $"Halo {emp.EmployeeName};anda sudah absen masuk pada {tapHistory.CheckInDateTime?.ToString("HH:mm")}",
+                                                });
+                                            }
+                                        }
+                                        else if (now >= minCheckIn2 && now <= maxCheckIn2)
+                                        {
+                                            tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckInDateTime.Between(minCheckIn2, maxCheckIn2));
+                                            if (tapHistory.Query.Load())
+                                            {
+                                                return JsonConvert.SerializeObject(new
+                                                {
+                                                    status = false,
+                                                    message = $"Halo {emp.EmployeeName};anda sudah absen masuk pada {tapHistory.CheckInDateTime?.ToString("HH:mm")}",
+                                                });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                tapHistory.Query.OrderBy(tapHistory.Query.CheckOutDateTime.Descending);
+
+                                if (hour.SRShift != "ShiftID-013")
+                                {
+                                    TimeSpan maximumEndTime;
+
+                                    if (!TryParseTime(hour.MaximumEndTime, out maximumEndTime))
+                                    {
+                                        return JsonConvert.SerializeObject(new
+                                        {
+                                            status = false,
+                                            message = $"Jam maksimum pulang untuk WorkingHourID {hour.WorkingHourID} tidak valid;silahkan lapor ke SDM"
+                                        });
+                                    }
+
+                                    var maxCheckOut =
+                                        (hour.IsCrossDay ?? false)
+                                            ? now.AddDays(1).Date.Add(maximumEndTime)
+                                            : now.Date.Add(maximumEndTime);
+
+                                    tapHistory.Query.Where(tapHistory.Query.CheckOutDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime <= now);
+                                    if (tapHistory.Query.Load())
+                                    {
+                                        if (now <= maxCheckOut)
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = $"Halo {emp.EmployeeName};anda sudah absen pulang pada {tapHistory.CheckOutDateTime?.ToString("HH:mm")}",
+                                            });
+                                        }
+                                        else
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
+                                            });
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    TimeSpan minimumEndTime;
+                                    TimeSpan maximumEndTime;
+                                    TimeSpan minimumEndTime2;
+                                    TimeSpan maximumEndTime2;
+
+                                    if (!TryParseTime(hour.MinimumEndTime, out minimumEndTime) ||
+                                        !TryParseTime(hour.MaximumEndTime, out maximumEndTime) ||
+                                        !TryParseTime(hour.MinimumEndTime2, out minimumEndTime2) ||
+                                        !TryParseTime(hour.MaximumEndTime2, out maximumEndTime2))
+                                    {
+                                        return JsonConvert.SerializeObject(new
+                                        {
+                                            status = false,
+                                            message = $"Data jam pulang shift WorkingHourID {hour.WorkingHourID} tidak lengkap atau tidak valid;silahkan lapor ke SDM"
+                                        });
+                                    }
+
+                                    var minCheckOut =
+                                        now.Date.Add(minimumEndTime);
+
+                                    var maxCheckOut =
+                                        now.Date.Add(maximumEndTime);
+
+                                    var minCheckOut2 =
+                                        (hour.IsCrossDay ?? false)
+                                            ? now.AddDays(1).Date.Add(minimumEndTime2)
+                                            : now.Date.Add(minimumEndTime2);
+
+                                    var maxCheckOut2 =
+                                        (hour.IsCrossDay ?? false)
+                                            ? now.AddDays(1).Date.Add(maximumEndTime2)
+                                            : now.Date.Add(maximumEndTime2);
+
+                                    tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime <= now);
+                                    if (tapHistory.Query.Load())
+                                    {
+                                        tapHistory = new MonthlyAttendanceDetailHistory();
+                                        tapHistory.Query.es.Top = 1;
+                                        tapHistory.Query.Where(tapHistory.Query.PersonID == emp.PersonID && tapHistory.Query.WorkingHourID == hour.WorkingHourID);
+                                        tapHistory.Query.OrderBy(tapHistory.Query.CheckInDateTime.Descending);
+
+                                        if (now >= minCheckOut && now <= maxCheckOut)
+                                        {
+                                            tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime.Between(minCheckOut, maxCheckOut));
+                                            if (tapHistory.Query.Load())
+                                            {
+                                                return JsonConvert.SerializeObject(new
+                                                {
+                                                    status = false,
+                                                    message = $"Halo {emp.EmployeeName};anda sudah absen pulang pada {tapHistory.CheckOutDateTime?.ToString("HH:mm")}",
+                                                });
+                                            }
+                                        }
+                                        else if (now >= minCheckOut2 && now <= maxCheckOut2)
+                                        {
+                                            tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime.Between(minCheckOut, maxCheckOut));
+                                            if (tapHistory.Query.Load())
+                                            {
+                                                return JsonConvert.SerializeObject(new
+                                                {
+                                                    status = false,
+                                                    message = $"Halo {emp.EmployeeName};anda sudah absen pulang pada {tapHistory.CheckOutDateTime?.ToString("HH:mm")}",
+                                                });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            return JsonConvert.SerializeObject(new
+                                            {
+                                                status = false,
+                                                message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
 
-                    // cek apabila sdh tap in dan out
-                    //if (hour.SRShift != "ShiftID-013") // diluar pagi malam
+                    AddHeader(period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
+
+                    if (new string[] { "ShiftID-001", "ShiftID-002" }.Contains(hour.SRShift)) // single shift tgl in dan tgl out sama
                     {
-                        var tapHistory = new MonthlyAttendanceDetailHistory();
-                        tapHistory.Query.es.Top = 1;
-                        tapHistory.Query.Where(tapHistory.Query.PersonID == emp.PersonID && tapHistory.Query.WorkingHourID == hour.WorkingHourID);
-                        //if (hour.SRShift == "ShiftID-003")
-                        //    history.Query.Where(history.Query.CheckInDateTime.Date() == now.Date);
-                        //else
-                        //    history.Query.Where($"<'{now.Date.ToString("yyyyMMdd")}' BETWEEN CONVERT(VARCHAR(MAX), {history.Query.CheckInDateTime}, 112) AND CONVERT(VARCHAR(MAX), {history.Query.CheckOutDateTime}, 112)>");
-                        //if (history.Query.Load())
-                        //{
-                        //    return JsonConvert.SerializeObject(new
-                        //    {
-                        //        status = false,
-                        //        message = "Anda tidak dijadwalkan;silahkan lapor ke SDM"
-                        //    });
-                        //}
+                        var str = SingleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                        if (!string.IsNullOrWhiteSpace(str)) return str;
+                    }
+                    else if (new string[] { "ShiftID-003" }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false)) // single shift (malam) tgl in dan tgl out beda
+                    {
+                        var str = SingleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                        if (!string.IsNullOrWhiteSpace(str)) return str;
+                    }
+                    //else if (new string[] { "ShiftID-012" }.Contains(hour.SRShift)) // double shift tgl in dan tgl out sama (pagi dan sore)
+                    //{
+                    //    var str = DoubleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                    //    if (!string.IsNullOrWhiteSpace(str)) return str;
+                    //}
+                    else if (new string[] { "ShiftID-013" }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false)) // double shift tgl in dan tgl out beda (pagi dan malam)
+                    {
+                        TimeSpan minimumStartTime;
+                        TimeSpan maximumStartTime;
+                        TimeSpan minimumEndTime;
+                        TimeSpan maximumEndTime;
+
+                        TimeSpan minimumStartTime2;
+                        TimeSpan maximumStartTime2;
+                        TimeSpan minimumEndTime2;
+                        TimeSpan maximumEndTime2;
+
+                        if (!TryParseTime(hour.MinimumStartTime, out minimumStartTime) ||
+                            !TryParseTime(hour.MaximumStartTime, out maximumStartTime) ||
+                            !TryParseTime(hour.MinimumEndTime, out minimumEndTime) ||
+                            !TryParseTime(hour.MaximumEndTime, out maximumEndTime) ||
+                            !TryParseTime(hour.MinimumStartTime2, out minimumStartTime2) ||
+                            !TryParseTime(hour.MaximumStartTime2, out maximumStartTime2) ||
+                            !TryParseTime(hour.MinimumEndTime2, out minimumEndTime2) ||
+                            !TryParseTime(hour.MaximumEndTime2, out maximumEndTime2))
+                        {
+                            return JsonConvert.SerializeObject(new
+                            {
+                                status = false,
+                                message = $"Data jam ShiftID-013 untuk WorkingHourID {hour.WorkingHourID} tidak lengkap atau tidak valid;silahkan lapor ke SDM"
+                            });
+                        }
+
+                        var minCheckIn =
+    isCheckIn
+        ? now.Date.Add(minimumStartTime)
+        : now.Date == history.CheckInDateTime.Value.Date
+            ? now.Date.Add(minimumStartTime)
+            : now.AddDays(-1).Date.Add(minimumStartTime);
+
+                        var maxCheckIn =
+                            isCheckIn
+                                ? now.Date.Add(maximumStartTime)
+                                : now.Date == history.CheckInDateTime.Value.Date
+                                    ? now.Date.Add(maximumStartTime)
+                                    : now.AddDays(-1).Date.Add(maximumStartTime);
+
+                        var minCheckOut =
+                            isCheckIn
+                                ? now.Date.Add(minimumEndTime)
+                                : now.Date == history.CheckInDateTime.Value.Date
+                                    ? now.Date.Add(minimumEndTime)
+                                    : now.AddDays(-1).Date.Add(minimumEndTime);
+
+                        var maxCheckOut =
+                            isCheckIn
+                                ? now.Date.Add(maximumEndTime)
+                                : now.Date == history.CheckInDateTime.Value.Date
+                                    ? now.Date.Add(maximumEndTime)
+                                    : now.AddDays(-1).Date.Add(maximumEndTime);
+
+                        var minCheckIn2 =
+                            isCheckIn
+                                ? now.Date.Add(minimumStartTime2)
+                                : now.Date == history.CheckInDateTime.Value.Date
+                                    ? now.Date.Add(minimumStartTime2)
+                                    : now.AddDays(-1).Date.Add(minimumStartTime2);
+
+                        var maxCheckIn2 =
+                            isCheckIn
+                                ? now.Date.Add(maximumStartTime2)
+                                : now.Date == history.CheckInDateTime.Value.Date
+                                    ? now.Date.Add(maximumStartTime2)
+                                    : now.AddDays(-1).Date.Add(maximumStartTime2);
+
+                        var minCheckOut2 =
+                            isCheckIn
+                                ? now.Date.Add(minimumEndTime2)
+                                : now.Date == history.CheckInDateTime.Value.AddDays(1).Date
+                                    ? now.Date.Add(minimumEndTime2)
+                                    : now.AddDays(1).Date.Add(minimumEndTime2);
+
+                        var maxCheckOut2 =
+                            isCheckIn
+                                ? now.Date.Add(maximumEndTime2)
+                                : now.Date == history.CheckInDateTime.Value.AddDays(1).Date
+                                    ? now.Date.Add(maximumEndTime2)
+                                    : now.AddDays(1).Date.Add(maximumEndTime2);
 
                         if (isCheckIn)
                         {
-                            tapHistory.Query.OrderBy(tapHistory.Query.CheckInDateTime.Descending);
-
-                            if (hour.SRShift != "ShiftID-013")
+                            if ((now >= minCheckIn) && (now <= maxCheckIn))
                             {
-                                var maxCheckIn = now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime, "hh\\:mm", null));
-
-                                tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckInDateTime <= now);
-                                if (tapHistory.Query.Load())
-                                {
-                                    if (now <= maxCheckIn)
-                                    {
-                                        return JsonConvert.SerializeObject(new
-                                        {
-                                            status = false,
-                                            message = $"Halo {emp.EmployeeName};anda sudah absen masuk pada {tapHistory.CheckInDateTime?.ToString("HH:mm")}",
-                                        });
-                                    }
-                                    else
-                                    {
-                                        return JsonConvert.SerializeObject(new
-                                        {
-                                            status = false,
-                                            message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
-                                        });
-                                    }
-                                }
+                                var str = SingleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                                if (!string.IsNullOrWhiteSpace(str)) return str;
+                            }
+                            else if ((now >= minCheckIn2) && (now <= maxCheckIn2))
+                            {
+                                var str = DoubleSkipSingleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                                if (!string.IsNullOrWhiteSpace(str)) return str;
                             }
                             else
                             {
-                                var minCheckIn = now.Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime, "hh\\:mm", null));
-                                var maxCheckIn = now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime, "hh\\:mm", null));
-                                var minCheckIn2 = now.Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime2, "hh\\:mm", null));
-                                var maxCheckIn2 = now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime2, "hh\\:mm", null));
-
-                                tapHistory.Query.Where(history.Query.CheckInDateTime.Date() == now.Date && history.Query.CheckOutDateTime <= now);
-                                if (tapHistory.Query.Load())
+                                return JsonConvert.SerializeObject(new
                                 {
-                                    tapHistory = new MonthlyAttendanceDetailHistory();
-                                    tapHistory.Query.es.Top = 1;
-                                    tapHistory.Query.Where(tapHistory.Query.PersonID == emp.PersonID && tapHistory.Query.WorkingHourID == hour.WorkingHourID);
-                                    tapHistory.Query.OrderBy(tapHistory.Query.CheckInDateTime.Descending);
-
-                                    if (now >= minCheckIn && now <= maxCheckIn)
-                                    {
-                                        tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckInDateTime.Between(minCheckIn, maxCheckIn));
-                                        if (tapHistory.Query.Load())
-                                        {
-                                            return JsonConvert.SerializeObject(new
-                                            {
-                                                status = false,
-                                                message = $"Halo {emp.EmployeeName};anda sudah absen masuk pada {tapHistory.CheckInDateTime?.ToString("HH:mm")}",
-                                            });
-                                        }
-                                    }
-                                    else if (now >= minCheckIn2 && now <= maxCheckIn2)
-                                    {
-                                        tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckInDateTime.Between(minCheckIn2, maxCheckIn2));
-                                        if (tapHistory.Query.Load())
-                                        {
-                                            return JsonConvert.SerializeObject(new
-                                            {
-                                                status = false,
-                                                message = $"Halo {emp.EmployeeName};anda sudah absen masuk pada {tapHistory.CheckInDateTime?.ToString("HH:mm")}",
-                                            });
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return JsonConvert.SerializeObject(new
-                                        {
-                                            status = false,
-                                            message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
-                                        });
-                                    }
-                                }
+                                    status = false,
+                                    message = "Anda tidak bisa absen karena belum waktunya"
+                                });
                             }
                         }
                         else
                         {
-                            tapHistory.Query.OrderBy(tapHistory.Query.CheckOutDateTime.Descending);
-
-                            if (hour.SRShift != "ShiftID-013")
+                            if ((now >= minCheckOut) && (now <= maxCheckOut))
                             {
-                                var maxCheckOut = (hour.IsCrossDay ?? false) ? now.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null)) : now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null));
-
-                                tapHistory.Query.Where(tapHistory.Query.CheckOutDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime <= now);
-                                if (tapHistory.Query.Load())
-                                {
-                                    if (now <= maxCheckOut)
-                                    {
-                                        return JsonConvert.SerializeObject(new
-                                        {
-                                            status = false,
-                                            message = $"Halo {emp.EmployeeName};anda sudah absen pulang pada {tapHistory.CheckOutDateTime?.ToString("HH:mm")}",
-                                        });
-                                    }
-                                    else
-                                    {
-                                        return JsonConvert.SerializeObject(new
-                                        {
-                                            status = false,
-                                            message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
-                                        });
-                                    }
-                                }
+                                var str = SingleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                                if (!string.IsNullOrWhiteSpace(str)) return str;
+                            }
+                            else if ((now >= minCheckOut2) && (now <= maxCheckOut2))
+                            {
+                                var str = DoubleSkipSingleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                                if (!string.IsNullOrWhiteSpace(str)) return str;
                             }
                             else
                             {
-                                var minCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime, "hh\\:mm", null));
-                                var maxCheckOut = now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null));
-                                var minCheckOut2 = (hour.IsCrossDay ?? false) ? now.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime2, "hh\\:mm", null)) : now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime2, "hh\\:mm", null));
-                                var maxCheckOut2 = (hour.IsCrossDay ?? false) ? now.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime2, "hh\\:mm", null)) : now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime2, "hh\\:mm", null));
-
-                                tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime <= now);
-                                if (tapHistory.Query.Load())
+                                return JsonConvert.SerializeObject(new
                                 {
-                                    tapHistory = new MonthlyAttendanceDetailHistory();
-                                    tapHistory.Query.es.Top = 1;
-                                    tapHistory.Query.Where(tapHistory.Query.PersonID == emp.PersonID && tapHistory.Query.WorkingHourID == hour.WorkingHourID);
-                                    tapHistory.Query.OrderBy(tapHistory.Query.CheckInDateTime.Descending);
-
-                                    if (now >= minCheckOut && now <= maxCheckOut)
-                                    {
-                                        tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime.Between(minCheckOut, maxCheckOut));
-                                        if (tapHistory.Query.Load())
-                                        {
-                                            return JsonConvert.SerializeObject(new
-                                            {
-                                                status = false,
-                                                message = $"Halo {emp.EmployeeName};anda sudah absen pulang pada {tapHistory.CheckOutDateTime?.ToString("HH:mm")}",
-                                            });
-                                        }
-                                    }
-                                    else if (now >= minCheckOut2 && now <= maxCheckOut2)
-                                    {
-                                        tapHistory.Query.Where(tapHistory.Query.CheckInDateTime.Date() == now.Date && tapHistory.Query.CheckOutDateTime.Between(minCheckOut, maxCheckOut));
-                                        if (tapHistory.Query.Load())
-                                        {
-                                            return JsonConvert.SerializeObject(new
-                                            {
-                                                status = false,
-                                                message = $"Halo {emp.EmployeeName};anda sudah absen pulang pada {tapHistory.CheckOutDateTime?.ToString("HH:mm")}",
-                                            });
-                                        }
-                                    }
-                                    else
-                                    {
-                                        return JsonConvert.SerializeObject(new
-                                        {
-                                            status = false,
-                                            message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya",
-                                        });
-                                    }
-                                }
+                                    status = false,
+                                    message = "Anda tidak bisa absen karena belum waktunya"
+                                });
                             }
                         }
                     }
-                }
-
-                AddHeader(period.PayrollPeriodID ?? -1, emp.PersonID ?? -1);
-
-                if (new string[] { "ShiftID-001", "ShiftID-002" }.Contains(hour.SRShift)) // single shift tgl in dan tgl out sama
-                {
-                    var str = SingleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                    if (!string.IsNullOrWhiteSpace(str)) return str;
-                }
-                else if (new string[] { "ShiftID-003" }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false)) // single shift (malam) tgl in dan tgl out beda
-                {
-                    var str = SingleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                    if (!string.IsNullOrWhiteSpace(str)) return str;
-                }
-                //else if (new string[] { "ShiftID-012" }.Contains(hour.SRShift)) // double shift tgl in dan tgl out sama (pagi dan sore)
-                //{
-                //    var str = DoubleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                //    if (!string.IsNullOrWhiteSpace(str)) return str;
-                //}
-                else if (new string[] { "ShiftID-013" }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false)) // double shift tgl in dan tgl out beda (pagi dan malam)
-                {
-                    var minCheckIn = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.Date ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime, "hh\\:mm", null)) : now.AddDays(-1).Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime, "hh\\:mm", null));
-                    var maxCheckIn = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.Date ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime, "hh\\:mm", null)) : now.AddDays(-1).Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime, "hh\\:mm", null));
-
-                    var minCheckOut = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.Date ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime, "hh\\:mm", null)) : now.AddDays(-1).Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime, "hh\\:mm", null));
-                    var maxCheckOut = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.Date ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null)) : now.AddDays(-1).Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime, "hh\\:mm", null));
-
-                    var minCheckIn2 = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime2, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.Date ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime2, "hh\\:mm", null)) : now.AddDays(-1).Date.Add(TimeSpan.ParseExact(hour.MinimumStartTime2, "hh\\:mm", null));
-                    var maxCheckIn2 = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime2, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.Date ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime2, "hh\\:mm", null)) : now.AddDays(-1).Date.Add(TimeSpan.ParseExact(hour.MaximumStartTime2, "hh\\:mm", null));
-
-                    var minCheckOut2 = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime2, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.AddDays(1).Date ? now.Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime2, "hh\\:mm", null)) : now.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.MinimumEndTime2, "hh\\:mm", null));
-                    var maxCheckOut2 = isCheckIn ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime2, "hh\\:mm", null)) :
-                        now.Date == history.CheckInDateTime.Value.AddDays(1).Date ? now.Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime2, "hh\\:mm", null)) : now.AddDays(1).Date.Add(TimeSpan.ParseExact(hour.MaximumEndTime2, "hh\\:mm", null));
+                    //else if (new string[] { "ShiftID-023" }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false)) // double shift tgl in dan tgl out beda (sore dan malam)
+                    //{
+                    //    var str = DoubleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
+                    //    if (!string.IsNullOrWhiteSpace(str)) return str;
+                    //}
 
                     if (isCheckIn)
                     {
-                        if ((now >= minCheckIn) && (now <= maxCheckIn))
+                        if (new string[] { "ShiftID-001", "ShiftID-002", "ShiftID-003" }.Contains(hour.SRShift))
                         {
-                            var str = SingleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                            if (!string.IsNullOrWhiteSpace(str)) return str;
+                            return JsonConvert.SerializeObject(new
+                            {
+                                status = true,
+                                message = $"Selamat bekerja {emp.EmployeeName};anda sudah absen masuk pada {now.ToString("HH:mm")}",
+                                detail = $"Jadwal anda : {hour.StartTime} s/d {hour.EndTime}"
+                            });
                         }
-                        else if ((now >= minCheckIn2) && (now <= maxCheckIn2))
+                        //else if (new string[] { "ShiftID-012", "ShiftID-023" }.Contains(hour.SRShift))
+                        //{
+                        //    return JsonConvert.SerializeObject(new
+                        //    {
+                        //        status = true,
+                        //        message = $"Selamat Bekerja {emp.EmployeeName}, anda sudah absen masuk pada {now.ToString("HH:mm")}",
+                        //        detail = $"{hour.StartTime} s/d {hour.EndTime2}"
+                        //    });
+                        //}
+                        else if (new string[] { "ShiftID-013", }.Contains(hour.SRShift))
                         {
-                            var str = DoubleSkipSingleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                            if (!string.IsNullOrWhiteSpace(str)) return str;
+                            return JsonConvert.SerializeObject(new
+                            {
+                                status = true,
+                                message = $"Selamat bekerja {emp.EmployeeName};anda sudah absen masuk pada {now.ToString("HH:mm")}",
+                                detail = $"Jadwal anda : {hour.StartTime} s/d {hour.EndTime} dan {hour.StartTime2} s/d {hour.EndTime2}"
+                            });
                         }
                         else
                         {
                             return JsonConvert.SerializeObject(new
                             {
                                 status = false,
-                                message = "Anda tidak bisa absen karena belum waktunya"
+                                message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya"
                             });
                         }
                     }
                     else
                     {
-                        if ((now >= minCheckOut) && (now <= maxCheckOut))
-                        {
-                            var str = SingleSameday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                            if (!string.IsNullOrWhiteSpace(str)) return str;
-                        }
-                        else if ((now >= minCheckOut2) && (now <= maxCheckOut2))
-                        {
-                            var str = DoubleSkipSingleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                            if (!string.IsNullOrWhiteSpace(str)) return str;
-                        }
-                        else
-                        {
-                            return JsonConvert.SerializeObject(new
-                            {
-                                status = false,
-                                message = "Anda tidak bisa absen karena belum waktunya"
-                            });
-                        }
-                    }
-                }
-                //else if (new string[] { "ShiftID-023" }.Contains(hour.SRShift) && (hour.IsCrossDay ?? false)) // double shift tgl in dan tgl out beda (sore dan malam)
-                //{
-                //    var str = DoubleCrossday(now, period.PayrollPeriodID ?? -1, emp.PersonID ?? -1, hour, isCheckIn);
-                //    if (!string.IsNullOrWhiteSpace(str)) return str;
-                //}
-
-                if (isCheckIn)
-                {
-                    if (new string[] { "ShiftID-001", "ShiftID-002", "ShiftID-003" }.Contains(hour.SRShift))
-                    {
                         return JsonConvert.SerializeObject(new
                         {
                             status = true,
-                            message = $"Selamat bekerja {emp.EmployeeName};anda sudah absen masuk pada {now.ToString("HH:mm")}",
-                            detail = $"Jadwal anda : {hour.StartTime} s/d {hour.EndTime}"
+                            message = $"Hati-hati dijalan {emp.EmployeeName};anda sudah absen pulang pada {now.ToString("HH:mm")}"
                         });
                     }
-                    //else if (new string[] { "ShiftID-012", "ShiftID-023" }.Contains(hour.SRShift))
-                    //{
-                    //    return JsonConvert.SerializeObject(new
-                    //    {
-                    //        status = true,
-                    //        message = $"Selamat Bekerja {emp.EmployeeName}, anda sudah absen masuk pada {now.ToString("HH:mm")}",
-                    //        detail = $"{hour.StartTime} s/d {hour.EndTime2}"
-                    //    });
-                    //}
-                    else if (new string[] { "ShiftID-013", }.Contains(hour.SRShift))
-                    {
-                        return JsonConvert.SerializeObject(new
-                        {
-                            status = true,
-                            message = $"Selamat bekerja {emp.EmployeeName};anda sudah absen masuk pada {now.ToString("HH:mm")}",
-                            detail = $"Jadwal anda : {hour.StartTime} s/d {hour.EndTime} dan {hour.StartTime2} s/d {hour.EndTime2}"
-                        });
-                    }
-                    else
-                    {
-                        return JsonConvert.SerializeObject(new
-                        {
-                            status = false,
-                            message = $"Halo {emp.EmployeeName};anda tidak bisa absen karena belum waktunya"
-                        });
-                    }
-                }
-                else
-                {
-                    return JsonConvert.SerializeObject(new
-                    {
-                        status = true,
-                        message = $"Hati-hati dijalan {emp.EmployeeName};anda sudah absen pulang pada {now.ToString("HH:mm")}"
-                    });
                 }
             }
             catch (Exception ex)
