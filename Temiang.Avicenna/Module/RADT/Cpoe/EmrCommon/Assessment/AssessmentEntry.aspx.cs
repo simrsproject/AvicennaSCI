@@ -1970,6 +1970,15 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 return;
 
             var cmd = @"
+UPDATE dbo.MedicalDischargeSummarySource
+SET
+    IsDeleted = 1,
+    LastUpdateDateTime = GETDATE(),
+    LastUpdateByUserID = @UserID
+WHERE MDSRegistrationInfoMedicID = @MDSRegistrationInfoMedicID
+    AND SourceRegistrationInfoMedicID <> @SourceRegistrationInfoMedicID
+    AND IsDeleted = 0;
+
 MERGE dbo.MedicalDischargeSummarySource AS target
 USING
 (
@@ -2017,8 +2026,8 @@ WHEN NOT MATCHED THEN
             pars.Add("SourceRegistrationInfoMedicID", sourceRegistrationInfoMedicID);
             pars.Add("UserID", AppSession.UserLogin.UserID);
 
-            var entity = new RegistrationInfoMedic();
-            entity.ExecuteNonQuery(esQueryType.Text, cmd, pars);
+            var utility = new Temiang.Dal.Core.esUtility();
+            utility.ExecuteNonQuery(esQueryType.Text, cmd, pars);
         }
 
         private bool IsMdsSourceRelationTableExists()

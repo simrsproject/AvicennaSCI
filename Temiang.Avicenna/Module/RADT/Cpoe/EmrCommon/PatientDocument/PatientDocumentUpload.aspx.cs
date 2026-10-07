@@ -123,6 +123,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         {
             if (!CanEditPatientDocumentByMedicalRecord())
             {
+                args.IsCancel = true;
                 args.MessageText = "Edit attachment hanya dapat dilakukan oleh Rekam Medis level Manajer/Pengatur.";
                 return;
             }
@@ -156,6 +157,20 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         public override bool OnGetStatusMenuEdit()
         {
             return CanEditPatientDocumentByMedicalRecord();
+        }
+
+        protected override bool HasEditAccess
+        {
+            get { return CanEditPatientDocumentByMedicalRecord(); }
+        }
+
+        protected override void OnBeforeMenuEditClick(ValidateArgs args)
+        {
+            if (!CanEditPatientDocumentByMedicalRecord())
+            {
+                args.IsCancel = true;
+                args.MessageText = "Edit attachment hanya dapat dilakukan oleh Rekam Medis level Manajer/Pengatur.";
+            }
         }
 
         private void SetEntityValue(PatientDocument entity)

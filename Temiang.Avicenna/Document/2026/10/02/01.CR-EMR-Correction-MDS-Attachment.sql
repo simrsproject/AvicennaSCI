@@ -67,3 +67,41 @@ BEGIN
         WHERE IsDeleted = 0;
 END
 GO
+
+/* Pastikan hanya SOAP terakhir yang menjadi sumber aktif untuk setiap MDS */
+;WITH ActiveSource AS
+(
+    SELECT
+        MedicalDischargeSummarySourceID,
+        ROW_NUMBER() OVER
+        (
+            PARTITION BY MDSRegistrationInfoMedicID
+            ORDER BY MedicalDischargeSummarySourceID DESC
+        ) AS RowNo
+    FROM dbo.MedicalDischargeSummarySource
+    WHERE IsDeleted = 0
+)
+UPDATE src
+SET
+    src.IsDeleted = 1,
+    src.LastUpdateDateTime = GETDATE(),
+    src.LastUpdateByUserID = 'system'
+FROM dbo.MedicalDischargeSummarySource src
+INNER JOIN ActiveSource activeSource
+    ON activeSource.MedicalDischargeSummarySourceID = src.MedicalDischargeSummarySourceID
+WHERE activeSource.RowNo > 1;
+GO
+
+IF NOT EXISTS
+(
+    SELECT 1
+    FROM sys.indexes
+    WHERE object_id = OBJECT_ID('dbo.MedicalDischargeSummarySource')
+        AND name = 'UX_MedicalDischargeSummarySource_ActiveMDS'
+)
+BEGIN
+    CREATE UNIQUE INDEX UX_MedicalDischargeSummarySource_ActiveMDS
+        ON dbo.MedicalDischargeSummarySource (MDSRegistrationInfoMedicID)
+        WHERE IsDeleted = 0;
+END
+GO

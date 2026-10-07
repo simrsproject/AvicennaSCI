@@ -29,6 +29,7 @@ CR ini tidak seluruhnya bisa selesai hanya dengan modifikasi UI. Ada bagian yang
 
 2. Batasi save edit Attachment.
    - Walaupun user membuka URL edit langsung, save edit ditolak jika bukan `RM.01` / `RM.02`.
+   - Popup Attachment memakai hak edit group `RM.01` / `RM.02`, termasuk saat masuk melalui `mod=edit` dan mengaktifkan tombol Edit. Tidak mensyaratkan izin Edit umum menu EMR; aturan halaman lain tetap mengikuti izin menu existing.
 
 3. Edit Attachment bisa mengganti nama dokumen, notes, tanggal dokumen, dan isi file.
    - File lama tidak disimpan sebagai versi baru.
@@ -77,6 +78,7 @@ Dengan relasi ini, rule nomor 3 bisa akurat:
 1. Kalau SOAP sumber MDS dibatalkan, MDS ikut dibatalkan.
 2. Kalau ada beberapa SOAP, hanya MDS yang terkait SOAP tersebut yang ikut batal.
 3. Tidak perlu menebak dari `RegistrationNo` saja.
+4. Jika SOAP berikutnya memperbarui MDS yang sama, relasi sumber lama dinonaktifkan dan SOAP terakhir menjadi satu-satunya sumber aktif MDS.
 
 ### MDS IGD
 

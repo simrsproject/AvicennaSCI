@@ -1333,8 +1333,8 @@ WHERE src.SourceRegistrationInfoMedicID = @SourceRegistrationInfoMedicID
             pars.Add("IsDeleted", isDeleted);
             pars.Add("UserID", AppSession.UserLogin.UserID);
 
-            var entity = new RegistrationInfoMedic();
-            entity.ExecuteNonQuery(esQueryType.Text, cmd, pars);
+            var utility = new Temiang.Dal.Core.esUtility();
+            utility.ExecuteNonQuery(esQueryType.Text, cmd, pars);
         }
 
         private bool IsMdsSourceRelationTableExists()

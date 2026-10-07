@@ -224,6 +224,11 @@ namespace Temiang.Avicenna.Common
             return true;
         }
 
+        protected virtual bool HasEditAccess
+        {
+            get { return UserAccess.IsProgramEditAble && UserAccess.IsEditAble; }
+        }
+
         bool _statusMenuEdit;
         bool _onGetStatusMenuEditExecuted;
         private bool StatusMenuEdit
@@ -655,7 +660,7 @@ namespace Temiang.Avicenna.Common
                 if (UserAccess.IsExist)
                 {
                     ToolBarMenuData.Items[0].Enabled = UserAccess.IsProgramAddAble && UserAccess.IsAddAble; // New
-                    ToolBarMenuData.Items[1].Enabled = UserAccess.IsProgramEditAble && UserAccess.IsEditAble; // Edit
+                    ToolBarMenuData.Items[1].Enabled = HasEditAccess; // Edit
                     ToolBarMenuData.Items[3].Enabled = UserAccess.IsProgramDeleteAble && UserAccess.IsDeleteAble; //Delete
                 }
             }
@@ -1122,8 +1127,7 @@ namespace Temiang.Avicenna.Common
                 //                                       StatusMenuEdit && UserAccess.IsProgramEditAble &&
                 //                                       UserAccess.IsEditAble; // Edit
                 //else
-                ToolBarMenuEdit.Enabled = isModusRead && ToolBar.EditEnabled && StatusMenuEdit &&
-                                                   UserAccess.IsProgramEditAble && UserAccess.IsEditAble; // Edit
+                ToolBarMenuEdit.Enabled = isModusRead && ToolBar.EditEnabled && StatusMenuEdit && HasEditAccess; // Edit
             }
 
             // Delete
@@ -1316,7 +1320,7 @@ namespace Temiang.Avicenna.Common
 
         protected void ForceToEditMode(ValidateArgs args)
         {
-            if (UserAccess.IsProgramEditAble && UserAccess.IsEditAble &&
+            if (HasEditAccess &&
                 ViewState["qStringProcessed"] == null)
             {
                 ViewState["qStringProcessed"] = "yes";
