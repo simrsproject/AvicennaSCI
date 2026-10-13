@@ -50,7 +50,28 @@ CR ini tidak seluruhnya bisa selesai hanya dengan modifikasi UI. Ada bagian yang
    - Jika tabel belum ada, code tidak error dan flow lama tetap berjalan.
    - Saat SOAP/Assessment sumber dibatalkan dari grid EMR, MDS yang terkait ikut diset batal lewat relasi tersebut.
 
+5. Tanggal MDS rawat jalan menggunakan tanggal pembuatan MDS.
+   - `RegistrationInfoMedic.DateTimeInfo` diisi ketika record MDS pertama kali dibuat.
+   - Penyimpanan ulang SOAP yang memperbarui MDS existing tidak mengubah tanggal pembuatan MDS.
+   - Field tanggal pulang pada `MedicalDischargeSummary` tidak diubah karena memiliki fungsi klinis dan pelaporan yang berbeda.
+
 ## Catatan database
+
+### Waktu perubahan isi pada cetakan MDS (poin 5)
+
+- Jalankan `02.CR-MDS-Content-Revision.sql` pada database aplikasi yang juga dibaca Web Service report.
+- Trigger membandingkan isi lama/baru MDS dokter dan Casemix; INSERT pertama serta update metadata saja tidak menghasilkan keterangan revisi.
+- Tanggal pulang dan waktu autosave tidak dijadikan waktu revisi. Waktu revisi menggunakan waktu SQL Server ketika isi berubah.
+- Deploy Web Service `RSMM/Emr/PatientFormAndLetter.asmx` dan template RSI `ResumeMedisInPatient.trdx` / `ResumeMedisOutPatient.trdx` ke lokasi yang ditunjuk `ReportUrlLocation`.
+- Footer kedua template membaca `MdsContentRevisionText`; tidak menggunakan waktu cetak atau `RegistrationInfoMedic.LastUpdateDateTime`.
+- Catatan revisi mulai tersedia setelah script terpasang; tidak merekonstruksi revisi historis. Perubahan tabel terpisah seperti diagnosis/prosedur yang tidak memperbarui field MDS perlu diuji terpisah.
+
+Pengujian:
+1. Buat MDS baru dan cetak: tidak ada teks perubahan.
+2. Ubah Physical Examination / Keluhan Utama melalui SOAP sumber atau form MDS; simpan lalu cetak: teks perubahan berisi waktu save, tanggal awal MDS tetap.
+3. Cetak ulang beberapa menit kemudian: waktu perubahan tetap.
+4. Save tanpa perubahan isi: waktu perubahan tetap.
+5. Ulangi pada rawat inap dan Outpatient, termasuk Casemix bila digunakan.
 
 ### Attachment
 

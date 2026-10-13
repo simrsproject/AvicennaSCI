@@ -528,6 +528,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     DpjpName = par.ParamedicName,
                     DpjpSign = Convert.ToBase64String(imgDpjp),
                     LastUpdateDateTime = lastUpdateDateTime,
+                    MdsContentRevisionText = MdsContentRevisionText(registrationNo, p_IsForCasemix),
                     RegistrationInfoMedicCreatedBy = createdRegMedUserName,
                     RegistrationInfoMedicCreatedDate = regMed.CreatedDateTime,
                     RegistrationInfoMedicLastUpdatedBy = lastUpdateRegMedUserName,
@@ -1040,6 +1041,7 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     DpjpSign = Convert.ToBase64String(imgDpjp),
                     DpjpSignByte = imgDpjp,
                     SignatureImageByte = signimg.SignatureImage,
+                    MdsContentRevisionText = MdsContentRevisionText(registrationNo, p_IsForCasemix),
                     RegistrationInfoMedicCreatedBy = createdRegMedUserName,
                     RegistrationInfoMedicCreatedDate = regMed.CreatedDateTime,
                     RegistrationInfoMedicLastUpdatedBy = lastUpdateRegMedUserName,
@@ -1127,6 +1129,25 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
             {
                 Context.Response.Write(ex.Message + " " + ex.StackTrace);
             }
+        }
+
+        private static string MdsContentRevisionText(string registrationNo, string isForCasemix)
+        {
+            var parameters = new Temiang.Dal.Interfaces.esParameters();
+            parameters.Add("RegistrationNo", registrationNo);
+            parameters.Add("IsForCasemix", isForCasemix == "1");
+            var utility = new Temiang.Dal.Core.esUtility();
+            var revisedAt = utility.ExecuteScalar(Temiang.Dal.DynamicQuery.esQueryType.Text, @"
+IF OBJECT_ID('dbo.MedicalDischargeSummaryRevision', 'U') IS NOT NULL
+    SELECT LastContentChangeDateTime
+    FROM dbo.MedicalDischargeSummaryRevision
+    WHERE RegistrationNo = @RegistrationNo AND IsForCasemix = @IsForCasemix;
+ELSE
+    SELECT CAST(NULL AS datetime);", parameters);
+
+            return revisedAt == null || revisedAt == DBNull.Value
+                ? string.Empty
+                : string.Format("Tanggal/jam perubahan isi MDS: {0:dd/MM/yyyy HH:mm}", Convert.ToDateTime(revisedAt));
         }
 
         private static string RichTextValidation(string richText, bool? isRichTextMode)

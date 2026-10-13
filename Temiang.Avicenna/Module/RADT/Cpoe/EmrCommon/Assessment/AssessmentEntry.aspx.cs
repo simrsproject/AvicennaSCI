@@ -1950,6 +1950,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 ent.SRMedicalNotesInputType = "MDS";
                 ent.ServiceUnitID = serviceUnitID;
                 ent.ParamedicID = ParamedicID;
+
+                var createdDate = (new DateTime()).NowAtSqlServer();
+                ent.DateTimeInfo = new DateTime(createdDate.Year, createdDate.Month, createdDate.Day, createdDate.Hour, createdDate.Minute, 0);
             }
 
             ent.Info1 = string.Format("Medical Discharge Summary");
@@ -1957,8 +1960,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             ent.Info3 = string.Empty;
             ent.Info4 = string.Empty;
             ent.IsPRMRJ = true;
-            var date = DateTime.Now;
-            ent.DateTimeInfo = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, 0);
             ent.ReferenceNo = refNo;
             ent.ReferenceType = "MDS";
             ent.Save();
