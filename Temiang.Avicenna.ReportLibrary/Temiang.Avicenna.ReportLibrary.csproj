@@ -751,6 +751,12 @@
     <Compile Include="RADT\Registration\PatientIdentity.Designer.cs">
       <DependentUpon>PatientIdentity.cs</DependentUpon>
     </Compile>
+    <Compile Include="RLib_Rpt\Inventory\KSA\PharmaceuticalActivitiesKsa.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RLib_Rpt\Inventory\KSA\PharmaceuticalActivitiesKsa.designer.cs">
+      <DependentUpon>PharmaceuticalActivitiesKsa.cs</DependentUpon>
+    </Compile>
     <Compile Include="RLib_Slip\Assessment\RSYS\IntegratedNotesIpr.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -9721,6 +9727,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RADT\Registration\PatientIdentity.resx">
       <DependentUpon>PatientIdentity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RLib_Rpt\Inventory\KSA\PharmaceuticalActivitiesKsa.resx">
+      <DependentUpon>PharmaceuticalActivitiesKsa.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="RLib_Slip\Assessment\RSYS\IntegratedNotesIpr.resx">
       <DependentUpon>IntegratedNotesIpr.cs</DependentUpon>
