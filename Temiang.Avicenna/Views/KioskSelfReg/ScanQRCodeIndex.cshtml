@@ -1,0 +1,647 @@
+﻿
+<div id="scanQRCodePage">
+    <style>
+        #scanQRCodePage {
+            padding: 30px;
+        }
+
+            #scanQRCodePage .scan-card {
+                width: 100%;
+                min-height: 420px;
+                border: none;
+                border-radius: 14px;
+                box-shadow: 0 5px 24px rgba(0, 0, 0, 0.10);
+                overflow: hidden;
+            }
+
+            #scanQRCodePage .scan-header {
+                padding: 24px 30px;
+                background: #182772;
+                color: #fff;
+            }
+
+                #scanQRCodePage .scan-header h3 {
+                    margin: 0;
+                    font-size: 30px;
+                    font-weight: 600;
+                }
+
+            #scanQRCodePage .scan-body {
+                padding: 45px 40px;
+            }
+
+            #scanQRCodePage .scan-icon {
+                font-size: 76px;
+                color: #182772;
+                margin-bottom: 20px;
+            }
+
+            #scanQRCodePage .scan-title {
+                font-size: 32px;
+                font-weight: 600;
+                margin-bottom: 12px;
+                color: #26345c;
+            }
+
+            #scanQRCodePage .scan-description {
+                font-size: 20px;
+                color: #6c757d;
+                margin-bottom: 35px;
+            }
+
+            #scanQRCodePage .scan-label {
+                display: block;
+                font-size: 22px;
+                font-weight: 600;
+                margin-bottom: 14px;
+                color: #343a40;
+            }
+
+            #scanQRCodePage #txtQRCode {
+                height: 85px;
+                padding: 15px 24px;
+                font-size: 30px;
+                font-weight: 600;
+                border: 2px solid #182772;
+                border-radius: 10px;
+                text-align: center;
+                letter-spacing: 1px;
+            }
+
+                #scanQRCodePage #txtQRCode:focus {
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+                }
+
+            #scanQRCodePage .scan-status {
+                margin-top: 25px;
+                padding: 18px;
+                border-radius: 10px;
+                background: #f1f5ff;
+                color: #182772;
+                font-size: 18px;
+            }
+
+                #scanQRCodePage .scan-status i {
+                    margin-right: 8px;
+                }
+
+                #scanQRCodePage .scan-status.processing {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                #scanQRCodePage .scan-status.success {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                #scanQRCodePage .scan-status.error {
+                    background: #f8d7da;
+                    color: #721c24;
+                }
+
+        @@media (max-width: 768px) {
+            #scanQRCodePage {
+                padding: 12px;
+            }
+
+                #scanQRCodePage .scan-body {
+                    padding: 25px 15px;
+                }
+
+                #scanQRCodePage .scan-header h3 {
+                    font-size: 24px;
+                }
+
+                #scanQRCodePage .scan-title {
+                    font-size: 25px;
+                }
+
+                #scanQRCodePage #txtQRCode {
+                    height: 65px;
+                    font-size: 22px;
+                }
+
+                #scanQRCodePage .scan-label {
+                    font-size: 18px;
+                }
+        }
+
+
+        #scanQRCodePage .scan-screen-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+            max-width: 950px;
+            margin: 0 auto 35px;
+            padding: 22px 26px;
+            text-align: left;
+            background: #fff3cd;
+            border: 2px solid #ffda6a;
+            border-left: 8px solid #f0ad00;
+            border-radius: 12px;
+            color: #664d03;
+        }
+
+            #scanQRCodePage .scan-screen-warning > i {
+                font-size: 38px;
+                color: #e0a000;
+                margin-top: 3px;
+            }
+
+            #scanQRCodePage .scan-screen-warning strong {
+                display: block;
+                font-size: 22px;
+                margin-bottom: 8px;
+            }
+
+            #scanQRCodePage .scan-screen-warning p {
+                margin: 0;
+                font-size: 18px;
+                line-height: 1.6;
+            }
+
+        @@media (max-width: 768px) {
+            #scanQRCodePage .scan-screen-warning {
+                gap: 12px;
+                padding: 16px;
+            }
+
+                #scanQRCodePage .scan-screen-warning > i {
+                    font-size: 28px;
+                }
+
+                #scanQRCodePage .scan-screen-warning strong {
+                    font-size: 18px;
+                }
+
+                #scanQRCodePage .scan-screen-warning p {
+                    font-size: 16px;
+                }
+        }
+
+
+        .scan-processing-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(12, 20, 48, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+            .scan-processing-overlay.active {
+                display: flex;
+            }
+
+        .scan-dialog {
+            width: 100%;
+            max-width: 540px;
+            padding: 38px 34px;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            animation: scanDialogIn .25s ease-out;
+        }
+
+        .scan-loading-spinner {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 22px;
+            border: 6px solid #e7eaf5;
+            border-top-color: #182772;
+            border-radius: 50%;
+            animation: scanSpin .8s linear infinite;
+        }
+
+        .scan-progress-track {
+            width: 100%;
+            height: 12px;
+            margin: 24px 0 16px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #e9edf5;
+        }
+
+        .scan-progress-bar {
+            width: 35%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #182772, #4285f4);
+            animation: scanProgress 1.2s ease-in-out infinite;
+        }
+
+        .scan-dialog-title {
+            margin: 0 0 12px;
+            color: #26345c;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .scan-dialog-message {
+            margin: 0;
+            color: #65708a;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .scan-result-icon {
+            display: flex;
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 20px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #eef2ff;
+            color: #182772;
+            font-size: 38px;
+        }
+
+            .scan-result-icon.success {
+                background: #d8f5e2;
+                color: #16803c;
+            }
+
+            .scan-result-icon.error {
+                background: #fde2e2;
+                color: #c62828;
+            }
+
+            .scan-result-icon.warning {
+                background: #fff0cc;
+                color: #a66b00;
+            }
+
+        .scan-result-button {
+            min-width: 150px;
+            margin-top: 28px;
+            padding: 12px 28px;
+            border: 0;
+            border-radius: 10px;
+            background: #182772;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+            .scan-result-button:hover {
+                background: #101d5e;
+            }
+
+        @@keyframes scanSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes scanProgress {
+            0% {
+                transform: translateX(-120%);
+            }
+
+            100% {
+                transform: translateX(320%);
+            }
+        }
+
+        @@keyframes scanDialogIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .scan-dialog {
+                padding: 28px 20px;
+            }
+
+            .scan-dialog-title {
+                font-size: 23px;
+            }
+
+            .scan-dialog-message {
+                font-size: 16px;
+            }
+        }
+    </style>
+
+    <div class="card scan-card">
+        <div class="scan-header">
+            <h3>
+                <i class="fas fa-qrcode"></i>
+                <span lang="id">Scan QR Code Check-in</span>
+                <span lang="en">QR Code Check-in</span>
+            </h3>
+        </div>
+
+        <div class="scan-body">
+            <div class="text-center">
+                <div class="scan-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+
+                <div class="scan-title">
+                    <span lang="id">Check-in Pasien Website Immanuel</span>
+                    <span lang="en">Patient Check-in Website Immanuel</span>
+                </div>
+
+                <div class="scan-description">
+                    <span lang="id">
+                        Silakan scan QR Code yang Anda terima melalui email
+                        setelah berhasil membuat janji temu (Appointment)
+                        melalui Website Immanuel untuk melanjutkan proses check-in.
+                    </span>
+                    <span lang="en">
+                        Please scan the QR Code sent to your email after
+                        successfully booking an appointment through the
+                        Immanuel Website to continue the check-in process.
+                    </span>
+                </div>
+
+                <div class="scan-screen-warning">
+                    <i class="fas fa-sun"></i>
+                    <div>
+                        <strong>
+                            <span lang="id">Penting! Cerahkan Layar HP Anda</span>
+                            <span lang="en">Important! Increase Your Phone Screen Brightness</span>
+                        </strong>
+                        <p>
+                            <span lang="id">
+                                Atur kecerahan layar HP hingga maksimal agar QR Code
+                                dapat terbaca dengan jelas oleh scanner.
+                            </span>
+                            <span lang="en">
+                                Set your phone screen brightness to maximum so the
+                                scanner can read your QR Code clearly.
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <form id="formScanQRCode" autocomplete="off">
+                <div class="form-group">
+                    <label for="txtQRCode" class="scan-label">
+                        <span lang="id">Nomor Appointment</span>
+                        <span lang="en">Appointment Number</span>
+                    </label>
+
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               id="txtQRCode"
+                               name="txtQRCode"
+                               placeholder="Scan QR Code..."
+                               autocomplete="off"
+                               autocapitalize="off"
+                               spellcheck="false">
+                    </div>
+                </div>
+            </form>
+
+            <div id="scanQRCodeStatus" class="scan-status text-center">
+                <i class="fas fa-qrcode"></i>
+                <span lang="id">
+                    Menunggu scan QR Code...
+                </span>
+                <span lang="en">
+                    Waiting for QR Code scan...
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="scanQRCodeOverlay" class="scan-processing-overlay" role="dialog" aria-modal="true" aria-live="polite">
+    <div class="scan-dialog">
+        <div id="scanQRCodeLoading">
+            <div class="scan-loading-spinner"></div>
+            <h3 class="scan-dialog-title">Memproses QR Code</h3>
+            <div class="scan-progress-track">
+                <div class="scan-progress-bar"></div>
+            </div>
+            <p class="scan-dialog-message">Mohon tunggu, QR Code sedang diproses...</p>
+        </div>
+
+        <div id="scanQRCodeResult" style="display:none;">
+            <div id="scanQRCodeResultIcon" class="scan-result-icon">
+                <i class="fas fa-info"></i>
+            </div>
+            <h3 id="scanQRCodeResultTitle" class="scan-dialog-title"></h3>
+            <p id="scanQRCodeResultMessage" class="scan-dialog-message"></p>
+            <button type="button" id="btnCloseQRCodeAlert" class="scan-result-button">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var scanTimer = null;
+        var isProcessingQRCode = false;
+        var outsideScanBuffer = "";
+        var outsideScanTimer = null;
+        var scanAlertTimer = null;
+        var scanResultCloseTimer = null;
+
+        function FocusQRCode() {
+            var input = document.getElementById("txtQRCode");
+            if (input) input.focus();
+        }
+
+        function SetQRCodeStatus(message, type) {
+            var status = $("#scanQRCodeStatus");
+            status.removeClass("processing success error");
+            if (type) status.addClass(type);
+            status.text(message);
+        }
+
+        function ShowQRCodeLoading() {
+            clearTimeout(scanResultCloseTimer);
+            $("#scanQRCodeLoading").show();
+            $("#scanQRCodeResult").hide();
+            $("#scanQRCodeOverlay").addClass("active");
+        }
+
+        function ShowQRCodeAlert(title, message, type, icon) {
+            var iconElement = $("#scanQRCodeResultIcon");
+            iconElement.removeClass("success error warning").addClass(type || "");
+            iconElement.html('<i class="fas ' + icon + '"></i>');
+            $("#scanQRCodeResultTitle").text(title);
+            $("#scanQRCodeResultMessage").text(message);
+            $("#scanQRCodeLoading").hide();
+            $("#scanQRCodeResult").show();
+
+            // Popup hasil tertutup otomatis setelah 5 detik.
+            clearTimeout(scanResultCloseTimer);
+            scanResultCloseTimer = setTimeout(function () {
+                CloseQRCodeAlert();
+            }, 5000);
+        }
+
+        function CloseQRCodeAlert() {
+            clearTimeout(scanResultCloseTimer);
+            $("#scanQRCodeOverlay").removeClass("active");
+            $("#txtQRCode").val("");
+            isProcessingQRCode = false;
+            SetQRCodeStatus("Menunggu scan QR Code...", "");
+            setTimeout(FocusQRCode, 150);
+        }
+
+        function FinishDummyProcess(focusError, qrCode) {
+            var outcomes = [
+                {
+                    title: "Nomor Appointment Tidak Tersedia",
+                    message: "Nomor Appointment tidak ditemukan. Silakan periksa kembali QR Code Anda.",
+                    type: "error",
+                    icon: "fa-times-circle"
+                },
+                {
+                    title: "Appointment Sudah Check In",
+                    message: "Nomor Appointment tersebut sudah melakukan Check In, silahkan menuju Poli.",
+                    type: "warning",
+                    icon: "fa-exclamation-triangle"
+                },
+                {
+                    title: "Check In Berhasil",
+                    message: "Check In berhasil. Silakan langsung menuju Poli.",
+                    type: "success",
+                    icon: "fa-check-circle"
+                },
+                {
+                    title: "Error",
+                    message: "Terjadi kesalahan saat memproses QR Code. Silakan coba kembali.",
+                    type: "error",
+                    icon: "fa-exclamation-circle"
+                }
+            ];
+
+            var result = focusError ? {
+                title: "Silakan Scan Ulang",
+                message: "Pastikan kursor berada di kolom Nomor Appointment sebelum melakukan scan.",
+                type: "warning",
+                icon: "fa-exclamation-triangle"
+            } : outcomes[Math.floor(Math.random() * outcomes.length)];
+
+            console.log("Dummy scan QR Code:", qrCode || "(focus tidak berada di textbox)", result.title);
+            ShowQRCodeAlert(result.title, result.message, result.type, result.icon);
+            SetQRCodeStatus("Menunggu scan QR Code...", "");
+        }
+
+        function StartQRCodeProcess(qrCode, focusError) {
+            if (isProcessingQRCode) return;
+            isProcessingQRCode = true;
+            clearTimeout(scanTimer);
+            clearTimeout(scanAlertTimer);
+
+            SetQRCodeStatus("QR Code sedang diproses...", "processing");
+            ShowQRCodeLoading();
+
+            // Simulasi loading; hasil masih dummy dan belum memanggil API.
+            scanAlertTimer = setTimeout(function () {
+                FinishDummyProcess(focusError, qrCode);
+            }, 1800);
+        }
+
+        function ScanQRCodeGO() {
+            if (isProcessingQRCode) return;
+
+            var qrCode = $.trim($("#txtQRCode").val());
+            if (qrCode === "") {
+                FocusQRCode();
+                return;
+            }
+
+            StartQRCodeProcess(qrCode, false);
+        }
+
+        $("#txtQRCode")
+            .off(".scanQRCode")
+            .on("keydown.scanQRCode", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    clearTimeout(scanTimer);
+                    ScanQRCodeGO();
+                }
+            })
+            .on("input.scanQRCode", function () {
+                clearTimeout(scanTimer);
+                if (isProcessingQRCode) return;
+
+                if ($.trim(this.value) !== "") {
+                    scanTimer = setTimeout(function () {
+                        ScanQRCodeGO();
+                    }, 700);
+                }
+            });
+
+        // Deteksi scanner keyboard saat fokus sedang tidak berada di TextBox QR Code.
+        // Scanner biasanya mengetik cepat lalu mengirim Enter.
+        $(document)
+            .off("keydown.scanQRCodeOutside")
+            .on("keydown.scanQRCodeOutside", function (event) {
+                if (!$("#scanQRCodePage").length || isProcessingQRCode) return;
+
+                var input = document.getElementById("txtQRCode");
+                if (document.activeElement === input) {
+                    outsideScanBuffer = "";
+                    clearTimeout(outsideScanTimer);
+                    return;
+                }
+
+                if (event.key === "Enter") {
+                    var scannedValue = outsideScanBuffer;
+                    outsideScanBuffer = "";
+                    clearTimeout(outsideScanTimer);
+
+                    if (scannedValue.length >= 3) {
+                        event.preventDefault();
+                        StartQRCodeProcess(scannedValue, true);
+                    }
+                    return;
+                }
+
+                if (event.key && event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
+                    outsideScanBuffer += event.key;
+                    clearTimeout(outsideScanTimer);
+                    outsideScanTimer = setTimeout(function () {
+                        outsideScanBuffer = "";
+                    }, 1000);
+                }
+            });
+
+        $("#btnCloseQRCodeAlert")
+            .off("click.scanQRCode")
+            .on("click.scanQRCode", CloseQRCodeAlert);
+
+        $("#scanQRCodePage")
+            .off("click.scanQRCodeFocus")
+            .on("click.scanQRCodeFocus", function (event) {
+                if (!$(event.target).closest("button, input, label").length && !$("#scanQRCodeOverlay").hasClass("active")) {
+                    FocusQRCode();
+                }
+            });
+
+        $("#formScanQRCode")
+            .off("submit.scanQRCode")
+            .on("submit.scanQRCode", function (event) {
+                event.preventDefault();
+                ScanQRCodeGO();
+            });
+
+        setTimeout(FocusQRCode, 150);
+    })();
+</script>

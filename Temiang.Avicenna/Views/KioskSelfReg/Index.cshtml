@@ -323,6 +323,9 @@
 <div id="divCheckIn">
     checkin goes here
 </div>
+<div id="divScanQR">
+    scan qrcode goes here
+</div>
 
 <div class="row">
     <div></div>
@@ -343,7 +346,11 @@
             "parSelection": { "en": "Physician Selection", "id": "Pilihan Dokter" },
             "patInfo": { "en": "Patient Information", "id": "Informasi Pasien" },
             "bpjsInstruction": { "en": "Please Enter BPJS Referral Number", "id": "Silahkan Memasukan Nomor Rujukan BPJS" },
-            "qrCodeInstr": { "en": "Scan your QR-Code here", "id": "Pindai kode QR disini" }
+            "qrCodeInstr": { "en": "Scan your QR-Code here", "id": "Pindai kode QR disini" },
+            "pageTitleScanQR": {
+                "en": "Scan QR Code Check-in (Website Immanuel)",
+                "id": "Scan QR Code Check-in (Website Immanuel)"
+            },
         };
 
         var EnableBPJS = @(((bool)ViewBag.enableBPJS).ToString().ToLower());
@@ -404,6 +411,7 @@
             if (IsBpjsAntrolIntegration) {
                 NavLeftAddItem("<span lang='id'>Rencana Kunjungan<br />(Antrean Online)</span><span lang='en'>Appointment</span>", "fas fa-hospital-user text-primary", "SetPage(2)");
                 NavLeftAddItem("<span lang='id'>Check In<br />(Antrean Online)</span><span lang='en'>Check In</span>", "fas fa-hospital-user text-primary", "SetPage(3)");
+                NavLeftAddItem("<span lang='id'>Scan QR Code<br />(Website Immanuel)</span><span lang='en'>Scan QR Code</span>", "fas fa-qrcode text-primary", "SetPage(4)");
             }
 
             if (!CoreIsNullOrEmpty(GetRefID())) {
@@ -475,7 +483,7 @@
         var selectedMenu = 0; /*0 registrasi mandiri tunai, 1 registrasi mandiri bpjs rujukan*/
         var selectedPage = 0; /*0 registrasi mandiri, 1 antrian*/
 
-        var aPage = ["divKiosk", "divQueue", "divAppt", "divCheckIn"];
+        var aPage = ["divKiosk", "divQueue", "divAppt", "divCheckIn", "divScanQR"];
 
         function SetPage(i) {
             selectedPage = i;
@@ -487,6 +495,9 @@
             }
             else if (selectedPage == 3) {
                 CoreLoadContentToContainerDiv("@(ViewBag.UrlRoot)/Kioskselfreg/CheckInIndex", "divCheckIn", "POST", function () { SetLangBySpan(selectedLang); });
+            }
+            else if (selectedPage == 4) {
+                CoreLoadContentToContainerDiv("@(ViewBag.UrlRoot)/Kioskselfreg/ScanQRCodeIndex", "divScanQR", "POST", function () { SetLangBySpan(selectedLang); });
             }
 
         }
@@ -544,6 +555,10 @@
                     break;
                 } case 3: {
                     SetHtml('spanPageTitle', ShowLang(lang.pageTitleCheckIn));
+                    break;
+                }
+                case 4: {
+                    SetHtml('spanPageTitle', ShowLang(lang.pageTitleScanQR));
                     break;
                 }
             }

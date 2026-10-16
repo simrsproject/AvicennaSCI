@@ -932,6 +932,11 @@ namespace Temiang.Avicenna.Controllers
             return View();
         }
 
+        public ActionResult ScanQRCodeIndex()
+        {
+            return PartialView("ScanQRCodeIndex");
+        }
+
         #endregion
     }
 }

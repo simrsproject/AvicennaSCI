@@ -5462,6 +5462,7 @@
     <Content Include="Views\Home\Announcement.cshtml" />
     <Content Include="Views\Home\Chart16_05.cshtml" />
     <Content Include="Views\Queueing\RunningTextEditor.cshtml" />
+    <Content Include="Views\Kioskselfreg\ScanQRCodeIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessFailed.aspx.cs">
