@@ -451,9 +451,10 @@ namespace Temiang.Avicenna.Module.RADT.Master
                     query,
                     item.ItemName.As("refToItem_ItemName"),
                     su.ServiceUnitName.As("refToServiceUnit_ServiceUnitName"),
-                    "<0 AS refToItemPackage_Price>",
-                    "<0 AS refToItemPackage_Discount>",
-                    "<0 AS refToItemPackage_Total>"
+                    // Keep calculated columns decimal when EntitySpaces loads the query schema.
+                    "<CAST(0 AS decimal(18, 2)) AS refToItemPackage_Price>",
+                    "<CAST(0 AS decimal(18, 2)) AS refToItemPackage_Discount>",
+                    "<CAST(0 AS decimal(18, 2)) AS refToItemPackage_Total>"
                     );
                 query.InnerJoin(item).On(query.DetailItemID == item.ItemID);
                 query.InnerJoin(su).On(query.ServiceUnitID == su.ServiceUnitID);

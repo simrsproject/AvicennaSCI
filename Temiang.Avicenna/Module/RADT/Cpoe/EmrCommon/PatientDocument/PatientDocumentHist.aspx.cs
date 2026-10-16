@@ -181,7 +181,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
         }
 
+        protected string PatientDocumentEditLink(object patientDocumentId)
+        {
+            return string.Format("<a href=\"#\" onclick=\"showDetail('edit', '{0}')\"><img src=\"../../../../../Images/Toolbar/edit16.png\" border=\"0\" /></a>",
+                patientDocumentId);
+        }
 
     }
 }
-
