@@ -323,7 +323,7 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Rpt.Inventory.RSCH
             tableGroup12.Name = "Group3";
             this.table1.RowGroups.Add(tableGroup9);
             this.table1.RowGroups.Add(tableGroup12);
-            this.table1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(9.153D), Telerik.Reporting.Drawing.Unit.Inch(1.127D));
+            this.table1.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(9.154D), Telerik.Reporting.Drawing.Unit.Inch(1.128D));
             // 
             // textBox8
             // 
@@ -392,7 +392,7 @@ namespace Temiang.Avicenna.ReportLibrary.RLib_Rpt.Inventory.RSCH
             // textBox6
             // 
             this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(4.42D), Telerik.Reporting.Drawing.Unit.Inch(0.198D));
+            this.textBox6.Size = new Telerik.Reporting.Drawing.SizeU(Telerik.Reporting.Drawing.Unit.Inch(4.421D), Telerik.Reporting.Drawing.Unit.Inch(0.198D));
             this.textBox6.Style.BorderStyle.Bottom = Telerik.Reporting.Drawing.BorderType.Solid;
             this.textBox6.Style.BorderStyle.Left = Telerik.Reporting.Drawing.BorderType.Solid;
             this.textBox6.Style.BorderStyle.Right = Telerik.Reporting.Drawing.BorderType.Solid;
