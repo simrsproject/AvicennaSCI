@@ -659,6 +659,7 @@ namespace Temiang.Avicenna.WebService
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void BedMonitoringMjknGetList()
         {
+            Context.Response.ContentType = "application/json";
             var dtb = (new ServiceUnitCollection()).InpatientBedAvailabilityCustom();
             Context.Response.Write(JSonRetFormatted(ConvertDataTabletoObject(dtb)));
         }

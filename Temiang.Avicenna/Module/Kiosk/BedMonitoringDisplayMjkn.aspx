@@ -356,7 +356,7 @@
                 id: 'INT',
                 title: 'INTENSIVE CARE',
                 filter: function (d) {
-                    return ['ICU', 'HCU', 'NIC', 'PIC'].indexOf(d.BpjsClassID) !== -1;
+                    return ['ICU', 'HCU', 'NIC', 'PIC', 'NICU', 'PICU', 'IMCA', 'IMC'].indexOf(d.BpjsClassID) !== -1;
                 },
                 page: 0,
                 items: []
@@ -364,6 +364,14 @@
         ];
 
         $(document).ready(function () {
+            $.ajaxSetup({
+                beforeSend: function (xhr) {
+                    if (xhr.overrideMimeType) {
+                        xhr.overrideMimeType("application/json");
+                    }
+                }
+            });
+
             // Collapse sidebar untuk tampilan penuh monitor Kiosk
             $('body').removeClass("sidebar-mini");
             $('body').addClass("sidebar-collapse");
@@ -397,43 +405,79 @@
             $.ajax({
                 url: "<%=Helper.UrlRoot() %>/WebService/KioskQueue.asmx/BedMonitoringMjknGetList",
                 type: "POST",
-                contentType: "application/json; charset=utf-8",
                 dataType: "json",
-                data: "{}",
+                data: {},
                 success: function (response) {
                     _isFetching = false;
-                    var resData = response.d ? response.d : response;
+                    var resData = response;
+                    if (resData && resData.d !== undefined && resData.d !== null) {
+                        resData = resData.d;
+                    }
                     if (typeof resData === "string") {
-                        try { resData = JSON.parse(resData); } catch (e) { }
+                        try {
+                            var cleanJson = resData.trim();
+                            if (cleanJson.indexOf('}{') !== -1) {
+                                cleanJson = cleanJson.substring(0, cleanJson.indexOf('}{') + 1);
+                            }
+                            resData = JSON.parse(cleanJson);
+                        } catch (e) {
+                            console.error("JSON parse error:", e, resData);
+                        }
                     }
 
                     var rawList = [];
-                    if (resData && resData.status === false) {
+                    if (resData && resData.status === 'ERR') {
+                        console.error("Server returned error:", resData.errorCode, resData.data);
                         return;
-                    } else if (resData && resData.data) {
+                    } else if (resData && resData.data && $.isArray(resData.data)) {
                         rawList = resData.data;
                     } else if ($.isArray(resData)) {
                         rawList = resData;
+                    } else if (resData && typeof resData === 'object') {
+                        for (var key in resData) {
+                            if ($.isArray(resData[key])) {
+                                rawList = resData[key];
+                                break;
+                            }
+                        }
                     }
 
+                    console.log("BedMonitoringMjkn loaded items:", rawList.length);
                     processData(rawList);
                 },
-                error: function () {
+                error: function (xhr, status, error) {
                     _isFetching = false;
+                    console.error("fetchBedData error:", status, error, xhr.responseText);
+                    if (xhr && xhr.responseText) {
+                        try {
+                            var text = xhr.responseText.trim();
+                            if (text.indexOf('}{') !== -1) {
+                                text = text.substring(0, text.indexOf('}{') + 1);
+                            }
+                            var parsed = JSON.parse(text);
+                            if (parsed && parsed.data && $.isArray(parsed.data)) {
+                                processData(parsed.data);
+                            }
+                        } catch (err) {
+                            console.error("Fallback parse failed:", err);
+                        }
+                    }
                 }
             });
         }
 
         function processData(list) {
+            if (!list || !$.isArray(list)) return;
+
             // Normalkan data kamar
             var normalized = [];
             for (var i = 0; i < list.length; i++) {
                 var row = list[i];
-                var bpjsClass = (row.BpjsClassID || '').toString().trim().toUpperCase();
-                var roomName = (row.ServiceUnitName || row.RoomID || '-').toString().trim();
-                var cap = parseInt(row.Capacity, 10);
+                var bpjsClass = (row.BpjsClassID || row.bpjsclassid || row.BPJSCLASSID || '').toString().trim().toUpperCase();
+                var roomName = (row.ServiceUnitName || row.serviceunitname || row.SERVICEUNITNAME || row.RoomID || row.roomid || '-').toString().trim();
+                var cap = parseInt(row.Capacity !== undefined ? row.Capacity : (row.capacity !== undefined ? row.capacity : 0), 10);
                 if (isNaN(cap)) cap = 0;
-                var avail = parseInt(row.Available, 10);
+                var avail = parseInt(row.Available !== undefined ? row.Available : (row.available !== undefined ? row.available : 0), 10);
                 if (isNaN(avail)) avail = 0;
 
                 var occ = cap - avail;
@@ -441,7 +485,7 @@
 
                 normalized.push({
                     BpjsClassID: bpjsClass,
-                    RoomID: row.RoomID,
+                    RoomID: row.RoomID || row.roomid || '',
                     ServiceUnitName: roomName,
                     Capacity: cap,
                     Occupied: occ,

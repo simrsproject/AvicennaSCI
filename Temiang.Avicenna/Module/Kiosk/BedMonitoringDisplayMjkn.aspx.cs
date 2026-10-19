@@ -23,8 +23,7 @@ namespace Temiang.Avicenna.Module.Kiosk
 
         public string GetBrandName()
         {
-            var b = new Brand();
-            return b.Name;
+            return "RS. IMMANUEL";
         }
     }
 }
