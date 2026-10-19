@@ -19,7 +19,7 @@
         .kiosk-title {
             font-size: 2rem;
             font-weight: 700;
-            color: #ffffff;
+            color: #000000;
             margin: 0;
             letter-spacing: 1px;
             display: flex;
