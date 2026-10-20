@@ -1,16 +1,25 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Parameters;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using Temiang.Avicenna.Common.BPJS.VClaim.v11;
 using Temiang.Avicenna.Module.RADT;
 using Temiang.Avicenna.Module.RADT.Master;
 using Temiang.Avicenna.WebService;
-using Temiang.Avicenna.Common.BPJS.VClaim.v11;
 
 namespace Temiang.Avicenna.Controllers
 {
@@ -915,6 +924,410 @@ namespace Temiang.Avicenna.Controllers
             ViewData["ServiceUnitPar"] = aSU;
 
             return View("ParamedicSlideShow2");
+        }
+
+
+        [HttpPost]
+        public async Task<JsonResult> ValidateAppointmentQRCode(string qrCode)
+        {
+            try
+            {
+                // 1. VALIDASI QR CODE
+                if (string.IsNullOrWhiteSpace(qrCode))
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "QR Code tidak boleh kosong."
+                    });
+                }
+
+                // 2. DECRYPT QR CODE
+                string decryptedData = DecryptAppointmentQRCode(qrCode.Trim());
+
+                string appointmentNo;
+
+                // 3. PARSE HASIL DEKRIPSI
+                try
+                {
+                    JObject payload = JObject.Parse(decryptedData);
+                    appointmentNo = Convert.ToString(payload["AppointmentNo"]);
+                }
+                catch
+                {
+                    appointmentNo = decryptedData;
+                }
+
+                appointmentNo = appointmentNo?.Trim();
+
+                if (string.IsNullOrWhiteSpace(appointmentNo))
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "AppointmentNo tidak ditemukan dalam QR Code."
+                    });
+                }
+
+                // 4. CARI APPOINTMENT
+                var appointmentQuery = new AppointmentQuery("apt");
+                var appointmentCollection = new AppointmentCollection();
+
+                appointmentQuery.Where(
+                    appointmentQuery.AppointmentNo == appointmentNo
+                );
+
+                appointmentCollection.Load(appointmentQuery);
+
+                if (appointmentCollection.Count == 0)
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "Appointment tidak ditemukan."
+                    });
+                }
+
+                var appointment = appointmentCollection.First();
+
+                // 5. VALIDASI STATUS APPOINTMENT
+                string appointmentStatus = appointment.SRAppointmentStatus;
+                string expectedStatus = AppSession.Parameter.AppointmentStatusOpen;
+
+                bool isAppointmentOpen = string.Equals(
+                    appointmentStatus?.Trim(),
+                    expectedStatus?.Trim(),
+                    StringComparison.OrdinalIgnoreCase
+                );
+
+                if (!isAppointmentOpen)
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "Appointment tidak dapat diproses.",
+                        data = new
+                        {
+                            AppointmentNo = appointmentNo,
+                            AppointmentStatus = appointmentStatus,
+                            ExpectedStatus = expectedStatus
+                        }
+                    });
+                }
+
+                // 6. ACCESS KEY REGISTRATION WEBSERVICE
+                string accessKey = "AvcMblPat";
+
+                // 7. SIAPKAN PARAMETER REGISTRATIONCREATEFROMAPPOINTMENT
+                if (!appointment.DateOfBirth.HasValue)
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "Tanggal lahir pasien belum tersedia pada appointment."
+                    });
+                }
+
+                var parameters = new System.Collections.Generic.Dictionary<string, string>
+        {
+            { "AccessKey", accessKey },
+            { "AppointmentNo", appointment.AppointmentNo },
+            { "FirstName", appointment.FirstName ?? "" },
+            { "MiddleName", appointment.MiddleName ?? "" },
+            { "LastName", appointment.LastName ?? "" },
+            { "DateOfBirth", appointment.DateOfBirth.Value.ToString("yyyy-MM-dd") },
+            { "BirthPlace", appointment.BirthPlace ?? "" },
+            { "Sex", appointment.Sex ?? "" },
+            { "StreetName", appointment.StreetName ?? "" },
+            { "District", appointment.District ?? "" },
+            { "City", appointment.City ?? "" },
+            { "County", appointment.County ?? "" },
+            { "State", appointment.State ?? "" },
+            { "ZipCode", appointment.ZipCode ?? "" },
+            { "PhoneNo", appointment.PhoneNo ?? "" },
+            { "MobilePhoneNo", appointment.MobilePhoneNo ?? "" },
+            { "Email", appointment.Email ?? "" },
+            { "Ssn", appointment.Ssn ?? "" },
+            { "GuarantorID", appointment.GuarantorID ?? "" },
+            { "Notes", appointment.Notes ?? "" },
+
+            // Data tambahan belum tersedia pada entity yang ditampilkan.
+            // Isi dari sumber data yang benar jika diperlukan.
+            { "SRReligion", "" },
+            { "SREducation", "" },
+            { "SROccupation", "" },
+            { "SRMaritalStatus", "" },
+            { "SRTitle", "" },
+            { "ResponsibleName", "" },
+            { "SRRelationship", "" },
+            { "ResponsibleAddress", "" },
+            { "ResponsiblePhoneNo", "" }
+        };
+
+                // 8. PANGGIL WEBMETHOD AVICENNA
+                // URL memakai host dan application path saat ini.
+                string applicationPath = Request.ApplicationPath.TrimEnd('/');
+
+                string endpoint =
+                    Request.Url.GetLeftPart(UriPartial.Authority) +
+                    applicationPath +
+                    "/webservice/V1_1/RegistrationWS.asmx/RegistrationCreateFromAppointment";
+
+                using (var client = new HttpClient())
+                using (var content = new FormUrlEncodedContent(parameters))
+                {
+                    client.Timeout = TimeSpan.FromSeconds(30);
+
+                    var apiResponse = await client.PostAsync(endpoint, content);
+                    string responseText = await apiResponse.Content.ReadAsStringAsync();
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "[QR CHECK-IN] RegistrationWS HTTP: " +
+                        (int)apiResponse.StatusCode
+                    );
+
+                    System.Diagnostics.Debug.WriteLine(
+                        "[QR CHECK-IN] RegistrationWS response: " +
+                        responseText
+                    );
+
+                    if (!apiResponse.IsSuccessStatusCode)
+                    {
+                        return Json(new
+                        {
+                            status = "ERR",
+                            message = "Layanan registrasi Avicenna gagal merespons.",
+                            httpStatus = (int)apiResponse.StatusCode
+                        });
+                    }
+
+                    // 9. PARSE RESPONSE WEBMETHOD
+                    JObject apiResult;
+
+                    try
+                    {
+                        apiResult = JObject.Parse(responseText);
+
+                        // Mendukung wrapper JSON ASP.NET AJAX jika ada.
+                        if (apiResult["d"] != null &&
+                            apiResult["d"].Type == JTokenType.Object)
+                        {
+                            apiResult = (JObject)apiResult["d"];
+                        }
+                    }
+                    catch
+                    {
+                        return Json(new
+                        {
+                            status = "ERR",
+                            message = "Respons RegistrationWS bukan JSON yang valid."
+                        });
+                    }
+
+                    string apiStatus = Convert.ToString(apiResult["status"]);
+
+                    if (!string.Equals(
+                        apiStatus,
+                        "OK",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        return Json(new
+                        {
+                            status = "ERR",
+                            message = Convert.ToString(apiResult["data"])
+                                ?? Convert.ToString(apiResult["message"])
+                                ?? "Registrasi appointment gagal.",
+                            registrationResponse = apiResult
+                        });
+                    }
+
+                    // 10. AMBIL DATA REGISTRASI DARI RESPONSE
+                    JObject registrationData = apiResult["data"] as JObject;
+
+                    if (registrationData == null)
+                    {
+                        return Json(new
+                        {
+                            status = "ERR",
+                            message = "Registrasi diproses, tetapi struktur data respons belum sesuai.",
+                            registrationResponse = apiResult
+                        });
+                    }
+
+                    // 11. AMBIL NAMA POLI
+                    var serviceUnit = new ServiceUnit();
+
+                    string serviceUnitName = "";
+
+                    if (serviceUnit.LoadByPrimaryKey(appointment.ServiceUnitID))
+                    {
+                        serviceUnitName = serviceUnit.ServiceUnitName;
+                    }
+
+                    string patientName = string.Join(
+                        " ",
+                        new[]
+                        {
+                    appointment.FirstName,
+                    appointment.MiddleName,
+                    appointment.LastName
+                        }.Where(x => !string.IsNullOrWhiteSpace(x))
+                    );
+
+                    // 12. RESPONSE KE AJAX
+                    return Json(new
+                    {
+                        status = "OK",
+                        message = "Check-in berhasil.",
+                        data = new
+                        {
+                            PatientName = patientName,
+                            MedicalNo = Convert.ToString(registrationData["MedicalNo"]),
+                            AppointmentNo = Convert.ToString(registrationData["AppointmentNo"]),
+                            RegistrationNo = Convert.ToString(registrationData["RegistrationNo"]),
+                            ServiceUnitID = appointment.ServiceUnitID,
+                            ServiceUnitName = serviceUnitName,
+                            RegistrationDate = Convert.ToString(registrationData["RegistrationDate"]),
+                            RegistrationQue = Convert.ToString(registrationData["RegistrationQue"]),
+                            VisitNo = Convert.ToString(registrationData["VisitNo"])
+                        }
+                    });
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "[QR CHECK-IN] RegistrationWS timeout."
+                );
+
+                return Json(new
+                {
+                    status = "ERR",
+                    message = "Layanan registrasi timeout. Periksa status registrasi sebelum mencoba scan ulang."
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "[QR CHECK-IN ERROR] " + ex
+                );
+
+                return Json(new
+                {
+                    status = "ERR",
+                    message = "Gagal memproses check-in.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        private string DecryptAppointmentQRCode(string qrCode)
+        {
+            // Key harus berasal dari konfigurasi server,
+            // jangan ditulis langsung di source code.
+            string keyBase64 =
+                System.Configuration.ConfigurationManager
+                    .AppSettings["CHECKIN_QR_KEY"];
+
+            if (string.IsNullOrWhiteSpace(keyBase64))
+                throw new Exception("CHECKIN_QR_KEY belum dikonfigurasi.");
+
+            byte[] key = Convert.FromBase64String(keyBase64);
+            byte[] envelopeBytes = Convert.FromBase64String(qrCode);
+
+            JObject envelope = JObject.Parse(
+                Encoding.UTF8.GetString(envelopeBytes)
+            );
+
+            byte[] iv = Convert.FromBase64String(
+                (string)envelope["iv"]
+            );
+
+            byte[] tag = Convert.FromBase64String(
+                (string)envelope["tag"]
+            );
+
+            byte[] ciphertext = Convert.FromBase64String(
+                (string)envelope["data"]
+            );
+
+            if (key.Length != 32)
+                throw new Exception("Key harus berukuran 32 byte.");
+
+            if (iv.Length != 12 || tag.Length != 16)
+                throw new Exception("Format IV atau authentication tag tidak valid.");
+
+            // AES-GCM membutuhkan ciphertext dan tag.
+            byte[] input = new byte[ciphertext.Length + tag.Length];
+
+            Buffer.BlockCopy(
+                ciphertext, 0, input, 0, ciphertext.Length
+            );
+
+            Buffer.BlockCopy(
+                tag, 0, input, ciphertext.Length, tag.Length
+            );
+
+            var cipher = new GcmBlockCipher(new AesEngine());
+
+            cipher.Init(
+                false,
+                new AeadParameters(
+                    new KeyParameter(key),
+                    128,
+                    iv
+                )
+            );
+
+            byte[] plaintext = new byte[cipher.GetOutputSize(input.Length)];
+
+            int length = cipher.ProcessBytes(
+                input, 0, input.Length, plaintext, 0
+            );
+
+            length += cipher.DoFinal(plaintext, length);
+
+            return Encoding.UTF8.GetString(plaintext, 0, length);
+        }
+
+        [HttpPost]
+        public JsonResult TestDecryptAppointmentQRCode(string qrCode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(qrCode))
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "QR Code kosong."
+                    });
+                }
+
+                string appointmentNo = DecryptAppointmentQRCode(qrCode);
+
+                return Json(new
+                {
+                    status = "OK",
+                    message = "Decrypt berhasil.",
+                    data = new
+                    {
+                        AppointmentNo = appointmentNo
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    "[QR DECRYPT TEST] " + ex
+                );
+
+                return Json(new
+                {
+                    status = "ERR",
+                    message = "Decrypt gagal. Periksa format token, algoritma, dan konfigurasi key."
+                });
+            }
         }
 
         #region Appointment

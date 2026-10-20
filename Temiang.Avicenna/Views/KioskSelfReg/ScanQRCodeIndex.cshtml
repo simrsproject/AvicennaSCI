@@ -449,118 +449,260 @@
 </div>
 
 <script>
+
     (function () {
         var scanTimer = null;
+        var outsideScanTimer = null;
+        var scanResultCloseTimer = null;
+
         var isProcessingQRCode = false;
         var outsideScanBuffer = "";
-        var outsideScanTimer = null;
-        var scanAlertTimer = null;
-        var scanResultCloseTimer = null;
+        var lastOutsideKeyTime = 0;
+
+        var INPUT_SELECTOR = "#txtQRCode";
+        var OVERLAY_SELECTOR = "#scanQRCodeOverlay";
+        var POPUP_DURATION = 4000;
+        var SCANNER_KEY_INTERVAL = 100;
 
         function FocusQRCode() {
             var input = document.getElementById("txtQRCode");
-            if (input) input.focus();
+
+            if (
+                input &&
+                !isProcessingQRCode &&
+                !$(OVERLAY_SELECTOR).hasClass("active")
+            ) {
+                input.focus();
+            }
         }
 
         function SetQRCodeStatus(message, type) {
             var status = $("#scanQRCodeStatus");
+
             status.removeClass("processing success error");
-            if (type) status.addClass(type);
+
+            if (type) {
+                status.addClass(type);
+            }
+
             status.text(message);
         }
 
         function ShowQRCodeLoading() {
             clearTimeout(scanResultCloseTimer);
+
             $("#scanQRCodeLoading").show();
             $("#scanQRCodeResult").hide();
-            $("#scanQRCodeOverlay").addClass("active");
+            $(OVERLAY_SELECTOR).addClass("active");
         }
 
         function ShowQRCodeAlert(title, message, type, icon) {
             var iconElement = $("#scanQRCodeResultIcon");
-            iconElement.removeClass("success error warning").addClass(type || "");
-            iconElement.html('<i class="fas ' + icon + '"></i>');
+
+            clearTimeout(scanResultCloseTimer);
+
+            // Pastikan popup selalu terlihat, termasuk saat scanner
+            // digunakan ketika fokus tidak berada di textbox.
+            $(OVERLAY_SELECTOR).addClass("active");
+
+            iconElement
+                .removeClass("success error warning")
+                .addClass(type || "");
+
+            iconElement.html(
+                '<i class="fas ' + (icon || "fa-info-circle") + '"></i>'
+            );
+
             $("#scanQRCodeResultTitle").text(title);
             $("#scanQRCodeResultMessage").text(message);
+
             $("#scanQRCodeLoading").hide();
             $("#scanQRCodeResult").show();
 
-            // Popup hasil tertutup otomatis setelah 5 detik.
-            clearTimeout(scanResultCloseTimer);
+            // Popup ditutup otomatis setelah 8 detik.
             scanResultCloseTimer = setTimeout(function () {
                 CloseQRCodeAlert();
-            }, 5000);
+            }, POPUP_DURATION);
         }
 
         function CloseQRCodeAlert() {
             clearTimeout(scanResultCloseTimer);
-            $("#scanQRCodeOverlay").removeClass("active");
+
+            $(OVERLAY_SELECTOR).removeClass("active");
+
+            $("#scanQRCodeLoading").show();
+            $("#scanQRCodeResult").hide();
+
             $("#txtQRCode").val("");
+
             isProcessingQRCode = false;
+            outsideScanBuffer = "";
+
+            clearTimeout(scanTimer);
+            clearTimeout(outsideScanTimer);
+
             SetQRCodeStatus("Menunggu scan QR Code...", "");
-            setTimeout(FocusQRCode, 150);
+
+            setTimeout(FocusQRCode, 200);
         }
 
-        function FinishDummyProcess(focusError, qrCode) {
-            var outcomes = [
-                {
-                    title: "Nomor Appointment Tidak Tersedia",
-                    message: "Nomor Appointment tidak ditemukan. Silakan periksa kembali QR Code Anda.",
-                    type: "error",
-                    icon: "fa-times-circle"
-                },
-                {
-                    title: "Appointment Sudah Check In",
-                    message: "Nomor Appointment tersebut sudah melakukan Check In, silahkan menuju Poli.",
-                    type: "warning",
-                    icon: "fa-exclamation-triangle"
-                },
-                {
-                    title: "Check In Berhasil",
-                    message: "Check In berhasil. Silakan langsung menuju Poli.",
-                    type: "success",
-                    icon: "fa-check-circle"
-                },
-                {
-                    title: "Error",
-                    message: "Terjadi kesalahan saat memproses QR Code. Silakan coba kembali.",
-                    type: "error",
-                    icon: "fa-exclamation-circle"
-                }
-            ];
+        function ShowFocusWarning() {
+            ShowQRCodeAlert(
+                "Silakan Scan Ulang",
+                "Kursor tidak berada di kolom Nomor Appointment. " +
+                    "Silakan arahkan kursor ke kolom tersebut, lalu scan ulang QR Code.",
+                "warning",
+                "fa-exclamation-triangle"
+            );
 
-            var result = focusError ? {
-                title: "Silakan Scan Ulang",
-                message: "Pastikan kursor berada di kolom Nomor Appointment sebelum melakukan scan.",
-                type: "warning",
-                icon: "fa-exclamation-triangle"
-            } : outcomes[Math.floor(Math.random() * outcomes.length)];
-
-            console.log("Dummy scan QR Code:", qrCode || "(focus tidak berada di textbox)", result.title);
-            ShowQRCodeAlert(result.title, result.message, result.type, result.icon);
-            SetQRCodeStatus("Menunggu scan QR Code...", "");
+            SetQRCodeStatus(
+                "Scan ditolak karena fokus tidak berada di kolom Appointment.",
+                "error"
+            );
         }
 
         function StartQRCodeProcess(qrCode, focusError) {
-            if (isProcessingQRCode) return;
-            isProcessingQRCode = true;
-            clearTimeout(scanTimer);
-            clearTimeout(scanAlertTimer);
+            if (isProcessingQRCode) {
+                return;
+            }
 
-            SetQRCodeStatus("QR Code sedang diproses...", "processing");
+            clearTimeout(scanTimer);
+            clearTimeout(outsideScanTimer);
+
+            isProcessingQRCode = true;
+
+            // Scanner digunakan saat fokus berada di luar textbox.
+            if (focusError) {
+                ShowFocusWarning();
+                return;
+            }
+
+            qrCode = $.trim(qrCode || "");
+
+            if (!qrCode) {
+                isProcessingQRCode = false;
+                FocusQRCode();
+                return;
+            }
+
+            SetQRCodeStatus("Memvalidasi Appointment...", "processing");
             ShowQRCodeLoading();
 
-            // Simulasi loading; hasil masih dummy dan belum memanggil API.
-            scanAlertTimer = setTimeout(function () {
-                FinishDummyProcess(focusError, qrCode);
-            }, 1800);
+            $.ajax({
+                url: "@Url.Action("ValidateAppointmentQRCode", "Kioskselfreg")",
+                type: "POST",
+                data: {
+                    qrCode: qrCode
+                },
+                dataType: "json",
+                timeout: 15000,
+
+                success: function (response) {
+                    if (!response || response.status !== "OK") {
+                        ShowQRCodeAlert(
+                            "Appointment Tidak Valid",
+                            response && response.message
+                                ? response.message
+                                : "Appointment tidak ditemukan atau QR Code tidak valid.",
+                            "error",
+                            "fa-times-circle"
+                        );
+
+                        SetQRCodeStatus(
+                            "Appointment tidak dapat divalidasi.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+                    var appointment = response.data || {};
+
+                    var appointmentStatus = (
+                        appointment.AppointmentStatusName || ""
+                    ).trim().toLowerCase();
+
+                    if (appointmentStatus !== "open") {
+                        ShowQRCodeAlert(
+                            "Appointment Tidak Dapat Diproses",
+                            "Status appointment saat ini: " +
+                                (
+                                    appointment.AppointmentStatusName ||
+                                    "Tidak diketahui"
+                                ) +
+                                ". Silakan hubungi petugas.",
+                            "warning",
+                            "fa-exclamation-triangle"
+                        );
+
+                        SetQRCodeStatus(
+                            "Status appointment tidak valid.",
+                            "error"
+                        );
+
+                        return;
+                    }
+
+                    ShowQRCodeAlert(
+                        "Appointment Valid",
+                        "Nomor Appointment " +
+                            (appointment.AppointmentNo || qrCode) +
+                            " berhasil divalidasi. Silakan lanjutkan proses check-in.",
+                        "success",
+                        "fa-check-circle"
+                    );
+
+                    SetQRCodeStatus(
+                        "Appointment berhasil divalidasi.",
+                        "success"
+                    );
+                },
+
+                error: function (xhr, status, error) {
+                    var message =
+                        "Gagal menghubungi layanan validasi appointment.";
+
+                    if (status === "timeout") {
+                        message =
+                            "Request timeout. Server terlalu lama merespons.";
+                    } else if (xhr.status === 404) {
+                        message =
+                            "Action ValidateAppointmentQRCode tidak ditemukan (404).";
+                    } else if (xhr.status === 500) {
+                        message = "Terjadi error pada backend (500).";
+                    } else if (xhr.status === 0) {
+                        message =
+                            "Request gagal. Periksa koneksi atau akses jaringan.";
+                    }
+
+                    console.error("[QR CHECK-IN] HTTP Status:", xhr.status);
+                    console.error("[QR CHECK-IN] AJAX Status:", status);
+                    console.error("[QR CHECK-IN] Error:", error);
+                    console.error("[QR CHECK-IN] Response:", xhr.responseText);
+
+                    ShowQRCodeAlert(
+                        "Validasi Gagal",
+                        message,
+                        "error",
+                        "fa-exclamation-circle"
+                    );
+
+                    SetQRCodeStatus(
+                        "Validasi appointment gagal.",
+                        "error"
+                    );
+                }
+            });
         }
 
         function ScanQRCodeGO() {
-            if (isProcessingQRCode) return;
+            if (isProcessingQRCode) {
+                return;
+            }
 
-            var qrCode = $.trim($("#txtQRCode").val());
-            if (qrCode === "") {
+            var qrCode = $.trim($(INPUT_SELECTOR).val());
+
+            if (!qrCode) {
                 FocusQRCode();
                 return;
             }
@@ -568,18 +710,25 @@
             StartQRCodeProcess(qrCode, false);
         }
 
-        $("#txtQRCode")
+        // Scan langsung ke textbox: dukung Enter dan scanner
+        // yang tidak mengirim Enter dengan debounce.
+        $(INPUT_SELECTOR)
             .off(".scanQRCode")
             .on("keydown.scanQRCode", function (event) {
                 if (event.key === "Enter") {
                     event.preventDefault();
+                    event.stopPropagation();
+
                     clearTimeout(scanTimer);
                     ScanQRCodeGO();
                 }
             })
             .on("input.scanQRCode", function () {
                 clearTimeout(scanTimer);
-                if (isProcessingQRCode) return;
+
+                if (isProcessingQRCode) {
+                    return;
+                }
 
                 if ($.trim(this.value) !== "") {
                     scanTimer = setTimeout(function () {
@@ -588,53 +737,88 @@
                 }
             });
 
-        // Deteksi scanner keyboard saat fokus sedang tidak berada di TextBox QR Code.
-        // Scanner biasanya mengetik cepat lalu mengirim Enter.
+        // Deteksi scanner ketika fokus berada di luar textbox.
         $(document)
-            .off("keydown.scanQRCodeOutside")
+            .off(".scanQRCodeOutside")
             .on("keydown.scanQRCodeOutside", function (event) {
-                if (!$("#scanQRCodePage").length || isProcessingQRCode) return;
+                if (
+                    !$("#scanQRCodePage").length ||
+                    isProcessingQRCode ||
+                    $(OVERLAY_SELECTOR).hasClass("active")
+                ) {
+                    return;
+                }
 
                 var input = document.getElementById("txtQRCode");
+
+                // Jika fokus sudah berada di textbox, gunakan handler textbox.
                 if (document.activeElement === input) {
                     outsideScanBuffer = "";
+                    lastOutsideKeyTime = 0;
                     clearTimeout(outsideScanTimer);
                     return;
                 }
+
+                var now = Date.now();
 
                 if (event.key === "Enter") {
                     var scannedValue = outsideScanBuffer;
+
                     outsideScanBuffer = "";
+                    lastOutsideKeyTime = 0;
+
                     clearTimeout(outsideScanTimer);
 
+                    // Hanya anggap sebagai scanner jika terdapat data
+                    // yang terkumpul sebelum Enter.
                     if (scannedValue.length >= 3) {
                         event.preventDefault();
+                        event.stopPropagation();
+
                         StartQRCodeProcess(scannedValue, true);
                     }
+
                     return;
                 }
 
-                if (event.key && event.key.length === 1 && !event.ctrlKey && !event.altKey && !event.metaKey) {
-                    outsideScanBuffer += event.key;
-                    clearTimeout(outsideScanTimer);
-                    outsideScanTimer = setTimeout(function () {
-                        outsideScanBuffer = "";
-                    }, 1000);
+                // Abaikan kombinasi shortcut keyboard.
+                if (
+                    !event.key ||
+                    event.key.length !== 1 ||
+                    event.ctrlKey ||
+                    event.altKey ||
+                    event.metaKey
+                ) {
+                    return;
                 }
+
+                // Jika jeda antarkarakter terlalu lama, mulai buffer baru.
+                if (
+                    lastOutsideKeyTime > 0 &&
+                    now - lastOutsideKeyTime > SCANNER_KEY_INTERVAL
+                ) {
+                    outsideScanBuffer = "";
+                }
+
+                outsideScanBuffer += event.key;
+                lastOutsideKeyTime = now;
+
+                clearTimeout(outsideScanTimer);
+
+                outsideScanTimer = setTimeout(function () {
+                    outsideScanBuffer = "";
+                    lastOutsideKeyTime = 0;
+                }, 1000);
             });
 
+        // Tombol Tutup popup.
         $("#btnCloseQRCodeAlert")
             .off("click.scanQRCode")
-            .on("click.scanQRCode", CloseQRCodeAlert);
-
-        $("#scanQRCodePage")
-            .off("click.scanQRCodeFocus")
-            .on("click.scanQRCodeFocus", function (event) {
-                if (!$(event.target).closest("button, input, label").length && !$("#scanQRCodeOverlay").hasClass("active")) {
-                    FocusQRCode();
-                }
+            .on("click.scanQRCode", function () {
+                CloseQRCodeAlert();
             });
 
+        // Enter pada form tidak menyebabkan submit/reload halaman.
         $("#formScanQRCode")
             .off("submit.scanQRCode")
             .on("submit.scanQRCode", function (event) {
@@ -642,6 +826,33 @@
                 ScanQRCodeGO();
             });
 
+        // Klik area kosong mengembalikan fokus ke textbox.
+        $("#scanQRCodePage")
+            .off("click.scanQRCodeFocus")
+            .on("click.scanQRCodeFocus", function (event) {
+                if (
+                    !$(event.target).closest(
+                        "button, input, label, a, select, textarea"
+                    ).length &&
+                    !$(OVERLAY_SELECTOR).hasClass("active")
+                ) {
+                    FocusQRCode();
+                }
+            });
+
+        // Tombol Escape menutup popup.
+        $(document)
+            .off("keydown.scanQRCodeEscape")
+            .on("keydown.scanQRCodeEscape", function (event) {
+                if (
+                    event.key === "Escape" &&
+                    $(OVERLAY_SELECTOR).hasClass("active")
+                ) {
+                    CloseQRCodeAlert();
+                }
+            });
+
         setTimeout(FocusQRCode, 150);
     })();
+
 </script>
