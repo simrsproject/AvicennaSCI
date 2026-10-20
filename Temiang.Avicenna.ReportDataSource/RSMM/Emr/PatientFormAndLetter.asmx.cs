@@ -448,6 +448,20 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                     createdRegMedUserName = createdUser.UserName;
                 }
 
+                // Validasi RegistrationInfoMedic IsDeleted
+                var regMedDeleted = new RegistrationInfoMedic();
+                regMedDeleted.Query.Where(
+                    regMedDeleted.Query.RegistrationNo == registrationNo,
+                    regMedDeleted.Query.SRMedicalNotesInputType == "MDS",
+                    regMedDeleted.Query.IsDeleted == true
+                );
+
+                if (regMedDeleted.Query.Load())
+                {
+                    ResponseWrite("{}");
+                    return;
+                }
+
                 // DPJP Sign
                 var userDpjpsign = DpjpSignUser(registrationNo);
 
