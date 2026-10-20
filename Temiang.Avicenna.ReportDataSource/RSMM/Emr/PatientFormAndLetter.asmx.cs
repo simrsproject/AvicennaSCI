@@ -815,6 +815,20 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 //var ppaSignUrl = string.Concat(url.Scheme, "://", url.Authority, subUrl,
                 //    string.Format("ImgHandler.ashx?type=mdsppasign&regno={0}", medsum.RegistrationNo));
 
+                // Validasi RegistrationInfoMedic IsDeleted
+                var regMedDeleted = new RegistrationInfoMedic();
+                regMedDeleted.Query.Where(
+                    regMedDeleted.Query.RegistrationNo == registrationNo,
+                    regMedDeleted.Query.SRMedicalNotesInputType == "MDS",
+                    regMedDeleted.Query.IsDeleted == true
+                );
+
+                if (regMedDeleted.Query.Load())
+                {
+                    ResponseWrite("{}");
+                    return;
+                }
+
                 // DPJP Sign
                 var userDpjpsign = DpjpSignUser(registrationNo);
 
@@ -988,6 +1002,20 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                     lastUpdateRegMedUserName = lastUser.UserName;
                     createdRegMedUserName = createdUser.UserName;
+                }
+
+                // Validasi RegistrationInfoMedic IsDeleted
+                var regMedDeleted = new RegistrationInfoMedic();
+                regMedDeleted.Query.Where(
+                    regMedDeleted.Query.RegistrationNo == registrationNo,
+                    regMedDeleted.Query.SRMedicalNotesInputType == "MDS",
+                    regMedDeleted.Query.IsDeleted == true
+                );
+
+                if (regMedDeleted.Query.Load())
+                {
+                    ResponseWrite("{}");
+                    return;
                 }
 
                 var signParamedic = SignParamedic(registrationNo).Rows.Count > 1 ? SignParamedic(registrationNo).Rows[0]["SignatureImage"] : null;
