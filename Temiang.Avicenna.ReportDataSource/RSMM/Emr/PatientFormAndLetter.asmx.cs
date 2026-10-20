@@ -1102,17 +1102,17 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 //    string.Format("ImgHandler.ashx?type=mdsppasign&regno={0}", medsum.RegistrationNo));
 
                 // Validasi RegistrationInfoMedic IsDeleted
-                var regMedDeleted = new RegistrationInfoMedic();
-                regMedDeleted.Query.Where(
-                    regMedDeleted.Query.RegistrationNo == registrationNo,
-                    regMedDeleted.Query.SRMedicalNotesInputType == "MDS",
-                    regMedDeleted.Query.IsDeleted == true
+                var regMedStatus = new RegistrationInfoMedic();
+                regMedStatus.Query.Where(
+                    regMedStatus.Query.RegistrationNo == registrationNo,
+                    regMedStatus.Query.SRMedicalNotesInputType == "MDS"
                 );
 
-                if (regMedDeleted.Query.Load())
+                bool isMdsDeleted = false;
+
+                if (regMedStatus.Query.Load())
                 {
-                    ResponseWrite("{}");
-                    return;
+                    isMdsDeleted = regMedStatus.IsDeleted == true;
                 }
 
                 // DPJP Sign
@@ -1125,53 +1125,313 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                 var additionalField = new
                 {
-                    ReferralName = referralName,
-                    ReferralAddress = referralAddress,
-                    NamaDokter = Paramedic.GetParamedicName(medsum.ParamedicID), //ParamedicTeam.DPJP(reg.RegistrationNo).ParamedicName,
-                    TglPulang = string.Format("{0:dd-MMM-yyyy}", reg.DischargeDate ?? medsum.DischargeDate),
-                    JamPulang = string.Format("{0:HH:mm}", reg.DischargeTime ?? medsum.DischargeTime),
+                    ReferralName = FieldOrEmpty(
+                        referralName,
+                        isMdsDeleted
+                    ),
 
-                    Indikasi = RichTextValidation(medsum.TreatmentIndications, medsum.IsRichTextMode),
-                    ChiefComplaint = RichTextValidation(medsum.ChiefComplaint, medsum.IsRichTextMode),
-                    Anamnesis = RichTextValidation(medsum.HistOfPresentIllness, medsum.IsRichTextMode),
-                    Komorbiditas = RichTextValidation(medsum.PastMedicalHistory, medsum.IsRichTextMode),
-                    Fisik = RichTextValidation(medsum.PhysicalExam, medsum.IsRichTextMode),
-                    Penunjang = RichTextValidation(medsum.AncillaryExam, medsum.IsRichTextMode),
-                    DiagnosaAkhir = RichTextValidation(mainDiag.DiagnosisText, medsum.IsRichTextMode),
-                    DianosaIdAkhir = mainDiag.DiagnoseID,
-                    DiagnosaSinonim = mainDiag.DiagnoseSynonym,
-                    DiagnosaSekunder = ConvertDataTabletoObject(DiagnoseOther(registrationNo, mergeRegs)),
-                    Operasi = ConvertDataTabletoObject(Procedure(registrationNo, p_IsForCasemix)),
-                    Medications = RichTextValidation(medsum.Medications, medsum.IsRichTextMode),
-                    KondisiPulang = StandardReference.GetItemName(AppEnum.StandardReference.DischargeCondition, medsum.SRDischargeCondition),
-                    SuggestionFollowUp = RichTextValidation(medsum.SuggestionFollowUp, medsum.IsRichTextMode),
-                    AlasanPulang = StandardReference.GetItemName(AppEnum.StandardReference.DischargeMethod, medsum.SRDischargeMethod),
-                    HomeMedications = ConvertDataTabletoObject(HomeMedication(reg.RegistrationNo, reg.FromRegistrationNo)),
-                    Prognosis = RichTextValidation(medsum.Prognosis, medsum.IsRichTextMode),
-                    PenjaminBayar = guar.GuarantorName,
-                    ProcedureName = medsum.ProcedureName,
-                    HistoryOfPresentIllness = medsum.HistOfPresentIllness,
-                    VitalSign = ConvertDataTabletoObject(dtbLastVs),
-                    NextControlPlan = ControlPlanExtItems(plan.ControlPlan),
-                    followup = medsum.SuggestionFollowUp,
-                    DokterTeamm = ConvertDataTabletoObject(DokterTeam(reg.RegistrationNo)),
-                    AncillaryExamOther = RichTextValidation(medsum.AncillaryExamOther, medsum.IsRichTextMode),
-                    HealthcareLogo = Convert.ToBase64String(hc.HealthcareLogo),
-                    EmergencyContact = emrct.ContactName,
-                    EmployeeNo = pat.EmployeeNo,
-                    GuarantorCard = pat.GuarantorCardNo,
-                    PatientInType = StandardReference.GetItemName(AppEnum.StandardReference.PatientInType, reg.SRPatientInType),
-                    Relation = StandardReference.GetItemName(AppEnum.StandardReference.Relationship, emrct.SRRelationship),
-                    smf = StandardReference.GetItemName(AppEnum.StandardReference.ParamedicRL1, par.SRParamedicRL1),
-                    //PpaSignUrl = signParamedic != null ? signParamedic : string.Empty,
-                    PpaSignUrl = !string.IsNullOrEmpty(Convert.ToString(signParamedic)) ? Encoding.UTF8.GetBytes(Convert.ToString(signParamedic)) : medsum.PpaSign,
-                    SignatureImage = hc != null && signimg.SignatureImage != null ? Convert.ToBase64String(signimg.SignatureImage) : string.Empty,
-                    education = ConvertDataTabletoObject(PatientEducation(registrationNo)),
-                    UnitIntended = StandardReference.GetItemName(AppEnum.StandardReference.UnitIntended, medsum.SRUnitIntended),
-                    UserSign = UserSign,
-                    ReferExternal = ConvertDataTabletoObject(ReferExternal(medsum.RegistrationNo, p_IsForCasemix)),
-                    DpjpName = par.ParamedicName,
-                    DpjpSign = Convert.ToBase64String(imgDpjp)
+                                    ReferralAddress = FieldOrEmpty(
+                        referralAddress,
+                        isMdsDeleted
+                    ),
+
+                                    NamaDokter = FieldOrEmpty(
+                        Paramedic.GetParamedicName(medsum.ParamedicID),
+                        isMdsDeleted
+                    ),
+
+                                    TglPulang = FieldOrEmpty(
+                        string.Format(
+                            "{0:dd-MMM-yyyy}",
+                            reg.DischargeDate ?? medsum.DischargeDate
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    JamPulang = FieldOrEmpty(
+                        string.Format(
+                            "{0:HH:mm}",
+                            reg.DischargeTime ?? medsum.DischargeTime
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Indikasi = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.TreatmentIndications,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    ChiefComplaint = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.ChiefComplaint,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Anamnesis = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.HistOfPresentIllness,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Komorbiditas = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.PastMedicalHistory,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Fisik = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.PhysicalExam,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Penunjang = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.AncillaryExam,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    DiagnosaAkhir = FieldOrEmpty(
+                        RichTextValidation(
+                            mainDiag.DiagnosisText,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    DianosaIdAkhir = FieldOrEmpty(
+                        Convert.ToString(mainDiag.DiagnoseID),
+                        isMdsDeleted
+                    ),
+
+                                    DiagnosaSinonim = FieldOrEmpty(
+                        Convert.ToString(mainDiag.DiagnoseSynonym),
+                        isMdsDeleted
+                    ),
+
+                                    DiagnosaSekunder = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            DiagnoseOther(registrationNo, mergeRegs)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Operasi = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            Procedure(registrationNo, p_IsForCasemix)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Medications = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.Medications,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    KondisiPulang = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.DischargeCondition,
+                            medsum.SRDischargeCondition
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    SuggestionFollowUp = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.SuggestionFollowUp,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    AlasanPulang = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.DischargeMethod,
+                            medsum.SRDischargeMethod
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    HomeMedications = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            HomeMedication(
+                                reg.RegistrationNo,
+                                reg.FromRegistrationNo
+                            )
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Prognosis = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.Prognosis,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    PenjaminBayar = FieldOrEmpty(
+                        guar.GuarantorName,
+                        isMdsDeleted
+                    ),
+
+                                    ProcedureName = FieldOrEmpty(
+                        Convert.ToString(medsum.ProcedureName),
+                        isMdsDeleted
+                    ),
+
+                                    HistoryOfPresentIllness = FieldOrEmpty(
+                        Convert.ToString(medsum.HistOfPresentIllness),
+                        isMdsDeleted
+                    ),
+
+                                    VitalSign = FieldOrEmpty(
+                        ConvertDataTabletoObject(dtbLastVs),
+                        isMdsDeleted
+                    ),
+
+                                    NextControlPlan = FieldOrEmpty(
+                        ControlPlanExtItems(plan.ControlPlan),
+                        isMdsDeleted
+                    ),
+
+                                    followup = FieldOrEmpty(
+                        Convert.ToString(medsum.SuggestionFollowUp),
+                        isMdsDeleted
+                    ),
+
+                                    DokterTeamm = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            DokterTeam(reg.RegistrationNo)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    AncillaryExamOther = FieldOrEmpty(
+                        RichTextValidation(
+                            medsum.AncillaryExamOther,
+                            medsum.IsRichTextMode
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    HealthcareLogo = FieldOrEmpty(
+                        hc != null && hc.HealthcareLogo != null
+                            ? Convert.ToBase64String(hc.HealthcareLogo)
+                            : string.Empty,
+                        isMdsDeleted
+                    ),
+
+                                    EmergencyContact = FieldOrEmpty(
+                        Convert.ToString(emrct.ContactName),
+                        isMdsDeleted
+                    ),
+
+                                    EmployeeNo = FieldOrEmpty(
+                        Convert.ToString(pat.EmployeeNo),
+                        isMdsDeleted
+                    ),
+
+                                    GuarantorCard = FieldOrEmpty(
+                        Convert.ToString(pat.GuarantorCardNo),
+                        isMdsDeleted
+                    ),
+
+                                    PatientInType = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.PatientInType,
+                            reg.SRPatientInType
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Relation = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.Relationship,
+                            emrct.SRRelationship
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    smf = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.ParamedicRL1,
+                            par.SRParamedicRL1
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    PpaSignUrl = FieldOrEmpty(
+                        !string.IsNullOrEmpty(Convert.ToString(signParamedic))
+                            ? Encoding.UTF8.GetBytes(
+                                Convert.ToString(signParamedic)
+                            )
+                            : medsum.PpaSign,
+                        isMdsDeleted
+                    ),
+
+                                    SignatureImage = FieldOrEmpty(
+                        hc != null && signimg.SignatureImage != null
+                            ? Convert.ToBase64String(signimg.SignatureImage)
+                            : string.Empty,
+                        isMdsDeleted
+                    ),
+
+                                    education = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            PatientEducation(registrationNo)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    UnitIntended = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.UnitIntended,
+                            medsum.SRUnitIntended
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    UserSign = FieldOrEmpty(
+                        UserSign,
+                        isMdsDeleted
+                    ),
+
+                                    ReferExternal = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            ReferExternal(
+                                medsum.RegistrationNo,
+                                p_IsForCasemix
+                            )
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    DpjpName = FieldOrEmpty(
+                        Convert.ToString(par.ParamedicName),
+                        isMdsDeleted
+                    ),
+
+                                    DpjpSign = FieldOrEmpty(
+                        Convert.ToBase64String(imgDpjp),
+                        isMdsDeleted
+                    )
                 };
 
                 var retField = MergeJsonData(HeaderField(pat, reg, null), additionalField);
@@ -1291,17 +1551,17 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 }
 
                 // Validasi RegistrationInfoMedic IsDeleted
-                var regMedDeleted = new RegistrationInfoMedic();
-                regMedDeleted.Query.Where(
-                    regMedDeleted.Query.RegistrationNo == registrationNo,
-                    regMedDeleted.Query.SRMedicalNotesInputType == "MDS",
-                    regMedDeleted.Query.IsDeleted == true
+                var regMedStatus = new RegistrationInfoMedic();
+                regMedStatus.Query.Where(
+                    regMedStatus.Query.RegistrationNo == registrationNo,
+                    regMedStatus.Query.SRMedicalNotesInputType == "MDS"
                 );
 
-                if (regMedDeleted.Query.Load())
+                bool isMdsDeleted = false;
+
+                if (regMedStatus.Query.Load())
                 {
-                    ResponseWrite("{}");
-                    return;
+                    isMdsDeleted = regMedStatus.IsDeleted == true;
                 }
 
                 var signParamedic = SignParamedic(registrationNo).Rows.Count > 1 ? SignParamedic(registrationNo).Rows[0]["SignatureImage"] : null;
@@ -1315,63 +1575,274 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                 var additionalField = new
                 {
+                    NamaDokter = FieldOrEmpty(
+                        Paramedic.GetParamedicName(medsum.ParamedicID),
+                        isMdsDeleted
+                    ),
 
-                    NamaDokter = Paramedic.GetParamedicName(medsum.ParamedicID), //ParamedicTeam.DPJP(reg.RegistrationNo).ParamedicName,
-                    TglPulang = string.Format("{0:dd-MMM-yyyy}", reg.DischargeDate ?? medsum.DischargeDate),
+                                    TglPulang = FieldOrEmpty(
+                        string.Format(
+                            "{0:dd-MMM-yyyy}",
+                            reg.DischargeDate ?? medsum.DischargeDate
+                        ),
+                        isMdsDeleted
+                    ),
 
-                    Indikasi = RichTextValidation(medsum.TreatmentIndications, medsum.IsRichTextMode),
-                    ChiefComplaint = RichTextValidation(medsum.ChiefComplaint, medsum.IsRichTextMode),
-                    Anamnesis = RichTextValidation(medsum.HistOfPresentIllness, medsum.IsRichTextMode),
-                    Komorbiditas = RichTextValidation(medsum.PastMedicalHistory, medsum.IsRichTextMode),
-                    Fisik = RichTextValidation(medsum.PhysicalExam, medsum.IsRichTextMode),
-                    Penunjang = RichTextValidation(medsum.AncillaryExam, medsum.IsRichTextMode),
-                    MedicalProcedures = RichTextValidation(medsum.MedicalProcedures, medsum.IsRichTextMode),
-                    DiagnosaAkhir = RichTextValidation(mainDiag.DiagnosisText, medsum.IsRichTextMode),
-                    DianosaIdAkhir = mainDiag.DiagnoseID,
-                    DiagnosaSinonim = mainDiag.DiagnoseSynonym,
-                    kelas.ClassName,
-                    refer.OtherInformation,
-                    //DiagnosaSekunder = ConvertDataTabletoObject(DiagnoseOther(registrationNo, mergeRegs)), //Request RSI : disamakan dengan inpatient. (Fajri 2023/06/26)
-                    DiagnosaSekunder = ConvertDataTabletoObject(MdsDiagnoseOther(registrationNo, p_IsForCasemix)),
-                    Operasi = ConvertDataTabletoObject(Procedure(registrationNo, p_IsForCasemix)),
-                    Medications = RichTextValidation(medsum.Medications, medsum.IsRichTextMode),
-                    KondisiPulang = StandardReference.GetItemName(AppEnum.StandardReference.DischargeCondition, medsum.SRDischargeCondition),
-                    SuggestionFollowUp = RichTextValidation(medsum.SuggestionFollowUp, medsum.IsRichTextMode),
-                    AlasanPulang = StandardReference.GetItemName(AppEnum.StandardReference.DischargeMethod, medsum.SRDischargeMethod),
-                    HomeMedications = ConvertDataTabletoObject(HomeMedication(reg.RegistrationNo, reg.FromRegistrationNo)),
-                    Prognosis = RichTextValidation(medsum.Prognosis, medsum.IsRichTextMode),
-                    PenjaminBayar = guar.GuarantorName,
-                    ProcedureName = medsum.ProcedureName,
-                    HistoryOfPresentIllness = medsum.HistOfPresentIllness,
-                    VitalSign = ConvertDataTabletoObject(dtbLastVs),
-                    NextControlPlan = ControlPlanExtItems(plan.ControlPlan),
-                    followup = medsum.SuggestionFollowUp,
-                    //HealthcareLogo = Convert.ToBase64String(hc.HealthcareLogo),
-                    HealthcareLogo = hc != null && hc.HealthcareLogo != null ? Convert.ToBase64String(hc.HealthcareLogo) : String.Empty,
-                    DokterTeamm = ConvertDataTabletoObject(DokterTeam(reg.RegistrationNo)),
-                    Diet = RichTextValidation(medsum.Diet, medsum.IsRichTextMode),
-                    AncillaryExamOther = RichTextValidation(medsum.AncillaryExamOther, medsum.IsRichTextMode),
-                    EmergencyContact = emrct.ContactName,
-                    Relation = StandardReference.GetItemName(AppEnum.StandardReference.Relationship, emrct.SRRelationship),
-                    EmployeeNo = pat.EmployeeNo,
-                    GuarantorCard = pat.GuarantorCardNo,
-                    PatientInType = StandardReference.GetItemName(AppEnum.StandardReference.PatientInType, reg.SRPatientInType),
-                    smf = StandardReference.GetItemName(AppEnum.StandardReference.ParamedicRL1, par.SRParamedicRL1),
-                    //PpaSignUrl = ppaSignUrl,
-                    //PpaSignUrl = signParamedic != null ? signParamedic : string.Empty,
-                    PpaSignUrl = !string.IsNullOrEmpty(Convert.ToString(signParamedic)) ? Encoding.UTF8.GetBytes(Convert.ToString(signParamedic)) : medsum.PpaSign,
-                    SignatureImage = hc != null && signimg.SignatureImage != null ? Convert.ToBase64String(signimg.SignatureImage) : string.Empty,
-                    PatientAssessment = ConvertDataTabletoObject(PatientAssessment(registrationNo)),
-                    education = ConvertDataTabletoObject(PatientEducation(registrationNo)),
-                    UnitIntended = StandardReference.GetItemName(AppEnum.StandardReference.UnitIntended, medsum.SRUnitIntended),
-                    Dpjp = par.ParamedicName,
-                    DpjpSign = Convert.ToBase64String(imgDpjp),
-                    DpjpSignByte = imgDpjp,
-                    SignatureImageByte = signimg.SignatureImage,
-                    RegistrationInfoMedicCreatedBy = createdRegMedUserName,
-                    RegistrationInfoMedicCreatedDate = regMed.CreatedDateTime,
-                    RegistrationInfoMedicLastUpdatedBy = lastUpdateRegMedUserName,
-                    RegistrationInfoMedicLastUpdatedDate = regMed.LastUpdateDateTime
+                                    Indikasi = FieldOrEmpty(
+                        RichTextValidation(medsum.TreatmentIndications, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    ChiefComplaint = FieldOrEmpty(
+                        RichTextValidation(medsum.ChiefComplaint, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    Anamnesis = FieldOrEmpty(
+                        RichTextValidation(medsum.HistOfPresentIllness, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    Komorbiditas = FieldOrEmpty(
+                        RichTextValidation(medsum.PastMedicalHistory, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    Fisik = FieldOrEmpty(
+                        RichTextValidation(medsum.PhysicalExam, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    Penunjang = FieldOrEmpty(
+                        RichTextValidation(medsum.AncillaryExam, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    MedicalProcedures = FieldOrEmpty(
+                        RichTextValidation(medsum.MedicalProcedures, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    DiagnosaAkhir = FieldOrEmpty(
+                        RichTextValidation(mainDiag.DiagnosisText, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    DianosaIdAkhir = FieldOrEmpty(
+                        Convert.ToString(mainDiag.DiagnoseID),
+                        isMdsDeleted
+                    ),
+
+                                    DiagnosaSinonim = FieldOrEmpty(
+                        Convert.ToString(mainDiag.DiagnoseSynonym),
+                        isMdsDeleted
+                    ),
+
+                    ClassName = FieldOrEmpty(kelas.ClassName, isMdsDeleted),
+                    OtherInformation = FieldOrEmpty(refer.OtherInformation, isMdsDeleted),
+
+                    DiagnosaSekunder = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            MdsDiagnoseOther(registrationNo, p_IsForCasemix)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Operasi = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            Procedure(registrationNo, p_IsForCasemix)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Medications = FieldOrEmpty(
+                        RichTextValidation(medsum.Medications, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    KondisiPulang = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.DischargeCondition,
+                            medsum.SRDischargeCondition
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    SuggestionFollowUp = FieldOrEmpty(
+                        RichTextValidation(medsum.SuggestionFollowUp, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    AlasanPulang = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.DischargeMethod,
+                            medsum.SRDischargeMethod
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    HomeMedications = FieldOrEmpty(
+                        ConvertDataTabletoObject(
+                            HomeMedication(reg.RegistrationNo, reg.FromRegistrationNo)
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Prognosis = FieldOrEmpty(
+                        RichTextValidation(medsum.Prognosis, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    PenjaminBayar = FieldOrEmpty(guar.GuarantorName, isMdsDeleted),
+
+                                    ProcedureName = FieldOrEmpty(
+                        Convert.ToString(medsum.ProcedureName),
+                        isMdsDeleted
+                    ),
+
+                                    HistoryOfPresentIllness = FieldOrEmpty(
+                        Convert.ToString(medsum.HistOfPresentIllness),
+                        isMdsDeleted
+                    ),
+
+                                    VitalSign = FieldOrEmpty(
+                        ConvertDataTabletoObject(dtbLastVs),
+                        isMdsDeleted
+                    ),
+
+                                    NextControlPlan = FieldOrEmpty(
+                        ControlPlanExtItems(plan.ControlPlan),
+                        isMdsDeleted
+                    ),
+
+                                    followup = FieldOrEmpty(
+                        Convert.ToString(medsum.SuggestionFollowUp),
+                        isMdsDeleted
+                    ),
+
+                                    HealthcareLogo = FieldOrEmpty(
+                        hc != null && hc.HealthcareLogo != null
+                            ? Convert.ToBase64String(hc.HealthcareLogo)
+                            : string.Empty,
+                        isMdsDeleted
+                    ),
+
+                                    DokterTeamm = FieldOrEmpty(
+                        ConvertDataTabletoObject(DokterTeam(reg.RegistrationNo)),
+                        isMdsDeleted
+                    ),
+
+                                    Diet = FieldOrEmpty(
+                        RichTextValidation(medsum.Diet, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    AncillaryExamOther = FieldOrEmpty(
+                        RichTextValidation(medsum.AncillaryExamOther, medsum.IsRichTextMode),
+                        isMdsDeleted
+                    ),
+
+                                    EmergencyContact = FieldOrEmpty(
+                        Convert.ToString(emrct.ContactName),
+                        isMdsDeleted
+                    ),
+
+                                    Relation = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.Relationship,
+                            emrct.SRRelationship
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    EmployeeNo = FieldOrEmpty(Convert.ToString(pat.EmployeeNo), isMdsDeleted),
+
+                                    GuarantorCard = FieldOrEmpty(
+                        Convert.ToString(pat.GuarantorCardNo),
+                        isMdsDeleted
+                    ),
+
+                                    PatientInType = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.PatientInType,
+                            reg.SRPatientInType
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    smf = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.ParamedicRL1,
+                            par.SRParamedicRL1
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    PpaSignUrl = FieldOrEmpty(
+                        !string.IsNullOrEmpty(Convert.ToString(signParamedic))
+                            ? Encoding.UTF8.GetBytes(Convert.ToString(signParamedic))
+                            : medsum.PpaSign,
+                        isMdsDeleted
+                    ),
+
+                                    SignatureImage = FieldOrEmpty(
+                        hc != null && signimg.SignatureImage != null
+                            ? Convert.ToBase64String(signimg.SignatureImage)
+                            : string.Empty,
+                        isMdsDeleted
+                    ),
+
+                                    PatientAssessment = FieldOrEmpty(
+                        ConvertDataTabletoObject(PatientAssessment(registrationNo)),
+                        isMdsDeleted
+                    ),
+
+                                    education = FieldOrEmpty(
+                        ConvertDataTabletoObject(PatientEducation(registrationNo)),
+                        isMdsDeleted
+                    ),
+
+                                    UnitIntended = FieldOrEmpty(
+                        StandardReference.GetItemName(
+                            AppEnum.StandardReference.UnitIntended,
+                            medsum.SRUnitIntended
+                        ),
+                        isMdsDeleted
+                    ),
+
+                                    Dpjp = FieldOrEmpty(Convert.ToString(par.ParamedicName), isMdsDeleted),
+
+                                    DpjpSign = FieldOrEmpty(
+                        Convert.ToBase64String(imgDpjp),
+                        isMdsDeleted
+                    ),
+
+                                    DpjpSignByte = FieldOrEmpty(imgDpjp, isMdsDeleted),
+
+                                    SignatureImageByte = FieldOrEmpty(
+                        signimg.SignatureImage,
+                        isMdsDeleted
+                    ),
+
+                                    RegistrationInfoMedicCreatedBy = FieldOrEmpty(
+                        createdRegMedUserName,
+                        isMdsDeleted
+                    ),
+
+                                    RegistrationInfoMedicCreatedDate = FieldOrEmpty(
+                        regMed.CreatedDateTime,
+                        isMdsDeleted
+                    ),
+
+                                    RegistrationInfoMedicLastUpdatedBy = FieldOrEmpty(
+                        lastUpdateRegMedUserName,
+                        isMdsDeleted
+                    ),
+
+                                    RegistrationInfoMedicLastUpdatedDate = FieldOrEmpty(
+                        regMed.LastUpdateDateTime,
+                        isMdsDeleted
+                    )
                 };
 
                 var retField = MergeJsonData(HeaderField(pat, reg, null), additionalField);
