@@ -811,6 +811,18 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     }
                 }
 
+                if (!pasienBaru && (pasien.IsBlackList ?? false))
+                {
+                    return Request.CreateResponse(HttpStatusCode.Created, new
+                    {
+                        metadata = new Antrol.AmbilAntrean.Response.Metadata()
+                        {
+                            Code = (int)HttpStatusCode.Created,
+                            Message = "Terdapat Kendala Pada Data Pasien, Silahkan Menghubungi Unit Registrasi Pasien"
+                        }
+                    });
+                }
+
                 if (pasienBaru)
                 {
                     if (new string[] { "RSARS", "RSIAM" }.Contains(AppSession.Parameter.HealthcareInitial))
@@ -1985,6 +1997,22 @@ namespace Temiang.Avicenna.Bridging.Controllers
                             }
                         }
                     }
+                }
+
+                if (!pasienBaru && (pasien.IsBlackList ?? false))
+                {
+                    meta = new Antrol.AmbilAntrean.Response.Metadata()
+                    {
+                        Code = (int)HttpStatusCode.Created,
+                        Message = "Terdapat Kendala Pada Data Pasien, Silahkan Menghubungi Unit Registrasi Pasien"
+                    };
+                    log.Response = JsonConvert.SerializeObject(meta);
+                    log.Save();
+
+                    return Request.CreateResponse(HttpStatusCode.Created, new
+                    {
+                        metadata = meta
+                    });
                 }
 
                 antrean = new Appointment();
