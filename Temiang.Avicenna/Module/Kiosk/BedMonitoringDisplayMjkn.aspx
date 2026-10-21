@@ -54,12 +54,13 @@
         .card-panel-header {
             padding: 10px 16px;
             font-weight: 700;
-            font-size: 1.45rem;
+            font-size: 1.90rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            position: relative;
             border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -78,6 +79,10 @@
             padding: 3px 10px;
             border-radius: 12px;
             color: #fff;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .tbl-kiosk {
