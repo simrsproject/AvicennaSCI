@@ -961,12 +961,15 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 }
 
                 var antrean = new Appointment();
+                // Only reuse a JKN booking for the requested service unit and physician.
                 antrean.Query.Where(
+                    antrean.Query.ServiceUnitID == su.ServiceUnitID,
+                    antrean.Query.ParamedicID == p.ParamedicID,
+                    antrean.Query.GuarantorID.In(AppSession.Parameter.GuarantorAskesID),
                     antrean.Query.PatientID == pasien.PatientID,
                     //antrean.Query.AppointmentDate.Date() == parsed.Date
                     antrean.Query.AppointmentDate >= parsed.Date, antrean.Query.AppointmentDate < parsed.Date.AddDays(1)
                 );
-                //antrean.Query.Where(antrean.Query.ServiceUnitID == su.ServiceUnitID, antrean.Query.ParamedicID == p.ParamedicID, antrean.Query.PatientID == pasien.PatientID, antrean.Query.AppointmentDate.Date() == parsed.Date);
                 //if (AppSession.Parameter.HealthcareID != "RSES")
                 antrean.Query.Where(antrean.Query.SRAppointmentStatus != AppSession.Parameter.AppointmentStatusCancel);
                 var apptExist = antrean.Query.Load();
