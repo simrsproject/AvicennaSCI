@@ -54,22 +54,23 @@
         .card-panel-header {
             padding: 10px 16px;
             font-weight: 700;
-            font-size: 1.45rem;
+            font-size: 2.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            position: relative;
             border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         /* Distinct color accents for class categories */
-        .hdr-kl1 { background: linear-gradient(90deg, #0d6efd, #0b5ed7); color: #fff; }
-        .hdr-kl2 { background: linear-gradient(90deg, #0dcaf0, #0aa2c0); color: #fff; }
-        .hdr-kl3 { background: linear-gradient(90deg, #198754, #146c43); color: #fff; }
-        .hdr-vip { background: linear-gradient(90deg, #fd7e14, #d35400); color: #fff; }
-        .hdr-vvp { background: linear-gradient(90deg, #6f42c1, #59359a); color: #fff; }
-        .hdr-int { background: linear-gradient(90deg, #dc3545, #b02a37); color: #fff; }
+        .hdr-kl1 { background: linear-gradient(90deg, #0b5ed7, #0b5ed7); color: #fff; }
+        .hdr-kl2 { background: linear-gradient(90deg, #337179, #337179); color: #fff; }
+        .hdr-kl3 { background: linear-gradient(90deg, #146c43, #146c43); color: #fff; }
+        .hdr-vip { background: linear-gradient(90deg, #d35400, #d35400); color: #fff; }
+        .hdr-vvp { background: linear-gradient(90deg, #59359a, #59359a); color: #fff; }
+        .hdr-int { background: linear-gradient(90deg, #ab4265, #ab4265); color: #fff; }
 
         .page-badge {
             font-size: 0.95rem;
@@ -78,6 +79,10 @@
             padding: 3px 10px;
             border-radius: 12px;
             color: #fff;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .tbl-kiosk {

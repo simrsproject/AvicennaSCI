@@ -60,9 +60,12 @@ namespace Temiang.Avicenna.Module.RADT.Master
             ViewState["IsNewRecord"] = false;
 
             txtBedID.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BedID);
-            cboClassID.SelectedValue = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.ClassID);
-            cboDefaultChargeClassID.SelectedValue =
-                (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.DefaultChargeClassID);
+            SelectStoredValue(cboClassID,
+                (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.ClassID),
+                ((Bed)DataItem).ClassName);
+            SelectStoredValue(cboDefaultChargeClassID,
+                (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.DefaultChargeClassID),
+                ((Bed)DataItem).DefaultChargeClassName);
             chkIsTemporary.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsTemporary);
             chkIsNeedConfirmation.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsNeedConfirmation);
             chkIsActive.Checked = (bool)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.IsActive);
@@ -77,12 +80,15 @@ namespace Temiang.Avicenna.Module.RADT.Master
 
             if (!string.IsNullOrWhiteSpace((String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBridgingType)))
             {
-                cboBridgingType.SelectedValue =
-                    (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBridgingType);
+                SelectStoredValue(cboBridgingType,
+                    (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.SRBridgingType),
+                    ((Bed)DataItem).BridingTypeName);
                 cboBridgingType_SelectedIndexChanged(null,
                     new RadComboBoxSelectedIndexChangedEventArgs(string.Empty, string.Empty, cboBridgingType.SelectedValue,
                         string.Empty));
-                cboServiceUnitAliasID.SelectedValue = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BridgingID);
+                SelectStoredValue(cboServiceUnitAliasID,
+                    (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BridgingID),
+                    (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BridgingName));
             }
 
             txtServiceUnitAliasName.Text = (String)DataBinder.Eval(DataItem, BedMetadata.ColumnNames.BridgingName);
@@ -93,6 +99,23 @@ namespace Temiang.Avicenna.Module.RADT.Master
                 cboClassID.Enabled = false;
                 chkIsActive.Enabled = false;
             }
+        }
+
+        private static void SelectStoredValue(RadComboBox comboBox, string value, string text)
+        {
+            value = value ?? string.Empty;
+            comboBox.ToolTip = string.Empty;
+            if (comboBox.FindItemByValue(value) == null)
+            {
+                // Keep the existing mapping even when its reference is inactive or unavailable.
+                // Do not add a warning to the item text: that text is also saved as the name.
+                comboBox.Items.Add(new RadComboBoxItem(
+                    string.IsNullOrEmpty(value) ? string.Empty : (string.IsNullOrEmpty(text) ? value : text), value));
+                if (!string.IsNullOrEmpty(value))
+                    comboBox.ToolTip = "The stored value is not available in the current reference list. The existing value has been retained.";
+            }
+            comboBox.ClearSelection();
+            comboBox.SelectedValue = value;
         }
 
         protected void customValidator_ServerValidate(object source, ServerValidateEventArgs args)
