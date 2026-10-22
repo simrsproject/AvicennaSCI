@@ -1872,6 +1872,7 @@
     <Content Include="Document\2025\09\iDRG\04. Master ICD9\4. Script Insert Procedure.sql" />
     <Content Include="Document\2025\09\iDRG\04. Master ICD9\5. Script Update Procedure.sql" />
     <Content Include="Document\2025\09\iDRG\index.php" />
+    <Content Include="AudioAvicenna.rar" />
     <None Include="Document\Bpjs Face Scan\Readme.md" />
     <Content Include="Document\2026\05\13\AntrianRSI\001-CREATE-TABLE-AutoNumberSemantic.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\002-CREATE-TABLE-VisitQueue.sql" />
