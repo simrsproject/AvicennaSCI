@@ -54,7 +54,7 @@
         .card-panel-header {
             padding: 10px 16px;
             font-weight: 700;
-            font-size: 1.90rem;
+            font-size: 2.5rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
