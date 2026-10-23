@@ -2340,19 +2340,31 @@ namespace Temiang.Avicenna.Module.Charges
                                     {
                                         if (!HttpContext.Current.IsDebuggingEnabled)
                                         {
+                                            bool IsUsingUniqueAcsnNumber = AppParameter.IsYes(AppParameter.ParameterItem.IsUsingUniqueACSN);
+
                                             foreach (var entity in transChargesItems.Where(t => t.IsOrderRealization ?? false))
                                             {
                                                 var root = new Common.Worklist.RSI.Json.Order.Root();
 
                                                 var orderno = string.Empty;
+                                                var orderNoComplete = string.Empty;
                                                 foreach (var c in entity.TransactionNo.ToCharArray())
                                                 {
                                                     if (!int.TryParse(c.ToString(), out int number)) continue;
+
+                                                    orderNoComplete += number.ToString();
                                                     if (number == 0) continue;
                                                     orderno += number.ToString();
                                                 }
 
-                                                root.acc = orderno;
+                                                if (IsUsingUniqueAcsnNumber)
+                                                {
+                                                    root.acc = $"{orderNoComplete}{entity.SequenceNo}"; //untuk unik acsn perlu ditambahkan sequenceno agar unique
+                                                }
+                                                else
+                                                {
+                                                    root.acc = orderno;
+                                                }
 
                                                 orderno += entity.SequenceNo.ToInt().ToString();
                                                 foreach (var c in entity.ItemID.ToCharArray())
@@ -2770,6 +2782,12 @@ namespace Temiang.Avicenna.Module.Charges
                                                 service.CreateXmlWorklist(ds);
 
                                                 entity.ResultValue = root.uid;
+
+                                                if (IsUsingUniqueAcsnNumber)
+                                                {
+                                                    //tambahkan ResultAcsn
+                                                    entity.ResultAcsn = root.acc;
+                                                }
                                             }
                                         }
                                     }

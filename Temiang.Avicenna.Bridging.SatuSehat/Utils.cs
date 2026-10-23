@@ -4241,16 +4241,29 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
             }
             else if (Temiang.Avicenna.Common.AppSession.Parameter.RisPacsInteropVendor == "INTIWID")
             {
+                bool IsUsingUniqueAcsnNumber = AppParameter.IsYes(AppParameter.ParameterItem.IsUsingUniqueACSN);
+                var orderNoComplete = string.Empty;
+
                 var orderno = string.Empty;
 
                 foreach (var c in transactionNo.ToCharArray())
                 {
                     if (!int.TryParse(c.ToString(), out int number)) continue;
+
+                    orderNoComplete += number.ToString();
                     if (number == 0) continue;
                     orderno += number.ToString();
                 }
 
-                accessionValue = orderno;
+                
+                if (IsUsingUniqueAcsnNumber)
+                {
+                    accessionValue = $"{orderno}{sequenceNo}"; //untuk unik acsn perlu ditambahkan sequenceno agar unique
+                }
+                else
+                {
+                    accessionValue = orderno;
+                }
             }
             else
             {

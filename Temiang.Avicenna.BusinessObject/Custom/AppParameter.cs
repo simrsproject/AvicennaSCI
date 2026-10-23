@@ -1297,7 +1297,8 @@ namespace Temiang.Avicenna.BusinessObject
             IsDirectButtonBetweenKioskVersion,
             IsUsingSuggestion,
 
-            IsAllowZeroNewPriceForTariff
+            IsAllowZeroNewPriceForTariff,
+            IsUsingUniqueACSN
         }
 
         public class DefaultRecordValue

@@ -1,8 +1,10 @@
 /*
 ===============================================================================
-                       Persistence Layer and Business Objects  
+                       Persistence Layer and Business Objects
 ===============================================================================
-                       Date Generated       : 10/02/2026 20:13:18
+                    Date Generated       : 2026-10-23 11:47:52 AM
+===============================================================================
+				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
 */
 
@@ -245,6 +247,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "SpecimenReceiveByUserID": this.str.SpecimenReceiveByUserID = (string)value; break;
                         case "SRCollectMethod": this.str.SRCollectMethod = (string)value; break;
                         case "IsVaccine": this.str.IsVaccine = (string)value; break;
+                        case "ResultAcsn": this.str.ResultAcsn = (string)value; break;
                     }
                 }
                 else
@@ -1687,6 +1690,22 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemBoolean(TransChargesItemMetadata.ColumnNames.IsVaccine, value);
             }
         }
+        /// <summary>
+        /// Maps to TransChargesItem.ResultAcsn
+        /// </summary>
+        virtual public System.String ResultAcsn
+        {
+            get
+            {
+                return base.GetSystemString(TransChargesItemMetadata.ColumnNames.ResultAcsn);
+            }
+
+            set
+            {
+                base.SetSystemString(TransChargesItemMetadata.ColumnNames.ResultAcsn, value);
+            }
+        }
+
 
         #endregion
 
@@ -2856,6 +2875,21 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.IsVaccine = Convert.ToBoolean(value);
                 }
             }
+            public System.String ResultAcsn
+            {
+                get
+                {
+                    System.String data = entity.ResultAcsn;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.ResultAcsn = null;
+                    else entity.ResultAcsn = Convert.ToString(value);
+                }
+            }
+
             private esTransChargesItem entity;
         }
         #endregion
@@ -2909,7 +2943,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.TransactionNo, esSystemType.String);
             }
         }
-
         public esQueryItem SequenceNo
         {
             get
@@ -2917,7 +2950,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SequenceNo, esSystemType.String);
             }
         }
-
         public esQueryItem ReferenceNo
         {
             get
@@ -2925,7 +2957,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ReferenceNo, esSystemType.String);
             }
         }
-
         public esQueryItem ReferenceSequenceNo
         {
             get
@@ -2933,7 +2964,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ReferenceSequenceNo, esSystemType.String);
             }
         }
-
         public esQueryItem ItemID
         {
             get
@@ -2941,7 +2971,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ItemID, esSystemType.String);
             }
         }
-
         public esQueryItem ChargeClassID
         {
             get
@@ -2949,7 +2978,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ChargeClassID, esSystemType.String);
             }
         }
-
         public esQueryItem ParamedicID
         {
             get
@@ -2957,7 +2985,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ParamedicID, esSystemType.String);
             }
         }
-
         public esQueryItem SecondParamedicID
         {
             get
@@ -2965,7 +2992,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SecondParamedicID, esSystemType.String);
             }
         }
-
         public esQueryItem IsAdminCalculation
         {
             get
@@ -2973,7 +2999,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsAdminCalculation, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsVariable
         {
             get
@@ -2981,7 +3006,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsVariable, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsCito
         {
             get
@@ -2989,7 +3013,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsCito, esSystemType.Boolean);
             }
         }
-
         public esQueryItem ChargeQuantity
         {
             get
@@ -2997,7 +3020,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ChargeQuantity, esSystemType.Decimal);
             }
         }
-
         public esQueryItem StockQuantity
         {
             get
@@ -3005,7 +3027,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.StockQuantity, esSystemType.Decimal);
             }
         }
-
         public esQueryItem SRItemUnit
         {
             get
@@ -3013,7 +3034,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SRItemUnit, esSystemType.String);
             }
         }
-
         public esQueryItem CostPrice
         {
             get
@@ -3021,7 +3041,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CostPrice, esSystemType.Decimal);
             }
         }
-
         public esQueryItem Price
         {
             get
@@ -3029,7 +3048,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.Price, esSystemType.Decimal);
             }
         }
-
         public esQueryItem DiscountAmount
         {
             get
@@ -3037,7 +3055,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.DiscountAmount, esSystemType.Decimal);
             }
         }
-
         public esQueryItem CitoAmount
         {
             get
@@ -3045,7 +3062,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CitoAmount, esSystemType.Decimal);
             }
         }
-
         public esQueryItem RoundingAmount
         {
             get
@@ -3053,7 +3069,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.RoundingAmount, esSystemType.Decimal);
             }
         }
-
         public esQueryItem SRDiscountReason
         {
             get
@@ -3061,7 +3076,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SRDiscountReason, esSystemType.String);
             }
         }
-
         public esQueryItem IsAssetUtilization
         {
             get
@@ -3069,7 +3083,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsAssetUtilization, esSystemType.Boolean);
             }
         }
-
         public esQueryItem AssetID
         {
             get
@@ -3077,7 +3090,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.AssetID, esSystemType.String);
             }
         }
-
         public esQueryItem IsBillProceed
         {
             get
@@ -3085,7 +3097,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsBillProceed, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsOrderRealization
         {
             get
@@ -3093,7 +3104,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsOrderRealization, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsPackage
         {
             get
@@ -3101,7 +3111,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsPackage, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsApprove
         {
             get
@@ -3109,7 +3118,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsApprove, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsVoid
         {
             get
@@ -3117,7 +3125,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsVoid, esSystemType.Boolean);
             }
         }
-
         public esQueryItem Notes
         {
             get
@@ -3125,7 +3132,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.Notes, esSystemType.String);
             }
         }
-
         public esQueryItem FilmNo
         {
             get
@@ -3133,7 +3139,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.FilmNo, esSystemType.String);
             }
         }
-
         public esQueryItem LastUpdateDateTime
         {
             get
@@ -3141,7 +3146,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.LastUpdateDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem LastUpdateByUserID
         {
             get
@@ -3149,7 +3153,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.LastUpdateByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem ParentNo
         {
             get
@@ -3157,7 +3160,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ParentNo, esSystemType.String);
             }
         }
-
         public esQueryItem SRCenterID
         {
             get
@@ -3165,7 +3167,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SRCenterID, esSystemType.String);
             }
         }
-
         public esQueryItem AutoProcessCalculation
         {
             get
@@ -3173,7 +3174,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.AutoProcessCalculation, esSystemType.Decimal);
             }
         }
-
         public esQueryItem ParamedicCollectionName
         {
             get
@@ -3181,7 +3181,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ParamedicCollectionName, esSystemType.String);
             }
         }
-
         public esQueryItem ToServiceUnitID
         {
             get
@@ -3189,7 +3188,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ToServiceUnitID, esSystemType.String);
             }
         }
-
         public esQueryItem RealizationDateTime
         {
             get
@@ -3197,7 +3195,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.RealizationDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem RealizationUserID
         {
             get
@@ -3205,7 +3202,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.RealizationUserID, esSystemType.String);
             }
         }
-
         public esQueryItem UpdateRealizationDateTime
         {
             get
@@ -3213,7 +3209,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.UpdateRealizationDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem UpdateRealizationUserID
         {
             get
@@ -3221,7 +3216,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.UpdateRealizationUserID, esSystemType.String);
             }
         }
-
         public esQueryItem IsCitoInPercent
         {
             get
@@ -3229,7 +3223,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsCitoInPercent, esSystemType.Boolean);
             }
         }
-
         public esQueryItem BasicCitoAmount
         {
             get
@@ -3237,7 +3230,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.BasicCitoAmount, esSystemType.Decimal);
             }
         }
-
         public esQueryItem IsItemRoom
         {
             get
@@ -3245,7 +3237,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsItemRoom, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsExtraItem
         {
             get
@@ -3253,7 +3244,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsExtraItem, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsSelectedExtraItem
         {
             get
@@ -3261,7 +3251,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsSelectedExtraItem, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsSendToLIS
         {
             get
@@ -3269,7 +3258,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsSendToLIS, esSystemType.Boolean);
             }
         }
-
         public esQueryItem CreatedDateTime
         {
             get
@@ -3277,7 +3265,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CreatedDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem CreatedByUserID
         {
             get
@@ -3285,7 +3272,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CreatedByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem IsCorrection
         {
             get
@@ -3293,7 +3279,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsCorrection, esSystemType.Boolean);
             }
         }
-
         public esQueryItem ResultValue
         {
             get
@@ -3301,7 +3286,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ResultValue, esSystemType.String);
             }
         }
-
         public esQueryItem IsDuplo
         {
             get
@@ -3309,7 +3293,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsDuplo, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsPaymentConfirmed
         {
             get
@@ -3317,7 +3300,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsPaymentConfirmed, esSystemType.Boolean);
             }
         }
-
         public esQueryItem PaymentConfirmedDateTime
         {
             get
@@ -3325,7 +3307,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.PaymentConfirmedDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem PaymentConfirmedBy
         {
             get
@@ -3333,7 +3314,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.PaymentConfirmedBy, esSystemType.String);
             }
         }
-
         public esQueryItem LastPaymentConfirmedDateTime
         {
             get
@@ -3341,7 +3321,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.LastPaymentConfirmedDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem LastPaymentConfirmedByUserID
         {
             get
@@ -3349,7 +3328,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.LastPaymentConfirmedByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem IsDescriptionResult
         {
             get
@@ -3357,7 +3335,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsDescriptionResult, esSystemType.Boolean);
             }
         }
-
         public esQueryItem PriceAdjusted
         {
             get
@@ -3365,7 +3342,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.PriceAdjusted, esSystemType.Decimal);
             }
         }
-
         public esQueryItem SRCitoPercentage
         {
             get
@@ -3373,7 +3349,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SRCitoPercentage, esSystemType.String);
             }
         }
-
         public esQueryItem ItemConditionRuleID
         {
             get
@@ -3381,7 +3356,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ItemConditionRuleID, esSystemType.String);
             }
         }
-
         public esQueryItem CommunicationID
         {
             get
@@ -3389,7 +3363,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CommunicationID, esSystemType.String);
             }
         }
-
         public esQueryItem IsCasemixApproved
         {
             get
@@ -3397,7 +3370,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsCasemixApproved, esSystemType.Boolean);
             }
         }
-
         public esQueryItem CasemixApprovedDateTime
         {
             get
@@ -3405,7 +3377,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CasemixApprovedDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem CasemixApprovedByUserID
         {
             get
@@ -3413,7 +3384,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CasemixApprovedByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem TariffDate
         {
             get
@@ -3421,7 +3391,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.TariffDate, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SpecimenTakenDateTime
         {
             get
@@ -3429,7 +3398,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenTakenDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SpecimenTakenByUserID
         {
             get
@@ -3437,7 +3405,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenTakenByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem SpecimenSubmittedDateTime
         {
             get
@@ -3445,7 +3412,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenSubmittedDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SpecimenSubmittedByUserID
         {
             get
@@ -3453,7 +3419,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenSubmittedByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem SpecimenReceivedDateTime
         {
             get
@@ -3461,7 +3426,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenReceivedDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SpecimenReceivedByUserID
         {
             get
@@ -3469,7 +3433,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenReceivedByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem VoidDateTime
         {
             get
@@ -3477,7 +3440,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.VoidDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem VoidByUserID
         {
             get
@@ -3485,7 +3447,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.VoidByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem CasemixNotes
         {
             get
@@ -3493,7 +3454,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.CasemixNotes, esSystemType.String);
             }
         }
-
         public esQueryItem SpecimenCollectDateTime
         {
             get
@@ -3501,7 +3461,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenCollectDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SpecimenReceiveDateTime
         {
             get
@@ -3509,7 +3468,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenReceiveDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SpecimenCollectByUserID
         {
             get
@@ -3517,7 +3475,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenCollectByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem SpecimenReceiveByUserID
         {
             get
@@ -3525,7 +3482,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SpecimenReceiveByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem SRCollectMethod
         {
             get
@@ -3533,7 +3489,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.SRCollectMethod, esSystemType.String);
             }
         }
-
         public esQueryItem IsVaccine
         {
             get
@@ -3541,7 +3496,13 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.IsVaccine, esSystemType.Boolean);
             }
         }
-
+        public esQueryItem ResultAcsn
+        {
+            get
+            {
+                return new esQueryItem(this, TransChargesItemMetadata.ColumnNames.ResultAcsn, esSystemType.String);
+            }
+        }
     }
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
@@ -3745,7 +3706,7 @@ namespace Temiang.Avicenna.BusinessObject
     /// <summary>
     /// Encapsulates the 'TransChargesItem' table
     /// </summary>
-    [System.Diagnostics.DebuggerDisplay("TransChargesItem ({TransactionNo, SequenceNo})")]
+    [System.Diagnostics.DebuggerDisplay("TransChargesItem ({StandardReferenceID})")]
     [Serializable]
     public partial class TransChargesItem : esTransChargesItem
     {
@@ -4000,7 +3961,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.ChargeQuantity, 11, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.ChargeQuantity;
             c.NumericPrecision = 12;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((1))";
             c.IsNullable = true;
@@ -4009,7 +3969,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.StockQuantity, 12, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.StockQuantity;
             c.NumericPrecision = 10;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4024,7 +3983,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.CostPrice, 14, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.CostPrice;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4032,7 +3990,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.Price, 15, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.Price;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4040,7 +3997,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.DiscountAmount, 16, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.DiscountAmount;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4048,7 +4004,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.CitoAmount, 17, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.CitoAmount;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4056,7 +4011,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.RoundingAmount, 18, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.RoundingAmount;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4150,7 +4104,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.AutoProcessCalculation, 33, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.AutoProcessCalculation;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
@@ -4197,7 +4150,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.BasicCitoAmount, 41, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.BasicCitoAmount;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -4285,7 +4237,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.PriceAdjusted, 57, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = TransChargesItemMetadata.PropertyNames.PriceAdjusted;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -4411,7 +4362,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-
+            c = new esColumnMetadata(TransChargesItemMetadata.ColumnNames.ResultAcsn, 80, typeof(System.String), esSystemType.String);
+            c.PropertyName = TransChargesItemMetadata.PropertyNames.ResultAcsn;
+            c.CharacterMaxLength = 20;
+            c.IsNullable = true;
+            _columns.Add(c);
         }
         #endregion
 
@@ -4518,6 +4473,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string SpecimenReceiveByUserID = "SpecimenReceiveByUserID";
             public const string SRCollectMethod = "SRCollectMethod";
             public const string IsVaccine = "IsVaccine";
+            public const string ResultAcsn = "ResultAcsn";
         }
         #endregion
 
@@ -4604,6 +4560,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string SpecimenReceiveByUserID = "SpecimenReceiveByUserID";
             public const string SRCollectMethod = "SRCollectMethod";
             public const string IsVaccine = "IsVaccine";
+            public const string ResultAcsn = "ResultAcsn";
         }
         #endregion
 
@@ -4727,6 +4684,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("SpecimenReceiveByUserID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SRCollectMethod", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("IsVaccine", new esTypeMap("bit", "System.Boolean"));
+                meta.AddTypeMap("ResultAcsn", new esTypeMap("varchar", "System.String"));
 
 
                 meta.Source = "TransChargesItem";

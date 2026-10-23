@@ -20,6 +20,7 @@ namespace Temiang.Avicenna.Common
             public const string MEDICLAB_LIS_INTEROP_CONNECTION_NAME = "MEDICLAB_LIS_INTEROP";
             public const string TERASLIS_LIS_INTEROP_INTEROP_CONNECTION_NAME = "TERASLIS_LIS_INTEROP";
             public const string JASA_RAHAJA_INTEROP_CONNECTION_NAME = "JASA_RAHARJA_INTEROP";
+            public const int ACSN_UNIQUE_LENGTH_NUMBER = 14; //14 digit unique number
         }
 
         public class Program

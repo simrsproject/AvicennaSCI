@@ -414,7 +414,8 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                 patient.MedicalNo,
                 query.IsCorrection,
                 tc.ResultReadByPhysicianID,
-                item.IsHasTestResults
+                item.IsHasTestResults,
+                query.ResultAcsn.Coalesce("''")
                 );
 
             //if (PatientRelateds.Count == 1)
@@ -671,18 +672,44 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                         row["ResultValue"] = orderItem["ResultValue"];
                         row["ResultReadByPhysicianID"] = orderItem["ResultReadByPhysicianID"];
 
-                        if (ConfigurationManager.AppSettings["EpsUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["EpsUrlLocation"])) row["EpsUrlLocation"] = ConfigurationManager.AppSettings["EpsUrlLocation"];
-                        else row["EpsUrlLocation"] = string.Empty;
+                        //cek ACSN first 14 digit numbers
+                        if (!string.IsNullOrEmpty(row["ResultAcsn"].ToString()) 
+                            && row["ResultAcsn"].ToString().Length == AppConstant.HIS_INTEROP.ACSN_UNIQUE_LENGTH_NUMBER)
+                        {
+                            //USE API-2 INTIWID
+                            if (ConfigurationManager.AppSettings["EpsUrlLocationV2"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["EpsUrlLocationV2"])) row["EpsUrlLocation"] = ConfigurationManager.AppSettings["EpsUrlLocationV2"];
+                            else row["EpsUrlLocation"] = string.Empty;
 
-                        if (ConfigurationManager.AppSettings["DcomUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DcomUrlLocation"])) row["DcomUrlLocation"] = ConfigurationManager.AppSettings["DcomUrlLocation"];
-                        else row["DcomUrlLocation"] = string.Empty;
+                            if (ConfigurationManager.AppSettings["DcomUrlLocationV2"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DcomUrlLocationV2"])) row["DcomUrlLocation"] = ConfigurationManager.AppSettings["DcomUrlLocationV2"];
+                            else row["DcomUrlLocation"] = string.Empty;
+                        }
+                        else
+                        {
+                            if (ConfigurationManager.AppSettings["EpsUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["EpsUrlLocation"])) row["EpsUrlLocation"] = ConfigurationManager.AppSettings["EpsUrlLocation"];
+                            else row["EpsUrlLocation"] = string.Empty;
+
+                            if (ConfigurationManager.AppSettings["DcomUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DcomUrlLocation"])) row["DcomUrlLocation"] = ConfigurationManager.AppSettings["DcomUrlLocation"];
+                            else row["DcomUrlLocation"] = string.Empty;
+                        }
 
                         row["IsResultAvailable"] = "0";
                     }
                     i++;
 
-                    resultValueList.Add(ConfigurationManager.AppSettings["EpsUrlLocation"] + orderItem["ResultValue"].ToString());
-                    dicomValueList.Add(ConfigurationManager.AppSettings["DcomUrlLocation"] + orderItem["ResultValue"].ToString());
+
+                    if (!string.IsNullOrEmpty(row["ResultAcsn"].ToString())
+                            && row["ResultAcsn"].ToString().Length == AppConstant.HIS_INTEROP.ACSN_UNIQUE_LENGTH_NUMBER)
+                    {
+                        //USE API-2 INTIWID
+                        resultValueList.Add(ConfigurationManager.AppSettings["EpsUrlLocationV2"] + orderItem["ResultAcsn"].ToString());
+                        dicomValueList.Add(ConfigurationManager.AppSettings["DcomUrlLocationV2"] + orderItem["ResultAcsn"].ToString());
+                    }
+                    else
+                    {
+                        resultValueList.Add(ConfigurationManager.AppSettings["EpsUrlLocation"] + orderItem["ResultValue"].ToString());
+                        dicomValueList.Add(ConfigurationManager.AppSettings["DcomUrlLocation"] + orderItem["ResultValue"].ToString());
+                    }
+                    
 
 
                     if (transType == "RAD" && AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsUsingRisPacsInterop))
@@ -697,13 +724,28 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                                         {
                                             try
                                             {
-                                                if (ConfigurationManager.AppSettings["EpsUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["EpsUrlLocation"]))
-                                                    row["EpsUrlLocation"] = string.Join(";", resultValueList.Where(r => !string.IsNullOrWhiteSpace(r)));
-                                                else row["EpsUrlLocation"] = string.Empty;
+                                                if (!string.IsNullOrEmpty(row["ResultAcsn"].ToString())
+                                                && row["ResultAcsn"].ToString().Length == AppConstant.HIS_INTEROP.ACSN_UNIQUE_LENGTH_NUMBER)
+                                                {
+                                                    if (ConfigurationManager.AppSettings["EpsUrlLocationV2"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["EpsUrlLocationV2"]))
+                                                        row["EpsUrlLocation"] = string.Join(";", resultValueList.Where(r => !string.IsNullOrWhiteSpace(r)));
+                                                    else row["EpsUrlLocation"] = string.Empty;
 
-                                                if (ConfigurationManager.AppSettings["DcomUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DcomUrlLocation"]))
-                                                    row["DcomUrlLocation"] = string.Join(";", dicomValueList.Where(r => !string.IsNullOrWhiteSpace(r)));
-                                                else row["DcomUrlLocation"] = string.Empty;
+                                                    if (ConfigurationManager.AppSettings["DcomUrlLocationV2"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DcomUrlLocationV2"]))
+                                                        row["DcomUrlLocation"] = string.Join(";", dicomValueList.Where(r => !string.IsNullOrWhiteSpace(r)));
+                                                    else row["DcomUrlLocation"] = string.Empty;
+
+                                                }
+                                                else
+                                                {
+                                                    if (ConfigurationManager.AppSettings["EpsUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["EpsUrlLocation"]))
+                                                        row["EpsUrlLocation"] = string.Join(";", resultValueList.Where(r => !string.IsNullOrWhiteSpace(r)));
+                                                    else row["EpsUrlLocation"] = string.Empty;
+
+                                                    if (ConfigurationManager.AppSettings["DcomUrlLocation"] != null || !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["DcomUrlLocation"]))
+                                                        row["DcomUrlLocation"] = string.Join(";", dicomValueList.Where(r => !string.IsNullOrWhiteSpace(r)));
+                                                    else row["DcomUrlLocation"] = string.Empty;
+                                                }
 
                                                 //var service = new Common.Worklist.RSI.Service();
                                                 //var json = service.GetJsonOrder(new Common.Worklist.RSI.Json.Order.Root()

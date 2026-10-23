@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Temiang.Avicenna.BusinessObject;
 
@@ -20,6 +17,8 @@ namespace Temiang.Avicenna.Common.Worklist.RSI
 
     public class Service
     {
+        private bool IsUsingUniqueACSN => AppParameter.IsYes(AppParameter.ParameterItem.IsUsingUniqueACSN);
+
         public Json.Response.Root CreateJsonOrder(Json.Order.Root root)
         {
             string fileAndPath = ConfigurationManager.AppSettings["DocumentFolder"] + "order.json";
@@ -36,7 +35,29 @@ namespace Temiang.Avicenna.Common.Worklist.RSI
 
         public Json.Response.Root SendJsonOrder(Json.Order.Root root)
         {
-            var webrequest = (HttpWebRequest)WebRequest.Create("http://10.15.10.1:8086/api/index.php");
+            string PacsEndPoint = "/index.php";
+            try
+            {
+                if(IsUsingUniqueACSN)
+                {
+                    string PacsAPI = ConfigurationManager.AppSettings["PacsAPIV2"]; //http://10.15.10.1:8086/api-2
+                    PacsEndPoint = PacsAPI + "/index.php";
+                }
+                else
+                {
+                    //tambahkan di web.config 
+                    string PacsAPI = ConfigurationManager.AppSettings["PacsAPI"]; //http://10.15.10.1:8086/api
+                    PacsEndPoint = PacsAPI + "/index.php";
+                }
+            }
+            catch(Exception ex)
+            {
+                string PacsAPI = "http://10.15.10.1:8086/api"; //http://10.15.10.1:8086/api
+                PacsEndPoint = PacsAPI + "/index.php";
+            }
+            
+
+            var webrequest = (HttpWebRequest)WebRequest.Create(PacsEndPoint);
             webrequest.Method = "POST";
             webrequest.ContentType = "application/json";
 
@@ -59,7 +80,29 @@ namespace Temiang.Avicenna.Common.Worklist.RSI
         {
             if (isReload || _risPacsResults == null)
             {
-                var webrequest = (HttpWebRequest) WebRequest.Create("http://10.15.10.1:8086/api/index.php");
+                string PacsEndPoint = "/index.php";
+                try
+                {
+                    if (IsUsingUniqueACSN)
+                    {
+                        string PacsAPI = ConfigurationManager.AppSettings["PacsAPIV2"]; //http://10.15.10.1:8086/api-2
+                        PacsEndPoint = PacsAPI + "/index.php";
+                    }
+                    else
+                    {
+                        //tambahkan di web.config 
+                        string PacsAPI = ConfigurationManager.AppSettings["PacsAPI"]; //http://10.15.10.1:8086/api
+                        PacsEndPoint = PacsAPI + "/index.php";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    string PacsAPI = "http://10.15.10.1:8086/api";
+                    PacsEndPoint = PacsAPI + "/index.php";
+                }
+
+
+                var webrequest = (HttpWebRequest) WebRequest.Create(PacsEndPoint);
                 webrequest.Method = "GET";
                 webrequest.ContentType = "application/json";
 
@@ -75,7 +118,28 @@ namespace Temiang.Avicenna.Common.Worklist.RSI
         {
             var value = new string[2];
 
-            var webrequest = (HttpWebRequest)WebRequest.Create("http://10.15.10.1:8086/api/mwl_item.php");
+            string PacsEndPoint = "/mwl_item.php";
+            try
+            {
+                if (IsUsingUniqueACSN)
+                {
+                    string PacsAPI = ConfigurationManager.AppSettings["PacsAPIV2"]; //http://10.15.10.1:8086/api-2
+                    PacsEndPoint = PacsAPI + "/mwl_item.php";
+                }
+                else
+                {
+                    //tambahkan di web.config 
+                    string PacsAPI = ConfigurationManager.AppSettings["PacsAPI"]; //http://10.15.10.1:8086/api
+                    PacsEndPoint = PacsAPI + "/mwl_item.php";
+                }
+            }
+            catch (Exception ex)
+            {
+                string PacsAPI = "http://10.15.10.1:8086/api";
+                PacsEndPoint = PacsAPI + "/mwl_item.php";
+            }
+
+            var webrequest = (HttpWebRequest)WebRequest.Create(PacsEndPoint);
             webrequest.Method = "GET";
 
             var response = webrequest.GetResponse() as HttpWebResponse;

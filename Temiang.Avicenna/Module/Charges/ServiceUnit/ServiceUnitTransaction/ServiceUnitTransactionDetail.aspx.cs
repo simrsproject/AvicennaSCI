@@ -5385,19 +5385,31 @@ namespace Temiang.Avicenna.Module.Charges
                                                     {
                                                         if (AppSession.Parameter.HealthcareInitial == "RSI")
                                                         {
+                                                            bool IsUsingUniqueAcsnNumber = AppParameter.IsYes(AppParameter.ParameterItem.IsUsingUniqueACSN);
+
                                                             foreach (var detail in transChargesItems.Where(t => t.IsOrderRealization ?? false))
                                                             {
                                                                 var root = new Common.Worklist.RSI.Json.Order.Root();
 
                                                                 var orderno = string.Empty;
+                                                                var orderNoComplete = string.Empty;
                                                                 foreach (var c in detail.TransactionNo.ToCharArray())
                                                                 {
                                                                     if (!int.TryParse(c.ToString(), out int number)) continue;
+
+                                                                    orderNoComplete += number.ToString();
                                                                     if (number == 0) continue;
                                                                     orderno += number.ToString();
                                                                 }
 
-                                                                root.acc = orderno;
+                                                                if (IsUsingUniqueAcsnNumber)
+                                                                {
+                                                                    root.acc = $"{orderNoComplete}{detail.SequenceNo}"; //untuk unik acsn perlu ditambahkan sequenceno agar unique
+                                                                }
+                                                                else
+                                                                {
+                                                                    root.acc = orderno;
+                                                                }
 
                                                                 orderno += detail.SequenceNo.ToInt().ToString();
                                                                 foreach (var c in detail.ItemID.ToCharArray())
@@ -5811,6 +5823,12 @@ namespace Temiang.Avicenna.Module.Charges
                                                                 service.CreateXmlWorklist(ds);
 
                                                                 detail.ResultValue = root.uid;
+                                                                if(IsUsingUniqueAcsnNumber)
+                                                                {
+                                                                    //tambahkan ResultAcsn
+                                                                    detail.ResultAcsn = root.acc;
+                                                                }
+                                                                
                                                             }
                                                         }
                                                         else if (AppSession.Parameter.HealthcareInitial == "RSBK")

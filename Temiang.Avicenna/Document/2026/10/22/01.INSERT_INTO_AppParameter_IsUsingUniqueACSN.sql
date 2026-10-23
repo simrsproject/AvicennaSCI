@@ -1,0 +1,2 @@
+﻿INSERT INTO AppParameter(ParameterID, ParameterName, ParameterValue, ParameterType, LastUpdateDateTime, LastUpdateByUserID, IsUsedBySystem)
+VALUES('IsUsingUniqueACSN', 'Is Using ACSN Complete Number combine with Sequence No', 'No', '', GETDATE(), 'wiliam', 0)
