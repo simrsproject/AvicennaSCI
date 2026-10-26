@@ -951,7 +951,9 @@ namespace Temiang.Avicenna.Controllers
                 try
                 {
                     JObject payload = JObject.Parse(decryptedData);
-                    appointmentNo = Convert.ToString(payload["AppointmentNo"]);
+                    appointmentNo =
+                        Convert.ToString(payload["appointment_no"])
+                        ?? Convert.ToString(payload["AppointmentNo"]);
                 }
                 catch
                 {
@@ -1002,10 +1004,29 @@ namespace Temiang.Avicenna.Controllers
 
                 if (!isAppointmentOpen)
                 {
+                    string statusMessage;
+
+                    if (string.Equals(
+                        appointmentStatus?.Trim(),
+                        "04",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        statusMessage =
+                            "Nomor Appointment = <b>" + appointmentNo + "</b><br>" +
+                            "Appointment tersebut sudah Closed atau sudah melakukan Check-In.<br>" +
+                            "Silakan hubungi petugas apabila membutuhkan bantuan.";
+                    }
+                    else
+                    {
+                        statusMessage =
+                            "Appointment tidak dapat diproses karena statusnya tidak valid. " +
+                            "Silakan hubungi petugas.";
+                    }
+
                     return Json(new
                     {
                         status = "ERR",
-                        message = "Appointment tidak dapat diproses.",
+                        message = statusMessage,
                         data = new
                         {
                             AppointmentNo = appointmentNo,
@@ -1223,21 +1244,53 @@ namespace Temiang.Avicenna.Controllers
 
         private string DecryptAppointmentQRCode(string qrCode)
         {
-            // Key harus berasal dari konfigurasi server,
-            // jangan ditulis langsung di source code.
+            if (string.IsNullOrWhiteSpace(qrCode))
+                throw new Exception("QR Code kosong.");
+
+            // 1. Ambil key dari Web.config
             string keyBase64 =
                 System.Configuration.ConfigurationManager
                     .AppSettings["CHECKIN_QR_KEY"];
 
             if (string.IsNullOrWhiteSpace(keyBase64))
-                throw new Exception("CHECKIN_QR_KEY belum dikonfigurasi.");
+                throw new Exception(
+                    "CHECKIN_QR_KEY belum dikonfigurasi."
+                );
 
             byte[] key = Convert.FromBase64String(keyBase64);
-            byte[] envelopeBytes = Convert.FromBase64String(qrCode);
 
+            if (key.Length != 32)
+                throw new Exception(
+                    "CHECKIN_QR_KEY harus berukuran 32 byte."
+                );
+
+            // 2. Normalisasi Base64URL dari Laravel menjadi Base64 standar
+            string normalizedQrCode = qrCode.Trim()
+                .Replace('-', '+')
+                .Replace('_', '/');
+
+            normalizedQrCode = normalizedQrCode.PadRight(
+                normalizedQrCode.Length +
+                (4 - normalizedQrCode.Length % 4) % 4,
+                '='
+            );
+
+            byte[] envelopeBytes =
+                Convert.FromBase64String(normalizedQrCode);
+
+            // 3. Baca envelope JSON
             JObject envelope = JObject.Parse(
                 Encoding.UTF8.GetString(envelopeBytes)
             );
+
+            if (envelope["iv"] == null ||
+                envelope["tag"] == null ||
+                envelope["data"] == null)
+            {
+                throw new Exception(
+                    "Format envelope QR Code tidak lengkap."
+                );
+            }
 
             byte[] iv = Convert.FromBase64String(
                 (string)envelope["iv"]
@@ -1251,22 +1304,40 @@ namespace Temiang.Avicenna.Controllers
                 (string)envelope["data"]
             );
 
-            if (key.Length != 32)
-                throw new Exception("Key harus berukuran 32 byte.");
+            if (iv.Length != 12)
+                throw new Exception(
+                    "IV AES-GCM harus berukuran 12 byte."
+                );
 
-            if (iv.Length != 12 || tag.Length != 16)
-                throw new Exception("Format IV atau authentication tag tidak valid.");
+            if (tag.Length != 16)
+                throw new Exception(
+                    "Authentication tag harus berukuran 16 byte."
+                );
 
-            // AES-GCM membutuhkan ciphertext dan tag.
-            byte[] input = new byte[ciphertext.Length + tag.Length];
+            // 4. Gabungkan ciphertext + authentication tag
+            byte[] input = new byte[
+                ciphertext.Length + tag.Length
+            ];
 
             Buffer.BlockCopy(
-                ciphertext, 0, input, 0, ciphertext.Length
+                ciphertext,
+                0,
+                input,
+                0,
+                ciphertext.Length
             );
 
             Buffer.BlockCopy(
-                tag, 0, input, ciphertext.Length, tag.Length
+                tag,
+                0,
+                input,
+                ciphertext.Length,
+                tag.Length
             );
+
+            // 5. Inisialisasi AES-256-GCM dengan AAD yang sama
+            // seperti Laravel: openssl_encrypt(..., 'CheckinKey', 16)
+            byte[] aad = Encoding.UTF8.GetBytes("CheckinKey");
 
             var cipher = new GcmBlockCipher(new AesEngine());
 
@@ -1275,19 +1346,32 @@ namespace Temiang.Avicenna.Controllers
                 new AeadParameters(
                     new KeyParameter(key),
                     128,
-                    iv
+                    iv,
+                    aad
                 )
             );
 
-            byte[] plaintext = new byte[cipher.GetOutputSize(input.Length)];
+            // 6. Dekripsi dan validasi authentication tag
+            byte[] plaintext = new byte[
+                cipher.GetOutputSize(input.Length)
+            ];
 
             int length = cipher.ProcessBytes(
-                input, 0, input.Length, plaintext, 0
+                input,
+                0,
+                input.Length,
+                plaintext,
+                0
             );
 
             length += cipher.DoFinal(plaintext, length);
 
-            return Encoding.UTF8.GetString(plaintext, 0, length);
+            // 7. Kembalikan plaintext
+            return Encoding.UTF8.GetString(
+                plaintext,
+                0,
+                length
+            );
         }
 
         [HttpPost]

@@ -1,341 +1,393 @@
 ﻿
 <div id="scanQRCodePage">
     <style>
-        #scanQRCodePage {
-            padding: 30px;
-        }
+                #scanQRCodePage {
+                    padding: 30px;
+                }
 
-            #scanQRCodePage .scan-card {
-                width: 100%;
-                min-height: 420px;
-                border: none;
-                border-radius: 14px;
-                box-shadow: 0 5px 24px rgba(0, 0, 0, 0.10);
-                overflow: hidden;
-            }
+                    #scanQRCodePage .scan-card {
+                        width: 100%;
+                        min-height: 420px;
+                        border: none;
+                        border-radius: 14px;
+                        box-shadow: 0 5px 24px rgba(0, 0, 0, 0.10);
+                        overflow: hidden;
+                    }
 
-            #scanQRCodePage .scan-header {
-                padding: 24px 30px;
-                background: #182772;
-                color: #fff;
-            }
+                    #scanQRCodePage .scan-header {
+                        padding: 24px 30px;
+                        background: #182772;
+                        color: #fff;
+                    }
 
-                #scanQRCodePage .scan-header h3 {
+                        #scanQRCodePage .scan-header h3 {
+                            margin: 0;
+                            font-size: 30px;
+                            font-weight: 600;
+                        }
+
+                    #scanQRCodePage .scan-body {
+                        padding: 45px 40px;
+                    }
+
+                    #scanQRCodePage .scan-icon {
+                        font-size: 76px;
+                        color: #182772;
+                        margin-bottom: 20px;
+                    }
+
+                    #scanQRCodePage .scan-title {
+                        font-size: 32px;
+                        font-weight: 600;
+                        margin-bottom: 12px;
+                        color: #26345c;
+                    }
+
+                    #scanQRCodePage .scan-description {
+                        font-size: 20px;
+                        color: #6c757d;
+                        margin-bottom: 35px;
+                    }
+
+                    #scanQRCodePage .scan-label {
+                        display: block;
+                        font-size: 22px;
+                        font-weight: 600;
+                        margin-bottom: 14px;
+                        color: #343a40;
+                    }
+
+                    #scanQRCodePage #txtQRCode {
+                        height: 85px;
+                        padding: 15px 24px;
+                        font-size: 30px;
+                        font-weight: 600;
+                        border: 2px solid #182772;
+                        border-radius: 10px;
+                        text-align: center;
+                        letter-spacing: 1px;
+                    }
+
+                        #scanQRCodePage #txtQRCode:focus {
+                            border-color: #007bff;
+                            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+                        }
+
+                    #scanQRCodePage .scan-status {
+                        margin-top: 25px;
+                        padding: 18px;
+                        border-radius: 10px;
+                        background: #f1f5ff;
+                        color: #182772;
+                        font-size: 18px;
+                    }
+
+                        #scanQRCodePage .scan-status i {
+                            margin-right: 8px;
+                        }
+
+                        #scanQRCodePage .scan-status.processing {
+                            background: #fff3cd;
+                            color: #856404;
+                        }
+
+                        #scanQRCodePage .scan-status.success {
+                            background: #d4edda;
+                            color: #155724;
+                        }
+
+                        #scanQRCodePage .scan-status.error {
+                            background: #f8d7da;
+                            color: #721c24;
+                        }
+
+                @@media (max-width: 768px) {
+                    #scanQRCodePage {
+                        padding: 12px;
+                    }
+
+                        #scanQRCodePage .scan-body {
+                            padding: 25px 15px;
+                        }
+
+                        #scanQRCodePage .scan-header h3 {
+                            font-size: 24px;
+                        }
+
+                        #scanQRCodePage .scan-title {
+                            font-size: 25px;
+                        }
+
+                        #scanQRCodePage #txtQRCode {
+                            height: 65px;
+                            font-size: 22px;
+                        }
+
+                        #scanQRCodePage .scan-label {
+                            font-size: 18px;
+                        }
+                }
+
+
+                #scanQRCodePage .scan-screen-warning {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 18px;
+                    max-width: 950px;
+                    margin: 0 auto 35px;
+                    padding: 22px 26px;
+                    text-align: left;
+                    background: #fff3cd;
+                    border: 2px solid #ffda6a;
+                    border-left: 8px solid #f0ad00;
+                    border-radius: 12px;
+                    color: #664d03;
+                }
+
+                    #scanQRCodePage .scan-screen-warning > i {
+                        font-size: 38px;
+                        color: #e0a000;
+                        margin-top: 3px;
+                    }
+
+                    #scanQRCodePage .scan-screen-warning strong {
+                        display: block;
+                        font-size: 22px;
+                        margin-bottom: 8px;
+                    }
+
+                    #scanQRCodePage .scan-screen-warning p {
+                        margin: 0;
+                        font-size: 18px;
+                        line-height: 1.6;
+                    }
+
+                @@media (max-width: 768px) {
+                    #scanQRCodePage .scan-screen-warning {
+                        gap: 12px;
+                        padding: 16px;
+                    }
+
+                        #scanQRCodePage .scan-screen-warning > i {
+                            font-size: 28px;
+                        }
+
+                        #scanQRCodePage .scan-screen-warning strong {
+                            font-size: 18px;
+                        }
+
+                        #scanQRCodePage .scan-screen-warning p {
+                            font-size: 16px;
+                        }
+                }
+
+
+                .scan-processing-overlay {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 99999;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                    background: rgba(12, 20, 48, 0.45);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
+                }
+
+                    .scan-processing-overlay.active {
+                        display: flex;
+                    }
+
+                .scan-dialog {
+                    width: 100%;
+                    max-width: 540px;
+                    padding: 38px 34px;
+                    border-radius: 20px;
+                    background: #fff;
+                    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+                    text-align: center;
+                    animation: scanDialogIn .25s ease-out;
+                }
+
+                .scan-loading-spinner {
+                    width: 58px;
+                    height: 58px;
+                    margin: 0 auto 22px;
+                    border: 6px solid #e7eaf5;
+                    border-top-color: #182772;
+                    border-radius: 50%;
+                    animation: scanSpin .8s linear infinite;
+                }
+
+                .scan-progress-track {
+                    width: 100%;
+                    height: 12px;
+                    margin: 24px 0 16px;
+                    overflow: hidden;
+                    border-radius: 20px;
+                    background: #e9edf5;
+                }
+
+                .scan-progress-bar {
+                    width: 35%;
+                    height: 100%;
+                    border-radius: inherit;
+                    background: linear-gradient(90deg, #182772, #4285f4);
+                    animation: scanProgress 1.2s ease-in-out infinite;
+                }
+
+                .scan-dialog-title {
+                    margin: 0 0 12px;
+                    color: #26345c;
+                    font-size: 27px;
+                    font-weight: 700;
+                }
+
+                .scan-dialog-message {
                     margin: 0;
-                    font-size: 30px;
+                    color: #65708a;
+                    font-size: 18px;
+                    line-height: 1.6;
+                    white-space: pre-line;
+                }
+
+                .scan-result-icon {
+                    display: flex;
+                    width: 76px;
+                    height: 76px;
+                    margin: 0 auto 20px;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    background: #eef2ff;
+                    color: #182772;
+                    font-size: 38px;
+                }
+
+                    .scan-result-icon.success {
+                        background: #d8f5e2;
+                        color: #16803c;
+                    }
+
+                    .scan-result-icon.error {
+                        background: #fde2e2;
+                        color: #c62828;
+                    }
+
+                    .scan-result-icon.warning {
+                        background: #fff0cc;
+                        color: #a66b00;
+                    }
+
+                .scan-result-button {
+                    min-width: 150px;
+                    margin-top: 28px;
+                    padding: 12px 28px;
+                    border: 0;
+                    border-radius: 10px;
+                    background: #182772;
+                    color: #fff;
+                    font-size: 18px;
                     font-weight: 600;
                 }
 
-            #scanQRCodePage .scan-body {
-                padding: 45px 40px;
-            }
+                    .scan-result-button:hover {
+                        background: #101d5e;
+                    }
 
-            #scanQRCodePage .scan-icon {
-                font-size: 76px;
-                color: #182772;
-                margin-bottom: 20px;
-            }
-
-            #scanQRCodePage .scan-title {
-                font-size: 32px;
-                font-weight: 600;
-                margin-bottom: 12px;
-                color: #26345c;
-            }
-
-            #scanQRCodePage .scan-description {
-                font-size: 20px;
-                color: #6c757d;
-                margin-bottom: 35px;
-            }
-
-            #scanQRCodePage .scan-label {
-                display: block;
-                font-size: 22px;
-                font-weight: 600;
-                margin-bottom: 14px;
-                color: #343a40;
-            }
-
-            #scanQRCodePage #txtQRCode {
-                height: 85px;
-                padding: 15px 24px;
-                font-size: 30px;
-                font-weight: 600;
-                border: 2px solid #182772;
-                border-radius: 10px;
-                text-align: center;
-                letter-spacing: 1px;
-            }
-
-                #scanQRCodePage #txtQRCode:focus {
-                    border-color: #007bff;
-                    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+                @@keyframes scanSpin {
+                    to {
+                        transform: rotate(360deg);
+                    }
                 }
 
-            #scanQRCodePage .scan-status {
-                margin-top: 25px;
-                padding: 18px;
-                border-radius: 10px;
-                background: #f1f5ff;
-                color: #182772;
-                font-size: 18px;
-            }
+                @@keyframes scanProgress {
+                    0% {
+                        transform: translateX(-120%);
+                    }
 
-                #scanQRCodePage .scan-status i {
-                    margin-right: 8px;
+                    100% {
+                        transform: translateX(320%);
+                    }
                 }
 
-                #scanQRCodePage .scan-status.processing {
-                    background: #fff3cd;
-                    color: #856404;
+                @@keyframes scanDialogIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(12px) scale(.98);
+                    }
+
+                    to {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
                 }
 
-                #scanQRCodePage .scan-status.success {
-                    background: #d4edda;
-                    color: #155724;
+                @@media (max-width: 768px) {
+                    .scan-dialog {
+                        padding: 28px 20px;
+                    }
+
+                    .scan-dialog-title {
+                        font-size: 23px;
+                    }
+
+                    .scan-dialog-message {
+                        font-size: 16px;
+                    }
                 }
 
-                #scanQRCodePage .scan-status.error {
-                    background: #f8d7da;
-                    color: #721c24;
-                }
 
-        @@media (max-width: 768px) {
-            #scanQRCodePage {
-                padding: 12px;
-            }
-
-                #scanQRCodePage .scan-body {
-                    padding: 25px 15px;
-                }
-
-                #scanQRCodePage .scan-header h3 {
-                    font-size: 24px;
-                }
-
-                #scanQRCodePage .scan-title {
-                    font-size: 25px;
-                }
-
-                #scanQRCodePage #txtQRCode {
-                    height: 65px;
-                    font-size: 22px;
-                }
-
-                #scanQRCodePage .scan-label {
-                    font-size: 18px;
-                }
-        }
-
-
-        #scanQRCodePage .scan-screen-warning {
-            display: flex;
-            align-items: flex-start;
-            gap: 18px;
-            max-width: 950px;
-            margin: 0 auto 35px;
-            padding: 22px 26px;
-            text-align: left;
-            background: #fff3cd;
-            border: 2px solid #ffda6a;
-            border-left: 8px solid #f0ad00;
-            border-radius: 12px;
-            color: #664d03;
-        }
-
-            #scanQRCodePage .scan-screen-warning > i {
-                font-size: 38px;
-                color: #e0a000;
-                margin-top: 3px;
-            }
-
-            #scanQRCodePage .scan-screen-warning strong {
-                display: block;
-                font-size: 22px;
-                margin-bottom: 8px;
-            }
-
-            #scanQRCodePage .scan-screen-warning p {
-                margin: 0;
-                font-size: 18px;
-                line-height: 1.6;
-            }
-
-        @@media (max-width: 768px) {
-            #scanQRCodePage .scan-screen-warning {
-                gap: 12px;
-                padding: 16px;
-            }
-
-                #scanQRCodePage .scan-screen-warning > i {
-                    font-size: 28px;
-                }
-
-                #scanQRCodePage .scan-screen-warning strong {
-                    font-size: 18px;
-                }
-
-                #scanQRCodePage .scan-screen-warning p {
+                .checkin-details {
+                    margin-top: 18px;
+                    text-align: left;
                     font-size: 16px;
                 }
-        }
 
+                .checkin-row {
+                    display: grid;
+                    grid-template-columns: 175px 12px minmax(0, 1fr);
+                    gap: 5px;
+                    margin-bottom: 10px;
+                    align-items: start;
+                }
 
-        .scan-processing-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 99999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: rgba(12, 20, 48, 0.45);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
+                .checkin-row span:nth-child(2) {
+                    text-align: center;
+                }
 
-            .scan-processing-overlay.active {
-                display: flex;
+                .checkin-row span:last-child {
+                    font-weight: 600;
+                    overflow-wrap: anywhere;
+                }
+
+                .checkin-instruction {
+                    margin-top: 22px;
+                    padding: 15px;
+                    background: #f1f5ff;
+                    border-radius: 10px;
+                    color: #26345c;
+                    font-size: 15px;
+                    line-height: 1.6;
+                    text-align: left;
+                }
+
+                .scan-dialog-message {
+                    white-space: normal;
+                }
+
+    @@media (max-width: 576px) {
+            .checkin-row {
+                grid-template-columns: 135px 12px minmax(0, 1fr);
+                font-size: 13px;
             }
 
-        .scan-dialog {
-            width: 100%;
-            max-width: 540px;
-            padding: 38px 34px;
-            border-radius: 20px;
-            background: #fff;
-            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            animation: scanDialogIn .25s ease-out;
-        }
-
-        .scan-loading-spinner {
-            width: 58px;
-            height: 58px;
-            margin: 0 auto 22px;
-            border: 6px solid #e7eaf5;
-            border-top-color: #182772;
-            border-radius: 50%;
-            animation: scanSpin .8s linear infinite;
-        }
-
-        .scan-progress-track {
-            width: 100%;
-            height: 12px;
-            margin: 24px 0 16px;
-            overflow: hidden;
-            border-radius: 20px;
-            background: #e9edf5;
-        }
-
-        .scan-progress-bar {
-            width: 35%;
-            height: 100%;
-            border-radius: inherit;
-            background: linear-gradient(90deg, #182772, #4285f4);
-            animation: scanProgress 1.2s ease-in-out infinite;
-        }
-
-        .scan-dialog-title {
-            margin: 0 0 12px;
-            color: #26345c;
-            font-size: 27px;
-            font-weight: 700;
-        }
-
-        .scan-dialog-message {
-            margin: 0;
-            color: #65708a;
-            font-size: 18px;
-            line-height: 1.6;
-        }
-
-        .scan-result-icon {
-            display: flex;
-            width: 76px;
-            height: 76px;
-            margin: 0 auto 20px;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #eef2ff;
-            color: #182772;
-            font-size: 38px;
-        }
-
-            .scan-result-icon.success {
-                background: #d8f5e2;
-                color: #16803c;
-            }
-
-            .scan-result-icon.error {
-                background: #fde2e2;
-                color: #c62828;
-            }
-
-            .scan-result-icon.warning {
-                background: #fff0cc;
-                color: #a66b00;
-            }
-
-        .scan-result-button {
-            min-width: 150px;
-            margin-top: 28px;
-            padding: 12px 28px;
-            border: 0;
-            border-radius: 10px;
-            background: #182772;
-            color: #fff;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-            .scan-result-button:hover {
-                background: #101d5e;
-            }
-
-        @@keyframes scanSpin {
-            to {
-                transform: rotate(360deg);
+            .checkin-instruction {
+                font-size: 14px;
             }
         }
 
-        @@keyframes scanProgress {
-            0% {
-                transform: translateX(-120%);
-            }
-
-            100% {
-                transform: translateX(320%);
-            }
-        }
-
-        @@keyframes scanDialogIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px) scale(.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @@media (max-width: 768px) {
-            .scan-dialog {
-                padding: 28px 20px;
-            }
-
-            .scan-dialog-title {
-                font-size: 23px;
-            }
-
-            .scan-dialog-message {
-                font-size: 16px;
-            }
-        }
     </style>
 
     <div class="card scan-card">
@@ -459,6 +511,15 @@
         var outsideScanBuffer = "";
         var lastOutsideKeyTime = 0;
 
+        function escapeHtml(value) {
+            return String(value == null ? "-" : value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         var INPUT_SELECTOR = "#txtQRCode";
         var OVERLAY_SELECTOR = "#scanQRCodeOverlay";
         var POPUP_DURATION = 4000;
@@ -514,7 +575,7 @@
             );
 
             $("#scanQRCodeResultTitle").text(title);
-            $("#scanQRCodeResultMessage").text(message);
+            $("#scanQRCodeResultMessage").html(message);
 
             $("#scanQRCodeLoading").hide();
             $("#scanQRCodeResult").show();
@@ -597,6 +658,7 @@
                 dataType: "json",
                 timeout: 15000,
 
+
                 success: function (response) {
                     if (!response || response.status !== "OK") {
                         ShowQRCodeAlert(
@@ -618,44 +680,56 @@
 
                     var appointment = response.data || {};
 
-                    var appointmentStatus = (
-                        appointment.AppointmentStatusName || ""
-                    ).trim().toLowerCase();
+                    var appointmentNo = appointment.AppointmentNo || qrCode;
+                    var patientName = appointment.PatientName || "-";
+                    var poliName = appointment.ServiceUnitName || "-";
 
-                    if (appointmentStatus !== "open") {
-                        ShowQRCodeAlert(
-                            "Appointment Tidak Dapat Diproses",
-                            "Status appointment saat ini: " +
-                                (
-                                    appointment.AppointmentStatusName ||
-                                    "Tidak diketahui"
-                                ) +
-                                ". Silakan hubungi petugas.",
-                            "warning",
-                            "fa-exclamation-triangle"
-                        );
+                    // Tanggal check-in saat ini, format Indonesia
+                    var visitDate = new Intl.DateTimeFormat("id-ID", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                        timeZone: "Asia/Jakarta"
+                    }).format(new Date());
 
-                        SetQRCodeStatus(
-                            "Status appointment tidak valid.",
-                            "error"
-                        );
+                    var message =
+                        '<div class="checkin-details">' +
+                        '<div class="checkin-row">' +
+                        '<span>Nomor Appointment</span><span>:</span>' +
+                        '<span>' + escapeHtml(appointmentNo) + '</span>' +
+                        '</div>' +
+                        '<div class="checkin-row">' +
+                        '<span>Nama Pasien</span><span>:</span>' +
+                        '<span>' + escapeHtml(patientName) + '</span>' +
+                        '</div>' +
+                        '<div class="checkin-row">' +
+                        '<span>Poli Tujuan</span><span>:</span>' +
+                        '<span>' + escapeHtml(poliName) + '</span>' +
+                        '</div>' +
+                        '<div class="checkin-row">' +
+                        '<span>Tanggal Check-in</span><span>:</span>' +
+                        '<span>' + escapeHtml(visitDate) + '</span>' +
+                        '</div>' +
+                        '</div>' +
+                        '<div class="checkin-instruction">' +
+                        'Silakan langsung menuju poli tujuan yang tertera di atas ' +
+                        'untuk mendapatkan pelayanan. Ikuti arahan petugas apabila ' +
+                        'memerlukan bantuan. Terima kasih.' +
+                        '</div>';
 
-                        return;
-                    }
-
+                    // Tampilkan popup sukses
                     ShowQRCodeAlert(
-                        "Appointment Valid",
-                        "Nomor Appointment " +
-                            (appointment.AppointmentNo || qrCode) +
-                            " berhasil divalidasi. Silakan lanjutkan proses check-in.",
+                        "Check-in Berhasil!",
+                        message,
                         "success",
                         "fa-check-circle"
                     );
 
                     SetQRCodeStatus(
-                        "Appointment berhasil divalidasi.",
+                        "Check-in berhasil. Appointment No.: " + appointmentNo,
                         "success"
                     );
+
                 },
 
                 error: function (xhr, status, error) {
