@@ -397,7 +397,11 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
 
                 if (p_IsForCasemix == "1")
                 {
-                    lastUpdateDateTime = medsum.LastUpdateDateTime;
+                    var dpjpMedsum = new MedicalDischargeSummary();
+
+                    lastUpdateDateTime = dpjpMedsum.LoadByPrimaryKey(registrationNo)
+                        ? dpjpMedsum.LastUpdateDateTime
+                        : (DateTime?)null;
                 }
                 else
                 {
