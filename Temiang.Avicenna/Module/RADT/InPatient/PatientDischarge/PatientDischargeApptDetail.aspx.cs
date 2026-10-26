@@ -11,16 +11,49 @@ using DevExpress.Data.Mask;
 using Temiang.Avicenna.WebService;
 using System.Drawing;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using Temiang.Avicenna.BusinessObject.JsonField;
+using Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis;
+using InpatientControlPlan = Temiang.Avicenna.Common.BPJS.VClaim.InpatientControlPlan;
+using ControlLetter = Temiang.Avicenna.Common.BPJS.VClaim.v11.RencanaKontrol;
 
 namespace Temiang.Avicenna.Module.RADT.InPatient
 {
     public partial class PatientDischargeApptDetail : BasePageDialog
     {
         private AppAutoNumberLast _autoNumber;
+        private ControlPlanCtl _dischargeControlPlan;
+
+        private Registration _currentRegistration;
+        private Registration CurrentRegistration
+        {
+            get
+            {
+                if (_currentRegistration == null)
+                {
+                    _currentRegistration = new Registration();
+                    _currentRegistration.LoadByPrimaryKey(Request.QueryString["regno"]);
+                }
+                return _currentRegistration;
+            }
+        }
 
         protected void Page_Init(object sender, EventArgs e)
         {
             ProgramID = AppConstant.Program.PatientDischarge;
+
+            if (AppSession.Parameter.HealthcareInitial == "RSI" && InpatientControlPlan.IsSentOnDischarge(CurrentRegistration))
+            {
+                // Create on every Init so Web Forms restores postback values before validation/save.
+                _dischargeControlPlan = (ControlPlanCtl)LoadControl("~/Module/RADT/EmrIp/EmrIpCommon/ResumeMedis/ControlPlanCtl.ascx");
+                _dischargeControlPlan.ID = "dischargeControlPlan";
+                var panel = new System.Web.UI.WebControls.Panel { ID = "dischargeControlPlanPanel", Width = 700,
+                    ScrollBars = System.Web.UI.WebControls.ScrollBars.Auto };
+                panel.Style["max-width"] = "100%";
+                panel.Controls.Add(_dischargeControlPlan);
+                grdAppt.Parent.Controls.AddAt(grdAppt.Parent.Controls.IndexOf(grdAppt), panel);
+                grdAppt.Visible = false;
+            }
 
             if (!IsPostBack)
             {
@@ -38,8 +71,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
             if (!IsPostBack)
             {
                 txtRegistrationNo.Text = Request.QueryString["regno"];
-                var reg = new Registration();
-                reg.LoadByPrimaryKey(txtRegistrationNo.Text);
+                var reg = CurrentRegistration;
 
                 txtDischargeDate.SelectedDate = reg.DischargeDate ?? (new DateTime()).NowAtSqlServer().Date;
                 txtDischargeDate.Enabled = AppSession.Parameter.IsAllowEditDischargeDate && !reg.DischargeDate.HasValue;
@@ -79,6 +111,30 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                 {
                     cboSRDischargeMethod.SelectedValue = mds.SRDischargeMethod;
                     cboSRDischargeCondition.SelectedValue = mds.SRDischargeCondition;
+                }
+
+                if (_dischargeControlPlan != null)
+                {
+                    var plan = new MedicalDischargeSummaryByNurse();
+                    plan.LoadByPrimaryKey(reg.RegistrationNo);
+                    ViewState["ControlPlanVersion"] = ControlPlanVersion(plan.ControlPlan);
+                    if (!string.IsNullOrWhiteSpace(plan.ControlPlan))
+                        _dischargeControlPlan.Populate(plan.ControlPlan);
+                    else
+                    {
+                        // Retain manually entered discharge plans from before the trigger was moved.
+                        var appointments = new PatientDischargeAppointmentCollection();
+                        appointments.Query.Where(appointments.Query.RegistrationNo == reg.RegistrationNo);
+                        appointments.LoadAll();
+                        var items = appointments.Select(appt => new ControlPlanItem
+                        {
+                            ControlPlanDateTime = appt.AppointmentDate.GetValueOrDefault(),
+                            ServiceUnitID = appt.ServiceUnitID,
+                            ParamedicID = appt.ParamedicID,
+                            Notes = appt.Notes
+                        }).ToList();
+                        _dischargeControlPlan.Populate(JsonConvert.SerializeObject(new ControlPlan { Items = items }));
+                    }
                 }
 
                 trLoka.Style.Clear();
@@ -141,6 +197,47 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
             bool isAllowAppointment = (cboSRDischargeCondition.SelectedValue != AppSession.Parameter.DischargeConditionDie && cboSRDischargeCondition.SelectedValue != AppSession.Parameter.DischargeConditionDieLessThen48 && cboSRDischargeCondition.SelectedValue != AppSession.Parameter.DischargeConditionDieMoreThen48);
 
             if (!IsValid) return false;
+
+            ControlPlan dischargePlan = null;
+            List<ControlLetter.Insert.Request.Root> controlRequests = null;
+            string controlCardNo = null;
+            if (_dischargeControlPlan != null && isAllowAppointment)
+            {
+                if (CurrentRegistration.DischargeDate.HasValue)
+                {
+                    ShowInformationHeader("Pasien sudah dipulangkan. Muat ulang daftar pasien.");
+                    return false;
+                }
+                var currentPlan = new MedicalDischargeSummaryByNurse();
+                currentPlan.LoadByPrimaryKey(CurrentRegistration.RegistrationNo);
+                if (!Equals(ViewState["ControlPlanVersion"], ControlPlanVersion(currentPlan.ControlPlan)))
+                {
+                    ShowInformationHeader("Rencana kontrol di MDS sudah berubah. Tutup dan buka kembali discharge untuk mengambil data terbaru.");
+                    return false;
+                }
+                string message;
+                if (!_dischargeControlPlan.ValidateForDischarge(txtDischargeDate.SelectedDate.Value, out message))
+                {
+                    ShowInformationHeader(message);
+                    return false;
+                }
+                dischargePlan = _dischargeControlPlan.GetControlPlan();
+                if (dischargePlan.Items.Count > 0 && !Helper.IsBpjsIntegration)
+                {
+                    ShowInformationHeader("Integrasi BPJS belum aktif. SRK belum dapat dikirim.");
+                    return false;
+                }
+                try
+                {
+                    controlRequests = PrepareDischargeControlPlan(CurrentRegistration, dischargePlan);
+                    if (controlRequests.Count > 0) controlCardNo = GetControlCardNo(CurrentRegistration);
+                }
+                catch (Exception ex)
+                {
+                    ShowInformationHeader(ex.Message);
+                    return false;
+                }
+            }
 
             using (esTransactionScope trans = new esTransactionScope())
             {
@@ -428,7 +525,21 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                 feeColl.SetDischargeDate(entity, AppSession.Parameter.IsFeeCalculatedOnTransaction);
                 feeColl.Save();
 
-                if (isAllowAppointment)
+                if (dischargePlan != null)
+                {
+                    try
+                    {
+                        SendDischargeControlPlan(controlRequests, controlCardNo);
+                        InpatientControlPlan.SaveDraft(entity.RegistrationNo, dischargePlan);
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowInformationHeader(ex.Message);
+                        return false;
+                    }
+                }
+
+                if (isAllowAppointment && _dischargeControlPlan == null)
                 {
                     var pat = new Patient();
                     pat.LoadByPrimaryKey(entity.PatientID);
@@ -669,6 +780,71 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
             }
 
             return true;
+        }
+
+        private List<ControlLetter.Insert.Request.Root> PrepareDischargeControlPlan(Registration registration, ControlPlan plan)
+        {
+            var requests = new List<ControlLetter.Insert.Request.Root>();
+            foreach (var item in plan.Items)
+            {
+                var physician = new ParamedicBridging();
+                physician.Query.Where(physician.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                    physician.Query.ParamedicID == item.ParamedicID);
+                if (!physician.Query.Load() || string.IsNullOrWhiteSpace(physician.BridgingID))
+                    throw new InvalidOperationException("Mapping dokter BPJS untuk rencana kontrol tidak ditemukan.");
+
+                var unit = new ServiceUnitBridging();
+                unit.Query.Where(unit.Query.SRBridgingType == AppEnum.BridgingType.BPJS.ToString(),
+                    unit.Query.ServiceUnitID == item.ServiceUnitID);
+                if (!unit.Query.Load() || string.IsNullOrWhiteSpace(unit.BridgingID))
+                    throw new InvalidOperationException("Mapping poli BPJS untuk rencana kontrol tidak ditemukan.");
+
+                requests.Add(new ControlLetter.Insert.Request.Root
+                {
+                    Request = new ControlLetter.Insert.Request.TRequest
+                    {
+                        NoSEP = registration.BpjsSepNo,
+                        KodeDokter = physician.BridgingID,
+                        PoliKontrol = unit.BridgingID,
+                        TglRencanaKontrol = item.ControlPlanDateTime.ToString("yyyy-MM-dd"),
+                        User = AppSession.UserLogin.UserID
+                    }
+                });
+            }
+            return requests;
+        }
+
+        private static string ControlPlanVersion(string plan)
+        {
+            using (var hash = System.Security.Cryptography.SHA256.Create())
+                return Convert.ToBase64String(hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(plan ?? string.Empty)));
+        }
+
+        private static string GetControlCardNo(Registration registration)
+        {
+            var cardNo = registration.GuarantorCardNo;
+            if (string.IsNullOrWhiteSpace(cardNo))
+            {
+                var patient = new Patient();
+                patient.LoadByPrimaryKey(registration.PatientID);
+                cardNo = patient.GuarantorCardNo;
+            }
+            if (string.IsNullOrWhiteSpace(cardNo))
+                throw new InvalidOperationException("Nomor kartu BPJS untuk rencana kontrol belum diisi.");
+            return cardNo;
+        }
+
+        private void SendDischargeControlPlan(List<ControlLetter.Insert.Request.Root> requests, string cardNo)
+        {
+            foreach (var request in requests)
+            {
+                var date = DateTime.ParseExact(request.Request.TglRencanaKontrol, "yyyy-MM-dd", null);
+                InpatientControlPlan.EnsureControlLetter(request,
+                    () => new Common.BPJS.VClaim.v11.Service().GetRencanaKontrolByNoPeserta(
+                        date.ToString("MM"), date.ToString("yyyy"), cardNo,
+                        Common.BPJS.VClaim.Enum.FilterRencanaKontrol.TanggalRencanaKontrol),
+                    value => new Common.BPJS.VClaim.v11.Service().Insert(value));
+            }
         }
 
         public override string OnGetAdditionalJavaScriptCloseAndApply()

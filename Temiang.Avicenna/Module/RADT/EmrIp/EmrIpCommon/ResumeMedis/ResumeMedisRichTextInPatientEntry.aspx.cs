@@ -1791,6 +1791,13 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             var reg = new Registration();
             reg.LoadByPrimaryKey(RegistrationNo);
 
+            if (Common.BPJS.VClaim.InpatientControlPlan.IsSentOnDischarge(reg))
+            {
+                // Retain an undated plan so the nurse can complete it at discharge.
+                Common.BPJS.VClaim.InpatientControlPlan.SaveDraft(RegistrationNo, controlPlanCtl.GetControlPlan(true));
+                return;
+            }
+
             var nosep = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(reg.BpjsSepNo))
