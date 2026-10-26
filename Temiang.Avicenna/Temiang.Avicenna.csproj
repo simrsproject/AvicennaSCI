@@ -1939,6 +1939,7 @@
     <Content Include="Document\2026\09\01\01. PPRA Non PPAB Approval Parameter and Flag.sql" />
     <Content Include="Document\2026\10\02\01.CR-EMR-Correction-MDS-Attachment.sql" />
     <Content Include="Document\2026\10\22\01.INSERT_INTO_AppParameter_IsUsingUniqueACSN.sql" />
+    <Content Include="Document\2026\10\23\01.ALTER_TABLE_TransChargesItem_Add_Column_ResultAcsn.sql" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
