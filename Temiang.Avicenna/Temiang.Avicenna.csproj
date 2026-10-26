@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -1872,6 +1872,7 @@
     <Content Include="Document\2025\09\iDRG\04. Master ICD9\4. Script Insert Procedure.sql" />
     <Content Include="Document\2025\09\iDRG\04. Master ICD9\5. Script Update Procedure.sql" />
     <Content Include="Document\2025\09\iDRG\index.php" />
+    <Content Include="AudioAvicenna.rar" />
     <None Include="Document\Bpjs Face Scan\Readme.md" />
     <Content Include="Document\2026\05\13\AntrianRSI\001-CREATE-TABLE-AutoNumberSemantic.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\002-CREATE-TABLE-VisitQueue.sql" />
@@ -2828,6 +2829,7 @@
     <Content Include="Module\Inventory\Warehouse\ItemExpiryDate\ItemExpiryDateList.aspx" />
     <Content Include="Module\Inventory\Warehouse\ItemExpiryDate\ItemExpiryDatePorList.aspx" />
     <Content Include="Module\Kiosk\BedMonitoringDisplayGeneral.aspx" />
+    <Content Include="Module\Kiosk\BedMonitoringDisplayMjkn.aspx" />
     <Content Include="Module\Kiosk\BedMonitoringDisplayNonPandemi.aspx" />
     <Content Include="Module\Kiosk\BedMonitoringDisplayV2.aspx" />
     <Content Include="Module\Kiosk\BedMonitoringDisplay.aspx" />
@@ -13583,6 +13585,13 @@
     </Compile>
     <Compile Include="Module\Kiosk\BedMonitoringDisplayGeneral.aspx.designer.cs">
       <DependentUpon>BedMonitoringDisplayGeneral.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\Kiosk\BedMonitoringDisplayMjkn.aspx.cs">
+      <DependentUpon>BedMonitoringDisplayMjkn.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\Kiosk\BedMonitoringDisplayMjkn.aspx.designer.cs">
+      <DependentUpon>BedMonitoringDisplayMjkn.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\Kiosk\BedMonitoringDisplayNonPandemi.aspx.cs">
       <DependentUpon>BedMonitoringDisplayNonPandemi.aspx</DependentUpon>

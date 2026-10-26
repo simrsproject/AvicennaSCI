@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -652,6 +652,15 @@ namespace Temiang.Avicenna.WebService
         public void BedMonitoringGetListV2(string IpAddress)
         {
             var dtb = (new BedCollection()).GetBedInformationSummaryMF_Pandemi(IpAddress);
+            Context.Response.Write(JSonRetFormatted(ConvertDataTabletoObject(dtb)));
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public void BedMonitoringMjknGetList()
+        {
+            Context.Response.ContentType = "application/json";
+            var dtb = (new ServiceUnitCollection()).InpatientBedAvailabilityCustom();
             Context.Response.Write(JSonRetFormatted(ConvertDataTabletoObject(dtb)));
         }
         #endregion

@@ -158,15 +158,17 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     query.ItemID,
                     item.ItemName,
                     query.Description,
-                    @"<a.Quantity - ISNULL((SELECT SUM(dt.Quantity) 
+                                       @"<a.Quantity - ISNULL((SELECT SUM(dt.Quantity * dt.ConversionFactor)
                                             FROM ItemTransactionItem dt
                                             INNER JOIN ItemTransaction hd
                                                 ON dt.TransactionNo = hd.TransactionNo
                                             WHERE dt.ReferenceNo = a.TransactionNo
-                                                AND dt.SequenceNo =  a.SequenceNo
+                                                AND dt.ReferenceSequenceNo = a.SequenceNo
                                                 AND dt.ItemID = a.ItemID
-                                                AND hd.IsApproved = 1), 0) AS Quantity>",
-                    query.Quantity,
+                                                AND hd.TransactionCode = '037'
+                                                AND hd.IsApproved = 1
+                                                AND hd.IsVoid = 0), 0)
+                        / CASE WHEN a.ConversionFactor = 0 THEN 1 ELSE a.ConversionFactor END AS Quantity>",
                     query.SRItemUnit
                 );
             query.LeftJoin(item).On(query.ItemID == item.ItemID);

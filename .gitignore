@@ -1,4 +1,4 @@
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
@@ -66,3 +66,5 @@
 /.vs/Temiang.Avicenna/v17/TestStore/0/testlog.manifest
 /AGENTS.md
 /opencode.json
+/docs/superpowers/
+/docs/superpower/
