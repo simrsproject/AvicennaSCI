@@ -1233,10 +1233,13 @@ namespace Temiang.Avicenna.Controllers
                     "[QR CHECK-IN ERROR] " + ex
                 );
 
+                Response.StatusCode = 500;
+                Response.TrySkipIisCustomErrors = true;
+
                 return Json(new
                 {
                     status = "ERR",
-                    message = "Gagal memproses check-in.",
+                    message = "Gagal memproses check-in pada server Avicena.",
                     error = ex.Message
                 });
             }

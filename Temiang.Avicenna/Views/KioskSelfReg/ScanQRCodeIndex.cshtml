@@ -736,6 +736,37 @@
                     var message =
                         "Gagal menghubungi layanan validasi appointment.";
 
+                    var response = xhr.responseJSON;
+
+                    // Ambil pesan yang dikirim backend
+                    if (response) {
+                        if (response.message) {
+                            message = response.message;
+                        }
+
+                        if (response.error) {
+                            message += "\n\nDetail error: " + response.error;
+                        }
+                    } else if (xhr.responseText) {
+                        try {
+                            var parsedResponse = JSON.parse(xhr.responseText);
+
+                            if (parsedResponse.message) {
+                                message = parsedResponse.message;
+                            }
+
+                            if (parsedResponse.error) {
+                                message +=
+                                    "\n\nDetail error: " + parsedResponse.error;
+                            }
+                        } catch (e) {
+                            console.error(
+                                "[QR CHECK-IN] Response bukan JSON:",
+                                xhr.responseText
+                            );
+                        }
+                    }
+
                     if (status === "timeout") {
                         message =
                             "Request timeout. Server terlalu lama merespons.";
@@ -743,7 +774,14 @@
                         message =
                             "Action ValidateAppointmentQRCode tidak ditemukan (404).";
                     } else if (xhr.status === 500) {
-                        message = "Terjadi error pada backend (500).";
+                        message =
+                            response && response.message
+                                ? response.message
+                                : "Terjadi error pada backend (500).";
+
+                        if (response && response.error) {
+                            message += "\n\nDetail error: " + response.error;
+                        }
                     } else if (xhr.status === 0) {
                         message =
                             "Request gagal. Periksa koneksi atau akses jaringan.";
@@ -756,13 +794,13 @@
 
                     ShowQRCodeAlert(
                         "Validasi Gagal",
-                        message,
+                        escapeHtml(message).replace(/\n/g, "<br>"),
                         "error",
                         "fa-exclamation-circle"
                     );
 
                     SetQRCodeStatus(
-                        "Validasi appointment gagal.",
+                        message,
                         "error"
                     );
                 }
