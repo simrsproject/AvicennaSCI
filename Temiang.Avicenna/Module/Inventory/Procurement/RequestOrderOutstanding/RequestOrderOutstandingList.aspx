@@ -193,7 +193,7 @@
                             SortExpression="Description" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                         <telerik:GridBoundColumn HeaderStyle-Width="65px" DataField="Quantity" HeaderText="Qty"
                             UniqueName="Quantity" SortExpression="Quantity" HeaderStyle-HorizontalAlign="Center"
-                            ItemStyle-HorizontalAlign="Right" />
+                            ItemStyle-HorizontalAlign="Right" DataFormatString="{0:N2}"/>
                         <telerik:GridBoundColumn HeaderStyle-Width="100px" DataField="SRItemUnit" HeaderText="Unit"
                             UniqueName="SRItemUnit" SortExpression="SRItemUnit" HeaderStyle-HorizontalAlign="Left"
                             ItemStyle-HorizontalAlign="Left" />

@@ -566,12 +566,13 @@ namespace Temiang.Avicenna.Module.Payroll
 
         protected void cboOrganizationUnit_SelectedIndexChanged(object sender, Telerik.Web.UI.RadComboBoxSelectedIndexChangedEventArgs e)
         {
+
             if (string.IsNullOrWhiteSpace(e.Value)) return;
 
             var wsc = new WorkingScheduleCollection();
             wsc.Query.Where(wsc.Query.OrganizationUnitID == e.Value.ToInt() && wsc.Query.IsApproved == true && wsc.Query.IsVoid == false);
             wsc.Query.Load();
-
+            
             if (wsc.Any())
             {
                 var periods = new PayrollPeriodCollection();

@@ -93,22 +93,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             PatientDocumentID = newID;
 
             // Upload file
-            var fullPathFileName = UploadFile(entity);
+            var fullPathFileName = UploadFile(entity, false);
 
-            // Save thumbnail
             if (!string.IsNullOrWhiteSpace(fullPathFileName))
             {
-                if (entity.OriFileName.Contains(".jpg") || entity.OriFileName.Contains(".jpeg") || entity.OriFileName.Contains(".png"))
-                {
-                    var imgHelper = new ImageHelper();
-                    var imgArr = imgHelper.LoadImageToArray(fullPathFileName);
-                    var smallImg = imgHelper.ResizeImage(imgArr, new Size(100, 100), true, InterpolationMode.Low);
-
-                    if (entity.OriFileName.Contains(".jpg") || entity.OriFileName.Contains(".jpeg"))
-                        entity.SmallImage = imgHelper.ConvertImageToByteArray(smallImg, ImageFormat.Jpeg);
-                    else if (entity.OriFileName.Contains(".png"))
-                        entity.SmallImage = imgHelper.ConvertImageToByteArray(smallImg, ImageFormat.Png);
-                }
+                SaveThumbnail(entity, fullPathFileName);
                 entity.Save();
             }
             else
@@ -123,24 +112,47 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
         protected override void OnDataModeChanged(AppEnum.DataMode oldVal, AppEnum.DataMode newVal)
         {
-            rowUploadFile.Visible = newVal == (AppEnum.DataMode.New);
+            rowUploadFile.Visible = newVal == AppEnum.DataMode.New || newVal == AppEnum.DataMode.Edit;
         }
         protected override void OnMenuEditClick()
         {
         }
         protected override void OnMenuSaveEditClick(ValidateArgs args)
         {
-            // Edit hanya untuk update keterangan saja, jika edit filenya harus lewat delete lalu tambah
             var entity = new PatientDocument();
             if (entity.LoadByPrimaryKey(PatientDocumentID))
             {
+                var oldFileAttachName = entity.FileAttachName;
+                var oldPatientID = entity.PatientID;
+                var oldDocumentFolderYearly = entity.DocumentFolderYearly;
+                var oldIsUpload = entity.IsUpload ?? false;
+
                 SetEntityValue(entity);
+                var fullPathFileName = UploadFile(entity, true);
+                if (!string.IsNullOrWhiteSpace(fullPathFileName))
+                {
+                    SaveThumbnail(entity, fullPathFileName);
+                }
+
                 SaveEntity(entity);
+
+                if (!string.IsNullOrWhiteSpace(fullPathFileName))
+                    DeletePreviousUploadedFile(oldIsUpload, oldPatientID, oldDocumentFolderYearly, oldFileAttachName, entity.FileAttachName);
             }
             else
             {
                 args.MessageText = AppConstant.Message.RecordNotExist;
             }
+        }
+
+        public override bool OnGetStatusMenuEdit()
+        {
+            return true;
+        }
+
+        protected override bool HasEditAccess
+        {
+            get { return true; }
         }
 
         private void SetEntityValue(PatientDocument entity)
@@ -165,13 +177,15 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             return entity.PatientDocumentID ?? 0;
         }
 
-        private string UploadFile(PatientDocument entity)
+        private string UploadFile(PatientDocument entity, bool isReplaceFile)
         {
             if (uplFileTemplate.UploadedFiles.Count > 0)
             {
                 foreach (UploadedFile validFile in uplFileTemplate.UploadedFiles)
                 {
-                    var fileName = string.Format("{0:000000000000000}_{1}", entity.PatientDocumentID, validFile.GetName());
+                    var fileName = isReplaceFile
+                        ? string.Format("{0:000000000000000}_{1:yyyyMMddHHmmssfff}_{2}", entity.PatientDocumentID, DateTime.Now, validFile.GetName())
+                        : string.Format("{0:000000000000000}_{1}", entity.PatientDocumentID, validFile.GetName());
                     entity.FileAttachName = fileName;
                     entity.OriFileName = validFile.GetName();
 
@@ -196,6 +210,43 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
 
             return string.Empty;
+        }
+
+        private void SaveThumbnail(PatientDocument entity, string fullPathFileName)
+        {
+            entity.SmallImage = null;
+
+            var oriFileName = (entity.OriFileName ?? string.Empty).ToLower();
+            if (oriFileName.Contains(".jpg") || oriFileName.Contains(".jpeg") || oriFileName.Contains(".png"))
+            {
+                var imgHelper = new ImageHelper();
+                var imgArr = imgHelper.LoadImageToArray(fullPathFileName);
+                var smallImg = imgHelper.ResizeImage(imgArr, new Size(100, 100), true, InterpolationMode.Low);
+
+                if (oriFileName.Contains(".jpg") || oriFileName.Contains(".jpeg"))
+                    entity.SmallImage = imgHelper.ConvertImageToByteArray(smallImg, ImageFormat.Jpeg);
+                else if (oriFileName.Contains(".png"))
+                    entity.SmallImage = imgHelper.ConvertImageToByteArray(smallImg, ImageFormat.Png);
+            }
+        }
+
+        private void DeletePreviousUploadedFile(bool oldIsUpload, string oldPatientID, string oldDocumentFolderYearly, string oldFileAttachName, string newFileAttachName)
+        {
+            if (!oldIsUpload || string.IsNullOrWhiteSpace(oldPatientID) || string.IsNullOrWhiteSpace(oldFileAttachName) || oldFileAttachName == newFileAttachName)
+                return;
+
+            var fileFolderOld = System.IO.Path.Combine(AppSession.Parameter.ApplicationDocumentFolder, "PatientDocument", oldPatientID.Trim());
+            var fileFolderYearly = string.Empty;
+            if (!string.IsNullOrEmpty(oldDocumentFolderYearly))
+                fileFolderYearly = System.IO.Path.Combine(AppSession.Parameter.ApplicationDocumentFolder, "PatientDocumentYearly", oldDocumentFolderYearly, oldPatientID.Trim());
+
+            var fileFolder = fileFolderOld;
+            if (!System.IO.Directory.Exists(fileFolder))
+                fileFolder = string.IsNullOrEmpty(fileFolderYearly) ? fileFolderOld : fileFolderYearly;
+
+            var oldFilePath = System.IO.Path.Combine(fileFolder, oldFileAttachName);
+            if (System.IO.File.Exists(oldFilePath))
+                System.IO.File.Delete(oldFilePath);
         }
 
         protected override void OnMenuDeleteClick(ValidateArgs args)
@@ -251,4 +302,3 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
     }
 }
-
