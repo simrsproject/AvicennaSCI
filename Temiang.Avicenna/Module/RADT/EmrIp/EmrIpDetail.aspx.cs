@@ -2425,37 +2425,40 @@ Helper.UrlRoot()
             return string.Empty;
         }
 
-        public static string IntegratedNoteVerifPrintEditLink(GridItem container, bool isUserParamedicDpjp)
+
+        public static string IntegratedNoteVerifPrintEditLink(
+            GridItem container,
+            bool isUserParamedicDpjp)
         {
             if (DataBinder.Eval(container.DataItem, "IsDeleted") != DBNull.Value &&
                 true.Equals(DataBinder.Eval(container.DataItem, "IsDeleted")))
                 return string.Empty;
 
-            // Yg bisa memverifikasi adalah
-            // DPJP : Semua CPPT (SOAP;SBAR;ADIME;Notes;Handover Patient)
-            // Dokter Team : CPPT yg hanya ditujukan utk dokter tsb
-            //var isAccessVerif = !string.IsNullOrWhiteSpace(AppSession.UserLogin.ParamedicID) && AppSession.UserLogin.SRUserType == UserLogin.UserType.Doctor &&
-            //    "SOAP;SBAR;ADIME;Notes;Handover Patient".Contains(DataBinder
-            //        .Eval(container.DataItem, "SRMedicalNotesInputType").ToString())
-            //    && string.IsNullOrWhiteSpace(DataBinder.Eval(container.DataItem, "AssessmentTypeName").ToString())
-            //    && !true.Equals(DataBinder.Eval(container.DataItem, "IsDeleted"))
-            //    && !true.Equals(DataBinder.Eval(container.DataItem, "IsApproved"))
-            //    && (isUserParamedicDpjp || AppSession.UserLogin.ParamedicID.Equals(DataBinder.Eval(container.DataItem, "ParamedicID")));
+            // =========================================
+            // VERIFIKASI CPPT
+            // =========================================
 
-            // #TK-634: Handono (230902) 
-            // Verifikasi CPPT: SOAP;SBAR;ADIME;Notes;Handover Patient
-            // Yg bisa memverifikasi adalah
-            // DPJP : CPPT yg hanya ditujukan utk dokter tsb + tidak didefinisikan ParamedicID nya
-            // Selain DPJP : CPPT yg hanya ditujukan utk dokter tsb
-            var cpptParamedicID = DataBinder.Eval(container.DataItem, "ParamedicID") == null ? string.Empty : DataBinder.Eval(container.DataItem, "ParamedicID").ToString();
+            var cpptParamedicID =
+                DataBinder.Eval(container.DataItem, "ParamedicID") == null
+                    ? string.Empty
+                    : DataBinder.Eval(container.DataItem, "ParamedicID").ToString();
+
             var isAccessVerif = false;
-            if (!true.Equals(DataBinder.Eval(container.DataItem, "IsDeleted")) && !true.Equals(DataBinder.Eval(container.DataItem, "IsApproved")))
+
+            if (!true.Equals(DataBinder.Eval(container.DataItem, "IsDeleted")) &&
+                !true.Equals(DataBinder.Eval(container.DataItem, "IsApproved")))
             {
-                if (string.IsNullOrWhiteSpace(DataBinder.Eval(container.DataItem, "AssessmentTypeName").ToString()) && "SOAP;SBAR;ADIME;Notes;Handover Patient".Contains(DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType").ToString()))
+                if (string.IsNullOrWhiteSpace(
+                        DataBinder.Eval(container.DataItem, "AssessmentTypeName").ToString()) &&
+                    "SOAP;SBAR;ADIME;Notes;Handover Patient".Contains(
+                        DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType").ToString()))
                 {
-                    if (!string.IsNullOrWhiteSpace(AppSession.UserLogin.ParamedicID) && (AppSession.UserLogin.SRUserType == UserLogin.UserType.Doctor))
+                    if (!string.IsNullOrWhiteSpace(AppSession.UserLogin.ParamedicID) &&
+                        AppSession.UserLogin.SRUserType == UserLogin.UserType.Doctor)
                     {
-                        isAccessVerif = ((isUserParamedicDpjp && string.IsNullOrWhiteSpace(cpptParamedicID)) || AppSession.UserLogin.ParamedicID.Equals(cpptParamedicID));
+                        isAccessVerif =
+                            (isUserParamedicDpjp && string.IsNullOrWhiteSpace(cpptParamedicID)) ||
+                            AppSession.UserLogin.ParamedicID.Equals(cpptParamedicID);
                     }
                 }
             }
@@ -2463,33 +2466,53 @@ Helper.UrlRoot()
             var verifLink = !isAccessVerif
                 ? string.Empty
                 : string.Format(
-                    "<a style=\"cursor:pointer;\" onclick=\"javascript:openCpptVerification('{0}_{1}','{2}','{3}')\"><img style=\"border: 0px; vertical-align: middle;\" src=\"{4}/Images/Toolbar/post16.png\" alt=\"\"/></a><br /><br />",
+                    "<a style=\"cursor:pointer;\" onclick=\"javascript:openCpptVerification('{0}_{1}','{2}','{3}')\">" +
+                    "<img style=\"border:0;vertical-align:middle;\" src=\"{4}/Images/Toolbar/post16.png\" alt=\"\"/>" +
+                    "</a><br /><br />",
                     DataBinder.Eval(container.DataItem, "RegistrationInfoMedicID"),
                     DataBinder.Eval(container.DataItem, "IsFromAskep"),
-                    DataBinder.Eval(container.DataItem, "ParamedicID"), isUserParamedicDpjp, Helper.UrlRoot());
+                    DataBinder.Eval(container.DataItem, "ParamedicID"),
+                    isUserParamedicDpjp,
+                    Helper.UrlRoot());
 
+            // =========================================
+            // CEK TIPE CATATAN
+            // =========================================
 
-            // Hanya user yg membuat yg bisa mengedit
-            // ==========================================================
-            // EDIT LINK
-            // ==========================================================
+            var medicalNotesInputType =
+                DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType")?.ToString()
+                ?? string.Empty;
 
-            var medicalNotesInputType = DataBinder.Eval(
-                container.DataItem,
-                "SRMedicalNotesInputType"
-            )?.ToString() ?? string.Empty;
+            // Jika kolom IntegratedNotesType berbeda dengan
+            // SRMedicalNotesInputType, gunakan kolom yang benar di sini.
+            var integratedNotesType =
+                DataBinder.Eval(container.DataItem, "IntegratedNotesType")?.ToString()
+                ?? string.Empty;
+
+            var isMDS =
+                string.Equals(
+                    integratedNotesType,
+                    "MDS",
+                    StringComparison.OrdinalIgnoreCase)
+                ||
+                string.Equals(
+                    medicalNotesInputType,
+                    "MDS",
+                    StringComparison.OrdinalIgnoreCase);
 
             // APACHE II tidak boleh diedit dari Integrated Notes
             var isApacheII = string.Equals(
                 medicalNotesInputType,
                 "APACHE II",
-                StringComparison.OrdinalIgnoreCase
-            );
+                StringComparison.OrdinalIgnoreCase);
+
+            // =========================================
+            // VIEW / EDIT
+            // =========================================
 
             var isEditable = !isApacheII &&
                              (DataBinder.Eval(container.DataItem, "IsApproved") == DBNull.Value ||
-                              false.Equals(DataBinder.Eval(container.DataItem, "IsApproved")))
-                             &&
+                              false.Equals(DataBinder.Eval(container.DataItem, "IsApproved"))) &&
                              DataBinder.Eval(container.DataItem, "CreatedByUserID")
                                  .Equals(AppSession.UserLogin.UserID);
 
@@ -2500,30 +2523,61 @@ Helper.UrlRoot()
 
             if (!isApacheII)
             {
-                editLink = string.Format(
-                    "<a href=\"#\" onclick=\"javascript:entryAssessment('{7}', '{0}', '{1}','{2}','{3}','{4}','{8}','{9}','{10}','{11}'); return false;\"><img src=\"{5}/Images/Toolbar/{6}\" alt=\"{7}\" /></a><br /><br />",
-                    DataBinder.Eval(container.DataItem, "RegistrationNo"),
-                    DataBinder.Eval(container.DataItem, "ServiceUnitID"),
-                    DataBinder.Eval(container.DataItem, "SRAssessmentType"),
-                    DataBinder.Eval(container.DataItem, "RegistrationInfoMedicID"),
-                    true.Equals(DataBinder.Eval(container.DataItem, "IsInitialAssessment")),
-                    Helper.UrlRoot(),
-                    icon,
-                    mode,
-                    DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType"),
-                    DataBinder.Eval(container.DataItem, "ReferenceNo"),
-                    DataBinder.Eval(container.DataItem, "FromRegistrationNo"),
-                    DataBinder.Eval(container.DataItem, "ParamedicID")
-                );
+                if (isMDS)
+                {
+                    // VIEW DISABLED: abu-abu dan tidak bisa diklik
+                    editLink =
+                        "<span title=\"View tidak tersedia untuk Medical Discharge Summary\" " +
+                        "style=\"display:inline-block;opacity:0.45;cursor:not-allowed;\">" +
+                        "<img style=\"border:0;vertical-align:middle;filter:grayscale(100%);\" " +
+                        "src=\"" + Helper.UrlRoot() +
+                        "/Images/Toolbar/views16.png\" alt=\"View disabled\" />" +
+                        "</span><br /><br />";
+                }
+                else
+                {
+                    // Perilaku normal untuk tipe catatan lainnya
+                    editLink = string.Format(
+                        "<a href=\"#\" onclick=\"javascript:entryAssessment('{7}', '{0}', '{1}','{2}','{3}','{4}','{8}','{9}','{10}','{11}'); return false;\">" +
+                        "<img src=\"{5}/Images/Toolbar/{6}\" alt=\"{7}\" /></a><br /><br />",
+                        DataBinder.Eval(container.DataItem, "RegistrationNo"),
+                        DataBinder.Eval(container.DataItem, "ServiceUnitID"),
+                        DataBinder.Eval(container.DataItem, "SRAssessmentType"),
+                        DataBinder.Eval(container.DataItem, "RegistrationInfoMedicID"),
+                        true.Equals(DataBinder.Eval(container.DataItem, "IsInitialAssessment")),
+                        Helper.UrlRoot(),
+                        icon,
+                        mode,
+                        medicalNotesInputType,
+                        DataBinder.Eval(container.DataItem, "ReferenceNo"),
+                        DataBinder.Eval(container.DataItem, "FromRegistrationNo"),
+                        DataBinder.Eval(container.DataItem, "ParamedicID")
+                    );
+                }
             }
 
+            // =========================================
+            // PRINT OUT
+            // =========================================
+
+            // Aktifkan kembali Print Out untuk semua tipe catatan,
+            // termasuk MDS.
             var printLink = IntegratedNotePrintLink(container);
 
-            var link = string.Format("{0}{1}{2}", verifLink,
+            // =========================================
+            // GABUNGKAN SEMUA LINK
+            // =========================================
+
+            var link = string.Format(
+                "{0}{1}{2}",
+                verifLink,
                 editLink,
                 printLink);
+
             return link;
+
         }
+
 
         #endregion
 
