@@ -2483,22 +2483,11 @@ Helper.UrlRoot()
                 DataBinder.Eval(container.DataItem, "SRMedicalNotesInputType")?.ToString()
                 ?? string.Empty;
 
-            // Jika kolom IntegratedNotesType berbeda dengan
-            // SRMedicalNotesInputType, gunakan kolom yang benar di sini.
-            var integratedNotesType =
-                DataBinder.Eval(container.DataItem, "IntegratedNotesType")?.ToString()
-                ?? string.Empty;
-
-            var isMDS =
-                string.Equals(
-                    integratedNotesType,
-                    "MDS",
-                    StringComparison.OrdinalIgnoreCase)
-                ||
-                string.Equals(
-                    medicalNotesInputType,
-                    "MDS",
-                    StringComparison.OrdinalIgnoreCase);
+            var isMDS = string.Equals(
+                medicalNotesInputType,
+                "MDS",
+                StringComparison.OrdinalIgnoreCase
+            );
 
             // APACHE II tidak boleh diedit dari Integrated Notes
             var isApacheII = string.Equals(
