@@ -151,6 +151,11 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                         jobParameter.Name = "p_RegistrationNo";
                         jobParameter.ValueString = rim.RegistrationNo;
 
+                        // TEMPORARY FIX: Paksa report menggunakan mode Casemix
+                        var casemixParameter = jobParameters.AddNew();
+                        casemixParameter.Name = "p_IsForCasemix";
+                        casemixParameter.ValueString = "1";
+
                         AppSession.PrintJobParameters = jobParameters;
 
                         var reg = new Registration();
