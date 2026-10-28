@@ -1411,25 +1411,49 @@
                     Clinical Pathway :<asp:Label runat="server" ID="lblClinicalPathway" Width="100%" Font-Bold="true" />
                 </div>
                 <div>
-                    <cc:CollapsePanel ID="cpnPlafond" runat="server" Width="100%" Title="Patient Billing">
-                        <%= string.Format("<div id=\"plafondt{0}\"></div>", RegistrationNo.ToString().Replace("/","_")) %>
+                    <cc:CollapsePanel
+                        ID="cpnPlafond"
+                        runat="server"
+                        Width="100%"
+                        Title="Patient Billing"
+                        Visible="false">
+
+                        <%= string.Format("<div id=\"plafondt{0}\"></div>", RegistrationNo.ToString().Replace("/", "_")) %>
+
                         <script type="text/javascript">
-                            <%= AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsEmrListShowPlafondProgress) ? 
-                                    string.Format("UpdateStateEmrList(\"{6}\",\"{6}{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{7}\");", RegistrationNo.ToString().Replace("/","_"),
-                                        RegistrationNo, "", "", "", "", "plafondt",""):string.Empty%>
-                        </script>
-                        <div style="height: 10px">
-                        </div>
+                            <%= AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsEmrListShowPlafondProgress) ?
+                                string.Format(
+                                    "UpdateStateEmrList(\"{6}\",\"{6}{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{7}\");",
+                                    RegistrationNo.ToString().Replace("/", "_"),
+                                    RegistrationNo, "", "", "", "", "plafondt", ""
+                                ) : string.Empty %>
+                    </script>
+
+                        <div style="height: 10px"></div>
                     </cc:CollapsePanel>
-                    <cc:CollapsePanel ID="cpnDiagnosis" runat="server" Width="100%" Title="">
+
+                    <cc:CollapsePanel
+                        ID="cpnDiagnosis"
+                        runat="server"
+                        Width="100%"
+                        Title=""
+                        Visible="false">
+
                         <asp:Literal runat="server" ID="litDiagnosis"></asp:Literal>
 
-                        <div style="height: 10px">
-                        </div>
-                        <fieldset runat="server" id="fsSuggestion" style="background-color: #FFFF00;">
+                        <div style="height: 10px"></div>
+
+                        <fieldset
+                            runat="server"
+                            id="fsSuggestion"
+                            style="background-color: #FFFF00;"
+                            Visible="false">
+
                             <legend><strong>Suggestion</strong></legend>
+
                             <asp:Literal runat="server" ID="litSuggestion"></asp:Literal>
                         </fieldset>
+
                     </cc:CollapsePanel>
                     <cc:CollapsePanel ID="cpnAllergies" runat="server" Width="100%" Title="Allergies<div id='divEditAlg' style='float: right;padding:4px'><a  href='#' onclick='javascript:entryPatientAllergy(); event.cancelBubble = true;if(event.stopPropagation) event.stopPropagation();'> <img src='../../../Images/Toolbar/edit16.png'  alt='edit' /></a></div>">
                         <asp:Literal runat="server" ID="litPatientAllergy"></asp:Literal>

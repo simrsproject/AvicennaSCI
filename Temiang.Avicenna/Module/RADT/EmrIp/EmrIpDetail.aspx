@@ -1701,36 +1701,60 @@
                         <asp:Label runat="server" ID="lblPhysicianTeam" />
                     </fieldset>
                 </cc:CollapsePanel>
-                <cc:CollapsePanel ID="cpnPlafond" runat="server" Width="100%" Title="Patient Billing">
-                        <%= string.Format("<div id=\"plafondt{0}\"></div>", RegistrationNo.ToString().Replace("/","_")) %>
-                        <script type="text/javascript">
-                            <%= AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsEmrListShowPlafondProgress) ? 
-                                string.Format("UpdateStateEmrList(\"{6}\",\"{6}{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{7}\");", RegistrationNo.ToString().Replace("/","_"),
-                                RegistrationNo, "", "", "", "", "plafondt",""):string.Empty%>
-                        </script>
+                <cc:CollapsePanel
+                    ID="cpnPlafond"
+                    runat="server"
+                    Width="100%"
+                    Title="Patient Billing"
+                    Visible="false">
 
-                        <div style="height: 10px">
-                        </div>
+                    <%= string.Format("<div id=\"plafondt{0}\"></div>", RegistrationNo.ToString().Replace("/", "_")) %>
+
+                    <script type="text/javascript">
+                        <%= AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsEmrListShowPlafondProgress) ?
+                            string.Format(
+                                "UpdateStateEmrList(\"{6}\",\"{6}{0}\",\"{1}\",\"{2}\",\"{3}\",\"{4}\",\"{5}\",\"{7}\");",
+                                RegistrationNo.ToString().Replace("/", "_"),
+                                RegistrationNo, "", "", "", "", "plafondt", ""
+                            ) : string.Empty %>
+                </script>
+
+                    <div style="height: 10px"></div>
                 </cc:CollapsePanel>
-                <cc:CollapsePanel ID="cpnDiagnosis" runat="server" Width="100%" Title="">
+
+                <cc:CollapsePanel
+                    ID="cpnDiagnosis"
+                    runat="server"
+                    Width="100%"
+                    Title=""
+                    Visible="false">
+
                     <fieldset>
                         <legend>Initial Diagnose (Casemix)</legend>
                         <asp:Literal runat="server" ID="litInitialDiagnose"></asp:Literal>
                     </fieldset>
-                    <fieldset runat="server" id="fsSuggestion" style="background-color: #FFFF00;">
+
+                    <fieldset
+                        runat="server"
+                        id="fsSuggestion"
+                        style="background-color: #FFFF00;"
+                        Visible="false">
+
                         <legend>Suggestion</legend>
                         <asp:Literal runat="server" ID="litSuggestion"></asp:Literal>
                     </fieldset>
+
                     <fieldset>
                         <legend>Work Diagnose</legend>
                         <asp:Literal runat="server" ID="litWorkDiagnosis"></asp:Literal>
                     </fieldset>
+
                     <fieldset>
                         <legend>Final Diagnose</legend>
                         <asp:Literal runat="server" ID="litDiagnosis"></asp:Literal>
                     </fieldset>
-                    <div style="height: 10px">
-                    </div>
+
+                    <div style="height: 10px"></div>
                 </cc:CollapsePanel>
                 <cc:CollapsePanel ID="cpnReferFrom" runat="server" Width="100%" Title="Refer From Unit">
                     <fieldset id="fsetReferFrom" style="min-height: 80px;">
