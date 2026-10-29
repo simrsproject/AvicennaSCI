@@ -104,6 +104,7 @@ namespace Temiang.Avicenna.BusinessObject
 		
 				
 		#region LoadByPrimaryKey
+
 		#endregion
 		
 		#region Properties
