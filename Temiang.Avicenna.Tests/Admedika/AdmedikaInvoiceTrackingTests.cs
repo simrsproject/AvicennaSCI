@@ -89,6 +89,19 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void Parse_MixedArrayAndObjectInWrapper_PrefersObjectPayload()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":\"1\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"mixedResponse\":{"
+                + "\"items\":[\"A\",\"B\"],\"summary\":{\"patientName\":\"X\"}}}}}";
+
+            var response = ResponseParser.Parse<CheckIcdExclusionResponse>(json);
+
+            Assert.AreEqual("X", response.PatientName);
+        }
+
+        [TestMethod]
         public void InvoiceTracking_EmptyArray_ReturnsEmptyList()
         {
             var transport = new FakeTransport { NextResponse = EmptyJson };
@@ -99,6 +112,11 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.IsTrue(response.IsSuccess);
             Assert.IsNotNull(response.InvoiceTracking);
             Assert.AreEqual(0, response.InvoiceTracking.Count);
+
+            var payload = JObject.Parse(transport.LastBody)["input"]["txnData"]["invoiceTrackingRequest"]["invoiceTracking"];
+            Assert.IsNull(payload["dateName"]);
+            Assert.IsNull(payload["dateFrom"]);
+            Assert.IsNull(payload["dateTo"]);
         }
 
         [TestMethod]

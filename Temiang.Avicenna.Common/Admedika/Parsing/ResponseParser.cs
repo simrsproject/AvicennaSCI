@@ -88,15 +88,21 @@ namespace Temiang.Avicenna.Common.Admedika
                 var wrapper = property.Value as JObject;
                 if (wrapper == null) continue;
 
+                JObject arrayFallback = null;
+
                 foreach (var inner in wrapper.Properties())
                 {
-                    if (inner.Value is JArray) return wrapper;
+                    if (inner.Value is JArray)
+                    {
+                        arrayFallback = wrapper;
+                        continue;
+                    }
 
                     var payload = inner.Value as JObject;
                     if (payload != null) return payload;
                 }
 
-                return wrapper;
+                return arrayFallback ?? wrapper;
             }
 
             return null;

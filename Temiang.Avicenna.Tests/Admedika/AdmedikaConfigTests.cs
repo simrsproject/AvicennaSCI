@@ -54,6 +54,9 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual("CHECK_MEMBER_CLAIM_TXN_STATUS", AdmedikaConstant.ServiceID.CheckMemberClaimTxnStatus);
             Assert.AreEqual("GET_MEMBER_ENROLLED_PLAN_TC", AdmedikaConstant.ServiceID.GetMemberEnrolledPlanTc);
             Assert.AreEqual("CANCEL_OPEN_CLAIMS_TXN", AdmedikaConstant.ServiceID.CancelOpenClaimsTxn);
+            Assert.AreEqual("DAILY_MONITORING", AdmedikaConstant.ServiceID.DailyMonitoring);
+            Assert.AreEqual("EDOCS_UPLOAD", AdmedikaConstant.ServiceID.EdocsUpload);
+            Assert.AreEqual("INVOICE_TRACKING", AdmedikaConstant.ServiceID.InvoiceTracking);
         }
     }
 }
