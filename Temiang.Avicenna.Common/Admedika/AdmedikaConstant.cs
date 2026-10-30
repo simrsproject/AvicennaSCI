@@ -11,6 +11,7 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string DischargeOp = "DISCHARGE_OP";
             public const string CheckMemberClaimTxnStatus = "CHECK_MEMBER_CLAIM_TXN_STATUS";
             public const string GetMemberEnrolledPlanTc = "GET_MEMBER_ENROLLED_PLAN_TC";
+            public const string CancelOpenClaimsTxn = "CANCEL_OPEN_CLAIMS_TXN";
         }
     }
 }

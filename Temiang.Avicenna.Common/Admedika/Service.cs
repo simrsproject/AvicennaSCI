@@ -201,6 +201,27 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public CancelOpenClaimsTxnResponse CancelOpenClaimsTxn(string cardNo, string remarks)
+        {
+            var response = new CancelOpenClaimsTxnResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<CancelOpenClaimsTxnResponse>(
+                AdmedikaConstant.ServiceID.CancelOpenClaimsTxn,
+                new CancelOpenClaimsTxnTxnData
+                {
+                    Request = new CancelOpenClaimsTxnRequest
+                    {
+                        CancelOpenClaimTxn = new CancelOpenClaimsTxnPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            Remarks = remarks
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

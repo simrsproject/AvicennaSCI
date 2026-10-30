@@ -22,8 +22,8 @@ namespace Temiang.Avicenna.Tests.Admedika
             CollectionAssert.AreEqual(
                 new[]
                 {
-                    "CheckIcdExclusion", "CheckMemberClaimTxnStatus", "DischargeOp", "Eligibility",
-                    "GetEntitlement", "GetMemberEnrolledPlanTc", "HelloWorld"
+                    "CancelOpenClaimsTxn", "CheckIcdExclusion", "CheckMemberClaimTxnStatus", "DischargeOp",
+                    "Eligibility", "GetEntitlement", "GetMemberEnrolledPlanTc", "HelloWorld"
                 },
                 methods);
         }

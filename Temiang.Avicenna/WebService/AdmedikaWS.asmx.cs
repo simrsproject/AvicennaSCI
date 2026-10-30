@@ -73,5 +73,11 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.GetMemberEnrolledPlanTc(cardNo, covID, searchForTermCondition);
         }
+
+        [WebMethod]
+        public CancelOpenClaimsTxnResponse CancelOpenClaimsTxn(string cardNo, string remarks)
+        {
+            return _service.CancelOpenClaimsTxn(cardNo, remarks);
+        }
     }
 }
