@@ -90,10 +90,13 @@ namespace Temiang.Avicenna.Tests.Admedika
 
             var payload = input["txnData"]["dailyMonitoringRequest"]["dailyMonitoring"];
             Assert.AreEqual("12380291", payload["terminalID"].ToString());
+            Assert.AreEqual("8000991200054479", payload["cardNo"].ToString());
             Assert.AreEqual("provID001", payload["providerTransID"].ToString());
             Assert.AreEqual("12200001", payload["clID"].ToString());
             Assert.AreEqual("user01", payload["dmUser"].ToString());
             Assert.AreEqual("007-A", payload["dmForms"][0]["code"].ToString());
+            Assert.AreEqual("Nama Dokter = dr. Test\nSpecialist = SP.PD",
+                payload["dmForms"][0]["input"].ToString());
             Assert.AreEqual("007-B", payload["dmForms"][1]["code"].ToString());
             Assert.AreEqual("", payload["dmForms"][1]["input"].ToString());
         }
@@ -129,15 +132,22 @@ namespace Temiang.Avicenna.Tests.Admedika
         [TestMethod]
         public void DailyMonitoring_MissingForms_ReturnsEmptyList()
         {
-            const string json =
+            const string nullForms =
                 "{\"output\":{\"referenceID\":\"6003\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
                 + "\"format\":\"JSON\",\"txnData\":{\"dailyMonitoringResponse\":"
                 + "{\"dailyMonitoring\":{\"dmForms\":null}}}}}";
+            const string absentForms =
+                "{\"output\":{\"referenceID\":\"6004\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"dailyMonitoringResponse\":"
+                + "{\"dailyMonitoring\":{\"clID\":\"1\"}}}}}";
 
-            var response = ResponseParser.Parse<DailyMonitoringResponse>(json);
+            var nullResponse = ResponseParser.Parse<DailyMonitoringResponse>(nullForms);
+            var absentResponse = ResponseParser.Parse<DailyMonitoringResponse>(absentForms);
 
-            Assert.IsNotNull(response.DmForms);
-            Assert.AreEqual(0, response.DmForms.Count);
+            Assert.IsNotNull(nullResponse.DmForms);
+            Assert.AreEqual(0, nullResponse.DmForms.Count);
+            Assert.IsNotNull(absentResponse.DmForms);
+            Assert.AreEqual(0, absentResponse.DmForms.Count);
         }
     }
 }
