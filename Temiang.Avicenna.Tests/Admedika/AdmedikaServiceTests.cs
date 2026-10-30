@@ -38,6 +38,20 @@ namespace Temiang.Avicenna.Tests.Admedika
                 if (NextException != null) throw NextException;
                 return NextResponse;
             }
+
+            public int MultipartCallCount;
+            public string LastMultipartUrl;
+            public string LastMultipartData;
+            public AdmedikaFile[] LastFiles;
+
+            public string PostMultipart(string url, string jsonBody, AdmedikaFile[] files, int timeoutSeconds)
+            {
+                MultipartCallCount++;
+                LastMultipartUrl = url;
+                LastMultipartData = jsonBody;
+                LastFiles = files;
+                return NextResponse;
+            }
         }
 
         private class RecordingLogger : IAdmedikaLogger

@@ -32,6 +32,11 @@ namespace Temiang.Avicenna.Tests.Admedika
                 LastBody = jsonBody;
                 return NextResponse;
             }
+
+            public string PostMultipart(string url, string jsonBody, AdmedikaFile[] files, int timeoutSeconds)
+            {
+                throw new System.NotSupportedException();
+            }
         }
 
         private static AdmedikaConfig CreateConfig()
