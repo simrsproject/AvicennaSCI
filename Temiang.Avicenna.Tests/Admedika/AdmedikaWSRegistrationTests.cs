@@ -30,6 +30,31 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void AdmedikaWS_WebMethodsHaveUniqueDescriptions()
+        {
+            var descriptions = typeof(Temiang.Avicenna.WebService.AdmedikaWS)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Select(m => m.GetCustomAttributes(typeof(WebMethodAttribute), true)
+                    .Cast<WebMethodAttribute>().FirstOrDefault())
+                .Where(attribute => attribute != null)
+                .Select(attribute => attribute.Description)
+                .ToArray();
+
+            Assert.AreEqual(12, descriptions.Length);
+            Assert.IsTrue(descriptions.All(d => !string.IsNullOrWhiteSpace(d)),
+                "Setiap WebMethod harus memiliki Description.");
+            Assert.AreEqual(12, descriptions.Distinct().Count(),
+                "Description antar WebMethod harus unik.");
+
+            var service = typeof(Temiang.Avicenna.WebService.AdmedikaWS)
+                .GetCustomAttributes(typeof(WebServiceAttribute), true)
+                .Cast<WebServiceAttribute>()
+                .First();
+
+            Assert.IsFalse(string.IsNullOrWhiteSpace(service.Description));
+        }
+
+        [TestMethod]
         public void AdmedikaWS_HasPublicParameterlessConstructor()
         {
             var constructor = typeof(Temiang.Avicenna.WebService.AdmedikaWS)
