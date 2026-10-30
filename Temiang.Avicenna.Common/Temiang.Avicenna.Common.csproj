@@ -231,6 +231,8 @@
     <Compile Include="BPJS\Apotek\Referensi.cs" />
     <Compile Include="BPJS\Apotek\Resep.cs" />
     <Compile Include="BPJS\Apotek\Service.cs" />
+    <Compile Include="Admedika\AdmedikaConfig.cs" />
+    <Compile Include="Admedika\AdmedikaConstant.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
     <Compile Include="BPJS\Applicare\Service.cs" />
     <Compile Include="BPJS\Helper.cs" />
