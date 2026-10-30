@@ -270,6 +270,30 @@ namespace Temiang.Avicenna.Common.Admedika
                 files);
         }
 
+        public InvoiceTrackingResponse InvoiceTracking(string invoiceNo, string dateName, string dateFrom,
+            string dateTo)
+        {
+            var response = new InvoiceTrackingResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<InvoiceTrackingResponse>(
+                AdmedikaConstant.ServiceID.InvoiceTracking,
+                new InvoiceTrackingTxnData
+                {
+                    Request = new InvoiceTrackingRequest
+                    {
+                        InvoiceTracking = new InvoiceTrackingPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            InvoiceNo = invoiceNo,
+                            DateName = dateName,
+                            DateFrom = dateFrom,
+                            DateTo = dateTo
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

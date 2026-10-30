@@ -24,7 +24,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                 {
                     "CancelOpenClaimsTxn", "CheckIcdExclusion", "CheckMemberClaimTxnStatus", "DailyMonitoring",
                     "DischargeOp", "EdocsUpload", "Eligibility", "GetEntitlement", "GetMemberEnrolledPlanTc",
-                    "HelloWorld"
+                    "HelloWorld", "InvoiceTracking"
                 },
                 methods);
         }

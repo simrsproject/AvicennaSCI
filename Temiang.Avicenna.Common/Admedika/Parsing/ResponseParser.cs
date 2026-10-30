@@ -90,6 +90,8 @@ namespace Temiang.Avicenna.Common.Admedika
 
                 foreach (var inner in wrapper.Properties())
                 {
+                    if (inner.Value is JArray) return wrapper;
+
                     var payload = inner.Value as JObject;
                     if (payload != null) return payload;
                 }

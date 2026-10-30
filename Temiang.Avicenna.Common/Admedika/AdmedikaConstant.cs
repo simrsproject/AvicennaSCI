@@ -14,6 +14,7 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string CancelOpenClaimsTxn = "CANCEL_OPEN_CLAIMS_TXN";
             public const string DailyMonitoring = "DAILY_MONITORING";
             public const string EdocsUpload = "EDOCS_UPLOAD";
+            public const string InvoiceTracking = "INVOICE_TRACKING";
         }
     }
 }

@@ -93,5 +93,12 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.EdocsUpload(cardNo, clID, docType, remarks, patientName, userBy, files);
         }
+
+        [WebMethod]
+        public InvoiceTrackingResponse InvoiceTracking(string invoiceNo, string dateName, string dateFrom,
+            string dateTo)
+        {
+            return _service.InvoiceTracking(invoiceNo, dateName, dateFrom, dateTo);
+        }
     }
 }
