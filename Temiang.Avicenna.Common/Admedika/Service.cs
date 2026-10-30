@@ -46,8 +46,36 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        private bool RequireCoverageId(string covID, AdmedikaResponse response, out string normalized)
+        {
+            normalized = covID == null ? null : covID.Trim();
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                response.ErrorCode = "1999";
+                response.ErrorDesc = "covID cannot be empty.";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            if (!AdmedikaCoverageType.IsValid(normalized))
+            {
+                response.ErrorCode = "1820";
+                response.ErrorDesc = "Coverage code is invalid. Allowed coverage ID: "
+                                     + AdmedikaCoverageType.AllowedText() + ".";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            return true;
+        }
+
         public CheckIcdExclusionResponse CheckIcdExclusion(string cardNo, string covID, string diagnosisCodeList)
         {
+            var response = new CheckIcdExclusionResponse();
+            string normalizedCovID;
+            if (!RequireCoverageId(covID, response, out normalizedCovID)) return response;
+
             return Send<CheckIcdExclusionResponse>(
                 AdmedikaConstant.ServiceID.CheckIcdExclusion,
                 new CheckIcdExclusionTxnData
@@ -57,7 +85,7 @@ namespace Temiang.Avicenna.Common.Admedika
                         CheckIcdExclusion = new CheckIcdExclusionPayload
                         {
                             CardNo = cardNo,
-                            CovID = covID,
+                            CovID = normalizedCovID,
                             DiagnosisCodeList = diagnosisCodeList
                         }
                     }
@@ -80,6 +108,9 @@ namespace Temiang.Avicenna.Common.Admedika
             var response = new EligibilityResponse();
             if (!RequireTerminalId(response)) return response;
 
+            string normalizedCovID;
+            if (!RequireCoverageId(covID, response, out normalizedCovID)) return response;
+
             return Send<EligibilityResponse>(
                 AdmedikaConstant.ServiceID.Eligibility,
                 new EligibilityTxnData
@@ -90,7 +121,7 @@ namespace Temiang.Avicenna.Common.Admedika
                         {
                             TerminalID = _config.TerminalID,
                             CardNo = cardNo,
-                            CovID = covID,
+                            CovID = normalizedCovID,
                             DiagnosisCodeList = diagnosisCodeList,
                             ProviderTransID = providerTransID,
                             NationalID = nationalID,
@@ -185,6 +216,10 @@ namespace Temiang.Avicenna.Common.Admedika
         public GetMemberEnrolledPlanTcResponse GetMemberEnrolledPlanTc(string cardNo, string covID,
             string searchForTermCondition)
         {
+            var response = new GetMemberEnrolledPlanTcResponse();
+            string normalizedCovID;
+            if (!RequireCoverageId(covID, response, out normalizedCovID)) return response;
+
             return Send<GetMemberEnrolledPlanTcResponse>(
                 AdmedikaConstant.ServiceID.GetMemberEnrolledPlanTc,
                 new GetMemberEnrolledPlanTcTxnData
@@ -194,7 +229,7 @@ namespace Temiang.Avicenna.Common.Admedika
                         GetMemberEnrolledPlanTC = new GetMemberEnrolledPlanTcPayload
                         {
                             CardNo = cardNo,
-                            CovID = covID,
+                            CovID = normalizedCovID,
                             SearchForTermCondition = searchForTermCondition
                         }
                     }

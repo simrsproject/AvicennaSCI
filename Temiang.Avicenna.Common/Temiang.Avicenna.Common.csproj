@@ -270,6 +270,7 @@
     <Compile Include="Admedika\Response\HelloWorldResponse.cs" />
     <Compile Include="Admedika\RequestIdGenerator.cs" />
     <Compile Include="Admedika\TokenGenerator.cs" />
+    <Compile Include="Admedika\AdmedikaCoverageType.cs" />
     <Compile Include="Admedika\AdmedikaConfig.cs" />
     <Compile Include="Admedika\AdmedikaConstant.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
