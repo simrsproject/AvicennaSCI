@@ -247,8 +247,46 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public EdocsUploadResponse EdocsUpload(string cardNo, string clID, string docType, string remarks,
+            string patientName, string userBy, AdmedikaFile[] files)
+        {
+            return SendMultipart<EdocsUploadResponse>(
+                AdmedikaConstant.ServiceID.EdocsUpload,
+                new EdocsUploadTxnData
+                {
+                    Request = new EdocsUploadRequest
+                    {
+                        EdocsUpload = new EdocsUploadPayload
+                        {
+                            CardNo = cardNo,
+                            ClID = clID,
+                            DocType = docType,
+                            Remarks = remarks,
+                            PatientName = patientName,
+                            UserBy = userBy
+                        }
+                    }
+                },
+                files);
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
+        {
+            var body = BuildBody(serviceId, txnData);
+            return SendCore<TResponse>(serviceId, body,
+                () => _transport.Post(_config.ServiceUrl, body, _config.TimeoutSeconds));
+        }
+
+        private TResponse SendMultipart<TResponse>(string serviceId, object txnData, AdmedikaFile[] files)
+            where TResponse : AdmedikaResponse, new()
+        {
+            var body = BuildBody(serviceId, txnData);
+            return SendCore<TResponse>(serviceId, body,
+                () => _transport.PostMultipart(_config.ApiServiceUrl, body, files, _config.TimeoutSeconds));
+        }
+
+        private string BuildBody(string serviceId, object txnData)
         {
             var utcNow = DateTime.UtcNow;
             var requestId = RequestIdGenerator.Next();
@@ -264,12 +302,17 @@ namespace Temiang.Avicenna.Common.Admedika
                 TxnRequestDateTime = utcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture)
             };
 
-            var body = JsonConvert.SerializeObject(new { input = request }, SerializerSettings);
+            return JsonConvert.SerializeObject(new { input = request }, SerializerSettings);
+        }
+
+        private TResponse SendCore<TResponse>(string serviceId, string body, Func<string> send)
+            where TResponse : AdmedikaResponse, new()
+        {
             var stopwatch = Stopwatch.StartNew();
 
             try
             {
-                var raw = _transport.Post(_config.ServiceUrl, body, _config.TimeoutSeconds);
+                var raw = send();
                 stopwatch.Stop();
 
                 var response = ResponseParser.Parse<TResponse>(raw);

@@ -241,6 +241,8 @@
     <Compile Include="Admedika\Transport\IAdmedikaTransport.cs" />
     <Compile Include="Admedika\Request\GetMemberEnrolledPlanTcRequest.cs" />
     <Compile Include="Admedika\Response\GetMemberEnrolledPlanTcResponse.cs" />
+    <Compile Include="Admedika\Request\EdocsUploadRequest.cs" />
+    <Compile Include="Admedika\Response\EdocsUploadResponse.cs" />
     <Compile Include="Admedika\Transport\AdmedikaFile.cs" />
     <Compile Include="Admedika\Request\DailyMonitoringRequest.cs" />
     <Compile Include="Admedika\Response\DailyMonitoringResponse.cs" />

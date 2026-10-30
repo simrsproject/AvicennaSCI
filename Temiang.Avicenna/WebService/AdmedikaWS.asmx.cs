@@ -86,5 +86,12 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.DailyMonitoring(cardNo, providerTransID, clID, dmUser, dmForms);
         }
+
+        [WebMethod]
+        public EdocsUploadResponse EdocsUpload(string cardNo, string clID, string docType, string remarks,
+            string patientName, string userBy, AdmedikaFile[] files)
+        {
+            return _service.EdocsUpload(cardNo, clID, docType, remarks, patientName, userBy, files);
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string GetMemberEnrolledPlanTc = "GET_MEMBER_ENROLLED_PLAN_TC";
             public const string CancelOpenClaimsTxn = "CANCEL_OPEN_CLAIMS_TXN";
             public const string DailyMonitoring = "DAILY_MONITORING";
+            public const string EdocsUpload = "EDOCS_UPLOAD";
         }
     }
 }

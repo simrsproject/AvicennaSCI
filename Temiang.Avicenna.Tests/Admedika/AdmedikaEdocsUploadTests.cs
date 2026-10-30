@@ -55,5 +55,102 @@ namespace Temiang.Avicenna.Tests.Admedika
             StringAssert.Contains(text, "filename=\"bad_name.txt\"");
             Assert.IsFalse(text.Contains("bad\"name.txt"));
         }
+
+        private const string SuccessJson =
+            "{\"output\":{\"referenceID\":\"7001\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
+            + "\"txnData\":{\"edocsUploadResponse\":{\"edocsUpload\":{\"msg\":\"Successfully\"}}},"
+            + "\"txnResponseDateTime\":\"20261030190000\"}}";
+
+        private const string FailedJson =
+            "{\"output\":{\"referenceID\":\"7002\",\"statusCode\":\"910\",\"statusMsg\":\"error on txnData\",\"format\":\"JSON\","
+            + "\"txnData\":{\"edocsUploadResponse\":{\"edocsUpload\":{\"errorCode\":\"1838\",\"errorDesc\":\"claims ID not found\"}}},"
+            + "\"txnResponseDateTime\":\"20261030190001\"}}";
+
+        private class FakeTransport : IAdmedikaTransport
+        {
+            public string NextResponse;
+            public int MultipartCallCount;
+            public string LastMultipartUrl;
+            public string LastMultipartData;
+            public AdmedikaFile[] LastFiles;
+
+            public string Post(string url, string jsonBody, int timeoutSeconds)
+            {
+                throw new AssertFailedException("Post biasa tidak boleh dipakai untuk EDOCS_UPLOAD.");
+            }
+
+            public string PostMultipart(string url, string jsonBody, AdmedikaFile[] files, int timeoutSeconds)
+            {
+                MultipartCallCount++;
+                LastMultipartUrl = url;
+                LastMultipartData = jsonBody;
+                LastFiles = files;
+                return NextResponse;
+            }
+        }
+
+        [TestMethod]
+        public void EdocsUpload_PostsDataAndFilesToApiEndpoint()
+        {
+            var transport = new FakeTransport { NextResponse = SuccessJson };
+            var config = new AdmedikaConfig
+            {
+                ServiceUrl = "https://example.test/customerhost_dev",
+                ApiServiceUrl = "https://example.test/api/customerhost_dev",
+                CustomerID = "CUST001",
+                SecurityWord = "secret",
+                TimeoutSeconds = 17,
+                IsLogEnabled = false
+            };
+            var service = new Service(config, transport, new NullAdmedikaLogger());
+            var files = new[]
+            {
+                new AdmedikaFile
+                {
+                    FileName = "surat.pdf", ContentType = "application/pdf",
+                    Content = Encoding.UTF8.GetBytes("%PDF-1.4")
+                }
+            };
+
+            var response = service.EdocsUpload("8000991200054479", "12200001", "GL",
+                "jaminan", "Juan Tamad", "user01", files);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("Successfully", response.Msg);
+            Assert.AreEqual("https://example.test/api/customerhost_dev", transport.LastMultipartUrl);
+            Assert.AreEqual(1, transport.MultipartCallCount);
+            Assert.AreEqual(1, transport.LastFiles.Length);
+            Assert.AreEqual("surat.pdf", transport.LastFiles[0].FileName);
+
+            var payload = Newtonsoft.Json.Linq.JObject.Parse(transport.LastMultipartData)["input"];
+            Assert.AreEqual("EDOCS_UPLOAD", payload["serviceID"].ToString());
+            var edocs = payload["txnData"]["edocsUploadRequest"]["edocsUpload"];
+            Assert.AreEqual("8000991200054479", edocs["cardNo"].ToString());
+            Assert.AreEqual("12200001", edocs["clID"].ToString());
+            Assert.AreEqual("GL", edocs["docType"].ToString());
+            Assert.AreEqual("user01", edocs["userBy"].ToString());
+        }
+
+        [TestMethod]
+        public void EdocsUpload_FailedResponse_ReturnsBusinessError()
+        {
+            var transport = new FakeTransport { NextResponse = FailedJson };
+            var config = new AdmedikaConfig
+            {
+                ApiServiceUrl = "https://example.test/api/customerhost_dev",
+                CustomerID = "CUST001",
+                SecurityWord = "secret",
+                TimeoutSeconds = 17,
+                IsLogEnabled = false
+            };
+            var service = new Service(config, transport, new NullAdmedikaLogger());
+
+            var response = service.EdocsUpload("8000991200054479", "12200001", "GL",
+                null, null, null, null);
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1838", response.ErrorCode);
+            Assert.AreEqual(1, transport.MultipartCallCount);
+        }
     }
 }
