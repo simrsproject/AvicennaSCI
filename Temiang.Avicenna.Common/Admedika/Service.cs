@@ -182,6 +182,25 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public GetMemberEnrolledPlanTcResponse GetMemberEnrolledPlanTc(string cardNo, string covID,
+            string searchForTermCondition)
+        {
+            return Send<GetMemberEnrolledPlanTcResponse>(
+                AdmedikaConstant.ServiceID.GetMemberEnrolledPlanTc,
+                new GetMemberEnrolledPlanTcTxnData
+                {
+                    Request = new GetMemberEnrolledPlanTcRequest
+                    {
+                        GetMemberEnrolledPlanTC = new GetMemberEnrolledPlanTcPayload
+                        {
+                            CardNo = cardNo,
+                            CovID = covID,
+                            SearchForTermCondition = searchForTermCondition
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

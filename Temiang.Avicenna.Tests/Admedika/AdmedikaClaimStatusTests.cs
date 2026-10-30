@@ -114,5 +114,79 @@ namespace Temiang.Avicenna.Tests.Admedika
             StringAssert.Contains(response.TechnicalError, "terminalID");
             Assert.AreEqual(0, transport.CallCount);
         }
+
+        private const string PlanSuccessJson =
+            "{\"output\":{\"referenceID\":\"4101\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
+            + "\"txnData\":{\"getMemberEnrolledPlanTCResponse\":{\"getMemberEnrolledPlanTC\":{"
+            + "\"cardNo\":\"8000991200054479\",\"patientName\":\"Lawrence Tan\",\"dob\":\"Apr-12-1977\","
+            + "\"payorName\":\"Jaminan Kesehatan\",\"enrolledPlan\":["
+            + "{\"covCode\":\"GP\",\"planID\":\"RJTP\",\"desc\":\"RAWAT JALAN\","
+            + "\"termCondition\":[{\"tcDesc\":\"HIV AIDS\",\"guaranteeFlag\":\"N\","
+            + "\"remarks\":\"Tidak dijamin (Pengecualian Polis)\"}]},"
+            + "{\"covCode\":\"DENTAL\",\"planID\":\"GD\",\"desc\":\"RAWAT GIGI\",\"termCondition\":[]}]}}},"
+            + "\"txnResponseDateTime\":\"20261030160100\"}}";
+
+        private const string PlanFailedJson =
+            "{\"output\":{\"referenceID\":\"4102\",\"statusCode\":\"910\",\"statusMsg\":\"error on txnData\",\"format\":\"JSON\","
+            + "\"txnData\":{\"getMemberEnrolledPlanTCResponse\":{\"getMemberEnrolledPlanTC\":{"
+            + "\"errorCode\":\"1999\",\"errorDesc\":\"covID cannot be empty\","
+            + "\"cardNo\":\"8000991200054479\",\"patientName\":\"\",\"covID\":\"\",\"covCode\":\"\"}}},"
+            + "\"txnResponseDateTime\":\"20261030160101\"}}";
+
+        [TestMethod]
+        public void GetMemberEnrolledPlanTc_MapsNestedPlansAndTerms()
+        {
+            var transport = new FakeTransport { NextResponse = PlanSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.GetMemberEnrolledPlanTc("8000991200054479", "02", "obat");
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual(2, response.EnrolledPlan.Count);
+            Assert.AreEqual("RJTP", response.EnrolledPlan[0].PlanID);
+            Assert.AreEqual(1, response.EnrolledPlan[0].TermCondition.Count);
+            Assert.AreEqual("HIV AIDS", response.EnrolledPlan[0].TermCondition[0].TcDesc);
+            Assert.AreEqual("N", response.EnrolledPlan[0].TermCondition[0].GuaranteeFlag);
+            Assert.AreEqual(0, response.EnrolledPlan[1].TermCondition.Count);
+
+            var payload = JObject.Parse(transport.LastBody)["input"]["txnData"]["getMemberEnrolledPlanTCRequest"]["getMemberEnrolledPlanTC"];
+            Assert.AreEqual("8000991200054479", payload["cardNo"].ToString());
+            Assert.AreEqual("02", payload["covID"].ToString());
+            Assert.AreEqual("obat", payload["searchForTermCondition"].ToString());
+            Assert.IsNull(payload["terminalID"]);
+        }
+
+        [TestMethod]
+        public void GetMemberEnrolledPlanTc_FailedResponse_ReturnsBusinessError()
+        {
+            var transport = new FakeTransport { NextResponse = PlanFailedJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.GetMemberEnrolledPlanTc("8000991200054479", "", null);
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1999", response.ErrorCode);
+            StringAssert.Contains(response.ErrorDesc, "covID");
+        }
+        [TestMethod]
+        public void SuccessResponseWithoutNestedLists_ReturnsEmptyLists()
+        {
+            const string status =
+                "{\"output\":{\"referenceID\":\"1\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"checkMemberClaimTxnStatusResponse\":"
+                + "{\"checkMemberClaimTxnStatus\":{\"clID\":\"1\"}}}}}";
+            const string plan =
+                "{\"output\":{\"referenceID\":\"2\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"getMemberEnrolledPlanTCResponse\":"
+                + "{\"getMemberEnrolledPlanTC\":{\"cardNo\":\"1\"}}}}}";
+
+            var statusResponse = ResponseParser.Parse<CheckMemberClaimTxnStatusResponse>(status);
+            var planResponse = ResponseParser.Parse<GetMemberEnrolledPlanTcResponse>(plan);
+
+            Assert.IsNotNull(statusResponse.Entitlement);
+            Assert.AreEqual(0, statusResponse.Entitlement.Count);
+            Assert.IsNotNull(planResponse.EnrolledPlan);
+            Assert.AreEqual(0, planResponse.EnrolledPlan.Count);
+        }
     }
 }

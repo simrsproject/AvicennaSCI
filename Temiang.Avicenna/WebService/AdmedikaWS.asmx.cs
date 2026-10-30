@@ -66,5 +66,12 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.CheckMemberClaimTxnStatus(cardNo, clID);
         }
+
+        [WebMethod]
+        public GetMemberEnrolledPlanTcResponse GetMemberEnrolledPlanTc(string cardNo, string covID,
+            string searchForTermCondition)
+        {
+            return _service.GetMemberEnrolledPlanTc(cardNo, covID, searchForTermCondition);
+        }
     }
 }
