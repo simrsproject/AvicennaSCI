@@ -48,6 +48,12 @@ namespace Temiang.Avicenna.Tests.Admedika
         {
             Assert.AreEqual("HELLO_WORLD", AdmedikaConstant.ServiceID.HelloWorld);
             Assert.AreEqual("CHECK_ICD_EXCLUSION", AdmedikaConstant.ServiceID.CheckIcdExclusion);
+            Assert.AreEqual("ELIGIBILITY", AdmedikaConstant.ServiceID.Eligibility);
+            Assert.AreEqual("GET_ENTITLEMENT", AdmedikaConstant.ServiceID.GetEntitlement);
+            Assert.AreEqual("DISCHARGE_OP", AdmedikaConstant.ServiceID.DischargeOp);
+            Assert.AreEqual("CHECK_MEMBER_CLAIM_TXN_STATUS", AdmedikaConstant.ServiceID.CheckMemberClaimTxnStatus);
+            Assert.AreEqual("GET_MEMBER_ENROLLED_PLAN_TC", AdmedikaConstant.ServiceID.GetMemberEnrolledPlanTc);
+            Assert.AreEqual("CANCEL_OPEN_CLAIMS_TXN", AdmedikaConstant.ServiceID.CancelOpenClaimsTxn);
         }
     }
 }

@@ -59,7 +59,10 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.IsTrue(response.IsSuccess);
             StringAssert.Contains(response.Msg, "ready to do ELIGIBILITY");
 
-            var payload = JObject.Parse(transport.LastBody)["input"]["txnData"]["cancelOpenClaimTxnRequest"]["cancelOpenClaimTxn"];
+            var input = JObject.Parse(transport.LastBody)["input"];
+            Assert.AreEqual("CANCEL_OPEN_CLAIMS_TXN", input["serviceID"].ToString());
+
+            var payload = input["txnData"]["cancelOpenClaimTxnRequest"]["cancelOpenClaimTxn"];
             Assert.AreEqual("12380291", payload["terminalID"].ToString());
             Assert.AreEqual("8000991200054479", payload["cardNo"].ToString());
             Assert.AreEqual("salah pendaftaran harusnya ke dental", payload["remarks"].ToString());
