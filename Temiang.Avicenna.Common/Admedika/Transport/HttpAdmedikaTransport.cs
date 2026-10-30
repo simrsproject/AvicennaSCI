@@ -48,7 +48,7 @@ namespace Temiang.Avicenna.Common.Admedika
                     {
                         if (file == null) continue;
 
-                        var fileName = (file.FileName ?? "file").Replace("\"", "_");
+                        var fileName = SanitizeFileName(file.FileName);
                         var contentType = string.IsNullOrWhiteSpace(file.ContentType)
                             ? "application/octet-stream"
                             : file.ContentType;
@@ -67,6 +67,19 @@ namespace Temiang.Avicenna.Common.Admedika
                 Write(stream, "--" + boundary + "--\r\n");
                 return stream.ToArray();
             }
+        }
+
+        private static string SanitizeFileName(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return "file";
+
+            var builder = new StringBuilder(fileName.Length);
+            foreach (var ch in fileName)
+            {
+                builder.Append(ch < 32 || ch == 127 || ch == '"' ? '_' : ch);
+            }
+
+            return builder.ToString();
         }
 
         private static void Write(Stream stream, string value)

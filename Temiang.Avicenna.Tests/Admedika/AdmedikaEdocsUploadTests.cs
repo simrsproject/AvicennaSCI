@@ -56,6 +56,91 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.IsFalse(text.Contains("bad\"name.txt"));
         }
 
+        [TestMethod]
+        public void BuildMultipartBody_StripsControlCharactersAndDefaultsEmptyName()
+        {
+            var files = new[]
+            {
+                new AdmedikaFile
+                {
+                    FileName = "a\r\nX-Evil: 1.txt", ContentType = "text/plain",
+                    Content = Encoding.UTF8.GetBytes("A")
+                },
+                new AdmedikaFile
+                {
+                    FileName = "   ", ContentType = "text/plain",
+                    Content = Encoding.UTF8.GetBytes("B")
+                }
+            };
+
+            var text = Encoding.UTF8.GetString(
+                HttpAdmedikaTransport.BuildMultipartBody("B", "{}", files));
+
+            Assert.IsFalse(text.Contains("\r\nX-Evil"));
+            StringAssert.Contains(text, "filename=\"a__X-Evil: 1.txt\"");
+            StringAssert.Contains(text, "filename=\"file\"");
+        }
+
+        [TestMethod]
+        public void BuildMultipartBody_HasOneDataPartAndOnePartPerFile()
+        {
+            var files = new[]
+            {
+                new AdmedikaFile { FileName = "a.txt", Content = Encoding.UTF8.GetBytes("A") },
+                new AdmedikaFile { FileName = "b.txt", Content = Encoding.UTF8.GetBytes("B") }
+            };
+
+            var body = HttpAdmedikaTransport.BuildMultipartBody("B", "{}", files);
+            var text = Encoding.UTF8.GetString(body);
+
+            Assert.AreEqual(1, CountOccurrences(text, "name=\"data\""));
+            Assert.AreEqual(2, CountOccurrences(text, "name=\"files\""));
+            Assert.AreEqual(3, CountOccurrences(text, "--B\r\n"));
+        }
+
+        [TestMethod]
+        public void BuildMultipartBody_PreservesBinaryContent()
+        {
+            var content = new byte[] { 0x00, 0xFF, 0x0D, 0x0A, 0x7F };
+            var files = new[]
+            {
+                new AdmedikaFile { FileName = "a.bin", Content = content }
+            };
+
+            var body = HttpAdmedikaTransport.BuildMultipartBody("B", "{}", files);
+
+            Assert.IsTrue(ContainsSequence(body, content));
+        }
+
+        private static int CountOccurrences(string value, string token)
+        {
+            var count = 0;
+            var index = 0;
+            while ((index = value.IndexOf(token, index, System.StringComparison.Ordinal)) >= 0)
+            {
+                count++;
+                index += token.Length;
+            }
+
+            return count;
+        }
+
+        private static bool ContainsSequence(byte[] haystack, byte[] needle)
+        {
+            for (var i = 0; i <= haystack.Length - needle.Length; i++)
+            {
+                var match = true;
+                for (var j = 0; j < needle.Length; j++)
+                {
+                    if (haystack[i + j] != needle[j]) { match = false; break; }
+                }
+
+                if (match) return true;
+            }
+
+            return false;
+        }
+
         private const string SuccessJson =
             "{\"output\":{\"referenceID\":\"7001\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
             + "\"txnData\":{\"edocsUploadResponse\":{\"edocsUpload\":{\"msg\":\"Successfully\"}}},"
