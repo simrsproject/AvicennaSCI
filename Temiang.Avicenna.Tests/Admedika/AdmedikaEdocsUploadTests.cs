@@ -256,5 +256,65 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual("1838", response.ErrorCode);
             Assert.AreEqual(1, transport.MultipartCallCount);
         }
+
+        private static AdmedikaConfig CreateConfig()
+        {
+            return new AdmedikaConfig
+            {
+                ServiceUrl = "https://example.test/customerhost_dev",
+                ApiServiceUrl = "https://example.test/api/customerhost_dev",
+                CustomerID = "CUST001",
+                SecurityWord = "secret",
+                TimeoutSeconds = 17,
+                IsLogEnabled = false
+            };
+        }
+
+        [TestMethod]
+        public void EdocsUpload_InvalidDocType_IsRejectedBeforeMultipart()
+        {
+            var transport = new FakeTransport { NextResponse = SuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.EdocsUpload("8000991200054479", "12200001", "XXX",
+                null, null, null, null);
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1997", response.ErrorCode);
+            StringAssert.Contains(response.ErrorDesc, "Invalid docType");
+            Assert.AreEqual(0, transport.MultipartCallCount);
+        }
+
+        [TestMethod]
+        public void EdocsUpload_EmptyDocType_IsRejectedBeforeMultipart()
+        {
+            var transport = new FakeTransport { NextResponse = SuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.EdocsUpload("8000991200054479", "12200001", "",
+                null, null, null, null);
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1999", response.ErrorCode);
+            StringAssert.Contains(response.ErrorDesc, "cannot be empty");
+            Assert.AreEqual(0, transport.MultipartCallCount);
+        }
+
+        [TestMethod]
+        public void EdocsUpload_SendsCanonicalDocType()
+        {
+            var transport = new FakeTransport { NextResponse = SuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.EdocsUpload("8000991200054479", "12200001", " gl ",
+                null, null, null, null);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual(1, transport.MultipartCallCount);
+
+            var payload = Newtonsoft.Json.Linq.JObject.Parse(transport.LastMultipartData)
+                ["input"]["txnData"]["edocsUploadRequest"]["edocsUpload"];
+            Assert.AreEqual("GL", payload["docType"].ToString());
+        }
     }
 }

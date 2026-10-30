@@ -282,9 +282,39 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        private bool RequireDocType(string docType, AdmedikaResponse response, out string normalized)
+        {
+            normalized = docType == null ? null : docType.Trim();
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                response.ErrorCode = "1999";
+                response.ErrorDesc = "docType cannot be empty.";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            var type = AdmedikaDocType.Get(normalized);
+            if (type == null)
+            {
+                response.ErrorCode = "1997";
+                response.ErrorDesc = "Invalid docType. Allowed: "
+                                     + AdmedikaDocType.AllowedText() + ".";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            normalized = type.Code;
+            return true;
+        }
+
         public EdocsUploadResponse EdocsUpload(string cardNo, string clID, string docType, string remarks,
             string patientName, string userBy, AdmedikaFile[] files)
         {
+            var response = new EdocsUploadResponse();
+            string normalizedDocType;
+            if (!RequireDocType(docType, response, out normalizedDocType)) return response;
+
             return SendMultipart<EdocsUploadResponse>(
                 AdmedikaConstant.ServiceID.EdocsUpload,
                 new EdocsUploadTxnData
@@ -295,7 +325,7 @@ namespace Temiang.Avicenna.Common.Admedika
                         {
                             CardNo = cardNo,
                             ClID = clID,
-                            DocType = docType,
+                            DocType = normalizedDocType,
                             Remarks = remarks,
                             PatientName = patientName,
                             UserBy = userBy
