@@ -57,6 +57,7 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual("DAILY_MONITORING", AdmedikaConstant.ServiceID.DailyMonitoring);
             Assert.AreEqual("EDOCS_UPLOAD", AdmedikaConstant.ServiceID.EdocsUpload);
             Assert.AreEqual("INVOICE_TRACKING", AdmedikaConstant.ServiceID.InvoiceTracking);
+            Assert.AreEqual("RE_PRINT_OUT", AdmedikaConstant.ServiceID.RePrintOut);
         }
     }
 }

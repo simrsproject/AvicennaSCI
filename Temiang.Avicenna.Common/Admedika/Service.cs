@@ -294,6 +294,23 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public RePrintOutResponse RePrintOut(string clID, string rePrintType)
+        {
+            return Send<RePrintOutResponse>(
+                AdmedikaConstant.ServiceID.RePrintOut,
+                new RePrintOutTxnData
+                {
+                    Request = new RePrintOutRequest
+                    {
+                        RePrintOut = new RePrintOutPayload
+                        {
+                            ClID = clID,
+                            RePrintType = rePrintType
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

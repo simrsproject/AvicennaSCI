@@ -100,5 +100,11 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.InvoiceTracking(invoiceNo, dateName, dateFrom, dateTo);
         }
+
+        [WebMethod]
+        public RePrintOutResponse RePrintOut(string clID, string rePrintType)
+        {
+            return _service.RePrintOut(clID, rePrintType);
+        }
     }
 }

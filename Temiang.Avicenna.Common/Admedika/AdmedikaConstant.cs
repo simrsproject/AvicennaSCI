@@ -15,6 +15,7 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string DailyMonitoring = "DAILY_MONITORING";
             public const string EdocsUpload = "EDOCS_UPLOAD";
             public const string InvoiceTracking = "INVOICE_TRACKING";
+            public const string RePrintOut = "RE_PRINT_OUT";
         }
     }
 }
