@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Web.Script.Services;
 using System.Web.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -56,6 +57,27 @@ namespace Temiang.Avicenna.Tests.Admedika
                 .First();
 
             Assert.IsFalse(string.IsNullOrWhiteSpace(service.Description));
+        }
+
+        [TestMethod]
+        public void AdmedikaWS_WebMethodsRespondWithJson()
+        {
+            var methods = typeof(Temiang.Avicenna.WebService.AdmedikaWS)
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                .Where(m => m.GetCustomAttributes(typeof(WebMethodAttribute), true).Length > 0)
+                .ToArray();
+
+            Assert.AreEqual(12, methods.Length);
+
+            foreach (var method in methods)
+            {
+                var script = method.GetCustomAttributes(typeof(ScriptMethodAttribute), true)
+                    .Cast<ScriptMethodAttribute>()
+                    .FirstOrDefault();
+
+                Assert.IsNotNull(script, method.Name + " harus memiliki [ScriptMethod].");
+                Assert.AreEqual(ResponseFormat.Json, script.ResponseFormat, method.Name);
+            }
         }
 
         [TestMethod]
