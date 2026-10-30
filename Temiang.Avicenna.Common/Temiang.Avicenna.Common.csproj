@@ -231,6 +231,7 @@
     <Compile Include="BPJS\Apotek\Referensi.cs" />
     <Compile Include="BPJS\Apotek\Resep.cs" />
     <Compile Include="BPJS\Apotek\Service.cs" />
+    <Compile Include="Admedika\AdmedikaMask.cs" />
     <Compile Include="Admedika\Logging\IAdmedikaLogger.cs" />
     <Compile Include="Admedika\Logging\NullAdmedikaLogger.cs" />
     <Compile Include="Admedika\Logging\WebServiceApiLogger.cs" />
