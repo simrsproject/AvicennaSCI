@@ -239,6 +239,9 @@
     <Compile Include="Admedika\Transport\AdmedikaTransportException.cs" />
     <Compile Include="Admedika\Transport\HttpAdmedikaTransport.cs" />
     <Compile Include="Admedika\Transport\IAdmedikaTransport.cs" />
+    <Compile Include="Admedika\Request\EligibilityRequest.cs" />
+    <Compile Include="Admedika\Response\BenefitItem.cs" />
+    <Compile Include="Admedika\Response\EligibilityResponse.cs" />
     <Compile Include="Admedika\Parsing\ResponseParser.cs" />
     <Compile Include="Admedika\Request\AdmedikaRequest.cs" />
     <Compile Include="Admedika\Request\CheckIcdExclusionRequest.cs" />

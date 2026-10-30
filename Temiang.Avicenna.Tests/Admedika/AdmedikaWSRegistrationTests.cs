@@ -19,7 +19,9 @@ namespace Temiang.Avicenna.Tests.Admedika
                 .OrderBy(n => n)
                 .ToArray();
 
-            CollectionAssert.AreEqual(new[] { "CheckIcdExclusion", "HelloWorld" }, methods);
+            CollectionAssert.AreEqual(
+                new[] { "CheckIcdExclusion", "Eligibility", "HelloWorld" },
+                methods);
         }
 
         [TestMethod]

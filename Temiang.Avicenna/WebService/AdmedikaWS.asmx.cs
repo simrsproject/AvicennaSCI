@@ -35,5 +35,14 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.CheckIcdExclusion(cardNo, covID, diagnosisCodeList);
         }
+
+        [WebMethod]
+        public EligibilityResponse Eligibility(string cardNo, string covID, string diagnosisCodeList,
+            string providerTransID, string nationalID, string familyCardID, string physicianName,
+            string accidentFlag, string surgicalFlag, string roomType, string roomPrice, string remarks)
+        {
+            return _service.Eligibility(cardNo, covID, diagnosisCodeList, providerTransID, nationalID,
+                familyCardID, physicianName, accidentFlag, surgicalFlag, roomType, roomPrice, remarks);
+        }
     }
 }

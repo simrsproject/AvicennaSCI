@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Admedika\AdmedikaConfigTests.cs" />
     <Compile Include="Admedika\AdmedikaMaskTests.cs" />
+    <Compile Include="Admedika\AdmedikaOutpatientTests.cs" />
     <Compile Include="Admedika\AdmedikaResponseParserTests.cs" />
     <Compile Include="Admedika\AdmedikaWSRegistrationTests.cs" />
     <Compile Include="Admedika\AdmedikaServiceTests.cs" />

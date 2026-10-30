@@ -64,6 +64,48 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        private bool RequireTerminalId(AdmedikaResponse response)
+        {
+            if (!string.IsNullOrWhiteSpace(_config.TerminalID)) return true;
+
+            response.TechnicalError = "AdMedika terminalID belum dikonfigurasi (AdmedikaTerminalID).";
+            response.StatusMsg = response.TechnicalError;
+            return false;
+        }
+
+        public EligibilityResponse Eligibility(string cardNo, string covID, string diagnosisCodeList,
+            string providerTransID, string nationalID, string familyCardID, string physicianName,
+            string accidentFlag, string surgicalFlag, string roomType, string roomPrice, string remarks)
+        {
+            var response = new EligibilityResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<EligibilityResponse>(
+                AdmedikaConstant.ServiceID.Eligibility,
+                new EligibilityTxnData
+                {
+                    Request = new EligibilityRequest
+                    {
+                        Eligibility = new EligibilityPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            CovID = covID,
+                            DiagnosisCodeList = diagnosisCodeList,
+                            ProviderTransID = providerTransID,
+                            NationalID = nationalID,
+                            FamilyCardID = familyCardID,
+                            PhysicianName = physicianName,
+                            AccidentFlag = accidentFlag,
+                            SurgicalFlag = surgicalFlag,
+                            RoomType = roomType,
+                            RoomPrice = roomPrice,
+                            Remarks = remarks
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {
