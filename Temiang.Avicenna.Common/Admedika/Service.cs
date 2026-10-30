@@ -126,6 +126,41 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public DischargeOpResponse DischargeOp(string cardNo, string diagnosisCodeList, string mcDays,
+            string providerTransID, string nationalID, string familyCardID, string physicianName,
+            string accidentFlag, string surgicalFlag, string roomType, string roomPrice, string remarks,
+            DischargeEntitlementInput[] entitlement)
+        {
+            var response = new DischargeOpResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<DischargeOpResponse>(
+                AdmedikaConstant.ServiceID.DischargeOp,
+                new DischargeOpTxnData
+                {
+                    Request = new DischargeOpRequest
+                    {
+                        Discharge = new DischargeOpPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            DiagnosisCodeList = diagnosisCodeList,
+                            McDays = mcDays,
+                            ProviderTransID = providerTransID,
+                            NationalID = nationalID,
+                            FamilyCardID = familyCardID,
+                            PhysicianName = physicianName,
+                            AccidentFlag = accidentFlag,
+                            SurgicalFlag = surgicalFlag,
+                            RoomType = roomType,
+                            RoomPrice = roomPrice,
+                            Remarks = remarks,
+                            Entitlement = entitlement
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

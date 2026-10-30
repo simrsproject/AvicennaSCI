@@ -155,5 +155,103 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.IsFalse(response.IsSuccess);
             Assert.AreEqual("1840", response.ErrorCode);
         }
+
+        private const string DischargeSuccessJson =
+            "{\"output\":{\"referenceID\":\"3201\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
+            + "\"txnData\":{\"dischargeResponse\":{\"discharge\":{"
+            + "\"clID\":\"1500001\",\"providerTransID\":\"RJ-001\",\"clStatus\":\"40\",\"clDesc\":\"VALID CLAIM\","
+            + "\"PayorName\":\"Jaminan Kesehatan\",\"dob\":\"Nov-17-1990\",\"policyNo\":\"X\","
+            + "\"payorMemberID\":\"201611_08\",\"policyDate\":\"Nov-14-2016 To Dec-29-2020\","
+            + "\"planCode\":\"OP55A\",\"covCode\":\"GP\",\"cardNo\":\"8000XXXXXXXXXXXX\","
+            + "\"patientName\":\"Juan Tamad\",\"totAmtIncurred\":\"1,810,000.51\","
+            + "\"totAmtApproved\":\"1,303,000.41\",\"totAmtNotApproved\":\"507,000.10\","
+            + "\"entitlement\":[{\"benID\":\"39\",\"shortName\":\"B.DR.UMUM\",\"longName\":\"Konsultasi\","
+            + "\"amtIncurred\":\"250,000.00\",\"amtApproved\":\"55,000.00\",\"amtNotApproved\":\"195,000.00\"}],"
+            + "\"printOut\":\"PENGESAHAN & TAGIHAN\\r\\nJUM.BIAYA :1810000\"}}},"
+            + "\"txnResponseDateTime\":\"20261030150200\"}}";
+
+        private const string DischargeFailedJson =
+            "{\"output\":{\"referenceID\":\"3202\",\"statusCode\":\"999\",\"statusMsg\":\"Error\",\"format\":\"JSON\","
+            + "\"txnData\":{\"dischargeResponse\":{\"discharge\":{"
+            + "\"errorCode\":\"1998\",\"errorDesc\":\"Rejected -> benefit not covered\","
+            + "\"cardNo\":\"8000XXXXXXXXXXXX\",\"patientName\":\"Juan Tamad\"}}},"
+            + "\"txnResponseDateTime\":\"20261030150201\"}}";
+
+        [TestMethod]
+        public void DischargeOp_MapsAmountsAndPrintOut()
+        {
+            var transport = new FakeTransport { NextResponse = DischargeSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.DischargeOp("8000991200054479", "J06", "3", "RJ-001",
+                null, null, "dr. Test", "N", "N", null, null, null,
+                new[]
+                {
+                    new DischargeEntitlementInput
+                    {
+                        BenID = "39",
+                        BenAmount = "250,000.00",
+                        BenItemList = new[]
+                        {
+                            new DischargeBenItemInput
+                            {
+                                Code = "S2080000xx", Name = "Biaya doctor Umum",
+                                DateIssue = "30102026", Qty = "1", TotPrice = "250,000.00"
+                            }
+                        }
+                    }
+                });
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("1,810,000.51", response.TotAmtIncurred);
+            Assert.AreEqual("1,303,000.41", response.TotAmtApproved);
+            Assert.AreEqual(1, response.Entitlement.Count);
+            Assert.AreEqual("55,000.00", response.Entitlement[0].AmtApproved);
+            Assert.AreEqual("PENGESAHAN & TAGIHAN\r\nJUM.BIAYA :1810000", response.PrintOut);
+        }
+
+        [TestMethod]
+        public void DischargeOp_SendsNestedEntitlementAndItems()
+        {
+            var transport = new FakeTransport { NextResponse = DischargeSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            service.DischargeOp("8000991200054479", "J06", "3", "RJ-001",
+                null, null, null, null, null, null, null, null,
+                new[]
+                {
+                    new DischargeEntitlementInput
+                    {
+                        BenID = "41",
+                        BenAmount = "210,000",
+                        BenItemList = new[]
+                        {
+                            new DischargeBenItemInput { Code = "001-1", Name = "Obat A", Qty = "6", TotPrice = "125,000" },
+                            new DischargeBenItemInput { Code = "001-2", Name = "Obat B", Qty = "12", TotPrice = "25,000" }
+                        }
+                    }
+                });
+
+            var payload = JObject.Parse(transport.LastBody)["input"]["txnData"]["dischargeRequest"]["discharge"];
+            Assert.AreEqual("12380291", payload["terminalID"].ToString());
+            Assert.AreEqual("J06", payload["diagnosisCodeList"].ToString());
+            Assert.AreEqual("41", payload["entitlement"][0]["benID"].ToString());
+            Assert.AreEqual("001-2", payload["entitlement"][0]["benItemList"][1]["code"].ToString());
+            Assert.IsNull(payload["roomType"] == null ? null : payload["roomType"].ToString());
+        }
+
+        [TestMethod]
+        public void DischargeOp_FailedResponse_ReturnsBusinessError()
+        {
+            var transport = new FakeTransport { NextResponse = DischargeFailedJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.DischargeOp("8000991200054479", "J06", null, null,
+                null, null, null, null, null, null, null, null, null);
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1998", response.ErrorCode);
+            StringAssert.Contains(response.ErrorDesc, "not covered");
+        }
     }
 }

@@ -50,5 +50,15 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.GetEntitlement(cardNo);
         }
+
+        [WebMethod]
+        public DischargeOpResponse DischargeOp(string cardNo, string diagnosisCodeList, string mcDays,
+            string providerTransID, string nationalID, string familyCardID, string physicianName,
+            string accidentFlag, string surgicalFlag, string roomType, string roomPrice, string remarks,
+            DischargeEntitlementInput[] entitlement)
+        {
+            return _service.DischargeOp(cardNo, diagnosisCodeList, mcDays, providerTransID, nationalID,
+                familyCardID, physicianName, accidentFlag, surgicalFlag, roomType, roomPrice, remarks, entitlement);
+        }
     }
 }
