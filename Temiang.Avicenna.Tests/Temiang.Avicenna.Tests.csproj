@@ -81,6 +81,7 @@
     <Compile Include="Admedika\AdmedikaConfigTests.cs" />
     <Compile Include="Admedika\AdmedikaMaskTests.cs" />
     <Compile Include="Admedika\AdmedikaResponseParserTests.cs" />
+    <Compile Include="Admedika\AdmedikaWSRegistrationTests.cs" />
     <Compile Include="Admedika\AdmedikaServiceTests.cs" />
     <Compile Include="Admedika\AdmedikaTokenTests.cs" />
     <Compile Include="Bridging\Controllers\AntrolControllerTests.cs" />
