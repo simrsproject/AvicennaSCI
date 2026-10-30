@@ -231,6 +231,13 @@
     <Compile Include="BPJS\Apotek\Referensi.cs" />
     <Compile Include="BPJS\Apotek\Resep.cs" />
     <Compile Include="BPJS\Apotek\Service.cs" />
+    <Compile Include="Admedika\Logging\IAdmedikaLogger.cs" />
+    <Compile Include="Admedika\Logging\NullAdmedikaLogger.cs" />
+    <Compile Include="Admedika\Logging\WebServiceApiLogger.cs" />
+    <Compile Include="Admedika\Service.cs" />
+    <Compile Include="Admedika\Transport\AdmedikaTransportException.cs" />
+    <Compile Include="Admedika\Transport\HttpAdmedikaTransport.cs" />
+    <Compile Include="Admedika\Transport\IAdmedikaTransport.cs" />
     <Compile Include="Admedika\Parsing\ResponseParser.cs" />
     <Compile Include="Admedika\Request\AdmedikaRequest.cs" />
     <Compile Include="Admedika\Request\CheckIcdExclusionRequest.cs" />
