@@ -7,6 +7,42 @@ namespace Temiang.Avicenna.WebService
     /// <summary>
     /// Fasade integrasi Gateway@AdMedika (customer host).
     /// </summary>
+    /// <remarks>
+    /// <para>Panduan pemanggilan dari code aplikasi:</para>
+    /// <code>
+    /// var ws = new Temiang.Avicenna.WebService.AdmedikaWS();
+    /// var result = ws.CheckIcdExclusion("8000991200054479", "02", "J06, B01.9");
+    ///
+    /// // 1. Periksa kegagalan teknis lebih dulu (timeout, TLS, body bukan JSON).
+    /// if (!string.IsNullOrEmpty(result.TechnicalError))
+    /// {
+    ///     // StatusCode/ErrorCode bisa kosong pada kondisi ini.
+    ///     ShowError(result.TechnicalError);
+    /// }
+    /// // 2. StatusCode "00" berarti sukses; selain itu gagal bisnis dari AdMedika.
+    /// else if (!result.IsSuccess) // IsSuccess == (StatusCode == "00")
+    /// {
+    ///     // ErrorCode/ErrorDesc berasal dari txnData AdMedika,
+    ///     // mis. "1833" = diagnosis exclusion, "1812" = member not found.
+    ///     ShowError(result.ErrorCode + " - " + result.ErrorDesc);
+    /// }
+    /// // 3. Sukses: baca field hasil sesuai service.
+    /// else
+    /// {
+    ///     ShowInfo(result.PatientName + " | " + result.PlanCode);
+    /// }
+    /// </code>
+    /// <para>
+    /// Alternatif tanpa fasade:
+    /// <c>new Temiang.Avicenna.Common.Admedika.Service()</c> memiliki method yang sama
+    /// dan mengembalikan tipe respons yang sama.
+    /// </para>
+    /// <para>
+    /// Catatan: kegagalan bisnis AdMedika tetap dikembalikan sebagai HTTP 200.
+    /// Periksa field <c>TechnicalError</c>, <c>StatusCode</c>, <c>ErrorCode</c>,
+    /// dan <c>ErrorDesc</c>; jangan bergantung pada HTTP status.
+    /// </para>
+    /// </remarks>
     [WebService(Namespace = "http://tempuri.org/",
         Description = "Integrasi customer host Avicenna dengan Gateway@AdMedika.")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
