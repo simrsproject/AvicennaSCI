@@ -141,6 +141,25 @@ namespace Temiang.Avicenna.Tests.Admedika
             return false;
         }
 
+        [TestMethod]
+        public void BuildMultipartBody_SanitizesContentTypeHeader()
+        {
+            var files = new[]
+            {
+                new AdmedikaFile
+                {
+                    FileName = "a.txt", ContentType = "text/plain\r\nX-Evil: 1",
+                    Content = Encoding.UTF8.GetBytes("A")
+                }
+            };
+
+            var text = Encoding.UTF8.GetString(
+                HttpAdmedikaTransport.BuildMultipartBody("B", "{}", files));
+
+            Assert.IsFalse(text.Contains("\r\nX-Evil"));
+            StringAssert.Contains(text, "Content-Type: text/plain__X-Evil: 1\r\n\r\n");
+        }
+
         private const string SuccessJson =
             "{\"output\":{\"referenceID\":\"7001\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
             + "\"txnData\":{\"edocsUploadResponse\":{\"edocsUpload\":{\"msg\":\"Successfully\"}}},"

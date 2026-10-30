@@ -53,14 +53,14 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
-        public void Next_ReturnsSixDigitsAndUniqueValues()
+        public void Next_ReturnsFiveDigitsAndUniqueValues()
         {
             var values = new HashSet<string>();
             for (var i = 0; i < 1000; i++)
             {
                 var id = RequestIdGenerator.Next();
-                Assert.AreEqual(6, id.Length);
-                Assert.IsTrue(int.Parse(id, CultureInfo.InvariantCulture) >= 100000);
+                Assert.AreEqual(5, id.Length);
+                Assert.IsTrue(int.Parse(id, CultureInfo.InvariantCulture) >= 10000);
                 Assert.IsTrue(values.Add(id), "requestID duplikat: " + id);
             }
         }

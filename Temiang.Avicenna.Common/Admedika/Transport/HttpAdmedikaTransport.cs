@@ -49,9 +49,7 @@ namespace Temiang.Avicenna.Common.Admedika
                         if (file == null) continue;
 
                         var fileName = SanitizeFileName(file.FileName);
-                        var contentType = string.IsNullOrWhiteSpace(file.ContentType)
-                            ? "application/octet-stream"
-                            : file.ContentType;
+                        var contentType = SanitizeContentType(file.ContentType);
 
                         Write(stream, "--" + boundary + "\r\n");
                         Write(stream, "Content-Disposition: form-data; name=\"files\"; filename=\""
@@ -77,6 +75,19 @@ namespace Temiang.Avicenna.Common.Admedika
             foreach (var ch in fileName)
             {
                 builder.Append(ch < 32 || ch == 127 || ch == '"' ? '_' : ch);
+            }
+
+            return builder.ToString();
+        }
+
+        private static string SanitizeContentType(string contentType)
+        {
+            if (string.IsNullOrWhiteSpace(contentType)) return "application/octet-stream";
+
+            var builder = new StringBuilder(contentType.Length);
+            foreach (var ch in contentType)
+            {
+                builder.Append(ch < 32 || ch == 127 ? '_' : ch);
             }
 
             return builder.ToString();
@@ -130,6 +141,7 @@ namespace Temiang.Avicenna.Common.Admedika
         {
             if (response == null) return null;
 
+            using (response)
             using (var stream = response.GetResponseStream())
             {
                 if (stream == null) return null;

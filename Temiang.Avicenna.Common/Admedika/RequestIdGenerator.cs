@@ -10,7 +10,7 @@ namespace Temiang.Avicenna.Common.Admedika
         public static string Next()
         {
             var value = Interlocked.Increment(ref _counter);
-            var requestId = 100000 + (value % 900000);
+            var requestId = 10000 + (value % 90000);
             return requestId.ToString(CultureInfo.InvariantCulture);
         }
     }

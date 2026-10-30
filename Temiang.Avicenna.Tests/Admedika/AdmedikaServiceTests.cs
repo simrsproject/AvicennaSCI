@@ -103,7 +103,7 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual("CUST001", input["customerID"].ToString());
 
             var requestId = input["requestID"].ToString();
-            Assert.AreEqual(6, requestId.Length);
+            Assert.AreEqual(5, requestId.Length);
 
             var requestDateTime = input["txnRequestDateTime"].ToString();
             Assert.AreEqual(14, requestDateTime.Length);
