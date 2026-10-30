@@ -43,6 +43,10 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual(12, descriptions.Length);
             Assert.IsTrue(descriptions.All(d => !string.IsNullOrWhiteSpace(d)),
                 "Setiap WebMethod harus memiliki Description.");
+            Assert.IsTrue(descriptions.All(d => d.Contains(". from source : ")),
+                "Setiap Description harus menyebutkan file sumber.");
+            Assert.IsTrue(descriptions.All(d => d.EndsWith(".pdf")),
+                "Setiap Description harus diakhiri nama file PDF.");
             Assert.AreEqual(12, descriptions.Distinct().Count(),
                 "Description antar WebMethod harus unik.");
 
