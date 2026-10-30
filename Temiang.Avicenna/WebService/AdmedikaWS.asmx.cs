@@ -79,5 +79,12 @@ namespace Temiang.Avicenna.WebService
         {
             return _service.CancelOpenClaimsTxn(cardNo, remarks);
         }
+
+        [WebMethod]
+        public DailyMonitoringResponse DailyMonitoring(string cardNo, string providerTransID, string clID,
+            string dmUser, DailyMonitoringForm[] dmForms)
+        {
+            return _service.DailyMonitoring(cardNo, providerTransID, clID, dmUser, dmForms);
+        }
     }
 }

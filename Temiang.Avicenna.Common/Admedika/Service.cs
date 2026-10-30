@@ -222,6 +222,31 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public DailyMonitoringResponse DailyMonitoring(string cardNo, string providerTransID, string clID,
+            string dmUser, DailyMonitoringForm[] dmForms)
+        {
+            var response = new DailyMonitoringResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<DailyMonitoringResponse>(
+                AdmedikaConstant.ServiceID.DailyMonitoring,
+                new DailyMonitoringTxnData
+                {
+                    Request = new DailyMonitoringRequest
+                    {
+                        DailyMonitoring = new DailyMonitoringPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            ProviderTransID = providerTransID,
+                            ClID = clID,
+                            DmUser = dmUser,
+                            DmForms = dmForms
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {
