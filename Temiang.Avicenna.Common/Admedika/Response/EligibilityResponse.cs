@@ -21,5 +21,10 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("referral_info_flag")] public string ReferralInfoFlag { get; set; }
         [JsonProperty("printOut")] public string PrintOut { get; set; }
         [JsonProperty("entitlement")] public List<BenefitItem> Entitlement { get; set; }
+
+        public EligibilityResponse()
+        {
+            Entitlement = new List<BenefitItem>();
+        }
     }
 }

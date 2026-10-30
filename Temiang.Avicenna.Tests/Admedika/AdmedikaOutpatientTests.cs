@@ -156,6 +156,31 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual("1840", response.ErrorCode);
         }
 
+        [TestMethod]
+        public void SuccessResponseWithoutEntitlement_ReturnsEmptyLists()
+        {
+            const string eligibility =
+                "{\"output\":{\"referenceID\":\"1\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"eligibilityResponse\":{\"eligibility\":{\"clID\":\"1\"}}}}}";
+            const string entitlement =
+                "{\"output\":{\"referenceID\":\"2\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"getEntitlementResponse\":{\"getEntitlement\":{\"clID\":\"1\"}}}}}";
+            const string discharge =
+                "{\"output\":{\"referenceID\":\"3\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"dischargeResponse\":{\"discharge\":{\"clID\":\"1\"}}}}}";
+
+            var eligibilityResponse = ResponseParser.Parse<EligibilityResponse>(eligibility);
+            var entitlementResponse = ResponseParser.Parse<GetEntitlementResponse>(entitlement);
+            var dischargeResponse = ResponseParser.Parse<DischargeOpResponse>(discharge);
+
+            Assert.IsNotNull(eligibilityResponse.Entitlement);
+            Assert.AreEqual(0, eligibilityResponse.Entitlement.Count);
+            Assert.IsNotNull(entitlementResponse.Entitlement);
+            Assert.AreEqual(0, entitlementResponse.Entitlement.Count);
+            Assert.IsNotNull(dischargeResponse.Entitlement);
+            Assert.AreEqual(0, dischargeResponse.Entitlement.Count);
+        }
+
         private const string DischargeSuccessJson =
             "{\"output\":{\"referenceID\":\"3201\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
             + "\"txnData\":{\"dischargeResponse\":{\"discharge\":{"
