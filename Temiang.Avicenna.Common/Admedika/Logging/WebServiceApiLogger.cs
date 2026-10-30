@@ -1,6 +1,5 @@
 using System;
 using System.Text.RegularExpressions;
-using System.Web;
 using Temiang.Avicenna.BusinessObject;
 
 namespace Temiang.Avicenna.Common.Admedika
@@ -24,24 +23,26 @@ namespace Temiang.Avicenna.Common.Admedika
 
             try
             {
-                var log = new WebServiceAPILog
-                {
-                    DateRequest = DateTime.Now,
-                    IPAddress = HttpContext.Current == null
-                        ? string.Empty
-                        : HttpContext.Current.Request.UserHostAddress,
-                    UrlAddress = serviceId,
-                    Params = MaskSensitive(requestBody),
-                    Response = MaskSensitive(responseBody),
-                    Totalms = (int)elapsedMs
-                };
-
-                log.Save();
+                CreateLogEntry(serviceId, requestBody, responseBody, elapsedMs).Save();
             }
             catch (Exception)
             {
                 // Logging tidak boleh menggagalkan transaksi.
             }
+        }
+
+        public static WebServiceAPILog CreateLogEntry(string serviceId, string requestBody,
+            string responseBody, long elapsedMs)
+        {
+            return new WebServiceAPILog
+            {
+                DateRequest = DateTime.Now,
+                IPAddress = "ADMEDIKA",
+                UrlAddress = serviceId,
+                Params = MaskSensitive(requestBody),
+                Response = MaskSensitive(responseBody),
+                Totalms = (int)elapsedMs
+            };
         }
 
         public static string MaskSensitive(string json)

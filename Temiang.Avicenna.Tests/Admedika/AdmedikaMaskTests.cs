@@ -40,6 +40,20 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void CreateLogEntry_UsesAdmedikaIpAndMasksCard()
+        {
+            var entry = WebServiceApiLogger.CreateLogEntry("CHECK_ICD_EXCLUSION",
+                "{\"cardNo\":\"8000991200054479\"}",
+                "{\"cardNo\":\"8000991200054479\"}", 12);
+
+            Assert.AreEqual("ADMEDIKA", entry.IPAddress);
+            Assert.AreEqual("CHECK_ICD_EXCLUSION", entry.UrlAddress);
+            Assert.AreEqual(12, entry.Totalms ?? 0);
+            StringAssert.Contains(entry.Params, "8000********4479");
+            StringAssert.Contains(entry.Response, "8000********4479");
+        }
+
+        [TestMethod]
         public void MaskSensitive_ReplacesCardNoOnlyInsideJson()
         {
             const string json =
