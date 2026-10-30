@@ -46,7 +46,14 @@ namespace Temiang.Avicenna.Common.Admedika
             var payload = FindPayload(txnData);
             if (payload == null) return result;
 
-            JsonConvert.PopulateObject(payload.ToString(), result);
+            try
+            {
+                JsonConvert.PopulateObject(payload.ToString(), result);
+            }
+            catch (Exception ex)
+            {
+                result.TechnicalError = "Payload respons tidak dapat dipetakan: " + ex.Message;
+            }
 
             if (string.IsNullOrEmpty(result.ErrorCode)) result.ErrorCode = Str(payload, "errorCode");
             if (string.IsNullOrEmpty(result.ErrorDesc)) result.ErrorDesc = Str(payload, "errorDesc");

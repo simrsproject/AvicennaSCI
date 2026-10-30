@@ -7,6 +7,11 @@ namespace Temiang.Avicenna.Common.Admedika
             if (value == null) return null;
             if (value.Length == 0) return string.Empty;
             if (value.Length <= 8) return new string('*', value.Length);
+            if (value.Length < 16)
+            {
+                return new string('*', value.Length - 4)
+                       + value.Substring(value.Length - 4);
+            }
 
             return value.Substring(0, 4)
                    + new string('*', value.Length - 8)

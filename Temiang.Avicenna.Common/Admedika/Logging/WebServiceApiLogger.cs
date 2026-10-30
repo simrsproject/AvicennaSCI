@@ -8,7 +8,7 @@ namespace Temiang.Avicenna.Common.Admedika
     public class WebServiceApiLogger : IAdmedikaLogger
     {
         private static readonly Regex CardNoPattern = new Regex(
-            "(\"cardNo\"\\s*:\\s*\")([^\"]*)(\")",
+            "(\"cardNo\"\\s*:\\s*)(?:\"([^\"]*)\"|([^,}\\]\\s]+))",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private readonly AdmedikaConfig _config;
@@ -50,9 +50,14 @@ namespace Temiang.Avicenna.Common.Admedika
 
             return CardNoPattern.Replace(
                 json,
-                match => match.Groups[1].Value
-                         + AdmedikaMask.CardNo(match.Groups[2].Value)
-                         + match.Groups[3].Value);
+                match =>
+                {
+                    var value = match.Groups[2].Success
+                        ? match.Groups[2].Value
+                        : match.Groups[3].Value;
+
+                    return match.Groups[1].Value + "\"" + AdmedikaMask.CardNo(value) + "\"";
+                });
         }
     }
 }

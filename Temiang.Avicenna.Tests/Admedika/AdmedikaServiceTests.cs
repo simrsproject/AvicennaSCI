@@ -164,6 +164,29 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void TransportFailure_WithUnparsableBody_DoesNotThrowAndStillLogs()
+        {
+            const string brokenBody =
+                "{\"output\":{\"referenceID\":\"1\",\"statusCode\":\"910\",\"statusMsg\":\"error\","
+                + "\"format\":\"JSON\",\"txnData\":{\"errorResponse\":{\"diag\":{"
+                + "\"diagnosisCodeList\":[\"J06\"],\"errorCode\":{\"code\":1833}}}}}}";
+
+            var transport = new FakeTransport
+            {
+                NextException = new AdmedikaTransportException("HTTP 500", brokenBody, null)
+            };
+            var logger = new RecordingLogger();
+            var service = new Service(CreateConfig(), transport, logger);
+
+            var response = service.CheckIcdExclusion("8000991200054479", "02", "J06");
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.IsFalse(string.IsNullOrEmpty(response.TechnicalError));
+            Assert.AreEqual("910", response.StatusCode);
+            Assert.AreEqual(1, logger.CallCount);
+        }
+
+        [TestMethod]
         public void InvalidJsonResponse_ReturnsTechnicalErrorWithoutThrowing()
         {
             var transport = new FakeTransport { NextResponse = "not-json" };

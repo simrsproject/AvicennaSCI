@@ -21,6 +21,25 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void CardNo_MidLength_DisclosesAtMostLastFour()
+        {
+            Assert.AreEqual("*****3456", AdmedikaMask.CardNo("ABC123456"));
+            Assert.AreEqual("********9012", AdmedikaMask.CardNo("123456789012"));
+        }
+
+        [TestMethod]
+        public void MaskSensitive_MasksUnquotedNumericCardNo()
+        {
+            const string json = "{\"output\":{\"cardNo\":8000991200054479,\"covID\":\"02\"}}";
+
+            var masked = WebServiceApiLogger.MaskSensitive(json);
+
+            Assert.IsFalse(masked.Contains("8000991200054479"));
+            StringAssert.Contains(masked, "\"cardNo\":\"8000********4479\"");
+            StringAssert.Contains(masked, "\"covID\":\"02\"");
+        }
+
+        [TestMethod]
         public void MaskSensitive_ReplacesCardNoOnlyInsideJson()
         {
             const string json =

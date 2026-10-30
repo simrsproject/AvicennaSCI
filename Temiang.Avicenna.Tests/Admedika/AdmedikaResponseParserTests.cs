@@ -73,6 +73,22 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void Parse_PayloadWithUnexpectedJsonType_ReturnsTechnicalErrorWithoutThrowing()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":\"1\",\"statusCode\":\"910\",\"statusMsg\":\"error\","
+                + "\"format\":\"JSON\",\"txnData\":{\"errorResponse\":{\"diag\":{"
+                + "\"diagnosisCodeList\":[\"J06\",\"J05\"],\"errorCode\":{\"code\":1833}}}},"
+                + "\"txnResponseDateTime\":\"20261030143012\"}}";
+
+            var response = ResponseParser.Parse<CheckIcdExclusionResponse>(json);
+
+            Assert.IsFalse(string.IsNullOrEmpty(response.TechnicalError));
+            Assert.AreEqual("910", response.StatusCode);
+            Assert.AreEqual("1", response.ReferenceID);
+        }
+
+        [TestMethod]
         public void Parse_HelloWorldPayload()
         {
             const string json =
