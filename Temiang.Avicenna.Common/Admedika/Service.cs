@@ -106,6 +106,26 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public GetEntitlementResponse GetEntitlement(string cardNo)
+        {
+            var response = new GetEntitlementResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<GetEntitlementResponse>(
+                AdmedikaConstant.ServiceID.GetEntitlement,
+                new GetEntitlementTxnData
+                {
+                    Request = new GetEntitlementRequest
+                    {
+                        GetEntitlement = new GetEntitlementPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

@@ -110,5 +110,50 @@ namespace Temiang.Avicenna.Tests.Admedika
             StringAssert.Contains(response.TechnicalError, "terminalID");
             Assert.AreEqual(0, transport.CallCount);
         }
+
+        private const string GetEntitlementSuccessJson =
+            "{\"output\":{\"referenceID\":\"3101\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\",\"format\":\"JSON\","
+            + "\"txnData\":{\"getEntitlementResponse\":{\"getEntitlement\":{"
+            + "\"cardNo\":\"8000991200054479\",\"patientName\":\"Juan Tamad\",\"clID\":\"1500001\","
+            + "\"clStatus\":\"08\",\"clDesc\":\"ELIGIBILITY APPROVED\",\"PayorName\":\"Jaminan Kesehatan\","
+            + "\"entitlement\":[{\"benID\":\"08\",\"shortName\":\"SPESIALISTIK\",\"longName\":\"Pelayanan Spesialistik\"},"
+            + "{\"benID\":\"82\",\"shortName\":\"IMUNISASI\",\"longName\":\"Imunisasi Dasar\"}]}}},"
+            + "\"txnResponseDateTime\":\"20261030150100\"}}";
+
+        private const string GetEntitlementFailedJson =
+            "{\"output\":{\"referenceID\":\"3102\",\"statusCode\":\"910\",\"statusMsg\":\"error on txnData\",\"format\":\"JSON\","
+            + "\"txnData\":{\"getEntitlementResponse\":{\"getEntitlement\":{"
+            + "\"errorCode\":\"1840\",\"errorDesc\":\"No open claims found\",\"cardNo\":\"8000991200054479\"}}},"
+            + "\"txnResponseDateTime\":\"20261030150101\"}}";
+
+        [TestMethod]
+        public void GetEntitlement_MapsBenefitsAndSendsTerminalId()
+        {
+            var transport = new FakeTransport { NextResponse = GetEntitlementSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.GetEntitlement("8000991200054479");
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("1500001", response.ClID);
+            Assert.AreEqual(2, response.Entitlement.Count);
+            Assert.AreEqual("82", response.Entitlement[1].BenID);
+
+            var payload = JObject.Parse(transport.LastBody)["input"]["txnData"]["getEntitlementRequest"]["getEntitlement"];
+            Assert.AreEqual("12380291", payload["terminalID"].ToString());
+            Assert.AreEqual("8000991200054479", payload["cardNo"].ToString());
+        }
+
+        [TestMethod]
+        public void GetEntitlement_FailedResponse_ReturnsBusinessError()
+        {
+            var transport = new FakeTransport { NextResponse = GetEntitlementFailedJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.GetEntitlement("8000991200054479");
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1840", response.ErrorCode);
+        }
     }
 }

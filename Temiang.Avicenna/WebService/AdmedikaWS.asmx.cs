@@ -44,5 +44,11 @@ namespace Temiang.Avicenna.WebService
             return _service.Eligibility(cardNo, covID, diagnosisCodeList, providerTransID, nationalID,
                 familyCardID, physicianName, accidentFlag, surgicalFlag, roomType, roomPrice, remarks);
         }
+
+        [WebMethod]
+        public GetEntitlementResponse GetEntitlement(string cardNo)
+        {
+            return _service.GetEntitlement(cardNo);
+        }
     }
 }
