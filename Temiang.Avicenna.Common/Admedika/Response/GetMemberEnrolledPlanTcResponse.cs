@@ -11,11 +11,13 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("payorName")] public string PayorName { get; set; }
         [JsonProperty("covID")] public string CovID { get; set; }
         [JsonProperty("covCode")] public string CovCode { get; set; }
-        [JsonProperty("enrolledPlan")] public List<EnrolledPlan> EnrolledPlan { get; set; }
+        private List<EnrolledPlan> _enrolledPlan = new List<EnrolledPlan>();
 
-        public GetMemberEnrolledPlanTcResponse()
+        [JsonProperty("enrolledPlan")]
+        public List<EnrolledPlan> EnrolledPlan
         {
-            EnrolledPlan = new List<EnrolledPlan>();
+            get { return _enrolledPlan; }
+            set { _enrolledPlan = value ?? new List<EnrolledPlan>(); }
         }
     }
 
@@ -24,11 +26,14 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("covCode")] public string CovCode { get; set; }
         [JsonProperty("planID")] public string PlanID { get; set; }
         [JsonProperty("desc")] public string Desc { get; set; }
-        [JsonProperty("termCondition")] public List<TermConditionItem> TermCondition { get; set; }
 
-        public EnrolledPlan()
+        private List<TermConditionItem> _termCondition = new List<TermConditionItem>();
+
+        [JsonProperty("termCondition")]
+        public List<TermConditionItem> TermCondition
         {
-            TermCondition = new List<TermConditionItem>();
+            get { return _termCondition; }
+            set { _termCondition = value ?? new List<TermConditionItem>(); }
         }
     }
 

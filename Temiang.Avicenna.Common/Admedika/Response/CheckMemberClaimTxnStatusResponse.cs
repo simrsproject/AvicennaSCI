@@ -18,12 +18,15 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("totAmtIncurred")] public string TotAmtIncurred { get; set; }
         [JsonProperty("totAmtApproved")] public string TotAmtApproved { get; set; }
         [JsonProperty("totAmtNotApproved")] public string TotAmtNotApproved { get; set; }
-        [JsonProperty("entitlement")] public List<BenefitItem> Entitlement { get; set; }
-        [JsonProperty("remarks")] public string Remarks { get; set; }
+        private List<BenefitItem> _entitlement = new List<BenefitItem>();
 
-        public CheckMemberClaimTxnStatusResponse()
+        [JsonProperty("entitlement")]
+        public List<BenefitItem> Entitlement
         {
-            Entitlement = new List<BenefitItem>();
+            get { return _entitlement; }
+            set { _entitlement = value ?? new List<BenefitItem>(); }
         }
+
+        [JsonProperty("remarks")] public string Remarks { get; set; }
     }
 }

@@ -20,11 +20,13 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("principalName")] public string PrincipalName { get; set; }
         [JsonProperty("referral_info_flag")] public string ReferralInfoFlag { get; set; }
         [JsonProperty("printOut")] public string PrintOut { get; set; }
-        [JsonProperty("entitlement")] public List<BenefitItem> Entitlement { get; set; }
+        private List<BenefitItem> _entitlement = new List<BenefitItem>();
 
-        public EligibilityResponse()
+        [JsonProperty("entitlement")]
+        public List<BenefitItem> Entitlement
         {
-            Entitlement = new List<BenefitItem>();
+            get { return _entitlement; }
+            set { _entitlement = value ?? new List<BenefitItem>(); }
         }
     }
 }

@@ -24,11 +24,13 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("totAmtApproved")] public string TotAmtApproved { get; set; }
         [JsonProperty("totAmtNotApproved")] public string TotAmtNotApproved { get; set; }
         [JsonProperty("printOut")] public string PrintOut { get; set; }
-        [JsonProperty("entitlement")] public List<DischargeEntitlementResult> Entitlement { get; set; }
+        private List<DischargeEntitlementResult> _entitlement = new List<DischargeEntitlementResult>();
 
-        public DischargeOpResponse()
+        [JsonProperty("entitlement")]
+        public List<DischargeEntitlementResult> Entitlement
         {
-            Entitlement = new List<DischargeEntitlementResult>();
+            get { return _entitlement; }
+            set { _entitlement = value ?? new List<DischargeEntitlementResult>(); }
         }
     }
 

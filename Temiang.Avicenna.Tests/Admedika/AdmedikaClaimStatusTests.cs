@@ -169,6 +169,33 @@ namespace Temiang.Avicenna.Tests.Admedika
             StringAssert.Contains(response.ErrorDesc, "covID");
         }
         [TestMethod]
+        public void ExplicitNullNestedLists_AreNormalizedToEmpty()
+        {
+            const string status =
+                "{\"output\":{\"referenceID\":\"1\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"checkMemberClaimTxnStatusResponse\":"
+                + "{\"checkMemberClaimTxnStatus\":{\"entitlement\":null}}}}}";
+            const string plan =
+                "{\"output\":{\"referenceID\":\"2\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"getMemberEnrolledPlanTCResponse\":"
+                + "{\"getMemberEnrolledPlanTC\":{\"enrolledPlan\":[{\"covCode\":\"GP\",\"termCondition\":null}]}}}}}";
+            const string discharge =
+                "{\"output\":{\"referenceID\":\"3\",\"statusCode\":\"00\",\"statusMsg\":\"Successful\","
+                + "\"format\":\"JSON\",\"txnData\":{\"dischargeResponse\":{\"discharge\":{\"entitlement\":null}}}}}";
+
+            var statusResponse = ResponseParser.Parse<CheckMemberClaimTxnStatusResponse>(status);
+            var planResponse = ResponseParser.Parse<GetMemberEnrolledPlanTcResponse>(plan);
+            var dischargeResponse = ResponseParser.Parse<DischargeOpResponse>(discharge);
+
+            Assert.IsNotNull(statusResponse.Entitlement);
+            Assert.AreEqual(0, statusResponse.Entitlement.Count);
+            Assert.IsNotNull(planResponse.EnrolledPlan[0].TermCondition);
+            Assert.AreEqual(0, planResponse.EnrolledPlan[0].TermCondition.Count);
+            Assert.IsNotNull(dischargeResponse.Entitlement);
+            Assert.AreEqual(0, dischargeResponse.Entitlement.Count);
+        }
+
+        [TestMethod]
         public void SuccessResponseWithoutNestedLists_ReturnsEmptyLists()
         {
             const string status =
