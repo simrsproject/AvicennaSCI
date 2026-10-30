@@ -60,5 +60,11 @@ namespace Temiang.Avicenna.WebService
             return _service.DischargeOp(cardNo, diagnosisCodeList, mcDays, providerTransID, nationalID,
                 familyCardID, physicianName, accidentFlag, surgicalFlag, roomType, roomPrice, remarks, entitlement);
         }
+
+        [WebMethod]
+        public CheckMemberClaimTxnStatusResponse CheckMemberClaimTxnStatus(string cardNo, string clID)
+        {
+            return _service.CheckMemberClaimTxnStatus(cardNo, clID);
+        }
     }
 }

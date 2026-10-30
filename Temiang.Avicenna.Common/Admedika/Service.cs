@@ -161,6 +161,27 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public CheckMemberClaimTxnStatusResponse CheckMemberClaimTxnStatus(string cardNo, string clID)
+        {
+            var response = new CheckMemberClaimTxnStatusResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<CheckMemberClaimTxnStatusResponse>(
+                AdmedikaConstant.ServiceID.CheckMemberClaimTxnStatus,
+                new CheckMemberClaimTxnStatusTxnData
+                {
+                    Request = new CheckMemberClaimTxnStatusRequest
+                    {
+                        CheckMemberClaimTxnStatus = new CheckMemberClaimTxnStatusPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            ClID = clID
+                        }
+                    }
+                });
+        }
+
         private TResponse Send<TResponse>(string serviceId, object txnData)
             where TResponse : AdmedikaResponse, new()
         {

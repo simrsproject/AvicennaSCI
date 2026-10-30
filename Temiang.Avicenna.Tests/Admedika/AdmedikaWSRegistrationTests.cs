@@ -20,7 +20,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                 .ToArray();
 
             CollectionAssert.AreEqual(
-                new[] { "CheckIcdExclusion", "DischargeOp", "Eligibility", "GetEntitlement", "HelloWorld" },
+                new[] { "CheckIcdExclusion", "CheckMemberClaimTxnStatus", "DischargeOp", "Eligibility", "GetEntitlement", "HelloWorld" },
                 methods);
         }
 

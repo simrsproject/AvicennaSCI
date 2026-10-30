@@ -78,6 +78,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Admedika\AdmedikaClaimStatusTests.cs" />
     <Compile Include="Admedika\AdmedikaConfigTests.cs" />
     <Compile Include="Admedika\AdmedikaMaskTests.cs" />
     <Compile Include="Admedika\AdmedikaOutpatientTests.cs" />
