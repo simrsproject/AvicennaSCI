@@ -46,6 +46,8 @@ namespace Temiang.Avicenna.Tests.Admedika
                 "Setiap WebMethod harus memiliki Description.");
             Assert.IsTrue(descriptions.All(d => d.Contains(". from source : ")),
                 "Setiap Description harus menyebutkan file sumber.");
+            Assert.IsTrue(descriptions.All(d => d.Contains("Request: ")),
+                "Setiap Description harus memuat ringkasan field request.");
             Assert.IsTrue(descriptions.All(d => d.EndsWith(".pdf")),
                 "Setiap Description harus diakhiri nama file PDF.");
             Assert.AreEqual(12, descriptions.Distinct().Count(),
