@@ -15,6 +15,7 @@ namespace Temiang.Avicenna.Common.Admedika
         public string CustomerID { get; set; }
         public string SecurityWord { get; set; }
         public string TerminalID { get; set; }
+        public string TimeZoneId { get; set; }
         public int TimeoutSeconds { get; set; }
         public bool IsLogEnabled { get; set; }
 
@@ -25,6 +26,7 @@ namespace Temiang.Avicenna.Common.Admedika
             CustomerID = GetString("AdmedikaCustomerID", string.Empty);
             SecurityWord = GetString("AdmedikaSecurityWord", string.Empty);
             TerminalID = GetString("AdmedikaTerminalID", string.Empty);
+            TimeZoneId = GetString("AdmedikaTimeZoneId", string.Empty);
             TimeoutSeconds = GetInt("AdmedikaTimeoutSeconds", 60);
             IsLogEnabled = GetBool("AdmedikaIsLogEnabled", true);
         }

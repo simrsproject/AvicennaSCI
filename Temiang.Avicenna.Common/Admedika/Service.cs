@@ -392,20 +392,42 @@ namespace Temiang.Avicenna.Common.Admedika
                 () => _transport.PostMultipart(_config.ApiServiceUrl, body, files, _config.TimeoutSeconds));
         }
 
+        public static string FormatRequestDateTime(DateTime utcNow, string timeZoneId)
+        {
+            var value = utcNow;
+
+            if (!string.IsNullOrWhiteSpace(timeZoneId))
+            {
+                try
+                {
+                    var zone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                    value = TimeZoneInfo.ConvertTimeFromUtc(utcNow, zone);
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                }
+                catch (InvalidTimeZoneException)
+                {
+                }
+            }
+
+            return value.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+        }
+
         private string BuildBody(string serviceId, object txnData)
         {
-            var utcNow = DateTime.UtcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+            var requestDateTime = FormatRequestDateTime(DateTime.UtcNow, _config.TimeZoneId);
             var requestId = RequestIdGenerator.Next();
 
             var request = new AdmedikaRequest<object>
             {
                 TokenAuth = TokenGenerator.CreateToken(
-                    _config.CustomerID, _config.SecurityWord, utcNow, requestId, serviceId),
+                    _config.CustomerID, _config.SecurityWord, requestDateTime, requestId, serviceId),
                 ServiceID = serviceId,
                 CustomerID = _config.CustomerID,
                 RequestID = requestId,
                 TxnData = txnData,
-                TxnRequestDateTime = utcNow
+                TxnRequestDateTime = requestDateTime
             };
 
             return JsonConvert.SerializeObject(new { input = request }, SerializerSettings);

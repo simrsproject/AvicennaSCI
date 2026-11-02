@@ -18,6 +18,7 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual(string.Empty, config.CustomerID);
             Assert.AreEqual(string.Empty, config.SecurityWord);
             Assert.AreEqual(string.Empty, config.TerminalID);
+            Assert.AreEqual(string.Empty, config.TimeZoneId);
         }
 
         [TestMethod]
@@ -30,6 +31,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                 CustomerID = "CUST001",
                 SecurityWord = "secret",
                 TerminalID = "12380291",
+                TimeZoneId = "SE Asia Standard Time",
                 TimeoutSeconds = 15,
                 IsLogEnabled = false
             };
@@ -39,6 +41,7 @@ namespace Temiang.Avicenna.Tests.Admedika
             Assert.AreEqual("CUST001", config.CustomerID);
             Assert.AreEqual("secret", config.SecurityWord);
             Assert.AreEqual("12380291", config.TerminalID);
+            Assert.AreEqual("SE Asia Standard Time", config.TimeZoneId);
             Assert.AreEqual(15, config.TimeoutSeconds);
             Assert.IsFalse(config.IsLogEnabled);
         }

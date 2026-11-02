@@ -213,8 +213,34 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
-        public void Logger_ReceivesServiceIdAndBodies()
+        public void FormatRequestDateTime_EmptyTimeZone_UsesUtc()
         {
+            var utc = new DateTime(2026, 11, 2, 3, 9, 16, DateTimeKind.Utc);
+
+            Assert.AreEqual("20261102030916", Service.FormatRequestDateTime(utc, string.Empty));
+            Assert.AreEqual("20261102030916", Service.FormatRequestDateTime(utc, null));
+        }
+
+        [TestMethod]
+        public void FormatRequestDateTime_WibTimeZone_ConvertsToLocal()
+        {
+            var utc = new DateTime(2026, 11, 2, 3, 9, 16, DateTimeKind.Utc);
+
+            Assert.AreEqual("20261102100916",
+                Service.FormatRequestDateTime(utc, "SE Asia Standard Time"));
+        }
+
+        [TestMethod]
+        public void FormatRequestDateTime_InvalidTimeZone_FallsBackToUtc()
+        {
+            var utc = new DateTime(2026, 11, 2, 3, 9, 16, DateTimeKind.Utc);
+
+            Assert.AreEqual("20261102030916",
+                Service.FormatRequestDateTime(utc, "Invalid/Zone"));
+        }
+
+        [TestMethod]
+        public void Logger_ReceivesServiceIdAndBodies()        {
             var transport = new FakeTransport { NextResponse = SuccessJson };
             var logger = new RecordingLogger();
             var service = new Service(CreateConfig(), transport, logger);
