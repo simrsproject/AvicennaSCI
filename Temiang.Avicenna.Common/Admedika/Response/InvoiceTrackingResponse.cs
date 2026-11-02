@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.Common.Admedika
 {
+    [XmlRoot("AdmedikaInvoiceTrackingResponse")]
     public class InvoiceTrackingResponse : AdmedikaResponse
     {
         private List<InvoiceTrackingItem> _invoiceTracking = new List<InvoiceTrackingItem>();

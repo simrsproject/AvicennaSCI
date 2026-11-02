@@ -1,7 +1,9 @@
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.Common.Admedika
 {
+    [XmlRoot("AdmedikaCheckIcdExclusionResponse")]
     public class CheckIcdExclusionResponse : AdmedikaResponse
     {
         [JsonProperty("PayorName")]

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Script.Services;
 using System.Web.Services;
+using System.Web.Services.Description;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Temiang.Avicenna.Tests.Admedika
@@ -80,6 +81,17 @@ namespace Temiang.Avicenna.Tests.Admedika
                 Assert.IsNotNull(script, method.Name + " harus memiliki [ScriptMethod].");
                 Assert.AreEqual(ResponseFormat.Json, script.ResponseFormat, method.Name);
             }
+        }
+
+        [TestMethod]
+        public void AdmedikaWS_ServiceDescriptionCanBeGenerated()
+        {
+            var reflector = new ServiceDescriptionReflector();
+
+            reflector.Reflect(typeof(Temiang.Avicenna.WebService.AdmedikaWS),
+                "http://localhost/AdmedikaWS.asmx");
+
+            Assert.IsTrue(reflector.ServiceDescriptions.Count > 0);
         }
 
         [TestMethod]

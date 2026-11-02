@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.Common.Admedika
 {
+    [XmlRoot("AdmedikaDischargeOpResponse")]
     public class DischargeOpResponse : AdmedikaResponse
     {
         [JsonProperty("clID")] public string ClID { get; set; }

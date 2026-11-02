@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.Common.Admedika
 {
+    [XmlRoot("AdmedikaGetMemberEnrolledPlanTcResponse")]
     public class GetMemberEnrolledPlanTcResponse : AdmedikaResponse
     {
         [JsonProperty("cardNo")] public string CardNo { get; set; }
