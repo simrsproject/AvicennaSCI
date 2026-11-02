@@ -1083,6 +1083,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                 table.Columns.Add(new DataColumn("ToServiceUnitID", typeof(string)));
                 table.Columns.Add(new DataColumn("PhysicianSenders", typeof(string)));
                 table.Columns.Add(new DataColumn("ResultValue", typeof(string)));
+                table.Columns.Add(new DataColumn("ResultAcsn", typeof(string)));
                 table.Columns.Add(new DataColumn("EpsUrlLocation", typeof(string)));
                 table.Columns.Add(new DataColumn("DcomUrlLocation", typeof(string)));
                 table.Columns.Add(new DataColumn("IsResultAvailable", typeof(string)));
