@@ -160,7 +160,7 @@ namespace Temiang.Avicenna.Module.Charges
             get
             {
                 var isEmptyFilter = txtOrderDate1.IsEmpty && txtOrderDate2.IsEmpty && txtDischargePlanDate.IsEmpty && string.IsNullOrEmpty(cboServiceUnitID.SelectedValue) && string.IsNullOrEmpty(txtRegistrationNo.Text) && 
-                    string.IsNullOrEmpty(cboRegistrationType.SelectedValue) && string.IsNullOrEmpty(txtPatientName.Text) && string.IsNullOrEmpty(cboGuarantorID.SelectedValue);
+                    string.IsNullOrEmpty(cboRegistrationType.SelectedValue) && string.IsNullOrEmpty(txtPatientName.Text) && string.IsNullOrEmpty(cboGuarantorID.SelectedValue) && !chkReadyToDischarge.Checked;
                 if (!ValidateSearch(isEmptyFilter, "Registration")) return null;
 
                 var qr = new RegistrationQuery("r");
@@ -240,56 +240,7 @@ namespace Temiang.Avicenna.Module.Charges
                 qr.LeftJoin(cl).On(cl.ClassID == qr.ChargeClassID);
                 qr.LeftJoin(cl2).On(cl2.ClassID == qr.CoverageClassID);
 
-                if (!txtOrderDate1.IsEmpty && !txtOrderDate2.IsEmpty)
-                    qr.Where(qr.RegistrationDate >= txtOrderDate1.SelectedDate, qr.RegistrationDate <= txtOrderDate2.SelectedDate);
-                if (!txtDischargePlanDate.IsEmpty)
-                    qr.Where(qr.DischargePlanDate >= txtDischargePlanDate.SelectedDate, qr.DischargePlanDate < txtDischargePlanDate.SelectedDate.Value.AddDays(1));
-                if (cboServiceUnitID.SelectedValue != string.Empty)
-                    qr.Where(qr.ServiceUnitID == cboServiceUnitID.SelectedValue);
-                if (txtRegistrationNo.Text != string.Empty)
-                {
-                    string searchReg = Helper.EscapeQuery(txtRegistrationNo.Text);
-                    Helper.AddFilterMedNoOrRegNoOrPatName(qr, qp, searchReg, "registration");
-                }
-
-                if (!string.IsNullOrEmpty(cboRegistrationType.SelectedValue))
-                {
-                    qr.Where(qr.SRRegistrationType == cboRegistrationType.SelectedValue);
-                    //isFilter = true;
-                }
-
-                if (txtPatientName.Text != string.Empty)
-                {
-                    string searchPatient = "%" + Helper.EscapeQuery(txtPatientName.Text) + "%";
-                    qr.Where(qp.FullName.Like(searchPatient));
-                    //qr.Where
-                    //    (
-                    //      string.Format("<LTRIM(RTRIM(LTRIM(p.FirstName + ' ' + p.MiddleName)) + ' ' + p.LastName) LIKE '{0}'>", searchPatient)
-                    //    );
-                }
-
-                if (!string.IsNullOrEmpty(cboGuarantorID.SelectedValue))
-                    qr.Where(qr.GuarantorID == cboGuarantorID.SelectedValue);
-
-                qr.Where(
-                    qr.IsClosed == false,
-                    qr.IsVoid == false
-                    );
-
-                if (!AppSession.Parameter.IsSeparatePaymentForOpConsul && !AppSession.Parameter.IsShowRegConsulOnVerificationBilling)
-                    qr.Where(qr.Or(qr.IsConsul == false, mrg.FromRegistrationNo == string.Empty));
-
-                if (!this.IsUserCrossUnitAble)
-                {
-                    var usr = new AppUserServiceUnitQuery("usr");
-                    qr.InnerJoin(usr).On(unit.ServiceUnitID == usr.ServiceUnitID &&
-                                         usr.UserID == AppSession.UserLogin.UserID);
-                }
-
-                if (chkReadyToDischarge.Checked)
-                {
-                    qr.Where(qr.DischargeDate.IsNull(), qr.DischargePlanDate.IsNotNull());
-                }
+                ApplyRegistrationFilters(qr, qp, unit, mrg, chkReadyToDischarge.Checked);
 
                 qr.OrderBy(qr.RegistrationDate.Descending, qr.ServiceUnitID.Ascending, qr.RegistrationNo.Descending);
 
@@ -320,7 +271,114 @@ namespace Temiang.Avicenna.Module.Charges
             }
         }
 
+        // Keep the notification and the list on the same search and access rules.
+        private void ApplyRegistrationFilters(RegistrationQuery qr, PatientQuery qp,
+            ServiceUnitQuery unit, MergeBillingQuery mrg, bool readyToDischarge)
+        {
+            if (!txtOrderDate1.IsEmpty && !txtOrderDate2.IsEmpty)
+                qr.Where(qr.RegistrationDate >= txtOrderDate1.SelectedDate, qr.RegistrationDate <= txtOrderDate2.SelectedDate);
+            if (!txtDischargePlanDate.IsEmpty)
+                qr.Where(qr.DischargePlanDate >= txtDischargePlanDate.SelectedDate, qr.DischargePlanDate < txtDischargePlanDate.SelectedDate.Value.AddDays(1));
+            if (cboServiceUnitID.SelectedValue != string.Empty)
+                qr.Where(qr.ServiceUnitID == cboServiceUnitID.SelectedValue);
+            if (txtRegistrationNo.Text != string.Empty)
+            {
+                string searchReg = Helper.EscapeQuery(txtRegistrationNo.Text);
+                Helper.AddFilterMedNoOrRegNoOrPatName(qr, qp, searchReg, "registration");
+            }
+
+            if (!string.IsNullOrEmpty(cboRegistrationType.SelectedValue))
+            {
+                qr.Where(qr.SRRegistrationType == cboRegistrationType.SelectedValue);
+                //isFilter = true;
+            }
+
+            if (txtPatientName.Text != string.Empty)
+            {
+                string searchPatient = "%" + Helper.EscapeQuery(txtPatientName.Text) + "%";
+                qr.Where(qp.FullName.Like(searchPatient));
+                //qr.Where
+                //    (
+                //      string.Format("<LTRIM(RTRIM(LTRIM(p.FirstName + ' ' + p.MiddleName)) + ' ' + p.LastName) LIKE '{0}'>", searchPatient)
+                //    );
+            }
+
+            if (!string.IsNullOrEmpty(cboGuarantorID.SelectedValue))
+                qr.Where(qr.GuarantorID == cboGuarantorID.SelectedValue);
+
+            qr.Where(
+                qr.IsClosed == false,
+                qr.IsVoid == false
+                );
+
+            if (!AppSession.Parameter.IsSeparatePaymentForOpConsul && !AppSession.Parameter.IsShowRegConsulOnVerificationBilling)
+                qr.Where(qr.Or(qr.IsConsul == false, mrg.FromRegistrationNo == string.Empty));
+
+            if (!this.IsUserCrossUnitAble)
+            {
+                var usr = new AppUserServiceUnitQuery("usr");
+                qr.InnerJoin(usr).On(unit.ServiceUnitID == usr.ServiceUnitID &&
+                                     usr.UserID == AppSession.UserLogin.UserID);
+            }
+
+            if (readyToDischarge)
+            {
+                qr.Where(qr.DischargeDate.IsNull(), qr.DischargePlanDate.IsNotNull());
+            }
+        }
+
+        private int GetReadyToDischargeCount()
+        {
+            var qr = new RegistrationQuery("r");
+            var qp = new PatientQuery("p");
+            var unit = new ServiceUnitQuery("s");
+            var mrg = new MergeBillingQuery("b");
+            var guar = new GuarantorQuery("g");
+
+            // Count registrations, without the list's TOP limit or display-only joins.
+            qr.Select("<COUNT(DISTINCT r.RegistrationNo) AS ReadyToDischargeCount>");
+            qr.InnerJoin(qp).On(qr.PatientID == qp.PatientID);
+            qr.LeftJoin(unit).On(qr.ServiceUnitID == unit.ServiceUnitID);
+            qr.InnerJoin(mrg).On(qr.RegistrationNo == mrg.RegistrationNo);
+            qr.InnerJoin(guar).On(qr.GuarantorID == guar.GuarantorID);
+            ApplyRegistrationFilters(qr, qp, unit, mrg, true);
+
+            var table = qr.LoadDataTable();
+            return Convert.ToInt32(table.Rows[0]["ReadyToDischargeCount"]);
+        }
+
+        protected void lbtnReadyToDischargeNotification_PreRender(object sender, EventArgs e)
+        {
+            var link = (System.Web.UI.WebControls.LinkButton)sender;
+            try
+            {
+                var count = GetReadyToDischargeCount();
+                link.Text = count > 0
+                    ? string.Format("Terdapat {0:N0} pasien yang akan segera pulang.", count)
+                    : "Tidak ada pasien yang akan segera pulang.";
+                link.Enabled = count > 0;
+            }
+            catch (Exception ex)
+            {
+                // A notification failure must not prevent the existing billing workflow.
+                LogError(ex);
+                link.Text = "Jumlah pasien yang akan segera pulang belum dapat dimuat.";
+                link.Enabled = false;
+            }
+        }
+
+        protected void lbtnReadyToDischargeNotification_Click(object sender, EventArgs e)
+        {
+            chkReadyToDischarge.Checked = true;
+            SearchRegistrations();
+        }
+
         protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            SearchRegistrations();
+        }
+
+        private void SearchRegistrations()
         {
             if (AppSession.Parameter.HealthcareInitialAppsVersion != "RSSA")
                 SaveValueToCookie();
