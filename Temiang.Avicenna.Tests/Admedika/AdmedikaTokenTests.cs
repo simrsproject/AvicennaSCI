@@ -53,6 +53,19 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void CreateToken_FromFormattedString_MatchesDateTimeOverload()
+        {
+            var utcDateTime = new DateTime(2017, 11, 8, 18, 17, 56);
+
+            var fromDateTime = TokenGenerator.CreateToken(
+                "MY_CUSTOMER_ID", "MySecurityWordHere", utcDateTime, "51515", "HELLO_WORLD");
+            var fromString = TokenGenerator.CreateToken(
+                "MY_CUSTOMER_ID", "MySecurityWordHere", "20171108181756", "51515", "HELLO_WORLD");
+
+            Assert.AreEqual(fromDateTime, fromString);
+        }
+
+        [TestMethod]
         public void Next_ReturnsFiveDigitsAndUniqueValues()
         {
             var values = new HashSet<string>();

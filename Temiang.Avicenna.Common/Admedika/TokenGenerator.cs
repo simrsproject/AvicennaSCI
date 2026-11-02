@@ -10,15 +10,23 @@ namespace Temiang.Avicenna.Common.Admedika
         public static string CreateToken(string customerId, string securityWord, DateTime utcDateTime,
             string requestId, string serviceId)
         {
+            return CreateToken(customerId, securityWord,
+                utcDateTime.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), requestId, serviceId);
+        }
+
+        public static string CreateToken(string customerId, string securityWord, string utcDateTime,
+            string requestId, string serviceId)
+        {
             if (customerId == null) throw new ArgumentNullException("customerId");
             if (securityWord == null) throw new ArgumentNullException("securityWord");
+            if (utcDateTime == null) throw new ArgumentNullException("utcDateTime");
             if (requestId == null) throw new ArgumentNullException("requestId");
             if (serviceId == null) throw new ArgumentNullException("serviceId");
 
             var line = string.Concat(
                 customerId, ":",
                 Sha256Hex(securityWord), ":",
-                utcDateTime.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), ":",
+                utcDateTime, ":",
                 requestId, ":",
                 serviceId);
 

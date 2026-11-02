@@ -394,7 +394,7 @@ namespace Temiang.Avicenna.Common.Admedika
 
         private string BuildBody(string serviceId, object txnData)
         {
-            var utcNow = DateTime.UtcNow;
+            var utcNow = DateTime.UtcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
             var requestId = RequestIdGenerator.Next();
 
             var request = new AdmedikaRequest<object>
@@ -405,7 +405,7 @@ namespace Temiang.Avicenna.Common.Admedika
                 CustomerID = _config.CustomerID,
                 RequestID = requestId,
                 TxnData = txnData,
-                TxnRequestDateTime = utcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture)
+                TxnRequestDateTime = utcNow
             };
 
             return JsonConvert.SerializeObject(new { input = request }, SerializerSettings);
