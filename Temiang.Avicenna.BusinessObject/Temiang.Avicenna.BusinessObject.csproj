@@ -796,6 +796,7 @@
     <Compile Include="Custom\WebServiceAPILogCollection.cs" />
     <Compile Include="Custom\WorkingSchduleInterventionDetail.cs" />
     <Compile Include="Custom\WorkingScheduleDetail.cs" />
+    <Compile Include="Generated\AdmedikaClaimTransaction.cs" />
     <Compile Include="Generated\Announcement.cs" />
     <Compile Include="Generated\AntrianAutoNumberSemantic.cs" />
     <Compile Include="Generated\AppStandardReferenceItemBridging.cs" />
