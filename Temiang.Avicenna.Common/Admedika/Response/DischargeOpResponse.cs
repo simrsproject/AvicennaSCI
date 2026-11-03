@@ -12,6 +12,7 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("clStatus")] public string ClStatus { get; set; }
         [JsonProperty("clDesc")] public string ClDesc { get; set; }
         [JsonProperty("payorName")] public string PayorName { get; set; }
+        [JsonProperty("payorCode")] public string PayorCode { get; set; }
         [JsonProperty("dob")] public string Dob { get; set; }
         [JsonProperty("policyNo")] public string PolicyNo { get; set; }
         [JsonProperty("payorMemberID")] public string PayorMemberID { get; set; }

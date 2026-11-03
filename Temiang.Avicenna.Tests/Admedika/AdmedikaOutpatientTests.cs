@@ -257,6 +257,32 @@ namespace Temiang.Avicenna.Tests.Admedika
             + "\"txnResponseDateTime\":\"20261030150201\"}}";
 
         [TestMethod]
+        public void DischargeOp_DevResponse_MapsPayorCodeAndClosedClaim()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":929370,\"statusCode\":0,\"statusMsg\":\"Successful\","
+                + "\"txnData\":{\"dischargeRequestResponse\":{\"dischargeRequest\":{"
+                + "\"clID\":\"28651305\",\"clStatus\":\"40\",\"clDesc\":\"VALID CLAIM\","
+                + "\"payorCode\":\"ADMEDKA\",\"PayorName\":\"Jaminan Kesehatan\","
+                + "\"planCode\":\"IDR\",\"cardNo\":\"8000991200072653\",\"patientName\":\"ADM TEST DUA\","
+                + "\"totAmtIncurred\":\"375000\",\"totAmtApproved\":\"375000\",\"totAmtNotApproved\":\"0\","
+                + "\"printOut\":\"PENGESAHAN\\nJUM.BIAYA :375000\","
+                + "\"entitlement\":[{\"benID\":\"39\",\"shortName\":\"B.DR.UMUM\","
+                + "\"longName\":\"Biaya Dokter Umum Per Tahun\",\"amtIncurred\":\"250000\","
+                + "\"amtApproved\":\"250000\",\"amtNotApproved\":\"0\"}]}}}}}";
+
+            var response = ResponseParser.Parse<DischargeOpResponse>(json);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("ADMEDKA", response.PayorCode);
+            Assert.AreEqual("VALID CLAIM", response.ClDesc);
+            Assert.AreEqual("375000", response.TotAmtApproved);
+            Assert.AreEqual(1, response.Entitlement.Count);
+            Assert.AreEqual("250000", response.Entitlement[0].AmtApproved);
+            StringAssert.Contains(response.PrintOut, "\n");
+        }
+
+        [TestMethod]
         public void DischargeOp_MapsAmountsAndPrintOut()
         {
             var transport = new FakeTransport { NextResponse = DischargeSuccessJson };
