@@ -89,6 +89,46 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void Parse_NumericZeroStatusCode_IsSuccess()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":929297,\"statusCode\":0,\"statusMsg\":\"Successful\","
+                + "\"txnData\":{\"helloResponse\":{\"hello\":{\"message\":\"Hi there\","
+                + "\"apiName\":\"Gateway@AdMedika\",\"apiVersion\":\"Rusty v1.0.0\"}}},"
+                + "\"txnResponseDatetime\":\"20261103095150\"}}";
+
+            var response = ResponseParser.Parse<HelloWorldResponse>(json);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("0", response.StatusCode);
+            Assert.AreEqual("Hi there", response.Message);
+            Assert.AreEqual("Rusty v1.0.0", response.ApiVersion);
+        }
+
+        [TestMethod]
+        public void Parse_NonZeroStatusCode_IsNotSuccess()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":0,\"statusCode\":612,"
+                + "\"statusMsg\":\"Request message is expired\"}}";
+
+            var response = ResponseParser.Parse<HelloWorldResponse>(json);
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("612", response.StatusCode);
+        }
+
+        [TestMethod]
+        public void Parse_MissingStatusCode_IsNotSuccess()
+        {
+            var response = ResponseParser.Parse<HelloWorldResponse>(
+                "{\"output\":{\"statusMsg\":\"unknown\"}}");
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.IsNull(response.StatusCode);
+        }
+
+        [TestMethod]
         public void Parse_HelloWorldPayload()
         {
             const string json =

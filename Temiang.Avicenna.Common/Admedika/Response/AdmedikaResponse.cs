@@ -29,7 +29,18 @@ namespace Temiang.Avicenna.Common.Admedika
 
         public bool IsSuccess
         {
-            get { return StatusCode == "00"; }
+            get
+            {
+                var code = (StatusCode ?? string.Empty).Trim();
+                if (code.Length == 0) return false;
+
+                foreach (var character in code)
+                {
+                    if (character != '0') return false;
+                }
+
+                return true;
+            }
         }
     }
 }
