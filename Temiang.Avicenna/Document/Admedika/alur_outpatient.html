@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alur Integrasi AdMedika — Rawat Jalan</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #5f6b7a;
+    --line: #e3e7ec;
+    --accent: #0f766e;
+    --accent-soft: #e6f4f1;
+    --warn: #b45309;
+    --warn-soft: #fdf3e3;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+    --info: #1d4ed8;
+    --info-soft: #e8eefc;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141a;
+      --card: #161c24;
+      --text: #e6edf3;
+      --muted: #9aa7b5;
+      --line: #26303b;
+      --accent: #2dd4bf;
+      --accent-soft: #12312d;
+      --warn: #fbbf24;
+      --warn-soft: #33270e;
+      --danger: #f87171;
+      --danger-soft: #331414;
+      --info: #93c5fd;
+      --info-soft: #14213d;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.65 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 28px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 12px 0 8px; }
+  .subtitle { color: var(--muted); margin: 0; max-width: 760px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  h2 { font-size: 20px; margin: 0 0 6px; }
+  h3 { font-size: 16px; margin: 22px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { color: var(--muted); margin-top: 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1px 6px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+  .b-required { color: var(--danger); background: var(--danger-soft); }
+  .b-optional { color: var(--info); background: var(--info-soft); }
+  .b-conditional { color: var(--warn); background: var(--warn-soft); }
+  .b-none { color: var(--muted); background: var(--bg); }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    margin: 16px 0 4px;
+  }
+  .node {
+    flex: 1 1 150px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--bg);
+    min-width: 140px;
+  }
+  .node strong { display: block; font-size: 13px; }
+  .node span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .node.key { border-color: var(--accent); background: var(--accent-soft); }
+  .node.key strong { color: var(--accent); }
+  .arrow {
+    align-self: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+  }
+  @media (max-width: 620px) {
+    .arrow { display: none; }
+    .node { flex-basis: 100%; }
+  }
+
+  .steps { list-style: none; padding: 0; margin: 16px 0 0; counter-reset: step; }
+  .steps > li {
+    position: relative;
+    padding: 0 0 22px 44px;
+    margin: 0;
+    border-left: 2px solid var(--line);
+    margin-left: 15px;
+  }
+  .steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .steps > li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+  }
+  .steps h3 { margin: 2px 0 4px; font-size: 15px; }
+  .steps p { margin: 4px 0; color: var(--muted); }
+  .steps .out { font-size: 13px; color: var(--text); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  .center { text-align: center; }
+  .nowrap { white-space: nowrap; }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .note p { margin: 4px 0; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .terminal {
+    background: #0b1220;
+    color: #d7e2ee;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 12px 0;
+  }
+  .terminal .c { color: #7dd3fc; }
+  .terminal .g { color: #86efac; }
+  .terminal .r { color: #fca5a5; }
+  .terminal .m { color: #94a3b8; }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 28px; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    section { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Dokumentasi Integrasi</span>
+    <h1>Alur AdMedika — Rawat Jalan</h1>
+    <p class="subtitle">
+      Urutan pemanggilan endpoint, arti klaim terbuka, serta cara menangani kondisi
+      yang paling sering terjadi saat integrasi rawat jalan berjalan.
+    </p>
+    <p class="meta">Sumber: <em>CustomerHost_ProviderBridging - OUTPATIENT.pdf</em>,
+      <em>CANCEL_OPEN_CLAIMS_TXN.pdf</em>, <em>EDOCS_UPLOAD v.Rustlang.pdf</em>,
+      <em>RE_PRINT_OUT.pdf</em>, <em>INVOICE_TRACKING.pdf</em>.</p>
+  </header>
+
+  <section>
+    <h2>1. Konsep: klaim terbuka</h2>
+    <p class="lead">Satu kunjungan rawat jalan = satu “case” klaim di AdMedika.</p>
+
+    <div class="flow">
+      <div class="node key">
+        <strong>ELIGIBILITY</strong>
+        <span>membuka klaim · status 08 · terbit LOA</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node">
+        <strong>Pelayanan pasien</strong>
+        <span>diagnosis, tindakan, obat, dokumen</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node key">
+        <strong>DISCHARGE_OP</strong>
+        <span>menutup klaim · status 40 · terbit LOC</span>
+      </div>
+    </div>
+
+    <p>
+      Klaim disebut <strong>terbuka</strong> selama sudah dibuka lewat <code>Eligibility</code>
+      tetapi belum ditutup lewat <code>DischargeOp</code>. AdMedika hanya mengizinkan
+      <strong>satu klaim terbuka per member</strong> untuk coverage yang sama.
+    </p>
+
+    <h3>Status klaim yang perlu dikenal</h3>
+    <table>
+      <thead>
+        <tr><th class="nowrap">clStatus</th><th>Arti</th><th>Terbuka?</th><th>Implikasi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>08</code></td><td>Eligibility approved</td><td><span class="badge b-required">Ya</span></td><td>Sudah terdaftar, belum discharge</td></tr>
+        <tr><td><code>39</code></td><td>Claims on hold</td><td><span class="badge b-conditional">Ya</span></td><td>Masih menggantung, perlu tindak lanjut</td></tr>
+        <tr><td><code>40</code></td><td>Valid claim</td><td><span class="badge b-none">Tidak</span></td><td>Sudah ditutup; boleh eligibility baru</td></tr>
+        <tr><td><code>41</code></td><td>Incomplete documents</td><td><span class="badge b-conditional">Dalam proses</span></td><td>Lengkapi dokumen</td></tr>
+        <tr><td><code>22</code></td><td>Claims rejected</td><td><span class="badge b-none">Tidak</span></td><td>Ditolak</td></tr>
+        <tr><td><code>42/43/44</code></td><td>Reimbursement</td><td><span class="badge b-none">Di luar alur</span></td><td>Bukan alur rawat jalan provider</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note warn">
+      <p><strong>Akibat jika membuat eligibility saat masih ada klaim terbuka:</strong></p>
+      <p>AdMedika menolak dengan <code>1998</code>, misalnya
+        <em>“Have a pending outpatient claims … Please proceed with discharge transaction!”</em></p>
+    </div>
+
+    <h3>Cara memeriksa dan menangani</h3>
+    <div class="grid2">
+      <div>
+        <p><strong>Periksa status</strong></p>
+        <p>Panggil <code>CheckMemberClaimTxnStatus</code> dengan <code>cardNo</code>.
+          Kosongkan <code>clID</code> untuk melihat klaim terbaru.</p>
+        <ul>
+          <li><code>clStatus 08</code> → ada klaim terbuka.</li>
+          <li><code>1840</code> → tidak ada klaim terbuka.</li>
+        </ul>
+      </div>
+      <div>
+        <p><strong>Tindakan</strong></p>
+        <ul>
+          <li>Klaim berjalan → lanjutkan <code>GetEntitlement</code>,
+            <code>EdocsUpload</code>, lalu <code>DischargeOp</code>.</li>
+          <li>Klaim salah → <code>CancelOpenClaimsTxn</code> dengan
+            <code>remarks</code>, lalu <code>Eligibility</code> baru.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Urutan pemanggilan rawat jalan</h2>
+    <p class="lead">Tiga langkah inti; sisanya opsional atau bersyarat.</p>
+
+    <div class="flow">
+      <div class="node"><strong>1. Cek status</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>2. Cek ICD</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>3. Eligibility</strong><span>wajib</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>4. Entitlement / dokumen</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>5. Discharge</strong><span>wajib</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>6. Reprint</strong><span>opsional</span></div>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <h3>HelloWorld <span class="badge b-optional">Opsional</span></h3>
+        <p>Memastikan URL dev/prod, kredensial, dan token bekerja.</p>
+        <p class="out">Hasil: <code>statusCode 0</code> dan pesan sapaan dari gateway.</p>
+      </li>
+      <li>
+        <h3>CheckMemberClaimTxnStatus <span class="badge b-optional">Opsional</span></h3>
+        <p>Mendeteksi klaim terbuka sebelum mendaftarkan kunjungan baru.</p>
+        <p class="out">Butuh <code>terminalID</code> + <code>cardNo</code>; <code>clID</code> boleh kosong.</p>
+      </li>
+      <li>
+        <h3>CheckIcdExclusion <span class="badge b-optional">Opsional</span></h3>
+        <p>Memeriksa apakah diagnosis termasuk pengecualian plan.</p>
+        <p class="out">Butuh <code>cardNo</code>, <code>covID</code>, dan daftar ICD-10.</p>
+      </li>
+      <li>
+        <h3>CancelOpenClaimsTxn <span class="badge b-conditional">Bersyarat</span></h3>
+        <p>Hanya jika ada klaim terbuka yang salah dan perlu dibatalkan.</p>
+        <p class="out">Butuh <code>terminalID</code>, <code>cardNo</code>, dan <code>remarks</code> alasan.</p>
+      </li>
+      <li>
+        <h3>Eligibility <span class="badge b-required">Wajib</span></h3>
+        <p>Membuka klaim rawat jalan. Menghasilkan <code>clID</code>, entitlement,
+          dan <code>printOut</code> LOA.</p>
+        <p class="out">Butuh <code>terminalID</code>, <code>cardNo</code>, <code>covID</code>,
+          diagnosis. Tidak boleh ada klaim terbuka lain.</p>
+      </li>
+      <li>
+        <h3>GetEntitlement <span class="badge b-optional">Opsional</span></h3>
+        <p>Mengambil benefit terkini dari klaim yang sedang berjalan.</p>
+        <p class="out">Butuh klaim terbuka; tanpa itu gateway menjawab <code>1840</code>.</p>
+      </li>
+      <li>
+        <h3>EdocsUpload <span class="badge b-conditional">Sesuai kebutuhan</span></h3>
+        <p>Mengunggah dokumen pendukung (surat jaminan, hasil lab, resume medis, dll.).</p>
+        <p class="out">Butuh <code>clID</code> dan <code>docType</code> yang valid.</p>
+      </li>
+      <li>
+        <h3>DischargeOp <span class="badge b-required">Wajib</span></h3>
+        <p>Menutup klaim dengan diagnosis dan rincian biaya. Menghasilkan nominal
+          approved dan <code>printOut</code> LOC.</p>
+        <p class="out">Butuh klaim terbuka, <code>diagnosisCodeList</code>, dan array
+          <code>entitlement</code> berisi <code>benItemList</code>.</p>
+      </li>
+      <li>
+        <h3>RePrintOut <span class="badge b-optional">Opsional</span></h3>
+        <p>Mencetak ulang dokumen: <code>E</code> = LOA, <code>D</code> = LOC,
+          <code>X</code> = LOR.</p>
+        <p class="out">Butuh <code>clID</code> dan <code>rePrintType</code>.</p>
+      </li>
+    </ol>
+
+    <div class="note">
+      <p><strong>Urutan minimal:</strong>
+        <code>Eligibility</code> → <code>DischargeOp</code>.
+        Tambahkan <code>GetEntitlement</code> / <code>EdocsUpload</code> bila diperlukan.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Cabang: klaim terbuka yang salah</h2>
+    <div class="terminal"><span class="m"># klaim terbuka ditemukan (clStatus 08)</span>
+CheckMemberClaimTxnStatus
+        <span class="c">↓</span>
+CancelOpenClaimsTxn          <span class="m">remarks: alasan pembatalan</span>
+        <span class="c">↓</span>
+Eligibility                  <span class="m">klaim baru, clID baru</span>
+        <span class="c">↓</span>
+DischargeOp                  <span class="m">menutup klaim</span></div>
+    <p>
+      Jangan membuat <code>Eligibility</code> baru tanpa membatalkan atau menutup
+      klaim lama; gateway akan menolak dengan <code>1998</code>.
+    </p>
+  </section>
+
+  <section>
+    <h2>4. Referensi endpoint</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>terminalID</th>
+          <th>Prasyarat klaim</th>
+          <th>Kegunaan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>HelloWorld</code></td><td>Tidak</td><td>Tidak ada</td><td>Uji konektivitas dan token</td></tr>
+        <tr><td><code>CheckIcdExclusion</code></td><td>Tidak</td><td>Tidak ada</td><td>Cek exclusion diagnosis</td></tr>
+        <tr><td><code>Eligibility</code></td><td>Ya</td><td>Tidak boleh ada klaim terbuka</td><td>Buka klaim rawat jalan</td></tr>
+        <tr><td><code>GetEntitlement</code></td><td>Ya</td><td>Klaim terbuka</td><td>Ambil benefit berjalan</td></tr>
+        <tr><td><code>DischargeOp</code></td><td>Ya</td><td>Klaim terbuka</td><td>Tutup klaim + hitung approved</td></tr>
+        <tr><td><code>CheckMemberClaimTxnStatus</code></td><td>Ya</td><td>Tidak ada</td><td>Cek status klaim member</td></tr>
+        <tr><td><code>GetMemberEnrolledPlanTc</code></td><td>Tidak</td><td>Tidak ada</td><td>Plan + term &amp; condition</td></tr>
+        <tr><td><code>CancelOpenClaimsTxn</code></td><td>Ya</td><td>Klaim terbuka</td><td>Batalkan klaim terbuka</td></tr>
+        <tr><td><code>EdocsUpload</code></td><td>Tidak</td><td><code>clID</code> valid</td><td>Unggah dokumen pendukung</td></tr>
+        <tr><td><code>RePrintOut</code></td><td>Tidak</td><td><code>clID</code> valid</td><td>Cetak ulang LOA/LOC/LOR</td></tr>
+        <tr><td><code>InvoiceTracking</code></td><td>Ya</td><td>Invoice sudah terbentuk</td><td>Lacak status invoice</td></tr>
+        <tr><td><code>DailyMonitoring</code></td><td>Ya</td><td>Klaim rawat inap terbuka</td><td>Form monitoring rawat inap</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. Membaca respons</h2>
+    <p>
+      Semua respons bisnis AdMedika dikembalikan sebagai <strong>HTTP 200</strong>.
+      Jangan menentukan sukses dari HTTP status; periksa field berikut secara berurutan.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Urutan</th><th>Field</th><th>Arti</th><th>Tindakan</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><code>TechnicalError</code></td><td>Gagal teknis: timeout, TLS, body bukan JSON</td><td>Tampilkan error konektivitas; jangan baca field bisnis</td></tr>
+        <tr><td>2</td><td><code>IsSuccess</code></td><td><code>statusCode</code> bernilai nol (<code>0</code> / <code>00</code>)</td><td>Jika true, lanjut baca data hasil</td></tr>
+        <tr><td>3</td><td><code>ErrorCode</code>, <code>ErrorDesc</code></td><td>Kegagalan bisnis dari <code>txnData</code></td><td>Tampilkan ke pengguna; mis. <code>1998</code>, <code>1840</code>, <code>1823</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Kode yang sering muncul</h3>
+    <table>
+      <thead><tr><th class="nowrap">Kode</th><th>Arti</th><th>Biasanya muncul saat</th></tr></thead>
+      <tbody>
+        <tr><td><code>1998</code></td><td>Rejected</td><td>Masih ada klaim terbuka; eligibility ditolak</td></tr>
+        <tr><td><code>1840</code></td><td>Not found</td><td>Tidak ada klaim terbuka, invoice/ICD tidak ditemukan</td></tr>
+        <tr><td><code>1823</code></td><td>Policy expired</td><td>Masa berlaku policy sudah lewat</td></tr>
+        <tr><td><code>1997</code></td><td>Invalid</td><td>Klaim milik provider lain atau tipe tidak valid</td></tr>
+        <tr><td><code>1838</code></td><td>Claims ID not found</td><td><code>clID</code> salah pada upload/reprint</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>6. Contoh urutan yang sudah diverifikasi</h2>
+    <div class="terminal"><span class="m"># kunjungan baru, tidak ada klaim terbuka</span>
+CheckMemberClaimTxnStatus   <span class="g">→ 1840, tidak ada klaim</span>
+Eligibility                 <span class="g">→ clID baru, status 08</span>
+GetEntitlement              <span class="g">→ daftar benefit</span>
+DischargeOp                 <span class="g">→ status 40, approved + LOC</span>
+RePrintOut (D)              <span class="g">→ printOut LOC</span></div>
+
+    <div class="terminal"><span class="m"># ada klaim terbuka yang salah</span>
+CheckMemberClaimTxnStatus   <span class="g">→ clStatus 08</span>
+CancelOpenClaimsTxn         <span class="g">→ klaim dibatalkan</span>
+Eligibility                 <span class="g">→ clID baru</span></div>
+
+    <div class="terminal"><span class="m"># klaim masih terbuka, lanjutkan kunjungan yang sama</span>
+GetEntitlement              <span class="g">→ benefit berjalan</span>
+EdocsUpload                 <span class="g">→ dokumen terlampir</span>
+DischargeOp                 <span class="g">→ klaim ditutup</span></div>
+  </section>
+
+  <section>
+    <h2>7. Catatan operasional</h2>
+    <ul>
+      <li>Satu member hanya boleh punya satu klaim terbuka per coverage. Selesaikan atau batalkan sebelum membuat yang baru.</li>
+      <li>Simpan <code>clID</code> dari <code>Eligibility</code>; dipakai untuk upload dokumen dan reprint.</li>
+      <li><code>terminalID</code> berasal dari konfigurasi, bukan parameter pemanggil.</li>
+      <li>Jangan mengandalkan HTTP status untuk menentukan sukses; gunakan <code>IsSuccess</code>.</li>
+      <li><code>DailyMonitoring</code> hanya untuk rawat inap; pada klaim rawat jalan akan ditolak.</li>
+      <li>Untuk rawat jalan, klaim yang sudah <code>40</code> tidak bisa di-discharge ulang; buat eligibility baru bila pasien datang lagi.</li>
+      <li>Nominal dan <code>printOut</code> diteruskan apa adanya; jangan memformat ulang sebelum menyimpan.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Avicenna × Gateway@AdMedika — dokumen internal. Diperbarui 3 November 2026.
+  </footer>
+</div>
+</body>
+</html>
