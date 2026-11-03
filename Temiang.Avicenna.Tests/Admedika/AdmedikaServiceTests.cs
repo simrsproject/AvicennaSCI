@@ -240,6 +240,75 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void IsOk_SuccessResponse_ReturnsTrue()
+        {
+            var service = new Service(CreateConfig(), new FakeTransport(), new NullAdmedikaLogger());
+            string message;
+
+            var ok = service.IsOk(new HelloWorldResponse { StatusCode = "0" }, out message);
+
+            Assert.IsTrue(ok);
+            Assert.IsNull(message);
+        }
+
+        [TestMethod]
+        public void IsOk_TechnicalError_ReturnsTechnicalMessage()
+        {
+            var service = new Service(CreateConfig(), new FakeTransport(), new NullAdmedikaLogger());
+            string message;
+
+            var ok = service.IsOk(new HelloWorldResponse { TechnicalError = "timeout" }, out message);
+
+            Assert.IsFalse(ok);
+            Assert.AreEqual("timeout", message);
+        }
+
+        [TestMethod]
+        public void IsOk_BusinessError_FormatsCodeAndDescription()
+        {
+            var service = new Service(CreateConfig(), new FakeTransport(), new NullAdmedikaLogger());
+            string message;
+
+            var ok = service.IsOk(new HelloWorldResponse
+            {
+                StatusCode = "910",
+                ErrorCode = "1998",
+                ErrorDesc = "Rejected -> pending claims"
+            }, out message);
+
+            Assert.IsFalse(ok);
+            Assert.AreEqual("[1998] Rejected -> pending claims", message);
+        }
+
+        [TestMethod]
+        public void IsOk_BusinessErrorWithoutErrorCode_FallsBackToStatusCode()
+        {
+            var service = new Service(CreateConfig(), new FakeTransport(), new NullAdmedikaLogger());
+            string message;
+
+            var ok = service.IsOk(new HelloWorldResponse
+            {
+                StatusCode = "910",
+                StatusMsg = "Error on txnData"
+            }, out message);
+
+            Assert.IsFalse(ok);
+            Assert.AreEqual("[910] Error on txnData", message);
+        }
+
+        [TestMethod]
+        public void IsOk_NullResponse_ReturnsDefaultMessage()
+        {
+            var service = new Service(CreateConfig(), new FakeTransport(), new NullAdmedikaLogger());
+            string message;
+
+            var ok = service.IsOk(null, out message);
+
+            Assert.IsFalse(ok);
+            Assert.AreEqual("Respons AdMedika kosong.", message);
+        }
+
+        [TestMethod]
         public void Logger_ReceivesServiceIdAndBodies()        {
             var transport = new FakeTransport { NextResponse = SuccessJson };
             var logger = new RecordingLogger();

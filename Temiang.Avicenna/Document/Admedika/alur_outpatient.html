@@ -374,14 +374,53 @@
 
   <section>
     <h2>3. Contoh pemanggilan dari kode aplikasi</h2>
-    <p class="lead">Memakai kelas <code>Service</code> langsung, tanpa SOAP/HTTP tambahan.</p>
+    <p class="lead">
+      Memakai kelas <code>Service</code> langsung, tanpa SOAP/HTTP tambahan.
+      Semua contoh memakai helper <code>srv.IsOk(...)</code> yang memeriksa
+      <code>TechnicalError</code> lebih dulu, lalu <code>IsSuccess</code>, dan
+      merangkum error menjadi <code>[kode] deskripsi</code>.
+    </p>
 
     <pre class="terminal"><span class="m">// menggunakan Temiang.Avicenna.Common.Admedika</span>
 using Temiang.Avicenna.Common.Admedika;
 
 var srv = new Temiang.Avicenna.Common.Admedika.Service();
+string message;
 
-var result = srv.Eligibility(
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// teknis atau bisnis, sudah terangkum</span>
+    return;
+}</pre>
+
+    <h3>3.1 HelloWorld</h3>
+    <pre class="terminal">var result = srv.HelloWorld();
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.Message + " | " + result.ApiName + " " + result.ApiVersion);</pre>
+
+    <h3>3.2 CheckIcdExclusion</h3>
+    <pre class="terminal">var result = srv.CheckIcdExclusion(
+    "8000991200072646",       <span class="m">// cardNo</span>
+    "02",                     <span class="m">// covID: 01-08</span>
+    "J06, B01.9");            <span class="m">// diagnosisCodeList</span>
+
+if (!srv.IsOk(result, out message))
+{
+    <span class="m">// ErrorCode "1833" = diagnosis exclusion</span>
+    ShowError(message);
+    return;
+}
+
+ShowInfo("Tidak ada exclusion untuk " + result.PatientName);</pre>
+
+    <h3>3.3 Eligibility</h3>
+    <pre class="terminal">var result = srv.Eligibility(
     cardNo: "8000991200072646",
     covID: "02",
     diagnosisCodeList: "J06",
@@ -395,28 +434,159 @@ var result = srv.Eligibility(
     roomPrice: null,
     remarks: "Registrasi rawat jalan");
 
-<span class="m">// 1. Gagal teknis: timeout, TLS, body bukan JSON</span>
-if (!string.IsNullOrEmpty(result.TechnicalError))
+if (!srv.IsOk(result, out message))
 {
-    ShowError(result.TechnicalError);
+    ShowError(message);
+    return;
 }
-<span class="m">// 2. Gagal bisnis: mis. 1998 pending claim, 1823 policy expired</span>
-else if (!result.IsSuccess)
-{
-    ShowError(string.Format("[{0}] {1}", result.ErrorCode, result.ErrorDesc));
-}
-<span class="m">// 3. Sukses: simpan clID dan tampilkan LOA</span>
-else
-{
-    var clID = result.ClID;             <span class="m">// contoh: 28651305</span>
-    var status = result.ClStatus;       <span class="m">// "08"</span>
-    var loa = result.PrintOut;          <span class="m">// teks LOA multi-baris</span>
-    var benefits = result.Entitlement;  <span class="m">// daftar benefit</span>
 
-    ShowInfo(string.Format("Eligibility {0} untuk {1}", status, result.PatientName));
+var clID = result.ClID;             <span class="m">// contoh: 28651305</span>
+var status = result.ClStatus;       <span class="m">// "08"</span>
+var loa = result.PrintOut;          <span class="m">// teks LOA multi-baris</span>
+var benefits = result.Entitlement;  <span class="m">// daftar benefit</span>
+
+ShowInfo(string.Format("Eligibility {0} untuk {1}", status, result.PatientName));</pre>
+
+    <h3>3.4 GetEntitlement</h3>
+    <pre class="terminal">var result = srv.GetEntitlement("8000991200072646");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila tidak ada klaim terbuka</span>
+    return;
+}
+
+foreach (var benefit in result.Entitlement)
+{
+    <span class="m">// benefit.BenID, ShortName, LongName</span>
+    <span class="m">// benefit.AvailLimit, FreqDesc, LimitDesc</span>
 }</pre>
 
-    <p class="lead"><code>ShowError</code> dan <code>ShowInfo</code> hanya placeholder untuk mekanisme tampilan aplikasi Anda.</p>
+    <h3>3.5 DischargeOp</h3>
+    <pre class="terminal">var entitlement = new[]
+{
+    new DischargeEntitlementInput
+    {
+        BenID = "39",
+        BenAmount = "250000.00",
+        BenItemList = new[]
+        {
+            new DischargeBenItemInput
+            {
+                Code = "S2080000xx",
+                Name = "Biaya Dokter Umum",
+                DateIssue = "03112026",   <span class="m">// ddmmyyyy</span>
+                Qty = "1",
+                TotPrice = "250000.00"
+            }
+        }
+    }
+};
+
+var result = srv.DischargeOp(
+    "8000991200072646", "J06", "3", "RJ-20261103-001",
+    null, null, "dr. Nama Dokter", "N", "N",
+    null, null, "Discharge rawat jalan", entitlement);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.ClStatus + " | " + result.TotAmtApproved + " | " + result.PrintOut);</pre>
+
+    <h3>3.6 CancelOpenClaimsTxn</h3>
+    <pre class="terminal">var result = srv.CancelOpenClaimsTxn(
+    "8000991200072646",
+    "Salah pendaftaran, ulang eligibility");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.Msg);</pre>
+
+    <h3>3.7 CheckMemberClaimTxnStatus</h3>
+    <pre class="terminal"><span class="m">// clID null = periksa klaim terbaru member</span>
+var result = srv.CheckMemberClaimTxnStatus("8000991200072646", null);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila tidak ada klaim terbuka</span>
+    return;
+}
+
+ShowInfo(result.ClStatus + " - " + result.ClDesc);</pre>
+
+    <h3>3.8 GetMemberEnrolledPlanTc</h3>
+    <pre class="terminal">var result = srv.GetMemberEnrolledPlanTc(
+    "8000991200072646", "02", "obat");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+foreach (var plan in result.EnrolledPlan)
+{
+    foreach (var term in plan.TermCondition)
+    {
+        <span class="m">// term.TcDesc, term.GuaranteeFlag (Y/N), term.Remarks</span>
+    }
+}</pre>
+
+    <h3>3.9 EdocsUpload</h3>
+    <pre class="terminal"><span class="m">// perlu: using System.IO;</span>
+var files = new[]
+{
+    new AdmedikaFile
+    {
+        FileName = "surat-jaminan.pdf",
+        ContentType = "application/pdf",
+        Content = File.ReadAllBytes(@"C:\dokumen\surat-jaminan.pdf")
+    }
+};
+
+var result = srv.EdocsUpload(
+    cardNo,
+    clID,
+    "GL",                       <span class="m">// docType, lihat AdmedikaDocType</span>
+    "Surat jaminan biaya",
+    patientName,
+    "user01",
+    files);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.Msg);</pre>
+
+    <h3>3.10 RePrintOut</h3>
+    <pre class="terminal">var result = srv.RePrintOut(
+    clID,
+    "D");   <span class="m">// E = LOA, D = LOC, X = LOR</span>
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1997 bila tipe tidak valid</span>
+    return;
+}
+
+ShowInfo(result.PrintOut);</pre>
+
+    <p class="lead">
+      <code>ShowError</code> dan <code>ShowInfo</code> hanya placeholder untuk
+      mekanisme tampilan aplikasi Anda. <code>DailyMonitoring</code> dan
+      <code>InvoiceTracking</code> tidak dicantumkan di sini karena alur datanya
+      berbeda.
+    </p>
 
     <div class="grid2">
       <div>
@@ -425,7 +595,7 @@ else
           <li><code>terminalID</code> tidak menjadi parameter; diambil dari <code>Web.config</code>.</li>
           <li><code>covID</code> divalidasi lokal: kosong → <code>1999</code>, tidak valid → <code>1820</code>.</li>
           <li>Field opsional yang <code>null</code> tidak dikirim.</li>
-          <li>Respons sukses berisi <code>ClID</code>, <code>ClStatus</code> (<code>08</code>), <code>PrintOut</code> (LOA), dan <code>Entitlement</code>.</li>
+          <li><code>Eligibility</code> menghasilkan <code>ClID</code>, <code>ClStatus</code> (<code>08</code>), <code>PrintOut</code> (LOA), dan <code>Entitlement</code>.</li>
         </ul>
       </div>
       <div>

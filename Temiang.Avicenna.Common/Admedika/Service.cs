@@ -36,6 +36,44 @@ namespace Temiang.Avicenna.Common.Admedika
             get { return _config; }
         }
 
+        /// <summary>
+        /// Menentukan apakah respons AdMedika dianggap sukses.
+        /// TechnicalError diperiksa lebih dulu, lalu IsSuccess.
+        /// </summary>
+        public bool IsOk(AdmedikaResponse result, out string message)
+        {
+            message = null;
+
+            if (result == null)
+            {
+                message = "Respons AdMedika kosong.";
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(result.TechnicalError))
+            {
+                message = result.TechnicalError;
+                return false;
+            }
+
+            if (!result.IsSuccess)
+            {
+                var code = result.ErrorCode ?? result.StatusCode;
+                var description = result.ErrorDesc ?? result.StatusMsg;
+
+                message = string.IsNullOrEmpty(code)
+                    ? description
+                    : string.Format("[{0}] {1}", code, description);
+
+                if (string.IsNullOrEmpty(message))
+                    message = "Permintaan AdMedika gagal.";
+
+                return false;
+            }
+
+            return true;
+        }
+
         public HelloWorldResponse HelloWorld()
         {
             return Send<HelloWorldResponse>(
