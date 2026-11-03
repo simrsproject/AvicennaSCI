@@ -8,10 +8,10 @@ namespace Temiang.Avicenna.WebService
     /// Fasade integrasi Gateway@AdMedika (customer host).
     /// </summary>
     /// <remarks>
-    /// <para>Panduan pemanggilan dari code aplikasi:</para>
+    /// <para>Panduan pemanggilan dari code aplikasi. Contoh : </para>
     /// <code>
-    /// var ws = new Temiang.Avicenna.WebService.AdmedikaWS();
-    /// var result = ws.CheckIcdExclusion("8000991200054479", "02", "J06, B01.9");
+    /// var srv = new Temiang.Avicenna.Common.Admedika.Service();
+    /// var result = srv.CheckIcdExclusion("8000991200054479", "02", "J06, B01.9");
     ///
     /// // 1. Periksa kegagalan teknis lebih dulu (timeout, TLS, body bukan JSON).
     /// if (!string.IsNullOrEmpty(result.TechnicalError))
@@ -32,11 +32,6 @@ namespace Temiang.Avicenna.WebService
     ///     ShowInfo(result.PatientName + " | " + result.PlanCode);
     /// }
     /// </code>
-    /// <para>
-    /// Alternatif tanpa fasade:
-    /// <c>new Temiang.Avicenna.Common.Admedika.Service()</c> memiliki method yang sama
-    /// dan mengembalikan tipe respons yang sama.
-    /// </para>
     /// <para>
     /// Catatan: kegagalan bisnis AdMedika tetap dikembalikan sebagai HTTP 200.
     /// Periksa field <c>TechnicalError</c>, <c>StatusCode</c>, <c>ErrorCode</c>,
