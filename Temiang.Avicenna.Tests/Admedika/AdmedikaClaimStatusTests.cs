@@ -139,6 +139,28 @@ namespace Temiang.Avicenna.Tests.Admedika
             + "\"txnResponseDateTime\":\"20261030160101\"}}";
 
         [TestMethod]
+        public void GetMemberEnrolledPlanTc_ObjectShapedPlan_IsMapped()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":929382,\"statusCode\":0,\"statusMsg\":\"Successful\","
+                + "\"txnData\":{\"getMemberEnrolledPlanTCResponse\":{\"getMemberEnrolledPlanTC\":{"
+                + "\"cardNo\":\"8000991200072646\",\"patientName\":\"ADM TEST SATU\",\"dob\":\"Jan-02-1999\","
+                + "\"payorName\":\"Jaminan Kesehatan\",\"enrolledPlan\":{"
+                + "\"covCode\":\"GP\",\"planID\":\"GP-003\",\"desc\":\"RAWAT JALAN\","
+                + "\"termCondition\":[{\"tcDesc\":\"Obat\",\"guaranteeFlag\":\"Y\",\"remarks\":\"Dijamin\"},"
+                + "{\"tcDesc\":\"Obat Herbal\",\"guaranteeFlag\":\"N\",\"remarks\":\"Tidak dijamin\"}]}}}}}}";
+
+            var response = ResponseParser.Parse<GetMemberEnrolledPlanTcResponse>(json);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.IsNull(response.TechnicalError);
+            Assert.AreEqual(1, response.EnrolledPlan.Count);
+            Assert.AreEqual("GP-003", response.EnrolledPlan[0].PlanID);
+            Assert.AreEqual(2, response.EnrolledPlan[0].TermCondition.Count);
+            Assert.AreEqual("N", response.EnrolledPlan[0].TermCondition[1].GuaranteeFlag);
+        }
+
+        [TestMethod]
         public void GetMemberEnrolledPlanTc_MapsNestedPlansAndTerms()
         {
             var transport = new FakeTransport { NextResponse = PlanSuccessJson };

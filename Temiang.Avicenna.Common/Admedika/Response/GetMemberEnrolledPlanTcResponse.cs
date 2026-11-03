@@ -16,6 +16,7 @@ namespace Temiang.Avicenna.Common.Admedika
         private List<EnrolledPlan> _enrolledPlan = new List<EnrolledPlan>();
 
         [JsonProperty("enrolledPlan")]
+        [JsonConverter(typeof(SingleOrArrayConverter<EnrolledPlan>))]
         public List<EnrolledPlan> EnrolledPlan
         {
             get { return _enrolledPlan; }
@@ -32,6 +33,7 @@ namespace Temiang.Avicenna.Common.Admedika
         private List<TermConditionItem> _termCondition = new List<TermConditionItem>();
 
         [JsonProperty("termCondition")]
+        [JsonConverter(typeof(SingleOrArrayConverter<TermConditionItem>))]
         public List<TermConditionItem> TermCondition
         {
             get { return _termCondition; }
