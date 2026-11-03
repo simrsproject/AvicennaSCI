@@ -373,7 +373,74 @@
   </section>
 
   <section>
-    <h2>3. Cabang: klaim terbuka yang salah</h2>
+    <h2>3. Contoh pemanggilan dari kode aplikasi</h2>
+    <p class="lead">Memakai kelas <code>Service</code> langsung, tanpa SOAP/HTTP tambahan.</p>
+
+    <pre class="terminal"><span class="m">// menggunakan Temiang.Avicenna.Common.Admedika</span>
+using Temiang.Avicenna.Common.Admedika;
+
+var srv = new Temiang.Avicenna.Common.Admedika.Service();
+
+var result = srv.Eligibility(
+    cardNo: "8000991200072646",
+    covID: "02",
+    diagnosisCodeList: "J06",
+    providerTransID: "RJ-20261103-001",
+    nationalID: null,
+    familyCardID: null,
+    physicianName: "dr. Nama Dokter",
+    accidentFlag: "N",
+    surgicalFlag: "N",
+    roomType: null,
+    roomPrice: null,
+    remarks: "Registrasi rawat jalan");
+
+<span class="m">// 1. Gagal teknis: timeout, TLS, body bukan JSON</span>
+if (!string.IsNullOrEmpty(result.TechnicalError))
+{
+    ShowError(result.TechnicalError);
+}
+<span class="m">// 2. Gagal bisnis: mis. 1998 pending claim, 1823 policy expired</span>
+else if (!result.IsSuccess)
+{
+    ShowError(string.Format("[{0}] {1}", result.ErrorCode, result.ErrorDesc));
+}
+<span class="m">// 3. Sukses: simpan clID dan tampilkan LOA</span>
+else
+{
+    var clID = result.ClID;             <span class="m">// contoh: 28651305</span>
+    var status = result.ClStatus;       <span class="m">// "08"</span>
+    var loa = result.PrintOut;          <span class="m">// teks LOA multi-baris</span>
+    var benefits = result.Entitlement;  <span class="m">// daftar benefit</span>
+
+    ShowInfo(string.Format("Eligibility {0} untuk {1}", status, result.PatientName));
+}</pre>
+
+    <p class="lead"><code>ShowError</code> dan <code>ShowInfo</code> hanya placeholder untuk mekanisme tampilan aplikasi Anda.</p>
+
+    <div class="grid2">
+      <div>
+        <h3>Yang perlu diketahui</h3>
+        <ul>
+          <li><code>terminalID</code> tidak menjadi parameter; diambil dari <code>Web.config</code>.</li>
+          <li><code>covID</code> divalidasi lokal: kosong → <code>1999</code>, tidak valid → <code>1820</code>.</li>
+          <li>Field opsional yang <code>null</code> tidak dikirim.</li>
+          <li>Respons sukses berisi <code>ClID</code>, <code>ClStatus</code> (<code>08</code>), <code>PrintOut</code> (LOA), dan <code>Entitlement</code>.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Jangan lupa</h3>
+        <ul>
+          <li>Jangan memanggil <code>Eligibility</code> bila masih ada klaim terbuka; cek dengan <code>CheckMemberClaimTxnStatus</code> atau batalkan lewat <code>CancelOpenClaimsTxn</code>.</li>
+          <li>Simpan <code>ClID</code> karena dibutuhkan <code>GetEntitlement</code>, <code>EdocsUpload</code>, <code>DischargeOp</code>, dan <code>RePrintOut</code>.</li>
+          <li>Respons bisnis tetap HTTP 200; periksa <code>IsSuccess</code>, bukan HTTP status.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Cabang: klaim terbuka yang salah</h2>
     <div class="terminal"><span class="m"># klaim terbuka ditemukan (clStatus 08)</span>
 CheckMemberClaimTxnStatus
         <span class="c">↓</span>
@@ -389,7 +456,7 @@ DischargeOp                  <span class="m">menutup klaim</span></div>
   </section>
 
   <section>
-    <h2>4. Referensi endpoint</h2>
+    <h2>5. Referensi endpoint</h2>
     <table>
       <thead>
         <tr>
@@ -417,7 +484,7 @@ DischargeOp                  <span class="m">menutup klaim</span></div>
   </section>
 
   <section>
-    <h2>5. Membaca respons</h2>
+    <h2>6. Membaca respons</h2>
     <p>
       Semua respons bisnis AdMedika dikembalikan sebagai <strong>HTTP 200</strong>.
       Jangan menentukan sukses dari HTTP status; periksa field berikut secara berurutan.
@@ -447,7 +514,7 @@ DischargeOp                  <span class="m">menutup klaim</span></div>
   </section>
 
   <section>
-    <h2>6. Contoh urutan yang sudah diverifikasi</h2>
+    <h2>7. Contoh urutan yang sudah diverifikasi</h2>
     <div class="terminal"><span class="m"># kunjungan baru, tidak ada klaim terbuka</span>
 CheckMemberClaimTxnStatus   <span class="g">→ 1840, tidak ada klaim</span>
 Eligibility                 <span class="g">→ clID baru, status 08</span>
@@ -467,7 +534,7 @@ DischargeOp                 <span class="g">→ klaim ditutup</span></div>
   </section>
 
   <section>
-    <h2>7. Catatan operasional</h2>
+    <h2>8. Catatan operasional</h2>
     <ul>
       <li>Satu member hanya boleh punya satu klaim terbuka per coverage. Selesaikan atau batalkan sebelum membuat yang baru.</li>
       <li>Simpan <code>clID</code> dari <code>Eligibility</code>; dipakai untuk upload dokumen dan reprint.</li>
