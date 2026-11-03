@@ -87,6 +87,32 @@ namespace Temiang.Avicenna.Tests.Admedika
         }
 
         [TestMethod]
+        public void Eligibility_DevResponse_MapsPayorCodeAndPreviousIcd()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":929364,\"statusCode\":0,\"statusMsg\":\"Successful\","
+                + "\"txnData\":{\"eligibilityResponse\":{\"eligibility\":{"
+                + "\"clID\":\"28651305\",\"clStatus\":\"08\",\"clDesc\":\"ELIGIBILITY APPROVED\","
+                + "\"payorCode\":\"ADMEDKA\",\"PayorName\":\"Jaminan Kesehatan\",\"dob\":\"Dec-11-1991\","
+                + "\"policyNo\":\"ADM_002X\",\"payorMemberID\":\"ADM_002X\","
+                + "\"policyDate\":\"Jan-01-2026 to Dec-31-2026\",\"planCode\":\"GP-003\","
+                + "\"cardNo\":\"8000991200072653\",\"patientName\":\"ADM TEST DUA\",\"pd\":\"Principal\","
+                + "\"principalName\":\"\",\"referral_info_flag\":\"N\",\"previous_icd_code\":\"F81.2\","
+                + "\"printOut\":\"PENDAFTARAN PASIEN\\nJAMINAN KESEHATAN\","
+                + "\"entitlement\":[{\"benID\":\"01\",\"shortName\":\"B.ADMIN\",\"longName\":\"Biaya Administrasi\"}]}}}}}";
+
+            var response = ResponseParser.Parse<EligibilityResponse>(json);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("ADMEDKA", response.PayorCode);
+            Assert.AreEqual("F81.2", response.PreviousIcdCode);
+            Assert.AreEqual("ELIGIBILITY APPROVED", response.ClDesc);
+            Assert.AreEqual("N", response.ReferralInfoFlag);
+            StringAssert.Contains(response.PrintOut, "\n");
+            Assert.AreEqual(1, response.Entitlement.Count);
+        }
+
+        [TestMethod]
         public void Eligibility_FailedResponse_ReturnsBusinessError()
         {
             var transport = new FakeTransport { NextResponse = EligibilityFailedJson };
