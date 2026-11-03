@@ -1875,6 +1875,15 @@
     <Content Include="AudioAvicenna.rar" />
     <Content Include="Document\2026\10\02\CR-EMR-Correction-MDS-Attachment-Implementation.md" />
     <Content Include="Document\2026\10\23\CR-SRK-Inpatient-On-Discharge.md" />
+    <Content Include="Document\2026\11\03\01.CreateTable_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
+    <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
+    <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
+    <Content Include="Document\Admedika\CustomerHost_ProviderBridging - OUTPATIENT.pdf" />
+    <Content Include="Document\Admedika\DAILY_MONITORING.pdf" />
+    <Content Include="Document\Admedika\EDOCS_UPLOAD v.Rustlang.pdf" />
+    <Content Include="Document\Admedika\INVOICE_TRACKING.pdf" />
+    <Content Include="Document\Admedika\RE_PRINT_OUT.pdf" />
     <None Include="Document\Bpjs Face Scan\Readme.md" />
     <Content Include="Document\2026\05\13\AntrianRSI\001-CREATE-TABLE-AutoNumberSemantic.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\002-CREATE-TABLE-VisitQueue.sql" />
@@ -1940,6 +1949,7 @@
     <Content Include="Document\2026\09\01\01. PPRA Non PPAB Approval Parameter and Flag.sql" />
     <Content Include="Document\2026\10\02\01.CR-EMR-Correction-MDS-Attachment.sql" />
     <Content Include="Document\2026\10\29\1.CREATE_View_Vw_GuarantorAdmedika.sql" />
+    <Content Include="Document\Admedika\alur_outpatient.html" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
