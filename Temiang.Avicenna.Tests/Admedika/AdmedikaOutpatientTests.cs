@@ -132,6 +132,29 @@ namespace Temiang.Avicenna.Tests.Admedika
             + "\"txnResponseDateTime\":\"20261030150101\"}}";
 
         [TestMethod]
+        public void GetEntitlement_DevResponse_MapsCovCodeStatusDescAndLimits()
+        {
+            const string json =
+                "{\"output\":{\"referenceID\":929318,\"statusCode\":0,\"statusMsg\":\"Successful\","
+                + "\"txnData\":{\"getEntitlementResponse\":{\"getEntitlement\":{"
+                + "\"cardNo\":\"8000991200072646\",\"patientName\":\"ADM TEST SATU\",\"clID\":\"28650934\","
+                + "\"covCode\":\"GP\",\"clStatus\":\"08\",\"clStatusDesc\":\"ELIGIBILITY APPROVED\","
+                + "\"PayorName\":\"Jaminan Kesehatan\",\"entitlement\":[{"
+                + "\"benID\":\"01\",\"shortName\":\"B.ADMIN\",\"longName\":\"Biaya Administrasi\","
+                + "\"availLimit\":\"n/a\",\"freqDesc\":\"YEARLY\",\"limitDesc\":\"MAX DOLLAR AMOUNT\"}]}}}}}";
+
+            var response = ResponseParser.Parse<GetEntitlementResponse>(json);
+
+            Assert.IsTrue(response.IsSuccess);
+            Assert.AreEqual("GP", response.CovCode);
+            Assert.AreEqual("ELIGIBILITY APPROVED", response.ClStatusDesc);
+            Assert.AreEqual(1, response.Entitlement.Count);
+            Assert.AreEqual("n/a", response.Entitlement[0].AvailLimit);
+            Assert.AreEqual("YEARLY", response.Entitlement[0].FreqDesc);
+            Assert.AreEqual("MAX DOLLAR AMOUNT", response.Entitlement[0].LimitDesc);
+        }
+
+        [TestMethod]
         public void GetEntitlement_MapsBenefitsAndSendsTerminalId()
         {
             var transport = new FakeTransport { NextResponse = GetEntitlementSuccessJson };

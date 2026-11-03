@@ -12,6 +12,8 @@ namespace Temiang.Avicenna.Common.Admedika
         [JsonProperty("clID")] public string ClID { get; set; }
         [JsonProperty("clStatus")] public string ClStatus { get; set; }
         [JsonProperty("clDesc")] public string ClDesc { get; set; }
+        [JsonProperty("clStatusDesc")] public string ClStatusDesc { get; set; }
+        [JsonProperty("covCode")] public string CovCode { get; set; }
         [JsonProperty("payorName")] public string PayorName { get; set; }
         private List<BenefitItem> _entitlement = new List<BenefitItem>();
 
