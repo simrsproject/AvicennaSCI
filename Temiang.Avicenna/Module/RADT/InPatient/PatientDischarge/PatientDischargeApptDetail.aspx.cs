@@ -417,7 +417,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                             //if (update)
                             {
                                 var co = new Common.BPJS.VClaim.v11.Service();
-                                var response = co.UpdateTglPulang(new Common.BPJS.VClaim.v20.Sep.UpdateRequest.UpdateTanggalPulang.TSep
+                                var paramUpdatePulang = new Common.BPJS.VClaim.v20.Sep.UpdateRequest.UpdateTanggalPulang.TSep
                                 {
                                     NoSep = bpjs.NoSEP,
                                     StatusPulang = new[] { AppSession.Parameter.DischargeConditionDieLessThen48, AppSession.Parameter.DischargeConditionDieMoreThen48 }.Contains(entity.SRDischargeCondition) ? "4" : stdRef.NumericValue.ToInt().ToString(),
@@ -426,7 +426,20 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                                     NoLPManual = bpjs.NoLP,
                                     User = AppSession.UserLogin.UserID,
                                     TglPulang = entity.DischargeDate.Value.Date.ToString("yyyy-MM-dd")
-                                });
+                                };
+
+                                var response = co.UpdateTglPulang(paramUpdatePulang);
+                                var log = new WebServiceAPILog
+                                {
+                                    DateRequest = DateTime.Now,
+                                    IPAddress = "10.200.200.188",
+                                    UrlAddress = "UpdateTglPulang",
+                                    Params = JsonConvert.SerializeObject(paramUpdatePulang),
+                                    Response = JsonConvert.SerializeObject(response),
+                                    Totalms = 0
+                                };
+                                log.Save();
+
                                 if (!response.MetaData.IsValid)
                                 {
                                     ShowInformationHeader(string.Format("Code : {0}, Message : Bridging BPJS, {1}", response.MetaData.Code, response.MetaData.Message));
@@ -585,7 +598,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                                         pat.MobilePhoneNo, pat.GuarantorCardNo, refno, 0, AppSession.UserLogin.UserID, AppSession.Parameter.AppointmentTypeControlPlan);
                                 }
 
-                                var valid = false;
+                                var valid = true;
                                 if (string.IsNullOrEmpty(refno)) valid = false;
                                 if (apt == null) valid = false;
                                 if (Helper.IsBpjsAntrolIntegration && AppSession.Parameter.GuarantorAskesID.Contains(entity.GuarantorID))
