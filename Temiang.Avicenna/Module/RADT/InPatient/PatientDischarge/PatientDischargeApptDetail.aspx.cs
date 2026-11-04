@@ -598,7 +598,7 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                                         pat.MobilePhoneNo, pat.GuarantorCardNo, refno, 0, AppSession.UserLogin.UserID, AppSession.Parameter.AppointmentTypeControlPlan);
                                 }
 
-                                var valid = true;
+                                var valid = false;
                                 if (string.IsNullOrEmpty(refno)) valid = false;
                                 if (apt == null) valid = false;
                                 if (Helper.IsBpjsAntrolIntegration && AppSession.Parameter.GuarantorAskesID.Contains(entity.GuarantorID))
