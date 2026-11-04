@@ -39,8 +39,10 @@ namespace Temiang.Avicenna.Common.Admedika
                 DateRequest = DateTime.Now,
                 IPAddress = "ADMEDIKA",
                 UrlAddress = serviceId,
-                Params = MaskSensitive(requestBody),
-                Response = MaskSensitive(responseBody),
+                Params = requestBody,
+                Response = responseBody,
+                //Params = MaskSensitive(requestBody),
+                //Response = MaskSensitive(responseBody),
                 Totalms = (int)elapsedMs
             };
         }
