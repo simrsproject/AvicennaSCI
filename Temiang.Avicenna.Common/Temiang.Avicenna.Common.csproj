@@ -218,6 +218,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="BaseControl\EntryControl.cs" />
+    <Compile Include="BPJS\VClaim\InpatientControlPlan.cs" />
     <Compile Include="BPJS\Antrian\List.cs" />
     <Compile Include="BPJS\Antrian\QrCode.cs" />
     <Compile Include="BPJS\Antrian\Referensi .cs" />
