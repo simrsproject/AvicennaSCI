@@ -646,7 +646,14 @@ namespace Temiang.Avicenna.ReportDataSource.RSMM.Emr
                 Alamat = pat.Address,
                 Suku = StandardReference.GetItemName(AppEnum.StandardReference.Ethnic, pat.SREthnic),
                 Pekerjaan = StandardReference.GetItemName(AppEnum.StandardReference.Occupation, pat.SROccupation),
-                PemeriksaanUmum = MergeJsonData(AssessmentUtil.VitalSignFolderField(mergeRegs, asses.AssessmentDateTime.Value), peObj),
+                PemeriksaanUmum = MergeJsonData(
+                    AssessmentUtil.VitalSignFolderField(
+                        mergeRegs,
+                        asses.AssessmentDateTime.Value,
+                        true
+                    ),
+                    peObj
+                ),
                 HandOver = AssessmentUtil.TransferToInPatient(reg.RegistrationNo),
                 PemeriksaanPenunjang = string.IsNullOrWhiteSpace(ancil) ? asses.OtherExam : string.Concat(ancil, Environment.NewLine, asses.OtherExam),
                 StatusPernikahan = StandardReference.GetItemName(AppEnum.StandardReference.MaritalStatus, pat.SRMaritalStatus),

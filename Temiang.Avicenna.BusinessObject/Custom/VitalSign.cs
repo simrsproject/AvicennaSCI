@@ -280,20 +280,45 @@ namespace Temiang.Avicenna.BusinessObject
             return 0;
         }
 
-        public static string LastVitalSignWithUnit(List<string> mergeRegistrations, VitalSignEnum vitalSignItem, DateTime lasDateTime)
+        public static string LastVitalSignWithUnit(
+            List<string> mergeRegistrations,
+            VitalSignEnum vitalSignItem,
+            DateTime lasDateTime,
+            bool useLatest = false)
         {
             var vitalSignID = GetVitalSignID(vitalSignItem);
 
             if (vitalSignItem == VitalSignEnum.BloodPressure)
             {
-                var dtb1 = LastVitalSignRecord(mergeRegistrations, GetVitalSignID(VitalSignEnum.BloodPressureSistolic), lasDateTime);
-                var dtb2 = LastVitalSignRecord(mergeRegistrations, GetVitalSignID(VitalSignEnum.BloodPressureDiastolic), lasDateTime);
+                var dtb1 = LastVitalSignRecord(
+                    mergeRegistrations,
+                    GetVitalSignID(VitalSignEnum.BloodPressureSistolic),
+                    lasDateTime,
+                    useLatest
+                );
+
+                var dtb2 = LastVitalSignRecord(
+                    mergeRegistrations,
+                    GetVitalSignID(VitalSignEnum.BloodPressureDiastolic),
+                    lasDateTime,
+                    useLatest
+                );
+
                 if (dtb1.Rows.Count > 0 && dtb2.Rows.Count > 0)
                 {
                     try
                     {
-                        var format = string.Concat("{0:N", dtb1.Rows[0][2].ToInt(), "} / {1:N", dtb2.Rows[0][2].ToInt(), "} {2}");
-                        return string.Format(format, dtb1.Rows[0][0], dtb2.Rows[0][0], dtb1.Rows[0][1]);
+                        var format = string.Concat(
+                            "{0:N", dtb1.Rows[0][2].ToInt(),
+                            "} / {1:N", dtb2.Rows[0][2].ToInt(), "} {2}"
+                        );
+
+                        return string.Format(
+                            format,
+                            dtb1.Rows[0][0],
+                            dtb2.Rows[0][0],
+                            dtb1.Rows[0][1]
+                        );
                     }
                     catch
                     {
@@ -303,14 +328,26 @@ namespace Temiang.Avicenna.BusinessObject
             }
             else
             {
+                var dtb = LastVitalSignRecord(
+                    mergeRegistrations,
+                    vitalSignID,
+                    lasDateTime,
+                    useLatest
+                );
 
-                var dtb = LastVitalSignRecord(mergeRegistrations, vitalSignID, lasDateTime);
                 if (dtb.Rows.Count > 0)
                 {
                     try
                     {
-                        var format = string.Concat("{0:N", dtb.Rows[0][2].ToInt(), "} {1}");
-                        return string.Format(format, dtb.Rows[0][0], dtb.Rows[0][1]);
+                        var format = string.Concat(
+                            "{0:N", dtb.Rows[0][2].ToInt(), "} {1}"
+                        );
+
+                        return string.Format(
+                            format,
+                            dtb.Rows[0][0],
+                            dtb.Rows[0][1]
+                        );
                     }
                     catch
                     {
@@ -322,7 +359,7 @@ namespace Temiang.Avicenna.BusinessObject
             return string.Empty;
         }
 
-        private static DataTable LastVitalSignRecord(List<string> mergeRegistrations, string vitalSignID, DateTime lastDateTime)
+        private static DataTable LastVitalSignRecord(List<string> mergeRegistrations, string vitalSignID, DateTime lastDateTime, bool useLatest = false)
         {
             var phrl = new PatientHealthRecordLineQuery("phrl");
             var quest = new QuestionQuery("q");
@@ -342,16 +379,19 @@ namespace Temiang.Avicenna.BusinessObject
 
             // Abaikan filter tanggal jika waktunya hampir bersamaan dengan waktu sekarang  
             // lastDateTime untuk keperluan display di asesmen (kondisi vital sign saat pembuatan asesmen)
-            if (DateTime.Now > lastDateTime.AddSeconds(10))
+            if (!useLatest && DateTime.Now > lastDateTime.AddSeconds(10))
             {
-                // RecordDate tidak seragam ...ada yg include time ada yg tidak
-                // Ambil semua record di tanggal sebelumnya
-                // ditambah record ditanggal dipilih dgn batasan time (untuk RecordDate yg include time)
-                // ditambah record ditanggal dipilih dgn batasan RecordTime
-
-                phrl.Where(phr.Or(phr.RecordDate <= lastDateTime.Date.AddDays(-1),
-                    phr.And(phr.RecordDate > lastDateTime.Date, phr.RecordDate <= lastDateTime),
-                    phr.And(phr.RecordDate == lastDateTime.Date, phr.RecordTime <= lastDateTime.ToString("HH:mm"))));
+                phrl.Where(phr.Or(
+                    phr.RecordDate <= lastDateTime.Date.AddDays(-1),
+                    phr.And(
+                        phr.RecordDate > lastDateTime.Date,
+                        phr.RecordDate <= lastDateTime
+                    ),
+                    phr.And(
+                        phr.RecordDate == lastDateTime.Date,
+                        phr.RecordTime <= lastDateTime.ToString("HH:mm")
+                    )
+                ));
             }
 
             // Ambil semua value termasuk 0 pada vitalsign terakhir untuk pasien meninggal (Handono 231004 by req: RSI)
@@ -363,7 +403,12 @@ namespace Temiang.Avicenna.BusinessObject
                 phrl.Where(phrl.QuestionAnswerNum > 0);
 
             phrl.Where(vital.VitalSignID == vitalSignID);
-            phrl.OrderBy(phr.RecordDate.Descending, phrl.TransactionNo.Descending);
+            phrl.OrderBy(
+                phrl.LastUpdateDateTime.Descending,
+                phr.RecordDate.Descending,
+                phr.RecordTime.Descending,
+                phrl.TransactionNo.Descending
+            );
             var dtb = phrl.LoadDataTable();
             return dtb;
         }
@@ -913,7 +958,7 @@ namespace Temiang.Avicenna.BusinessObject
             return questionAnswerFormatted;
         }
 
-        public static DataTable LastVitalSignRecord(string registrationNo, string referFromRegistrationNo, DateTime lastDateTime)
+        public static DataTable LastVitalSignRecord(string registrationNo, string referFromRegistrationNo, DateTime lastDateTime, bool useLatest = false)
         {
             // TODO: Tampilkan semua yg ada di EWS jika EWS ada recordnya
             var phrl = new PatientHealthRecordLineQuery("phrl");
@@ -935,7 +980,7 @@ namespace Temiang.Avicenna.BusinessObject
             phrl.Where(vital.VitalSignInitial != "CURB");
             // Abaikan filter tanggal jika waktunya hampir bersamaan dengan waktu sekarang  
             // lastDateTime untuk keperluan display di asesmen (kondisi vital sign saat pembuatan asesmen)
-            if (DateTime.Now > lastDateTime.AddSeconds(10))
+            if (!useLatest && DateTime.Now > lastDateTime.AddSeconds(10))
             {
                 // RecordDate tidak seragam ...ada yg include time ada yg tidak
                 // Ambil semua record di tanggal sebelumnya
@@ -952,7 +997,12 @@ namespace Temiang.Avicenna.BusinessObject
             phrl.Select(quest.SRAnswerType, vital.VitalSignID, vital.VitalSignName, phrl.QuestionAnswerPrefix,
                 phrl.QuestionAnswerSuffix,
                 phrl.QuestionAnswerText, phrl.QuestionAnswerNum, phrl.QuestionAnswerText2, phr.RecordDate, phr.RecordTime, vital.VitalSignInitial);
-            phrl.OrderBy(vital.SRVitalSignGroup.Ascending, vital.RowIndexInGroup.Ascending, vital.VitalSignName.Ascending, phr.RecordDate.Descending, phrl.TransactionNo.Descending);
+            phrl.OrderBy(
+                phrl.LastUpdateDateTime.Descending,
+                phr.RecordDate.Descending,
+                phr.RecordTime.Descending,
+                phrl.TransactionNo.Descending
+            );
 
             var dtb = phrl.LoadDataTable();
             return dtb;
