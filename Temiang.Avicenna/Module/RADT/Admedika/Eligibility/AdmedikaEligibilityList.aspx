@@ -4,6 +4,22 @@
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <%@ Register TagPrefix="cc" Namespace="Temiang.Avicenna.CustomControl" Assembly="Temiang.Avicenna" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <telerik:RadCodeBlock ID="RadCodeBlock1" runat="server">
+        <script type="text/javascript">
+            function openNewEligibility() {
+                var oWnd = $find("<%= winEligibility.ClientID %>");
+                oWnd.setUrl("AdmedikaEligibilityDialog.aspx");
+                oWnd.show();
+            }
+
+            function onEligibilityClientClose(oWnd, args) {
+                __doPostBack("<%= grdList.UniqueID %>", "rebind");
+            }
+        </script>
+    </telerik:RadCodeBlock>
+    <telerik:RadWindow ID="winEligibility" runat="server" Animation="None" Behavior="Close,Move"
+        ShowContentDuringLoad="False" Width="1150px" Height="700px" VisibleStatusbar="False"
+        Modal="true" OnClientClose="onEligibilityClientClose" />
     <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
@@ -124,6 +140,14 @@
             </tr>
         </table>
     </cc:CollapsePanel>
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td style="padding: 4px 0 6px 0;">
+                <asp:Button ID="btnNewEligibility" runat="server" Text="New Eligibility"
+                    OnClientClick="openNewEligibility(); return false;" />
+            </td>
+        </tr>
+    </table>
     <telerik:RadGrid ID="grdList" runat="server" OnNeedDataSource="grdList_NeedDataSource"
         AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
         <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">

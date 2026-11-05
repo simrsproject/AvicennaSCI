@@ -15,6 +15,24 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
     public partial class AdmedikaEligibilityList {
         
         /// <summary>
+        /// RadCodeBlock1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadCodeBlock RadCodeBlock1;
+        
+        /// <summary>
+        /// winEligibility control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadWindow winEligibility;
+        
+        /// <summary>
         /// RadAjaxManagerProxy1 control.
         /// </summary>
         /// <remarks>
@@ -130,6 +148,15 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ImageButton btnFilterCard;
+        
+        /// <summary>
+        /// btnNewEligibility control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btnNewEligibility;
         
         /// <summary>
         /// grdList control.

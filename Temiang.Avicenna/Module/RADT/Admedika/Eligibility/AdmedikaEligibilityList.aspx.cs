@@ -24,8 +24,14 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         {
             base.OnLoadComplete(e);
 
+            // Halaman ini hanya membaca data. Eligibility baru dibuat lewat dialog.
+            ToolBarMenuAdd.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+
             // Filter pencarian sudah tersedia inline, tidak memakai halaman search terpisah.
             ToolBarMenuSearch.Visible = false;
+
+            btnNewEligibility.Visible = IsUserAddAble;
         }
 
         public override void OnMenuEditClick(GridDataItem[] dataItems)

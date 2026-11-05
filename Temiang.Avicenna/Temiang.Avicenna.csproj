@@ -2984,6 +2984,7 @@
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleList.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx" />
+    <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx" />
     <Content Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineDashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineReference.aspx" />
@@ -15820,6 +15821,13 @@
     </Compile>
     <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx.designer.cs">
       <DependentUpon>AdmedikaEligibilityList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx.cs">
+      <DependentUpon>AdmedikaEligibilityDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx.designer.cs">
+      <DependentUpon>AdmedikaEligibilityDialog.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
