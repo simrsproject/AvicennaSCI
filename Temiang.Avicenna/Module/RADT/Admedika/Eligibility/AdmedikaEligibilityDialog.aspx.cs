@@ -47,10 +47,13 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             try
             {
+                var coverage = AdmedikaCoverageType.Get(rblCoverageType.SelectedValue);
+                var searchForTermCondition = coverage == null ? string.Empty : coverage.Description;
+
                 var result = service.GetMemberEnrolledPlanTc(
                     txtCardNo.Text.Trim(),
                     rblCoverageType.SelectedValue,
-                    string.Empty);
+                    searchForTermCondition);
 
                 string message;
                 if (!service.IsOk(result, out message))
