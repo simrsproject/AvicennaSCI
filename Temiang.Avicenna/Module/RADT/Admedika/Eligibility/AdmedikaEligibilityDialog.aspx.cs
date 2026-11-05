@@ -246,6 +246,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             AppendSummaryRow(html, "Status", response.ClStatus);
             AppendSummaryRow(html, "Description", response.ClDesc);
             AppendSummaryRow(html, "Patient Name", response.PatientName);
+            AppendSummaryRow(html, "Date of Birth", response.Dob);
             AppendSummaryRow(html, "Payor", JoinValue(response.PayorName, response.PayorCode, " / "));
             AppendSummaryRow(html, "Plan Code", response.PlanCode);
             AppendSummaryRow(html, "Card No", response.CardNo);
