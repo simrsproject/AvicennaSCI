@@ -1,0 +1,155 @@
+<%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterList.Master" AutoEventWireup="true"
+    CodeBehind="AdmedikaEligibilityList.aspx.cs" Inherits="Temiang.Avicenna.Module.RADT.Admedika.AdmedikaEligibilityList" %>
+
+<%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
+<%@ Register TagPrefix="cc" Namespace="Temiang.Avicenna.CustomControl" Assembly="Temiang.Avicenna" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
+        <AjaxSettings>
+            <telerik:AjaxSetting AjaxControlID="btnFilterDate">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterRegistration">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterPatient">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterCard">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterClID">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="grdList">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+        </AjaxSettings>
+    </telerik:RadAjaxManagerProxy>
+    <cc:CollapsePanel ID="CollapsePanel1" runat="server" Title="Search Filter">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="50%" style="vertical-align: top">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">
+                                Created Date
+                            </td>
+                            <td class="entry">
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <telerik:RadDatePicker ID="txtCreatedDate" runat="server" Width="100px" />
+                                        </td>
+                                        <td>
+                                        &nbsp;-&nbsp;
+                                        </td>
+                                        <td>
+                                            <telerik:RadDatePicker ID="txtCreatedDateTo" runat="server" Width="100px" />
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterDate" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                Registration No
+                            </td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtRegistrationNo" runat="server" Width="300px" MaxLength="40" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterRegistration" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                ClID (Claim ID)
+                            </td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtClID" runat="server" Width="300px" MaxLength="20" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterClID" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%" style="vertical-align: top">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">
+                                Patient Name
+                            </td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtPatientName" runat="server" Width="300px" MaxLength="150" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterPatient" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">
+                                Card No
+                            </td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtCardNo" runat="server" Width="300px" MaxLength="32" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterCard" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </cc:CollapsePanel>
+    <telerik:RadGrid ID="grdList" runat="server" OnNeedDataSource="grdList_NeedDataSource"
+        AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
+        <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">
+            <Columns>
+                <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Created Date Time"
+                    UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
+                    DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="140px" />
+                <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
+                    UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px" />
+                <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
+                    UniqueName="PatientName" SortExpression="PatientName" />
+                <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
+                    UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px" />
+                <telerik:GridBoundColumn DataField="ClID" HeaderText="ClID (Claim ID)"
+                    UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px" />
+                <telerik:GridBoundColumn DataField="ClStatus" HeaderText="ClStatus"
+                    UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="70px" />
+                <telerik:GridBoundColumn DataField="ClDesc" HeaderText="ClDesc"
+                    UniqueName="ClDesc" SortExpression="ClDesc" />
+                <telerik:GridCheckBoxColumn DataField="IsClosed" HeaderText="Is Closed"
+                    UniqueName="IsClosed" SortExpression="IsClosed" HeaderStyle-Width="70px"
+                    ItemStyle-HorizontalAlign="Center" />
+            </Columns>
+        </MasterTableView>
+        <ClientSettings EnableRowHoverStyle="true">
+            <Selecting AllowRowSelect="True" />
+        </ClientSettings>
+    </telerik:RadGrid>
+</asp:Content>

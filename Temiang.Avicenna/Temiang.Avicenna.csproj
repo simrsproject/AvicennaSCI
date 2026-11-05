@@ -1876,6 +1876,7 @@
     <Content Include="Document\2026\10\02\CR-EMR-Correction-MDS-Attachment-Implementation.md" />
     <Content Include="Document\2026\10\23\CR-SRK-Inpatient-On-Discharge.md" />
     <Content Include="Document\2026\11\03\01.CreateTable_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\2026\11\05\02.INSERT_INTO_Admedika_Menu.sql" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
@@ -2982,6 +2983,7 @@
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleDetail.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleList.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx" />
+    <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx" />
     <Content Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineDashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineReference.aspx" />
@@ -15811,6 +15813,13 @@
     </Compile>
     <Compile Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx.designer.cs">
       <DependentUpon>WorkingScheduleSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx.cs">
+      <DependentUpon>AdmedikaEligibilityList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx.designer.cs">
+      <DependentUpon>AdmedikaEligibilityList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>

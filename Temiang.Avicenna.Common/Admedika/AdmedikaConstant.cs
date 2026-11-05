@@ -92,5 +92,12 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string DCM016A = "016-A"; // Usage : DCM - Jaminan Asuransi lain
             public const string DCM017A = "017-A"; // Usage : DCM - Nama & jumlah Alat Bantu (Kruk, Tongkat, Korset, dll)
         }
+
+        public static class PrintTypeID
+        {
+            public const string LOA = "E"; // Letter of Authorization
+            public const string LOC = "D"; // Letter of Claim
+            public const string LOR = "X"; // Letter of Rejection
+        }
     }
 }

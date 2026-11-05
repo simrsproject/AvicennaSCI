@@ -1172,6 +1172,11 @@ namespace Temiang.Avicenna.Common
             public const string AmbulanceRealization = "17.02";
             public const string Vehicle = "17.10.01";
             public const string Driver = "17.10.02";
+
+            //ADMEDIKA
+            public const string AdmedikaEligibility = "01.21.01";
+            public const string AdmedikaDischargeOp = "01.21.02";
+            public const string AdmedikaDischargeIp = "01.21.03";
         }
 
         public class Report
