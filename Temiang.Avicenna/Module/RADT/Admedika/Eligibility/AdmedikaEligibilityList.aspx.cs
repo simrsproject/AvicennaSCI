@@ -73,6 +73,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 query.LeftJoin(patient).On(query.PatientID == patient.PatientID);
 
                 query.Select(
+                    query.AdmedikaClaimTransactionID,
                     query.CreatedDateTime,
                     query.RegistrationNo,
                     patient.FullName.As("PatientName"),
