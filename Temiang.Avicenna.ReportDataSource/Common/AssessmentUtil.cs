@@ -634,69 +634,35 @@ namespace Temiang.Avicenna.ReportDataSource.Common
             return obj;
         }
 
-        public static object VitalSignField(
-    List<string> mergeRegs,
-    DateTime lastDateTime,
-    bool useLatest = false)
+        public static object VitalSignField(List<string> mergeRegs, DateTime lastDateTime)
         {
             var vs = new
             {
-                BB = VitalSign.LastVitalSignWithUnit(
-                    mergeRegs,
-                    VitalSign.VitalSignEnum.BodyWeight,
-                    lastDateTime,
-                    useLatest),
-
-                TB = VitalSign.LastVitalSignWithUnit(
-                    mergeRegs,
-                    VitalSign.VitalSignEnum.BodyHeight,
-                    lastDateTime,
-                    useLatest),
-
-                Suhu = VitalSign.LastVitalSignWithUnit(
-                    mergeRegs,
-                    VitalSign.VitalSignEnum.Temperature,
-                    lastDateTime,
-                    useLatest),
-
-                TekananDarah = VitalSign.LastVitalSignWithUnit(
-                    mergeRegs,
-                    VitalSign.VitalSignEnum.BloodPressure,
-                    lastDateTime,
-                    useLatest),
-
-                Nadi = VitalSign.LastVitalSignWithUnit(
-                    mergeRegs,
-                    VitalSign.VitalSignEnum.HeartRate,
-                    lastDateTime,
-                    useLatest),
-
-                Pernafasan = VitalSign.LastVitalSignWithUnit(
-                    mergeRegs,
-                    VitalSign.VitalSignEnum.RespiratoryRate,
-                    lastDateTime,
-                    useLatest)
+                BB = VitalSign.LastVitalSignWithUnit(mergeRegs,
+                    VitalSign.VitalSignEnum.BodyWeight, lastDateTime),
+                TB = VitalSign.LastVitalSignWithUnit(mergeRegs,
+                    VitalSign.VitalSignEnum.BodyHeight, lastDateTime),
+                Suhu = VitalSign.LastVitalSignWithUnit(mergeRegs,
+                    VitalSign.VitalSignEnum.Temperature, lastDateTime),
+                TekananDarah =
+                    VitalSign.LastVitalSignWithUnit(mergeRegs,
+                        VitalSign.VitalSignEnum.BloodPressure, lastDateTime),
+                Nadi = VitalSign.LastVitalSignWithUnit(mergeRegs,
+                    VitalSign.VitalSignEnum.HeartRate, lastDateTime),
+                Pernafasan = VitalSign.LastVitalSignWithUnit(mergeRegs,
+                    VitalSign.VitalSignEnum.RespiratoryRate, lastDateTime)
             };
-
             return vs;
         }
 
-        public static object VitalSignFolderField(
-            List<string> mergeRegs,
-            DateTime lastDateTime,
-            bool useLatest = false)
+        public static object VitalSignFolderField(List<string> mergeRegs, DateTime lastDateTime)
+        {
+            var vs = new
             {
-                var vs = new
-                {
-                    VitalSign = VitalSignField(
-                        mergeRegs,
-                        lastDateTime,
-                        useLatest
-                    )
-                };
-
-                return vs;
-            }
+                VitalSign = VitalSignField(mergeRegs, lastDateTime)
+            };
+            return vs;
+        }
         private static string SurgicalHistory(string patientID, DateTime lastDateTime)
         {
             var strb = new StringBuilder();
