@@ -181,7 +181,8 @@
                     UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
                     DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="140px" />
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
-                    UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px" />
+                    UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
+                    ItemStyle-Font-Bold="true" />
                 <telerik:GridTemplateColumn DataField="PatientID" HeaderText="PatientID"
                     UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="200px">
                     <ItemTemplate>
@@ -191,9 +192,11 @@
                 <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
                     UniqueName="PatientName" SortExpression="PatientName" />
                 <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
-                    UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px" />
+                    UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px"
+                    ItemStyle-Font-Bold="true" />
                 <telerik:GridBoundColumn DataField="ClID" HeaderText="ClID (Claim ID)"
-                    UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px" />
+                    UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px"
+                    ItemStyle-Font-Bold="true" />
                 <telerik:GridBoundColumn DataField="CovID" HeaderText="CovID"
                     UniqueName="CovID" SortExpression="CovID" HeaderStyle-Width="70px" />
                 <telerik:GridTemplateColumn DataField="CovCode" HeaderText="CovCode"

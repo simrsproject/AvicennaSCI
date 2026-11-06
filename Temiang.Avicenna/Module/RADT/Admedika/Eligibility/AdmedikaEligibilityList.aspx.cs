@@ -108,24 +108,38 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             var patientId = Convert.ToString(row["PatientID"]);
             var registrationNo = Convert.ToString(row["RegistrationNo"]);
+            var refPatientName = Convert.ToString(row["RefPatientName"]);
+
+            string html;
 
             if (!string.IsNullOrEmpty(registrationNo))
-                return Server.HtmlEncode(patientId);
+            {
+                html = "<b>" + Server.HtmlEncode(patientId) + "</b>";
+            }
+            else
+            {
+                var claimId = Convert.ToString(row["AdmedikaClaimTransactionID"]);
+                var cardNo = Convert.ToString(row["CardNo"]);
+                var patientName = Convert.ToString(row["PatientName"]);
 
-            var claimId = Convert.ToString(row["AdmedikaClaimTransactionID"]);
-            var cardNo = Convert.ToString(row["CardNo"]);
-            var patientName = Convert.ToString(row["PatientName"]);
+                var args = string.Format("'{0}','{1}','{2}'",
+                    HttpUtility.JavaScriptStringEncode(claimId),
+                    HttpUtility.JavaScriptStringEncode(cardNo),
+                    HttpUtility.JavaScriptStringEncode(patientName));
 
-            var args = string.Format("'{0}','{1}','{2}'",
-                HttpUtility.JavaScriptStringEncode(claimId),
-                HttpUtility.JavaScriptStringEncode(cardNo),
-                HttpUtility.JavaScriptStringEncode(patientName));
+                html = string.IsNullOrEmpty(patientId)
+                    ? string.Format("<b><a href=\"#\" onclick=\"openSelectPatient({0}); return false;\">Pilih Patient</a></b>", args)
+                    : string.Format("<b><a href=\"#\" onclick=\"openSelectPatient({0}); return false;\" title=\"Change Patient\">{1}</a></b>",
+                        args, Server.HtmlEncode(patientId));
+            }
 
-            if (string.IsNullOrEmpty(patientId))
-                return string.Format("<a href=\"#\" onclick=\"openSelectPatient({0}); return false;\">Pilih Patient</a>", args);
+            if (!string.IsNullOrEmpty(refPatientName))
+            {
+                if (html.Length > 0) html += "<br />";
+                html += Server.HtmlEncode(refPatientName);
+            }
 
-            return string.Format("<a href=\"#\" onclick=\"openSelectPatient({0}); return false;\" title=\"Change Patient\">{1}</a>",
-                args, Server.HtmlEncode(patientId));
+            return html;
         }
 
         protected string BuildCovCodeHtml(object dataItem)
@@ -197,8 +211,12 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             get
             {
                 var query = new AdmedikaClaimTransactionQuery("a");
+                var patient = new PatientQuery("b");
 
                 query.es.WithNoLock = true;
+                patient.es.WithNoLock = true;
+
+                query.LeftJoin(patient).On(patient.PatientID == query.PatientID);
 
                 query.Select(
                     query.AdmedikaClaimTransactionID,
@@ -212,7 +230,8 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.CovCode,
                     query.ClStatus,
                     query.ClDesc,
-                    query.IsClosed
+                    query.IsClosed,
+                    "<RTRIM(LTRIM(ISNULL(b.FirstName, '') + ' ' + ISNULL(b.MiddleName, '') + ' ' + ISNULL(b.LastName, ''))) AS RefPatientName>"
                 );
 
                 if (!txtCreatedDate.IsEmpty)
