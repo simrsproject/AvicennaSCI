@@ -60,6 +60,30 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             grdList.Rebind();
         }
 
+        protected string BuildActionHtml(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var registrationNo = Convert.ToString(row["RegistrationNo"]);
+            var isClosed = row["IsClosed"] != DBNull.Value && Convert.ToBoolean(row["IsClosed"]);
+
+            var html = string.Empty;
+
+            if (string.IsNullOrEmpty(registrationNo) && !isClosed)
+            {
+                html += "<a href=\"#\" onclick=\"return false;\" title=\"Process To Registration\" style=\"text-decoration:none;white-space:nowrap;\">";
+                html += "<img src=\"../../../../Images/Toolbar/process16.png\" border=\"0\" alt=\"Process To Registration\" title=\"Process To Registration\" style=\"vertical-align:middle;\" />";
+                html += " Process To Registration</a>&nbsp;&nbsp;";
+            }
+
+            html += "<a href=\"#\" onclick=\"return false;\" title=\"Print LOA\" style=\"text-decoration:none;white-space:nowrap;\">";
+            html += "<img src=\"../../../../Images/Toolbar/print16.png\" border=\"0\" alt=\"Print LOA\" title=\"Print LOA\" style=\"vertical-align:middle;\" />";
+            html += " Print LOA</a>";
+
+            return html;
+        }
+
         private DataTable EligibilityTable
         {
             get

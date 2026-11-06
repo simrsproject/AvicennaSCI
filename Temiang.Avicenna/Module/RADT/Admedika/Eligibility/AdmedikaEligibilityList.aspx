@@ -170,6 +170,13 @@
                 <telerik:GridCheckBoxColumn DataField="IsClosed" HeaderText="Is Closed"
                     UniqueName="IsClosed" SortExpression="IsClosed" HeaderStyle-Width="70px"
                     ItemStyle-HorizontalAlign="Center" />
+                <telerik:GridTemplateColumn UniqueName="Action" HeaderText="Action"
+                    HeaderStyle-Width="280px" HeaderStyle-HorizontalAlign="Center"
+                    ItemStyle-HorizontalAlign="Center">
+                    <ItemTemplate>
+                        <%# BuildActionHtml(Container.DataItem) %>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
             </Columns>
         </MasterTableView>
         <ClientSettings EnableRowHoverStyle="true">
