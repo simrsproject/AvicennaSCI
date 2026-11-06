@@ -102,6 +102,15 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
                 grdList.Rebind();
             }
+            else if (sourceControl == grdList && !string.IsNullOrEmpty(eventArgument) &&
+                     eventArgument.StartsWith("printloa!", StringComparison.Ordinal))
+            {
+                var claimID = eventArgument.Substring("printloa!".Length);
+                if (!string.IsNullOrEmpty(claimID))
+                    PrintLOA(claimID);
+
+                grdList.Rebind();
+            }
         }
 
         protected string BuildPatientIdHtml(object dataItem)
@@ -189,24 +198,25 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
         {
             if (e.CommandName == "PrintLOA")
-            {
-                var jobParameters = new PrintJobParameterCollection();
-                var claimParameter = jobParameters.AddNew();
+                PrintLOA(e.CommandArgument.ToString());
+        }
 
-                var claimID = e.CommandArgument.ToString();
-                claimParameter.Name = "ClaimID";
-                claimParameter.ValueString = claimID;
+        private void PrintLOA(string claimID)
+        {
+            var jobParameters = new PrintJobParameterCollection();
+            var claimParameter = jobParameters.AddNew();
 
-                AppSession.PrintJobReportID = AppConstant.Report.AdmedikaPrintLOA;
-                AppSession.PrintJobParameters = jobParameters;
+            claimParameter.Name = "ClaimID";
+            claimParameter.ValueString = claimID;
 
-                string script = @"var oWnd = $find('" + winPrint.ClientID + "');" +
-                                "oWnd.SetUrl('" + Page.ResolveUrl("~/Module/Reports/ReportViewer.aspx") + "');" +
-                                "oWnd.Show();" +
-                                "oWnd.Maximize();";
-                RadAjaxPanel1.ResponseScripts.Add(script);
+            AppSession.PrintJobReportID = AppConstant.Report.AdmedikaPrintLOA;
+            AppSession.PrintJobParameters = jobParameters;
 
-            }
+            string script = @"var oWnd = $find('" + winPrint.ClientID + "');" +
+                             "oWnd.SetUrl('" + Page.ResolveUrl("~/Module/Reports/ReportViewer.aspx") + "');" +
+                             "oWnd.Show();" +
+                             "oWnd.Maximize();";
+            RadAjaxPanel1.ResponseScripts.Add(script);
         }
 
         private DataTable EligibilityTable

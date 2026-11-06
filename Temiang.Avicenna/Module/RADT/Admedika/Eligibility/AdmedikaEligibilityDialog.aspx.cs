@@ -19,6 +19,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             ButtonOk.Visible = false;
             ButtonCancel.Text = "Close";
+            ButtonCancel.OnClientClick = "closeEligibilityDialog(); return false;";
 
             if (IsPostBack) return;
 
@@ -111,6 +112,18 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 try
                 {
                     SaveEligibility(result, covID, diagnosisCodeList);
+
+                    if (!string.IsNullOrEmpty(result.ClID))
+                    {
+                        var claimID = HttpUtility.JavaScriptStringEncode(result.ClID);
+                        AjaxManager.ResponseScripts.Add(
+                            "var oWnd = GetRadWindow();" +
+                            "if (oWnd) {" +
+                            "oWnd.argument = oWnd.argument || {};" +
+                            "oWnd.argument.mode = 'printloa!" + claimID + "';" +
+                            "}");
+                    }
+
                     litEligibilityResponse.Text = BuildSuccessHtml("Eligibility berhasil disimpan.") + litEligibilityResponse.Text;
                     btnProcessEligibility.Enabled = false;
                     ShowInformationHeader("Eligibility berhasil disimpan.");

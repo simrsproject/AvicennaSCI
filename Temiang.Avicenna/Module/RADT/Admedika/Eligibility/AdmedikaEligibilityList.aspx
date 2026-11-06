@@ -8,12 +8,18 @@
         <script type="text/javascript">
             function openNewEligibility() {
                 var oWnd = $find("<%= winEligibility.ClientID %>");
+                oWnd.argument = new Object();
                 oWnd.setUrl("AdmedikaEligibilityDialog.aspx");
                 oWnd.show();
             }
 
             function onEligibilityClientClose(oWnd, args) {
-                __doPostBack("<%= grdList.UniqueID %>", "rebind");
+                var mode = (oWnd.argument && oWnd.argument.mode)
+                    ? oWnd.argument.mode
+                    : "rebind";
+
+                __doPostBack("<%= grdList.UniqueID %>", mode);
+                if (oWnd.argument) oWnd.argument.mode = null;
             }
 
             function openSelectPatient(id, cardNo, patientName) {
