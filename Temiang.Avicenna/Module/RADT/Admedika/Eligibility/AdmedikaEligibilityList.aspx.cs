@@ -56,6 +56,18 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             grdList.DataSource = EligibilityTable;
         }
 
+        protected void grdList_ItemDataBound(object sender, GridItemEventArgs e)
+        {
+            var item = e.Item as GridDataItem;
+            if (item == null) return;
+
+            var row = item.DataItem as DataRowView;
+            if (row == null) return;
+
+            if (string.IsNullOrEmpty(Convert.ToString(row["PatientID"])))
+                item["PatientID"].BackColor = System.Drawing.Color.Yellow;
+        }
+
         protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             grdList.Rebind();

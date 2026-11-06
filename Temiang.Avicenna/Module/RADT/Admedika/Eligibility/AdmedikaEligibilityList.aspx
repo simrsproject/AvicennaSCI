@@ -167,6 +167,7 @@
         </tr>
     </table>
     <telerik:RadGrid ID="grdList" runat="server" OnNeedDataSource="grdList_NeedDataSource"
+        OnItemDataBound="grdList_ItemDataBound"
         AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
         <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">
             <Columns>

@@ -80,7 +80,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             long transactionID;
             long.TryParse(Request.QueryString["id"], out transactionID);
 
-            var patientID = HttpUtility.JavaScriptStringEncode(grdPatient.SelectedValue.ToString());
+            var selectedValue = grdPatient.SelectedValue;
+            var patientID = HttpUtility.JavaScriptStringEncode(
+                selectedValue == null ? string.Empty : selectedValue.ToString());
 
             return "oWnd.argument.mode = 'selectpatient!" + transactionID + "!" + patientID + "'";
         }
