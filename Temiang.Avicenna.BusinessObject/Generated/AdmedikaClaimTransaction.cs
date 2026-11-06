@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-11-03 12:08:17 PM
+                    Date Generated       : 2026-11-06 08:26:45 AM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -189,6 +189,14 @@ namespace Temiang.Avicenna.BusinessObject
                         case "CreatedByUserID": this.str.CreatedByUserID = (string)value; break;
                         case "LastUpdateDateTime": this.str.LastUpdateDateTime = (string)value; break;
                         case "LastUpdateByUserID": this.str.LastUpdateByUserID = (string)value; break;
+                        case "PatientName": this.str.PatientName = (string)value; break;
+                        case "DateOfBirth": this.str.DateOfBirth = (string)value; break;
+                        case "PrintOutLOA": this.str.PrintOutLOA = (string)value; break;
+                        case "PrintOutLOC": this.str.PrintOutLOC = (string)value; break;
+                        case "PrintOutLOR": this.str.PrintOutLOR = (string)value; break;
+                        case "PolicyNo": this.str.PolicyNo = (string)value; break;
+                        case "PayorMemberID": this.str.PayorMemberID = (string)value; break;
+                        case "PolicyDate": this.str.PolicyDate = (string)value; break;
                     }
                 }
                 else
@@ -229,6 +237,11 @@ namespace Temiang.Avicenna.BusinessObject
 
                             if (value == null || value is System.DateTime)
                                 this.LastUpdateDateTime = (System.DateTime?)value;
+                            break;
+                        case "DateOfBirth":
+
+                            if (value == null || value is System.DateTime)
+                                this.DateOfBirth = (System.DateTime?)value;
                             break;
 
                         default:
@@ -589,6 +602,126 @@ namespace Temiang.Avicenna.BusinessObject
             set
             {
                 base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.LastUpdateByUserID, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PatientName
+        /// </summary>
+        virtual public System.String PatientName
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PatientName);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PatientName, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.DateOfBirth
+        /// </summary>
+        virtual public System.DateTime? DateOfBirth
+        {
+            get
+            {
+                return base.GetSystemDateTime(AdmedikaClaimTransactionMetadata.ColumnNames.DateOfBirth);
+            }
+
+            set
+            {
+                base.SetSystemDateTime(AdmedikaClaimTransactionMetadata.ColumnNames.DateOfBirth, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PrintOutLOA
+        /// </summary>
+        virtual public System.String PrintOutLOA
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOA);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOA, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PrintOutLOC
+        /// </summary>
+        virtual public System.String PrintOutLOC
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOC);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOC, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PrintOutLOR
+        /// </summary>
+        virtual public System.String PrintOutLOR
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOR);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOR, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PolicyNo
+        /// </summary>
+        virtual public System.String PolicyNo
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyNo);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyNo, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PayorMemberID
+        /// </summary>
+        virtual public System.String PayorMemberID
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PayorMemberID);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PayorMemberID, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.PolicyDate
+        /// </summary>
+        virtual public System.String PolicyDate
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, value);
             }
         }
 
@@ -963,6 +1096,118 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.LastUpdateByUserID = Convert.ToString(value);
                 }
             }
+            public System.String PatientName
+            {
+                get
+                {
+                    System.String data = entity.PatientName;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PatientName = null;
+                    else entity.PatientName = Convert.ToString(value);
+                }
+            }
+            public System.String DateOfBirth
+            {
+                get
+                {
+                    System.DateTime? data = entity.DateOfBirth;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.DateOfBirth = null;
+                    else entity.DateOfBirth = Convert.ToDateTime(value);
+                }
+            }
+            public System.String PrintOutLOA
+            {
+                get
+                {
+                    System.String data = entity.PrintOutLOA;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PrintOutLOA = null;
+                    else entity.PrintOutLOA = Convert.ToString(value);
+                }
+            }
+            public System.String PrintOutLOC
+            {
+                get
+                {
+                    System.String data = entity.PrintOutLOC;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PrintOutLOC = null;
+                    else entity.PrintOutLOC = Convert.ToString(value);
+                }
+            }
+            public System.String PrintOutLOR
+            {
+                get
+                {
+                    System.String data = entity.PrintOutLOR;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PrintOutLOR = null;
+                    else entity.PrintOutLOR = Convert.ToString(value);
+                }
+            }
+            public System.String PolicyNo
+            {
+                get
+                {
+                    System.String data = entity.PolicyNo;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PolicyNo = null;
+                    else entity.PolicyNo = Convert.ToString(value);
+                }
+            }
+            public System.String PayorMemberID
+            {
+                get
+                {
+                    System.String data = entity.PayorMemberID;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PayorMemberID = null;
+                    else entity.PayorMemberID = Convert.ToString(value);
+                }
+            }
+            public System.String PolicyDate
+            {
+                get
+                {
+                    System.String data = entity.PolicyDate;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.PolicyDate = null;
+                    else entity.PolicyDate = Convert.ToString(value);
+                }
+            }
 
             private esAdmedikaClaimTransaction entity;
         }
@@ -1169,6 +1414,62 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.LastUpdateByUserID, esSystemType.String);
+            }
+        }
+        public esQueryItem PatientName
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PatientName, esSystemType.String);
+            }
+        }
+        public esQueryItem DateOfBirth
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.DateOfBirth, esSystemType.DateTime);
+            }
+        }
+        public esQueryItem PrintOutLOA
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOA, esSystemType.String);
+            }
+        }
+        public esQueryItem PrintOutLOC
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOC, esSystemType.String);
+            }
+        }
+        public esQueryItem PrintOutLOR
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOR, esSystemType.String);
+            }
+        }
+        public esQueryItem PolicyNo
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PolicyNo, esSystemType.String);
+            }
+        }
+        public esQueryItem PayorMemberID
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PayorMemberID, esSystemType.String);
+            }
+        }
+        public esQueryItem PolicyDate
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, esSystemType.String);
             }
         }
     }
@@ -1686,6 +1987,50 @@ namespace Temiang.Avicenna.BusinessObject
             c.CharacterMaxLength = 40;
             c.IsNullable = true;
             _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PatientName, 23, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PatientName;
+            c.CharacterMaxLength = 100;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DateOfBirth, 24, typeof(System.DateTime), esSystemType.DateTime);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DateOfBirth;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOA, 25, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOutLOA;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOC, 26, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOutLOC;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOR, 27, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOutLOR;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyNo, 28, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PolicyNo;
+            c.CharacterMaxLength = 32;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PayorMemberID, 29, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PayorMemberID;
+            c.CharacterMaxLength = 32;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, 30, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PolicyDate;
+            c.CharacterMaxLength = 32;
+            c.IsNullable = true;
+            _columns.Add(c);
         }
         #endregion
 
@@ -1735,6 +2080,14 @@ namespace Temiang.Avicenna.BusinessObject
             public const string CreatedByUserID = "CreatedByUserID";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
+            public const string PatientName = "PatientName";
+            public const string DateOfBirth = "DateOfBirth";
+            public const string PrintOutLOA = "PrintOutLOA";
+            public const string PrintOutLOC = "PrintOutLOC";
+            public const string PrintOutLOR = "PrintOutLOR";
+            public const string PolicyNo = "PolicyNo";
+            public const string PayorMemberID = "PayorMemberID";
+            public const string PolicyDate = "PolicyDate";
         }
         #endregion
 
@@ -1764,6 +2117,14 @@ namespace Temiang.Avicenna.BusinessObject
             public const string CreatedByUserID = "CreatedByUserID";
             public const string LastUpdateDateTime = "LastUpdateDateTime";
             public const string LastUpdateByUserID = "LastUpdateByUserID";
+            public const string PatientName = "PatientName";
+            public const string DateOfBirth = "DateOfBirth";
+            public const string PrintOutLOA = "PrintOutLOA";
+            public const string PrintOutLOC = "PrintOutLOC";
+            public const string PrintOutLOR = "PrintOutLOR";
+            public const string PolicyNo = "PolicyNo";
+            public const string PayorMemberID = "PayorMemberID";
+            public const string PolicyDate = "PolicyDate";
         }
         #endregion
 
@@ -1830,6 +2191,14 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("CreatedByUserID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("LastUpdateDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("LastUpdateByUserID", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("PatientName", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("DateOfBirth", new esTypeMap("datetime", "System.DateTime"));
+                meta.AddTypeMap("PrintOutLOA", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("PrintOutLOC", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("PrintOutLOR", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("PolicyNo", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("PayorMemberID", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("PolicyDate", new esTypeMap("nvarchar", "System.String"));
 
 
                 meta.Source = "AdmedikaClaimTransaction";

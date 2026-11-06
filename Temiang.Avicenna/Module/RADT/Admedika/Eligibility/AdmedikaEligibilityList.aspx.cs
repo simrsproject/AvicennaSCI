@@ -65,18 +65,14 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             get
             {
                 var query = new AdmedikaClaimTransactionQuery("a");
-                var patient = new PatientQuery("b");
 
                 query.es.WithNoLock = true;
-                patient.es.WithNoLock = true;
-
-                query.LeftJoin(patient).On(query.PatientID == patient.PatientID);
 
                 query.Select(
                     query.AdmedikaClaimTransactionID,
                     query.CreatedDateTime,
                     query.RegistrationNo,
-                    patient.FullName.As("PatientName"),
+                    query.PatientName,
                     query.CardNo,
                     query.ClID,
                     query.ClStatus,
@@ -94,7 +90,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.Where(query.RegistrationNo == txtRegistrationNo.Text.Trim());
 
                 if (!string.IsNullOrWhiteSpace(txtPatientName.Text))
-                    query.Where(patient.FullName.Like("%" + Helper.EscapeQuery(txtPatientName.Text) + "%"));
+                    query.Where(query.PatientName.Like("%" + Helper.EscapeQuery(txtPatientName.Text) + "%"));
 
                 if (!string.IsNullOrWhiteSpace(txtCardNo.Text))
                     query.Where(query.CardNo.Like("%" + Helper.EscapeQuery(txtCardNo.Text) + "%"));

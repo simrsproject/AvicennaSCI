@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.UI;
@@ -175,6 +176,17 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             entity.ClDesc = response.ClDesc;
             entity.ServiceID = AdmedikaConstant.ServiceID.Eligibility;
             entity.PrintOut = response.PrintOut;
+            entity.PrintOutLOA = response.PrintOut;
+            entity.PatientName = response.PatientName;
+            entity.PolicyNo = response.PolicyNo;
+            entity.PayorMemberID = response.PayorMemberID;
+            entity.PolicyDate = response.PolicyDate;
+
+            DateTime dateOfBirth;
+            entity.DateOfBirth = DateTime.TryParse(response.Dob, CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out dateOfBirth)
+                ? dateOfBirth
+                : (DateTime?)null;
 
             if (entity.es.IsAdded)
                 entity.IsClosed = false;
@@ -286,13 +298,13 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 html.Append("</tbody></table>");
             }
 
-            if (!string.IsNullOrWhiteSpace(response.PrintOut))
-            {
-                html.Append("<div style=\"margin-top:10px;font-weight:bold;\">Print Out (LOA)</div>");
-                html.Append("<pre style=\"white-space:pre-wrap;border:1px solid #ccc;padding:6px;font-size:12px;\">");
-                html.Append(Encode(response.PrintOut));
-                html.Append("</pre>");
-            }
+            //if (!string.IsNullOrWhiteSpace(response.PrintOut))
+            //{
+            //    html.Append("<div style=\"margin-top:10px;font-weight:bold;\">Print Out (LOA)</div>");
+            //    html.Append("<pre style=\"white-space:pre-wrap;border:1px solid #ccc;padding:6px;font-size:12px;\">");
+            //    html.Append(Encode(response.PrintOut));
+            //    html.Append("</pre>");
+            //}
 
             return html.ToString();
         }
