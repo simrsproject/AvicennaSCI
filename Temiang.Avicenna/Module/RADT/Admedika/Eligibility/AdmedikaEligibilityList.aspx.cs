@@ -96,6 +96,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.AdmedikaClaimTransactionID,
                     query.CreatedDateTime,
                     query.RegistrationNo,
+                    query.PatientID,
                     query.PatientName,
                     query.CardNo,
                     query.ClID,

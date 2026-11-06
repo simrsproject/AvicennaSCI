@@ -140,7 +140,7 @@
             </tr>
         </table>
     </cc:CollapsePanel>
-    <table width="100%" cellpadding="0" cellspacing="0">
+    <table width="100%" cellpadding="0" cellspacing="10">
         <tr>
             <td style="padding: 4px 0 6px 0;">
                 <asp:Button ID="btnNewEligibility" runat="server" Text="New Eligibility"
@@ -157,6 +157,8 @@
                     DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="140px" />
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px" />
+                <telerik:GridBoundColumn DataField="PatientID" HeaderText="PatientID"
+                    UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="100px" />
                 <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
                     UniqueName="PatientName" SortExpression="PatientName" />
                 <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
