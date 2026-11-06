@@ -40,7 +40,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
                 query.Select(
                     query.PatientID,
-                    "<RTRIM(LTRIM(ISNULL(a.FirstName, '') + ' ' + ISNULL(a.MiddleName, '') + ' ' + ISNULL(a.LastName, ''))) AS PatientName>",
+                    query.FullName.As("PatientName"),
                     query.MedicalNo,
                     query.OldMedicalNo,
                     query.Ssn.As("SSN"),
@@ -55,7 +55,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.Where(query.GuarantorCardNo == txtGuarantorCardNo.Text.Trim());
 
                 if (!string.IsNullOrWhiteSpace(txtPatientName.Text))
-                    query.Where(string.Format("<RTRIM(LTRIM(ISNULL(a.FirstName, '') + ' ' + ISNULL(a.MiddleName, '') + ' ' + ISNULL(a.LastName, ''))) LIKE '%{0}%'>",
+                    query.Where(string.Format("<a.FullName LIKE '%{0}%'>",
                         Helper.EscapeQuery(txtPatientName.Text)));
 
                 query.OrderBy(query.FirstName.Ascending, query.MiddleName.Ascending, query.LastName.Ascending);

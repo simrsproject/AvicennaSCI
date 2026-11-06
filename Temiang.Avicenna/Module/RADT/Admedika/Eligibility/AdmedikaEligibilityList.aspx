@@ -197,6 +197,8 @@
                 </telerik:GridTemplateColumn>
                 <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
                     UniqueName="PatientName" SortExpression="PatientName" />
+                <telerik:GridBoundColumn DataField="MedicalNo" HeaderText="Medical No"
+                    UniqueName="MedicalNo" SortExpression="MedicalNo" HeaderStyle-Width="110px" />
                 <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
                     UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />

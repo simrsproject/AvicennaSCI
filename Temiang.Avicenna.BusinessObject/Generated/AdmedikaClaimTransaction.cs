@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-11-06 08:26:45 AM
+                    Date Generated       : 2026-11-07 12:47:48 AM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -197,6 +197,8 @@ namespace Temiang.Avicenna.BusinessObject
                         case "PolicyNo": this.str.PolicyNo = (string)value; break;
                         case "PayorMemberID": this.str.PayorMemberID = (string)value; break;
                         case "PolicyDate": this.str.PolicyDate = (string)value; break;
+                        case "MedicalNo": this.str.MedicalNo = (string)value; break;
+                        case "DischargeDateTime": this.str.DischargeDateTime = (string)value; break;
                     }
                 }
                 else
@@ -242,6 +244,11 @@ namespace Temiang.Avicenna.BusinessObject
 
                             if (value == null || value is System.DateTime)
                                 this.DateOfBirth = (System.DateTime?)value;
+                            break;
+                        case "DischargeDateTime":
+
+                            if (value == null || value is System.DateTime)
+                                this.DischargeDateTime = (System.DateTime?)value;
                             break;
 
                         default:
@@ -722,6 +729,36 @@ namespace Temiang.Avicenna.BusinessObject
             set
             {
                 base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.MedicalNo
+        /// </summary>
+        virtual public System.String MedicalNo
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo, value);
+            }
+        }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.DischargeDateTime
+        /// </summary>
+        virtual public System.DateTime? DischargeDateTime
+        {
+            get
+            {
+                return base.GetSystemDateTime(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime);
+            }
+
+            set
+            {
+                base.SetSystemDateTime(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, value);
             }
         }
 
@@ -1208,6 +1245,34 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.PolicyDate = Convert.ToString(value);
                 }
             }
+            public System.String MedicalNo
+            {
+                get
+                {
+                    System.String data = entity.MedicalNo;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.MedicalNo = null;
+                    else entity.MedicalNo = Convert.ToString(value);
+                }
+            }
+            public System.String DischargeDateTime
+            {
+                get
+                {
+                    System.DateTime? data = entity.DischargeDateTime;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.DischargeDateTime = null;
+                    else entity.DischargeDateTime = Convert.ToDateTime(value);
+                }
+            }
 
             private esAdmedikaClaimTransaction entity;
         }
@@ -1470,6 +1535,20 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, esSystemType.String);
+            }
+        }
+        public esQueryItem MedicalNo
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo, esSystemType.String);
+            }
+        }
+        public esQueryItem DischargeDateTime
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, esSystemType.DateTime);
             }
         }
     }
@@ -2031,6 +2110,17 @@ namespace Temiang.Avicenna.BusinessObject
             c.CharacterMaxLength = 32;
             c.IsNullable = true;
             _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo, 31, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.MedicalNo;
+            c.CharacterMaxLength = 15;
+            c.IsNullable = true;
+            _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, 32, typeof(System.DateTime), esSystemType.DateTime);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DischargeDateTime;
+            c.IsNullable = true;
+            _columns.Add(c);
         }
         #endregion
 
@@ -2088,6 +2178,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string PolicyNo = "PolicyNo";
             public const string PayorMemberID = "PayorMemberID";
             public const string PolicyDate = "PolicyDate";
+            public const string MedicalNo = "MedicalNo";
+            public const string DischargeDateTime = "DischargeDateTime";
         }
         #endregion
 
@@ -2125,6 +2217,8 @@ namespace Temiang.Avicenna.BusinessObject
             public const string PolicyNo = "PolicyNo";
             public const string PayorMemberID = "PayorMemberID";
             public const string PolicyDate = "PolicyDate";
+            public const string MedicalNo = "MedicalNo";
+            public const string DischargeDateTime = "DischargeDateTime";
         }
         #endregion
 
@@ -2199,6 +2293,8 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("PolicyNo", new esTypeMap("nvarchar", "System.String"));
                 meta.AddTypeMap("PayorMemberID", new esTypeMap("nvarchar", "System.String"));
                 meta.AddTypeMap("PolicyDate", new esTypeMap("nvarchar", "System.String"));
+                meta.AddTypeMap("MedicalNo", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("DischargeDateTime", new esTypeMap("datetime", "System.DateTime"));
 
 
                 meta.Source = "AdmedikaClaimTransaction";

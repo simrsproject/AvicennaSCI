@@ -94,8 +94,13 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                         var entity = new AdmedikaClaimTransaction();
                         if (entity.LoadByPrimaryKey(transactionID))
                         {
-                            entity.PatientID = parts[2];
-                            entity.Save();
+                            var patient = new Patient();
+                            if (patient.LoadByPrimaryKey(parts[2]))
+                            {
+                                entity.PatientID = patient.PatientID;
+                                entity.MedicalNo = patient.MedicalNo;
+                                entity.Save();
+                            }
                         }
                     }
                 }
@@ -237,6 +242,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.RegistrationNo,
                     query.PatientID,
                     query.PatientName,
+                    query.MedicalNo,
                     query.CardNo,
                     query.ClID,
                     query.CovID,
@@ -244,7 +250,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.ClStatus,
                     query.ClDesc,
                     query.IsClosed,
-                    "<RTRIM(LTRIM(ISNULL(b.FirstName, '') + ' ' + ISNULL(b.MiddleName, '') + ' ' + ISNULL(b.LastName, ''))) AS RefPatientName>"
+                    patient.FullName.As("RefPatientName")
                 );
 
                 if (!txtCreatedDate.IsEmpty)
