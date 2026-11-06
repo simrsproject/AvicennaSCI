@@ -177,7 +177,7 @@
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px" />
                 <telerik:GridTemplateColumn DataField="PatientID" HeaderText="PatientID"
-                    UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="100px">
+                    UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="200px">
                     <ItemTemplate>
                         <%# BuildPatientIdHtml(Container.DataItem) %>
                     </ItemTemplate>
@@ -190,17 +190,21 @@
                     UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px" />
                 <telerik:GridBoundColumn DataField="CovID" HeaderText="CovID"
                     UniqueName="CovID" SortExpression="CovID" HeaderStyle-Width="70px" />
-                <telerik:GridBoundColumn DataField="CovCode" HeaderText="CovCode"
-                    UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="90px" />
+                <telerik:GridTemplateColumn DataField="CovCode" HeaderText="CovCode"
+                    UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="150px">
+                    <ItemTemplate>
+                        <%# BuildCovCodeHtml(Container.DataItem) %>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridBoundColumn DataField="ClStatus" HeaderText="ClStatus"
                     UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="70px" />
                 <telerik:GridBoundColumn DataField="ClDesc" HeaderText="ClDesc"
                     UniqueName="ClDesc" SortExpression="ClDesc" />
                 <telerik:GridCheckBoxColumn DataField="IsClosed" HeaderText="Is Closed"
-                    UniqueName="IsClosed" SortExpression="IsClosed" HeaderStyle-Width="70px"
+                    UniqueName="IsClosed" SortExpression="IsClosed" HeaderStyle-Width="50px"
                     ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridTemplateColumn UniqueName="Action" HeaderText="Action"
-                    HeaderStyle-Width="280px" HeaderStyle-HorizontalAlign="Center"
+                    HeaderStyle-Width="320px" HeaderStyle-HorizontalAlign="Center"
                     ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <%# BuildActionHtml(Container.DataItem) %>

@@ -5,6 +5,7 @@ using System.Web.UI;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using Temiang.Avicenna.Common.Admedika;
 
 namespace Temiang.Avicenna.Module.RADT.Admedika
 {
@@ -124,6 +125,26 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             return string.Format("<a href=\"#\" onclick=\"openSelectPatient({0}); return false;\" title=\"Change Patient\">{1}</a>",
                 args, Server.HtmlEncode(patientId));
+        }
+
+        protected string BuildCovCodeHtml(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var covCode = Convert.ToString(row["CovCode"]);
+            var covID = Convert.ToString(row["CovID"]);
+            var coverage = AdmedikaCoverageType.Get(covID);
+
+            var html = Server.HtmlEncode(covCode);
+
+            if (coverage != null && !string.IsNullOrWhiteSpace(coverage.Description))
+            {
+                if (html.Length > 0) html += "<br />";
+                html += Server.HtmlEncode(coverage.Description);
+            }
+
+            return html;
         }
 
         protected string BuildActionHtml(object dataItem)
