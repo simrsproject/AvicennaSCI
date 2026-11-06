@@ -9,7 +9,7 @@
     IsUsingReportHeader, IsDirectPrintEnable, IsListLoadRecordOnInit, IsListLoadRecordIfFiltered, IsProgramRedirected,
     ApplicationID, ZplCommandTemplate, IsProgramExportAble, IsProgramCrossUnitAble, IsProgramPowerUserAble, SRProgramCategory
 ) VALUES (
-    '01.21', '01', 'Admedika Insurance', '01', 1, 1898, '',
+    '01.21', '01', 'AdMedika Insurance', '01', 1, 1898, '',
     1, 0, 0, 'PRG',
     0, 0, 0, 0,
     0, 0, 0, 0,

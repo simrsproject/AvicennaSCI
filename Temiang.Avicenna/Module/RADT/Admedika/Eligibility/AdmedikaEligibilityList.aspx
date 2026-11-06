@@ -15,11 +15,29 @@
             function onEligibilityClientClose(oWnd, args) {
                 __doPostBack("<%= grdList.UniqueID %>", "rebind");
             }
+
+            function openSelectPatient(id, cardNo, patientName) {
+                var oWnd = $find("<%= winPatient.ClientID %>");
+                oWnd.setUrl("AdmedikaPatientDialogList.aspx?id=" + encodeURIComponent(id) +
+                    "&cardNo=" + encodeURIComponent(cardNo) +
+                    "&patientName=" + encodeURIComponent(patientName));
+                oWnd.show();
+            }
+
+            function onPatientClientClose(oWnd, args) {
+                if (oWnd.argument && oWnd.argument.mode) {
+                    __doPostBack("<%= grdList.UniqueID %>", oWnd.argument.mode);
+                    oWnd.argument.mode = null;
+                }
+            }
         </script>
     </telerik:RadCodeBlock>
     <telerik:RadWindow ID="winEligibility" runat="server" Animation="None" Behavior="Close,Move"
         ShowContentDuringLoad="False" Width="1150px" Height="700px" VisibleStatusbar="False"
         Modal="true" OnClientClose="onEligibilityClientClose" />
+    <telerik:RadWindow ID="winPatient" runat="server" Animation="None" Behavior="Close,Move"
+        ShowContentDuringLoad="False" Width="1150px" Height="600px" VisibleStatusbar="False"
+        Modal="true" OnClientClose="onPatientClientClose" />
     <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
@@ -157,8 +175,12 @@
                     DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="140px" />
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px" />
-                <telerik:GridBoundColumn DataField="PatientID" HeaderText="PatientID"
-                    UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="100px" />
+                <telerik:GridTemplateColumn DataField="PatientID" HeaderText="PatientID"
+                    UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="100px">
+                    <ItemTemplate>
+                        <%# BuildPatientIdHtml(Container.DataItem) %>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
                     UniqueName="PatientName" SortExpression="PatientName" />
                 <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"

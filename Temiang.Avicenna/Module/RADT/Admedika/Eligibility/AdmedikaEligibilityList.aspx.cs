@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Web;
 using System.Web.UI;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
@@ -60,17 +61,71 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             grdList.Rebind();
         }
 
+        protected override void RaisePostBackEvent(IPostBackEventHandler sourceControl, string eventArgument)
+        {
+            base.RaisePostBackEvent(sourceControl, eventArgument);
+
+            if (sourceControl == grdList && !string.IsNullOrEmpty(eventArgument) &&
+                eventArgument.StartsWith("selectpatient!", StringComparison.Ordinal))
+            {
+                var parts = eventArgument.Split('!');
+                if (parts.Length >= 3 && !string.IsNullOrEmpty(parts[2]))
+                {
+                    long transactionID;
+                    if (long.TryParse(parts[1], out transactionID))
+                    {
+                        var entity = new AdmedikaClaimTransaction();
+                        if (entity.LoadByPrimaryKey(transactionID))
+                        {
+                            entity.PatientID = parts[2];
+                            entity.Save();
+                        }
+                    }
+                }
+
+                grdList.Rebind();
+            }
+        }
+
+        protected string BuildPatientIdHtml(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var patientId = Convert.ToString(row["PatientID"]);
+            var registrationNo = Convert.ToString(row["RegistrationNo"]);
+
+            if (!string.IsNullOrEmpty(registrationNo))
+                return Server.HtmlEncode(patientId);
+
+            var claimId = Convert.ToString(row["AdmedikaClaimTransactionID"]);
+            var cardNo = Convert.ToString(row["CardNo"]);
+            var patientName = Convert.ToString(row["PatientName"]);
+
+            var args = string.Format("'{0}','{1}','{2}'",
+                HttpUtility.JavaScriptStringEncode(claimId),
+                HttpUtility.JavaScriptStringEncode(cardNo),
+                HttpUtility.JavaScriptStringEncode(patientName));
+
+            if (string.IsNullOrEmpty(patientId))
+                return string.Format("<a href=\"#\" onclick=\"openSelectPatient({0}); return false;\">Pilih Patient</a>", args);
+
+            return string.Format("<a href=\"#\" onclick=\"openSelectPatient({0}); return false;\" title=\"Change Patient\">{1}</a>",
+                args, Server.HtmlEncode(patientId));
+        }
+
         protected string BuildActionHtml(object dataItem)
         {
             var row = dataItem as DataRowView;
             if (row == null) return string.Empty;
 
             var registrationNo = Convert.ToString(row["RegistrationNo"]);
+            var patientId = Convert.ToString(row["PatientID"]);
             var isClosed = row["IsClosed"] != DBNull.Value && Convert.ToBoolean(row["IsClosed"]);
 
             var html = string.Empty;
 
-            if (string.IsNullOrEmpty(registrationNo) && !isClosed)
+            if (!string.IsNullOrEmpty(patientId) && string.IsNullOrEmpty(registrationNo) && !isClosed)
             {
                 html += "<a href=\"#\" onclick=\"return false;\" title=\"Process To Registration\" style=\"text-decoration:none;white-space:nowrap;\">";
                 html += "<img src=\"../../../../Images/Toolbar/process16.png\" border=\"0\" alt=\"Process To Registration\" title=\"Process To Registration\" style=\"vertical-align:middle;\" />";
