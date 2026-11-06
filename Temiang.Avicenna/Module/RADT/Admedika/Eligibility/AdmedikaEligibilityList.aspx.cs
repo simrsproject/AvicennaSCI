@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Wordprocessing;
 using System;
 using System.Data;
 using System.Web;
@@ -165,11 +166,30 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 html += " Process To Registration</a>&nbsp;&nbsp;";
             }
 
-            html += "<a href=\"#\" onclick=\"return false;\" title=\"Print LOA\" style=\"text-decoration:none;white-space:nowrap;\">";
-            html += "<img src=\"../../../../Images/Toolbar/print16.png\" border=\"0\" alt=\"Print LOA\" title=\"Print LOA\" style=\"vertical-align:middle;\" />";
-            html += " Print LOA</a>";
+            return html;    
+        }
 
-            return html;
+        protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
+        {
+            if (e.CommandName == "PrintLOA")
+            {
+                var jobParameters = new PrintJobParameterCollection();
+                var claimParameter = jobParameters.AddNew();
+
+                var claimID = e.CommandArgument.ToString();
+                claimParameter.Name = "ClaimID";
+                claimParameter.ValueString = claimID;
+
+                AppSession.PrintJobReportID = AppConstant.Report.AdmedikaPrintLOA;
+                AppSession.PrintJobParameters = jobParameters;
+
+                string script = @"var oWnd = $find('" + winPrint.ClientID + "');" +
+                                "oWnd.SetUrl('" + Page.ResolveUrl("~/Module/Reports/ReportViewer.aspx") + "');" +
+                                "oWnd.Show();" +
+                                "oWnd.Maximize();";
+                RadAjaxPanel1.ResponseScripts.Add(script);
+
+            }
         }
 
         private DataTable EligibilityTable

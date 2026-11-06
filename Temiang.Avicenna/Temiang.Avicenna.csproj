@@ -1878,6 +1878,8 @@
     <Content Include="Document\2026\11\03\01.CreateTable_AdmedikaClaimTransaction.sql" />
     <Content Include="Document\2026\11\05\02.INSERT_INTO_Admedika_Menu.sql" />
     <Content Include="Document\2026\11\06\01.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\2026\11\06\02.spxml_AdmedikaPrintLOA.sql" />
+    <Content Include="Document\2026\11\06\03.INSERT_INTO_AppProgram_PrintLOA.sql" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />

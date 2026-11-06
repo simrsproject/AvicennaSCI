@@ -1570,6 +1570,8 @@ namespace Temiang.Avicenna.Common
 
             //0003994 daniel
             public const string TemplatePpaNotes = "SLP.10.0009";
+
+            public const string AdmedikaPrintLOA = "XML.01.2101";
         }
 
         public class Message

@@ -35,9 +35,13 @@
     <telerik:RadWindow ID="winEligibility" runat="server" Animation="None" Behavior="Close,Move"
         ShowContentDuringLoad="False" Width="1150px" Height="700px" VisibleStatusbar="False"
         Modal="true" OnClientClose="onEligibilityClientClose" />
-    <telerik:RadWindow ID="winPatient" runat="server" Animation="None" Behavior="Close,Move"
+    <telerik:RadWindow ID="winPatient" runat="server" Animation="None" Behavior="Close,Move,Resize,Maximize"
         ShowContentDuringLoad="False" Width="1150px" Height="600px" VisibleStatusbar="False"
         Modal="true" OnClientClose="onPatientClientClose" />
+    <telerik:RadWindow ID="winPrint" Animation="None" Width="1000px" Height="500px" runat="server"
+        ShowContentDuringLoad="false" Behavior="Close,Resize,Maximize" VisibleStatusbar="false"
+        Modal="true">
+    </telerik:RadWindow>
     <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
@@ -166,10 +170,12 @@
             </td>
         </tr>
     </table>
-    <telerik:RadGrid ID="grdList" runat="server" OnNeedDataSource="grdList_NeedDataSource"
-        OnItemDataBound="grdList_ItemDataBound"
-        AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
-        <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">
+    <telerik:RadAjaxPanel ID="RadAjaxPanel1" runat="server" Width="100%" LoadingPanelID="fw_ajxLoadingPanel"
+        EnableEmbeddedScripts="false" HorizontalAlign="NotSet">
+        <telerik:RadGrid ID="grdList" runat="server" OnNeedDataSource="grdList_NeedDataSource"
+            OnItemDataBound="grdList_ItemDataBound" OnItemCommand="grdList_ItemCommand"
+            AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
+            <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">
             <Columns>
                 <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Created Date Time"
                     UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
@@ -208,6 +214,12 @@
                     ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <%# BuildActionHtml(Container.DataItem) %>
+                        <asp:LinkButton ID="lnkPrintLOA" runat="server"
+                            CommandName="PrintLOA"
+                            CommandArgument='<%# Eval("ClID") %>'
+                            Text="LOA"
+                            CausesValidation="false"
+                            style="background: url(../../../../Images/Toolbar/print16.png) no-repeat left center; padding-left: 20px; text-decoration: none;" />
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
             </Columns>
@@ -215,5 +227,6 @@
         <ClientSettings EnableRowHoverStyle="true">
             <Selecting AllowRowSelect="True" />
         </ClientSettings>
-    </telerik:RadGrid>
+        </telerik:RadGrid>
+    </telerik:RadAjaxPanel>
 </asp:Content>
