@@ -100,6 +100,8 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.PatientName,
                     query.CardNo,
                     query.ClID,
+                    query.CovID,
+                    query.CovCode,
                     query.ClStatus,
                     query.ClDesc,
                     query.IsClosed

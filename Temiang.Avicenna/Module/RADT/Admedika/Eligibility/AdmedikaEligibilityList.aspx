@@ -165,6 +165,10 @@
                     UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px" />
                 <telerik:GridBoundColumn DataField="ClID" HeaderText="ClID (Claim ID)"
                     UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px" />
+                <telerik:GridBoundColumn DataField="CovID" HeaderText="CovID"
+                    UniqueName="CovID" SortExpression="CovID" HeaderStyle-Width="70px" />
+                <telerik:GridBoundColumn DataField="CovCode" HeaderText="CovCode"
+                    UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="90px" />
                 <telerik:GridBoundColumn DataField="ClStatus" HeaderText="ClStatus"
                     UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="70px" />
                 <telerik:GridBoundColumn DataField="ClDesc" HeaderText="ClDesc"
