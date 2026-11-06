@@ -68,6 +68,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             if (string.IsNullOrEmpty(Convert.ToString(row["PatientID"])))
                 item["PatientID"].BackColor = System.Drawing.Color.Yellow;
+
+            if (string.IsNullOrEmpty(Convert.ToString(row["RegistrationNo"])))
+                item["RegistrationNo"].BackColor = System.Drawing.Color.Yellow;
         }
 
         protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
