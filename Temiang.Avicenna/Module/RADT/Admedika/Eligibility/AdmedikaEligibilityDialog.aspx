@@ -62,7 +62,7 @@
                                     OnClick="btnCheckBenefit_Click" ValidationGroup="eligibility" />
                             </td>
                         </tr>
-                        <tr>
+                        <tr runat="server" visible="false">
                             <td class="label">
                                 ICD 10
                             </td>
