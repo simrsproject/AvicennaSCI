@@ -38,14 +38,17 @@
             }
 
             function openRegistration(patientID, registrationType, claimID) {
-                var url = "../../../Registration/RegistrationDetail.aspx?md=new"
+                var oWnd = $find("<%= winRegistration.ClientID %>");
+
+                var url = "<%= Page.ResolveUrl("~/Module/RADT/Registration/RegistrationDetail.aspx") %>?md=new"
                     + "&id=" + encodeURIComponent(patientID)
                     + "&rt=" + encodeURIComponent(registrationType)
                     + "&type=admedika"
                     + "&ClaimID=" + encodeURIComponent(claimID)
                     + "&norm=";
 
-                window.location.href = url;
+                oWnd.setUrl(url);
+                oWnd.show();
             }
         </script>
     </telerik:RadCodeBlock>
@@ -59,6 +62,9 @@
         ShowContentDuringLoad="false" Behavior="Close,Resize,Maximize" VisibleStatusbar="false"
         Modal="true">
     </telerik:RadWindow>
+    <telerik:RadWindow ID="winRegistration" runat="server" Animation="None"
+        ShowContentDuringLoad="False" Width="1200px" Height="640px"
+        VisibleStatusbar="False" Modal="true" Behavior="Close,Move,Resize,Maximize" />
     <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
