@@ -981,6 +981,11 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                             }
                     }
                 });
+
+                postData.Location[0].Period = new Bridging.SatuSehat.BusinessObject.Period()
+                {
+                    Start = string.Format("{0}+00:00", arrivedTime.AddHours(GmtDif).ToString(DateFormatLong))
+                };
             }
 
             return postData;
