@@ -13407,6 +13407,7 @@
       <DependentUpon>MergePurchaseOrderList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\Inventory\Procurement\ProcurementUtils.cs" />
+    <Compile Include="Module\Inventory\Procurement\RequestOrder\PurchaseRequestUsageHistory.cs" />
     <Compile Include="Module\Inventory\Procurement\PurchaseOrder\RequestOrderSelection.aspx.cs">
       <DependentUpon>RequestOrderSelection.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

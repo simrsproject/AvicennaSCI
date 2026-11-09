@@ -4,6 +4,11 @@
 
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <style type="text/css">
+        .purchaseRequestPickGrid .rgMasterTable > thead > tr > th {
+            border: none !important;
+        }
+    </style>
     <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="grdDetail">
@@ -105,9 +110,12 @@
             </tr>
         </table>
     </fieldset>
-    <telerik:RadGrid ID="grdDetail" runat="server" AutoGenerateColumns="False" GridLines="None"
+    <telerik:RadGrid ID="grdDetail" runat="server" AutoGenerateColumns="False" GridLines="None" CssClass="purchaseRequestPickGrid"
         OnNeedDataSource="grdDetail_NeedDataSource" OnPageIndexChanged="grdDetail_PageIndexChanged">
         <MasterTableView CommandItemDisplay="None" DataKeyNames="ItemID" ClientDataKeyNames="ItemID">
+            <ColumnGroups>
+                <telerik:GridColumnGroup Name="POOutstanding" HeaderText="PO Outstanding" HeaderStyle-HorizontalAlign="Center" />
+            </ColumnGroups>
             <Columns>
                 <telerik:GridTemplateColumn UniqueName="CheckBoxTemplateColumn" HeaderStyle-Width="40px">
                     <HeaderTemplate>
@@ -123,6 +131,16 @@
                     ItemStyle-HorizontalAlign="Left" />
                 <telerik:GridBoundColumn DataField="ItemName" HeaderText="Item Name" UniqueName="ItemName"
                     SortExpression="ItemName" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                <telerik:GridDateTimeColumn DataField="LastPODate" HeaderText="Date" ColumnGroupName="POOutstanding"
+                    UniqueName="LastPODate" HeaderStyle-Width="100px" DataFormatString="{0:dd/MM/yyyy}" />
+                <telerik:GridBoundColumn DataField="LastPONo" HeaderText="No. PO" ColumnGroupName="POOutstanding"
+                    UniqueName="LastPONo" HeaderStyle-Width="150px" />
+                <telerik:GridTemplateColumn HeaderText="Qty (Item Unit)" ColumnGroupName="POOutstanding"
+                    UniqueName="LastPOQuantity" HeaderStyle-Width="110px" ItemStyle-HorizontalAlign="Right">
+                    <ItemTemplate>
+                        <%# Eval("LastPOQuantity") == DBNull.Value ? "" : string.Format("{0:n2} {1}", Eval("LastPOQuantity"), Server.HtmlEncode(Convert.ToString(Eval("SRItemUnit")))) %>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridNumericColumn DataField="ConversionFactor" UniqueName="ConversionFactor"
                     SortExpression="ConversionFactor" Visible="false" />
                 <telerik:GridNumericColumn HeaderStyle-Width="80px" DataField="Minimum" HeaderText="Min"
@@ -140,27 +158,27 @@
                 <telerik:GridBoundColumn HeaderStyle-Width="80px" DataField="SRItemUnit" HeaderText="Item Unit"
                     UniqueName="SRItemUnit" SortExpression="SRItemUnit" HeaderStyle-HorizontalAlign="Left"
                     ItemStyle-HorizontalAlign="Left" />
-                <telerik:GridNumericColumn HeaderStyle-Width="80px" DataField="PurcUnitBalance" HeaderText="Suggest in Purc. Unit"
+                <telerik:GridNumericColumn HeaderStyle-Width="80px" DataField="PurcUnitBalance" HeaderText="Suggest in Item Unit"
                     UniqueName="PurcUnitBalance" SortExpression="PurcUnitBalance" HeaderStyle-HorizontalAlign="Center"
                     ItemStyle-HorizontalAlign="Right" DataFormatString="{0:n2}" />
                 <telerik:GridTemplateColumn UniqueName="QtyOrderColumn" HeaderStyle-Width="80px"
                     HeaderText="Request" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <telerik:RadNumericTextBox ID="txtQtyOrder" runat="server" Width="90%" DbValue='<%# Eval("QtyOrder") %>'
-                            NumberFormat-DecimalDigits="0" />
+                            NumberFormat-DecimalDigits="0" MinValue="0" />
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
                 <telerik:GridTemplateColumn UniqueName="QtyOrderColumn2" HeaderStyle-Width="80px"
                     ItemStyle-HorizontalAlign="Center" HeaderText="Request" HeaderStyle-HorizontalAlign="center">
                     <ItemTemplate>
-                        <telerik:RadNumericTextBox ID="txtQtyOrder2" runat="server" NumberFormat-DecimalDigits="0"
+                        <telerik:RadNumericTextBox ID="txtQtyOrder2" runat="server" NumberFormat-DecimalDigits="0" MinValue="0"
                             Value='<%# System.Convert.ToDecimal(DataBinder.Eval(Container.DataItem, "QtyOrder")) %>'
                             MaxValue='<%# System.Convert.ToDecimal(DataBinder.Eval(Container.DataItem, "QtyOrder")) %>'
                             Width="90%">
                         </telerik:RadNumericTextBox>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
-                <telerik:GridBoundColumn HeaderStyle-Width="90px" DataField="Unit" HeaderText="Purchase Unit"
+                <telerik:GridBoundColumn HeaderStyle-Width="90px" DataField="Unit" HeaderText="Request Unit"
                     UniqueName="Unit" SortExpression="Unit" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                 <telerik:GridBoundColumn HeaderStyle-Width="80px" DataField="SRPurchaseUnit" HeaderText="Purchase Unit"
                     UniqueName="SRPurchaseUnit" SortExpression="SRPurchaseUnit" HeaderStyle-HorizontalAlign="Left"

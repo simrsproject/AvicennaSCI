@@ -12,7 +12,11 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
     public partial class RequestOrderPickList : BasePageDialog
     {
-        private bool _isNeedValidatedMax;
+        private bool IsNeedValidatedMax
+        {
+            get { return (bool?)ViewState["IsNeedValidatedMax"] ?? false; }
+            set { ViewState["IsNeedValidatedMax"] = value; }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -64,18 +68,18 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 switch (Request.QueryString["it"])
                 {
                     case BusinessObject.Reference.ItemType.Medical:
-                        _isNeedValidatedMax = loc.IsValidateMaxValueOnPurcReqForIpm ?? false;
+                        IsNeedValidatedMax = loc.IsValidateMaxValueOnPurcReqForIpm ?? false;
                         break;
                     case BusinessObject.Reference.ItemType.NonMedical:
-                        _isNeedValidatedMax = loc.IsValidateMaxValueOnPurcReqForIpnm ?? false;
+                        IsNeedValidatedMax = loc.IsValidateMaxValueOnPurcReqForIpnm ?? false;
                         break;
                     case BusinessObject.Reference.ItemType.Kitchen:
-                        _isNeedValidatedMax = loc.IsValidateMaxValueOnPurcReqForIk ?? false;
+                        IsNeedValidatedMax = loc.IsValidateMaxValueOnPurcReqForIk ?? false;
                         break;
                 }
 
-                grdDetail.Columns[10].Visible = !_isNeedValidatedMax;
-                grdDetail.Columns[11].Visible = _isNeedValidatedMax;
+                grdDetail.MasterTableView.GetColumn("QtyOrderColumn").Visible = !IsNeedValidatedMax;
+                grdDetail.MasterTableView.GetColumn("QtyOrderColumn2").Visible = IsNeedValidatedMax;
 
                 btnPrint.Visible = AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsShowPriceInPurchaseRequest);
                 grdDetail.Columns[grdDetail.Columns.Count - 1].Visible = btnPrint.Visible; //disc2
@@ -104,7 +108,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 {
                     if (row["ItemID"].Equals(dataItem.GetDataKeyValue("ItemID").ToString()))
                     {
-                        row["QtyOrder"] = ((RadNumericTextBox)dataItem.FindControl("txtQtyOrder")).Value ?? 0;
+                        row["QtyOrder"] = GetRequestQuantityControl(dataItem).Value ?? 0;
                         break;
                     }
                 }
@@ -138,6 +142,9 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                     break;
             }
 
+            PurchaseRequestUsageHistory.AddLatestOutstandingPurchaseOrders(dtb, Request.QueryString["tu"], Request.QueryString["it"]);
+            dtb.AcceptChanges();
+            ViewState["RequestOrderDetail" + Request.UserHostName] = dtb;
             grdDetail.DataSource = dtb;
             grdDetail.DataBind();
         }
@@ -257,29 +264,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             query.OrderBy(qrItem.ItemName.Ascending);
             DataTable dtb = query.LoadDataTable();
 
-            var isUsingItemUnit = AppParameter.IsYes(AppParameter.ParameterItem.IsPurchaseRequestsUsingItemUnit);
-            if (isUsingItemUnit)
-            {
-                foreach (DataRow row in dtb.Rows)
-                {
-                    row["ConversionFactor"] = 1;
-                    row["SRPurchaseUnit"] = row["SRItemUnit"];
-                    row["Unit"] = row["SRItemUnit"] + "/1";
-                    row["Price"] = row["PriceInBaseUnit"];
-                }
-            }
-            else
-            {
-                foreach (DataRow row in dtb.Rows)
-                {
-                    row["QtyOrder"] =
-                        Math.Ceiling(((Convert.ToDecimal(row["Maximum"])) -
-                                      (Convert.ToDecimal(row["Balance"]))) /
-                                     (Convert.ToDecimal(row["ConversionFactor"])));
-                    row["Unit"] = row["SRPurchaseUnit"] + "/" +
-                                  string.Format("{0:n0}", (Convert.ToDecimal(row["ConversionFactor"])));
-                }
-            }
+            PurchaseRequestUsageHistory.UseItemUnits(dtb);
 
             dtb.AcceptChanges();
 
@@ -389,33 +374,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
 
             // Convert qty order dalam satuan terpilih
-            var isUsingItemUnit = AppParameter.IsYes(AppParameter.ParameterItem.IsPurchaseRequestsUsingItemUnit);
-            if (isUsingItemUnit)
-            {
-                // Menggunakan satuan kecil
-                foreach (DataRow row in dtbAvgSales.Rows)
-                {
-                    row["ConversionFactor"] = 1;
-                    row["SRPurchaseUnit"] = row["SRItemUnit"];
-                    row["Unit"] = row["SRItemUnit"] + "/1";
-                    row["Price"] = row["PriceInBaseUnit"];
-                }
-            }
-            else
-            {
-                // Convert ke Satuan Purchase Unit
-                foreach (DataRow row in dtbAvgSales.Rows)
-                {
-                    row["QtyOrder"] =
-                        Math.Ceiling(((Convert.ToDecimal(row["Maximum"])) - (chkIsIgnoreBalance.Checked ? 0 : (Convert.ToDecimal(row["Balance"])))) /
-                                     (Convert.ToDecimal(row["ConversionFactor"])));
-
-                    row["Unit"] = row["SRPurchaseUnit"] + "/" +
-                                  string.Format("{0:n0}", (Convert.ToDecimal(row["ConversionFactor"])));
-
-                    row["PurcUnitBalance"] = row["QtyOrder"];
-                }
-            }
+            PurchaseRequestUsageHistory.UseItemUnits(dtbAvgSales);
 
             // Hapus yg QtyOrder == 0
             foreach (DataRow row in dtbAvgSales.Rows)
@@ -689,29 +648,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             query.OrderBy(qrItem.ItemName.Ascending);
             DataTable dtb = query.LoadDataTable();
 
-            var isUsingItemUnit = AppParameter.IsYes(AppParameter.ParameterItem.IsPurchaseRequestsUsingItemUnit);
-            if (isUsingItemUnit)
-            {
-                foreach (DataRow row in dtb.Rows)
-                {
-                    row["ConversionFactor"] = 1;
-                    row["SRPurchaseUnit"] = row["SRItemUnit"];
-                    row["Unit"] = row["SRItemUnit"] + "/1";
-                    row["Price"] = row["PriceInBaseUnit"];
-                }
-            }
-            else
-            {
-                foreach (DataRow row in dtb.Rows)
-                {
-                    row["QtyOrder"] =
-                        Math.Ceiling(((Convert.ToDecimal(row["Maximum"])) -
-                                      (Convert.ToDecimal(row["Balance"]))) /
-                                     (Convert.ToDecimal(row["ConversionFactor"])));
-                    row["Unit"] = row["SRPurchaseUnit"] + "/" +
-                                  string.Format("{0:n0}", (Convert.ToDecimal(row["ConversionFactor"])));
-                }
-            }
+            PurchaseRequestUsageHistory.UseItemUnits(dtb);
 
             dtb.AcceptChanges();
 
@@ -845,8 +782,25 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             query.Select(itemBalTot.Select().As("refToItemBalance_BalanceTotal"));
         }
 
+        private RadNumericTextBox GetRequestQuantityControl(GridDataItem item)
+        {
+            return (RadNumericTextBox)item.FindControl(IsNeedValidatedMax ? "txtQtyOrder2" : "txtQtyOrder");
+        }
+
         public override bool OnButtonOkClicked()
         {
+            var selectedItems = grdDetail.MasterTableView.Items.Cast<GridDataItem>()
+                .Where(item => ((CheckBox)item.FindControl("detailChkbox")).Checked).ToArray();
+            foreach (var item in selectedItems)
+            {
+                var quantityControl = GetRequestQuantityControl(item);
+                if (IsNeedValidatedMax && quantityControl.Value > quantityControl.MaxValue)
+                {
+                    ShowInformationHeader("Request quantity cannot exceed the suggested quantity.");
+                    return false;
+                }
+            }
+
             //UpdateDataSource();
 
             DataTable tbl = (DataTable)ViewState["RequestOrderDetail" + Request.UserHostName];
@@ -855,13 +809,13 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             var coll = ItemTransactionItems;
             string seqNo = coll != null && coll.HasData ? coll[coll.Count - 1].SequenceNo : "000";
 
-            foreach (GridDataItem dataItem in grdDetail.MasterTableView.Items.Cast<GridDataItem>().Where(g => ((CheckBox)g.FindControl("detailChkbox")).Checked))
+            foreach (GridDataItem dataItem in selectedItems)
             {
                 //if (!((CheckBox)dataItem.FindControl("detailChkbox")).Checked) continue;
 
                 //foreach (DataRow row in tbl.Rows)
                 //{
-                decimal qtyOrder = Convert.ToDecimal(((RadNumericTextBox)dataItem.FindControl("txtQtyOrder")).Value);
+                decimal qtyOrder = Convert.ToDecimal(GetRequestQuantityControl(dataItem).Value ?? 0);
                 if (qtyOrder <= 0) continue;
 
                 ItemTransactionItem entity = FindItemTransactionItem(coll, dataItem["ItemID"].Text);
@@ -896,7 +850,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 entity.SRMasterBaseUnit = dataItem["SRItemUnit"].Text;
 
                 if (AppSession.Parameter.IsShowPriceInPurchaseRequest)
-                    ProcurementUtils.PopulateWithHistPrice(entity, Request.QueryString["it"], Request.QueryString["suppid"]);
+                    ProcurementUtils.PopulateWithHistPrice(entity, Request.QueryString["it"], Request.QueryString["suppid"], entity.SRItemUnit);
                 else
                 {
                     entity.Discount1Percentage = 0;
