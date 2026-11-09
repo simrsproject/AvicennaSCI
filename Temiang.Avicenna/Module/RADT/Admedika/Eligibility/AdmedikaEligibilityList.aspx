@@ -92,6 +92,11 @@
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterIsClosed">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterClID">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
@@ -185,6 +190,18 @@
                                     OnClick="btnFilter_Click" ToolTip="Search" />
                             </td>
                         </tr>
+                        <tr>
+                            <td class="label">
+                                Is Closed
+                            </td>
+                            <td class="entry">
+                                <asp:CheckBox ID="chkIsClosed" runat="server" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterIsClosed" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
                     </table>
                 </td>
             </tr>
@@ -211,6 +228,9 @@
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />
+                <telerik:GridCheckBoxColumn DataField="IsVoid" HeaderText="Is Void"
+                    UniqueName="IsVoid" SortExpression="IsVoid" HeaderStyle-Width="60px"
+                    ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridTemplateColumn DataField="PatientID" HeaderText="PatientID"
                     UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="200px">
                     <ItemTemplate>

@@ -69,7 +69,12 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             if (string.IsNullOrEmpty(Convert.ToString(row["PatientID"])))
                 item["PatientID"].BackColor = System.Drawing.Color.Yellow;
 
-            if (string.IsNullOrEmpty(Convert.ToString(row["RegistrationNo"])))
+            var isVoid = row["IsVoid"] != DBNull.Value && Convert.ToBoolean(row["IsVoid"]);
+            var registrationNo = Convert.ToString(row["RegistrationNo"]);
+
+            if (isVoid)
+                item["RegistrationNo"].BackColor = System.Drawing.ColorTranslator.FromHtml("#F8D7DA");
+            else if (string.IsNullOrEmpty(registrationNo))
                 item["RegistrationNo"].BackColor = System.Drawing.Color.Yellow;
         }
 
@@ -242,16 +247,20 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             {
                 var query = new AdmedikaClaimTransactionQuery("a");
                 var patient = new PatientQuery("b");
+                var registration = new RegistrationQuery("c");
 
                 query.es.WithNoLock = true;
                 patient.es.WithNoLock = true;
+                registration.es.WithNoLock = true;
 
                 query.LeftJoin(patient).On(patient.PatientID == query.PatientID);
+                query.LeftJoin(registration).On(registration.RegistrationNo == query.RegistrationNo);
 
                 query.Select(
                     query.AdmedikaClaimTransactionID,
                     query.CreatedDateTime,
                     query.RegistrationNo,
+                    "<ISNULL(c.IsVoid, 0) AS IsVoid>",
                     query.PatientID,
                     query.PatientName,
                     query.MedicalNo,
@@ -270,6 +279,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
                 if (!txtCreatedDateTo.IsEmpty)
                     query.Where(query.CreatedDateTime < txtCreatedDateTo.SelectedDate.Value.Date.AddDays(1));
+
+                if (chkIsClosed.Checked)
+                    query.Where(query.IsClosed == true);
 
                 if (!string.IsNullOrWhiteSpace(txtRegistrationNo.Text))
                     query.Where(query.RegistrationNo == txtRegistrationNo.Text.Trim());
