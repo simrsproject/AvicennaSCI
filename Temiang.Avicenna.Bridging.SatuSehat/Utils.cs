@@ -963,6 +963,24 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 {
                     new Identifier() { System = string.Format("http://sys-ids.kemkes.go.id/encounter/{0}",OrganizationID), Value = reg.RegistrationNo }
                 };
+
+                //mengakomodasi error 10165
+                postData.Location[0].Extension[0].ExtensionItem.Add(new ExtensionItem()
+                {
+                    Url = "upgradeClassIndicator",
+                    ValueCodeableConcept = new Code()
+                    {
+                        Coding = new List<Coding>()
+                            {
+                                new Coding()
+                                {
+                                    System = "http://terminology.kemkes.go.id/CodeSystem/locationUpgradeClass",
+                                    Code = "kelas-tetap",
+                                    Display = "Kelas Tetap Perawatan"
+                                }
+                            }
+                    }
+                });
             }
 
             return postData;
