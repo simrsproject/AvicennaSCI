@@ -29,6 +29,10 @@
         <tr>
             <td width="42%" valign="top" style="padding-right: 8px;">
                 <asp:Panel ID="pnlMain" runat="server" GroupingText="Eligibility Request" Width="100%">
+                    <div style="background-color: #0d6efd; color: #ffffff; padding: 4px 8px;
+                        margin-bottom: 8px; font-weight: bold;">
+                        Terminal ID : <asp:Label ID="lblTerminalID" runat="server" />
+                    </div>
                     <asp:ValidationSummary ID="validationSummary" runat="server" ValidationGroup="eligibility" />
                     <table width="100%">
                         <tr>

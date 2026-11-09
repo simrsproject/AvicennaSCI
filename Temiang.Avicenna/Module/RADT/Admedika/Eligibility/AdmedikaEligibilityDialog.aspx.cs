@@ -17,6 +17,8 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         {
             ProgramID = AppConstant.Program.AdmedikaEligibility;
 
+            lblTerminalID.Text = new AdmedikaConfig().TerminalID;
+
             ButtonOk.Visible = false;
             ButtonCancel.Text = "Close";
             ButtonCancel.OnClientClick = "closeEligibilityDialog(); return false;";
