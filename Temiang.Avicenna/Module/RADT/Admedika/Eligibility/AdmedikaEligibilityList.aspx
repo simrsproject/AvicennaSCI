@@ -269,7 +269,7 @@
                     UniqueName="IsClosed" SortExpression="IsClosed" HeaderStyle-Width="50px"
                     ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridTemplateColumn UniqueName="Action" HeaderText="Action"
-                    HeaderStyle-Width="320px" HeaderStyle-HorizontalAlign="Center"
+                    HeaderStyle-Width="150px" HeaderStyle-HorizontalAlign="Center"
                     ItemStyle-HorizontalAlign="Center">
                     <ItemTemplate>
                         <%# BuildActionHtml(Container.DataItem) %>
