@@ -234,7 +234,7 @@
                         <%# BuildGuarantorHtml(Container.DataItem) %>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
-                <telerik:GridCheckBoxColumn DataField="IsVoid" HeaderText="Is Void"
+                <telerik:GridCheckBoxColumn DataField="IsVoid" HeaderText="Is Void Reg"
                     UniqueName="IsVoid" SortExpression="IsVoid" HeaderStyle-Width="60px"
                     ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridTemplateColumn DataField="PatientID" HeaderText="PatientID"
