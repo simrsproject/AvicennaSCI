@@ -164,6 +164,25 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             return html;
         }
 
+        protected string BuildGuarantorHtml(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var guarantorId = Convert.ToString(row["GuarantorID"]);
+            var guarantorName = Convert.ToString(row["GuarantorName"]);
+
+            var html = Server.HtmlEncode(guarantorId);
+
+            if (!string.IsNullOrEmpty(guarantorName))
+            {
+                if (html.Length > 0) html += "<br />";
+                html += Server.HtmlEncode(guarantorName);
+            }
+
+            return html;
+        }
+
         protected string BuildCovCodeHtml(object dataItem)
         {
             var row = dataItem as DataRowView;
@@ -248,19 +267,24 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 var query = new AdmedikaClaimTransactionQuery("a");
                 var patient = new PatientQuery("b");
                 var registration = new RegistrationQuery("c");
+                var guarantor = new GuarantorQuery("d");
 
                 query.es.WithNoLock = true;
                 patient.es.WithNoLock = true;
                 registration.es.WithNoLock = true;
+                guarantor.es.WithNoLock = true;
 
                 query.LeftJoin(patient).On(patient.PatientID == query.PatientID);
                 query.LeftJoin(registration).On(registration.RegistrationNo == query.RegistrationNo);
+                query.LeftJoin(guarantor).On(guarantor.GuarantorID == registration.GuarantorID);
 
                 query.Select(
                     query.AdmedikaClaimTransactionID,
                     query.CreatedDateTime,
                     query.RegistrationNo,
                     "<ISNULL(c.IsVoid, 0) AS IsVoid>",
+                    guarantor.GuarantorID,
+                    guarantor.GuarantorName,
                     query.PatientID,
                     query.PatientName,
                     query.MedicalNo,

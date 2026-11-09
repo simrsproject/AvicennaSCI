@@ -10,7 +10,6 @@ CREATE TABLE [dbo].[AdmedikaClaimTransaction](
 	[RegistrationNo] [varchar](40) NULL,
 	[TransactionNo] [varchar](40) NULL,
 	[PatientID] [varchar](15) NULL,
-	[GuarantorID] [varchar](10) NULL,
 	[CardNo] [varchar](32) NULL,
 	[ClID] [varchar](20) NULL,
 	[CovID] [varchar](5) NULL,

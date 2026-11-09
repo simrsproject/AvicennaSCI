@@ -228,6 +228,12 @@
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />
+                <telerik:GridTemplateColumn DataField="GuarantorID" HeaderText="Guarantor ID / Name"
+                    UniqueName="Guarantor" SortExpression="GuarantorID" HeaderStyle-Width="200px">
+                    <ItemTemplate>
+                        <%# BuildGuarantorHtml(Container.DataItem) %>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridCheckBoxColumn DataField="IsVoid" HeaderText="Is Void"
                     UniqueName="IsVoid" SortExpression="IsVoid" HeaderStyle-Width="60px"
                     ItemStyle-HorizontalAlign="Center" />

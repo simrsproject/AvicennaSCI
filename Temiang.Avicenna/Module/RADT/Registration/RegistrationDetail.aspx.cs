@@ -7526,7 +7526,6 @@ namespace Temiang.Avicenna.Module.RADT
                 try
                 {
                     admedikaClaim.RegistrationNo = entity.RegistrationNo;
-                    admedikaClaim.GuarantorID = entity.GuarantorID;
                     admedikaClaim.Save();
                 }
                 catch (Exception ex)

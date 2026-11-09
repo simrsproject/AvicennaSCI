@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-11-07 12:47:48 AM
+                    Date Generated       : 2026-11-09 04:48:48 PM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -170,7 +170,6 @@ namespace Temiang.Avicenna.BusinessObject
                         case "RegistrationNo": this.str.RegistrationNo = (string)value; break;
                         case "TransactionNo": this.str.TransactionNo = (string)value; break;
                         case "PatientID": this.str.PatientID = (string)value; break;
-                        case "GuarantorID": this.str.GuarantorID = (string)value; break;
                         case "CardNo": this.str.CardNo = (string)value; break;
                         case "ClID": this.str.ClID = (string)value; break;
                         case "CovID": this.str.CovID = (string)value; break;
@@ -324,21 +323,6 @@ namespace Temiang.Avicenna.BusinessObject
             set
             {
                 base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.PatientID, value);
-            }
-        }
-        /// <summary>
-        /// Maps to AdmedikaClaimTransaction.GuarantorID
-        /// </summary>
-        virtual public System.String GuarantorID
-        {
-            get
-            {
-                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.GuarantorID);
-            }
-
-            set
-            {
-                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.GuarantorID, value);
             }
         }
         /// <summary>
@@ -867,20 +851,6 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.PatientID = Convert.ToString(value);
                 }
             }
-            public System.String GuarantorID
-            {
-                get
-                {
-                    System.String data = entity.GuarantorID;
-                    return (data == null) ? String.Empty : Convert.ToString(data);
-                }
-
-                set
-                {
-                    if (value == null || value.Length == 0) entity.GuarantorID = null;
-                    else entity.GuarantorID = Convert.ToString(value);
-                }
-            }
             public System.String CardNo
             {
                 get
@@ -1346,13 +1316,6 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PatientID, esSystemType.String);
-            }
-        }
-        public esQueryItem GuarantorID
-        {
-            get
-            {
-                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.GuarantorID, esSystemType.String);
             }
         }
         public esQueryItem CardNo
@@ -1956,168 +1919,162 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.GuarantorID, 4, typeof(System.String), esSystemType.String);
-            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.GuarantorID;
-            c.CharacterMaxLength = 10;
-            c.IsNullable = true;
-            _columns.Add(c);
-
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CardNo, 5, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CardNo, 4, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.CardNo;
             c.CharacterMaxLength = 32;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ClID, 6, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ClID, 5, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.ClID;
             c.CharacterMaxLength = 20;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CovID, 7, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CovID, 6, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.CovID;
             c.CharacterMaxLength = 5;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CovCode, 8, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CovCode, 7, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.CovCode;
             c.CharacterMaxLength = 10;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PlanCode, 9, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PlanCode, 8, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PlanCode;
             c.CharacterMaxLength = 20;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DiagnosisCodeList, 10, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DiagnosisCodeList, 9, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DiagnosisCodeList;
             c.CharacterMaxLength = 500;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ClStatus, 11, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ClStatus, 10, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.ClStatus;
             c.CharacterMaxLength = 5;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ClDesc, 12, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ClDesc, 11, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.ClDesc;
             c.CharacterMaxLength = 255;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ServiceID, 13, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.ServiceID, 12, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.ServiceID;
             c.CharacterMaxLength = 50;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOut, 14, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOut, 13, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOut;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.TotAmtIncurred, 15, typeof(System.Decimal), esSystemType.Decimal);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.TotAmtIncurred, 14, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.TotAmtIncurred;
             c.NumericPrecision = 18;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.TotAmtApproved, 16, typeof(System.Decimal), esSystemType.Decimal);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.TotAmtApproved, 15, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.TotAmtApproved;
             c.NumericPrecision = 18;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.TotAmtNotApproved, 17, typeof(System.Decimal), esSystemType.Decimal);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.TotAmtNotApproved, 16, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.TotAmtNotApproved;
             c.NumericPrecision = 18;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.IsClosed, 18, typeof(System.Boolean), esSystemType.Boolean);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.IsClosed, 17, typeof(System.Boolean), esSystemType.Boolean);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.IsClosed;
             c.HasDefault = true;
             c.Default = @"((0))";
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CreatedDateTime, 19, typeof(System.DateTime), esSystemType.DateTime);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CreatedDateTime, 18, typeof(System.DateTime), esSystemType.DateTime);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.CreatedDateTime;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CreatedByUserID, 20, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.CreatedByUserID, 19, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.CreatedByUserID;
             c.CharacterMaxLength = 40;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.LastUpdateDateTime, 21, typeof(System.DateTime), esSystemType.DateTime);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.LastUpdateDateTime, 20, typeof(System.DateTime), esSystemType.DateTime);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.LastUpdateDateTime;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.LastUpdateByUserID, 22, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.LastUpdateByUserID, 21, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.LastUpdateByUserID;
             c.CharacterMaxLength = 40;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PatientName, 23, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PatientName, 22, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PatientName;
             c.CharacterMaxLength = 100;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DateOfBirth, 24, typeof(System.DateTime), esSystemType.DateTime);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DateOfBirth, 23, typeof(System.DateTime), esSystemType.DateTime);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DateOfBirth;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOA, 25, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOA, 24, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOutLOA;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOC, 26, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOC, 25, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOutLOC;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOR, 27, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PrintOutLOR, 26, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PrintOutLOR;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyNo, 28, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyNo, 27, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PolicyNo;
             c.CharacterMaxLength = 32;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PayorMemberID, 29, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PayorMemberID, 28, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PayorMemberID;
             c.CharacterMaxLength = 32;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, 30, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, 29, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.PolicyDate;
             c.CharacterMaxLength = 32;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo, 31, typeof(System.String), esSystemType.String);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo, 30, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.MedicalNo;
             c.CharacterMaxLength = 15;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, 32, typeof(System.DateTime), esSystemType.DateTime);
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, 31, typeof(System.DateTime), esSystemType.DateTime);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DischargeDateTime;
             c.IsNullable = true;
             _columns.Add(c);
@@ -2151,7 +2108,6 @@ namespace Temiang.Avicenna.BusinessObject
             public const string RegistrationNo = "RegistrationNo";
             public const string TransactionNo = "TransactionNo";
             public const string PatientID = "PatientID";
-            public const string GuarantorID = "GuarantorID";
             public const string CardNo = "CardNo";
             public const string ClID = "ClID";
             public const string CovID = "CovID";
@@ -2190,7 +2146,6 @@ namespace Temiang.Avicenna.BusinessObject
             public const string RegistrationNo = "RegistrationNo";
             public const string TransactionNo = "TransactionNo";
             public const string PatientID = "PatientID";
-            public const string GuarantorID = "GuarantorID";
             public const string CardNo = "CardNo";
             public const string ClID = "ClID";
             public const string CovID = "CovID";
@@ -2266,7 +2221,6 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("RegistrationNo", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("TransactionNo", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("PatientID", new esTypeMap("varchar", "System.String"));
-                meta.AddTypeMap("GuarantorID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("CardNo", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("ClID", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("CovID", new esTypeMap("varchar", "System.String"));
