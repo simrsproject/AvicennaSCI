@@ -2071,6 +2071,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                     Reference = String.Format("Encounter/{0}", encounterId),
                     Display = string.Format("Pemeriksaan Fisik {0} di hari {1}, {2}", patSs.BridgingName, DayNames[vitalSignDateTime.DayOfWeek.ToInt()], vitalSignDateTime.ToString("dd MMM yyyy"))
                 };
+
+                postData.Issued = string.Format("{0}+00:00",vitalSignDateTime.AddHours(GmtDif).ToString(DateFormatLong));
             }
 
             // YYYY-MM-DDThh:mm:ss+00:00
