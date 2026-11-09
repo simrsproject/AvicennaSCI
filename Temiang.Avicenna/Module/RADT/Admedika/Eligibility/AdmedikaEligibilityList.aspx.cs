@@ -186,13 +186,25 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             var registrationNo = Convert.ToString(row["RegistrationNo"]);
             var patientId = Convert.ToString(row["PatientID"]);
+            var covID = Convert.ToString(row["CovID"]);
+            var covCode = Convert.ToString(row["CovCode"]);
+            var claimID = Convert.ToString(row["ClID"]);
             var isClosed = row["IsClosed"] != DBNull.Value && Convert.ToBoolean(row["IsClosed"]);
 
             var html = string.Empty;
 
             if (!string.IsNullOrEmpty(patientId) && string.IsNullOrEmpty(registrationNo) && !isClosed)
             {
-                html += "<a href=\"#\" onclick=\"return false;\" title=\"Process To Registration\" style=\"text-decoration:none;white-space:nowrap;\">";
+                var registrationType =
+                    (covID == "01" || string.Equals(covCode, "HNS", StringComparison.OrdinalIgnoreCase))
+                        ? AppConstant.RegistrationType.InPatient
+                        : AppConstant.RegistrationType.OutPatient;
+
+                html += string.Format(
+                    "<a href=\"#\" onclick=\"openRegistration('{0}','{1}','{2}'); return false;\" title=\"Process To Registration\" style=\"text-decoration:none;white-space:nowrap;\">",
+                    HttpUtility.JavaScriptStringEncode(patientId),
+                    registrationType,
+                    HttpUtility.JavaScriptStringEncode(claimID));
                 html += "<img src=\"../../../../Images/Toolbar/process16.png\" border=\"0\" alt=\"Process To Registration\" title=\"Process To Registration\" style=\"vertical-align:middle;\" />";
                 html += " Process To Registration</a>&nbsp;&nbsp;";
             }

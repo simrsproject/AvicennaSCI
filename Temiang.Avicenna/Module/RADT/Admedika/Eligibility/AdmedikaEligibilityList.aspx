@@ -36,6 +36,17 @@
                     oWnd.argument.mode = null;
                 }
             }
+
+            function openRegistration(patientID, registrationType, claimID) {
+                var url = "../../../Registration/RegistrationDetail.aspx?md=new"
+                    + "&id=" + encodeURIComponent(patientID)
+                    + "&rt=" + encodeURIComponent(registrationType)
+                    + "&type=admedika"
+                    + "&ClaimID=" + encodeURIComponent(claimID)
+                    + "&norm=";
+
+                window.location.href = url;
+            }
         </script>
     </telerik:RadCodeBlock>
     <telerik:RadWindow ID="winEligibility" runat="server" Animation="None" Behavior="Close,Move"
