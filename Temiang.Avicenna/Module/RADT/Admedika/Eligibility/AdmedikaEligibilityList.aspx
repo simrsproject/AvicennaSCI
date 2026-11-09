@@ -37,6 +37,10 @@
                 }
             }
 
+            function onRegistrationClientClose(oWnd, args) {
+                __doPostBack("<%= grdList.UniqueID %>", "rebind");
+            }
+
             function openRegistration(patientID, registrationType, claimID) {
                 var oWnd = $find("<%= winRegistration.ClientID %>");
 
@@ -64,7 +68,8 @@
     </telerik:RadWindow>
     <telerik:RadWindow ID="winRegistration" runat="server" Animation="None"
         ShowContentDuringLoad="False" Width="1200px" Height="640px"
-        VisibleStatusbar="False" Modal="true" Behavior="Close,Move,Resize,Maximize" />
+        VisibleStatusbar="False" Modal="true" Behavior="Close,Move,Resize,Maximize"
+        OnClientClose="onRegistrationClientClose" />
     <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
         <AjaxSettings>
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">

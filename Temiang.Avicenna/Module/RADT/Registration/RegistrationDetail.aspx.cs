@@ -35,6 +35,7 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Telerik.Web.UI;
@@ -7469,6 +7470,43 @@ namespace Temiang.Avicenna.Module.RADT
             SetEntityValue(entity, QueueingAppt, patient, que, newBed, chargesHD, paymentHD, billing, fileStatus, parTeams, emrContact,
                            patEmrContact, oldBed, patTransferHistory, bedRoomIn, mrFileStatus, responsible, birthRecord, registrationInfoSumary, bedStatusHistory);
 
+            var isAdmedika = string.Equals(Request.QueryString["type"], "admedika", StringComparison.OrdinalIgnoreCase);
+            AdmedikaClaimTransaction admedikaClaim = null;
+
+            if (isAdmedika)
+            {
+                var claimID = Request.QueryString["ClaimID"];
+
+                if (string.IsNullOrWhiteSpace(claimID))
+                {
+                    ShowInformationHeader("ClaimID Admedika tidak ditemukan.");
+                    return false;
+                }
+
+                var admedikaGuarantorIDs = VwGuarantorAdmedika.GetGuarantorIDs();
+                if (!admedikaGuarantorIDs.Contains(entity.GuarantorID))
+                {
+                    ShowInformationHeader("Guarantor yang dipilih bukan Admedika. Silakan pilih guarantor Admedika.");
+                    return false;
+                }
+
+                admedikaClaim = new AdmedikaClaimTransaction();
+                admedikaClaim.Query.es.Top = 1;
+                admedikaClaim.Query.Where(admedikaClaim.Query.ClID == claimID);
+
+                if (!admedikaClaim.Query.Load())
+                {
+                    ShowInformationHeader("Data eligibility Admedika dengan ClaimID " + claimID + " tidak ditemukan.");
+                    return false;
+                }
+
+                if (!string.IsNullOrEmpty(admedikaClaim.RegistrationNo))
+                {
+                    ShowInformationHeader("ClaimID " + claimID + " sudah terhubung ke registrasi " + admedikaClaim.RegistrationNo + ".");
+                    return false;
+                }
+            }
+
 
             if (AppSession.Parameter.PhysicianIsRequiredAtRegistration == "Yes" && string.IsNullOrEmpty(entity.ParamedicID))
             {
@@ -7482,6 +7520,22 @@ namespace Temiang.Avicenna.Module.RADT
                        TransChargesItemsDTComp, TransChargesItemsDTConsumption, billing, CostCalculations, paymentHD,
                        TransPaymentItemsDT, fileStatus, out itemNoStock, parTeams, emrContact, patEmrContact, oldBed,
                        patTransferHistory, bedRoomIn, mrFileStatus, responsible, birthRecord, RegistrationGuarantors, registrationInfoSumary, bedStatusHistory);
+
+            if (admedikaClaim != null)
+            {
+                try
+                {
+                    admedikaClaim.RegistrationNo = entity.RegistrationNo;
+                    admedikaClaim.GuarantorID = entity.GuarantorID;
+                    admedikaClaim.Save();
+                }
+                catch (Exception ex)
+                {
+                    Helper.RegisterStartupScript(this, "admedikaClaimUpdateError",
+                        "alert('Registrasi tersimpan, tetapi gagal update claim Admedika: " +
+                        HttpUtility.JavaScriptStringEncode(ex.Message) + "');");
+                }
+            }
 
             // Log reg from Google form
             var gfid = Page.Request.QueryString["gfid"];
