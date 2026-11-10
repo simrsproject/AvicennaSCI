@@ -164,17 +164,19 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         protected void btnGetClaimStatus_Click(object sender, EventArgs e)
         {
+            lblClaimStatusMessage.Text = string.Empty;
+
             var claim = new AdmedikaClaimTransaction();
             if (!claim.LoadByPrimaryKey(ClaimTransactionID))
             {
-                ShowInformationHeader("Data eligibility tidak ditemukan.");
+                SetClaimStatusMessage("Data eligibility tidak ditemukan.", true);
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(claim.CardNo) ||
                 string.IsNullOrWhiteSpace(claim.ClID))
             {
-                ShowInformationHeader("Card No atau ClID tidak tersedia.");
+                SetClaimStatusMessage("Card No atau ClID tidak tersedia.", true);
                 return;
             }
 
@@ -187,7 +189,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 string message;
                 if (!service.IsOk(result, out message))
                 {
-                    ShowInformationHeader(message);
+                    SetClaimStatusMessage(message, true);
                     return;
                 }
 
@@ -196,12 +198,20 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 claim.Save();
 
                 LoadDetail();
-                ShowInformationHeader("Check Claim Status berhasil.");
+                SetClaimStatusMessage("Check Claim Status berhasil.", false);
             }
             catch (Exception ex)
             {
-                ShowInformationHeader(ex.Message);
+                SetClaimStatusMessage(ex.Message, true);
             }
+        }
+
+        private void SetClaimStatusMessage(string message, bool isError)
+        {
+            lblClaimStatusMessage.Text = message;
+            lblClaimStatusMessage.ForeColor = isError
+                ? System.Drawing.Color.Red
+                : System.Drawing.Color.Green;
         }
 
         protected void btnPrintLOA_Click(object sender, EventArgs e)

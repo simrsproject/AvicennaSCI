@@ -55,6 +55,8 @@
                                     style="display: none; margin-top: 4px; color: #0d6efd; font-weight: bold;">
                                     Loading...
                                 </asp:Panel>
+                                <asp:Label ID="lblClaimStatusMessage" runat="server"
+                                    style="display: block; margin-top: 6px; font-weight: bold;" />
                             </td>
                         </tr>
                     </table>
