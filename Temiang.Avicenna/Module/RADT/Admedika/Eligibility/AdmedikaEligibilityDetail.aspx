@@ -7,6 +7,13 @@
     <telerik:RadWindow ID="winPrint" runat="server" Animation="None"
         Width="1000px" Height="500px" ShowContentDuringLoad="false"
         Behavior="Close,Resize,Maximize" VisibleStatusbar="false" Modal="true" />
+    <script type="text/javascript">
+        function showClaimLoading() {
+            var el = document.getElementById('<%= pnlClaimLoading.ClientID %>');
+            if (el) el.style.display = 'block';
+            return true;
+        }
+    </script>
     <div style="padding: 20px;">
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
@@ -36,6 +43,19 @@
                         <tr>
                             <td class="label">Discharge Date Time</td>
                             <td class="entry"><asp:Label ID="lblDischargeDateTime" runat="server" /></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td class="entry" style="text-align: right;">
+                                <asp:Button ID="btnGetClaimStatus" runat="server"
+                                    Text="Check Claim Status"
+                                    OnClick="btnGetClaimStatus_Click"
+                                    OnClientClick="return showClaimLoading();" />
+                                <asp:Panel ID="pnlClaimLoading" runat="server"
+                                    style="display: none; margin-top: 4px; color: #0d6efd; font-weight: bold;">
+                                    Loading...
+                                </asp:Panel>
+                            </td>
                         </tr>
                     </table>
                 </asp:Panel>

@@ -56,6 +56,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             {
                 ShowInformationHeader("Data eligibility tidak ditemukan.");
                 btnRePrintLOA.Enabled = false;
+                btnGetClaimStatus.Enabled = false;
                 return;
             }
 
@@ -109,6 +110,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             var printOut = string.IsNullOrWhiteSpace(claim.PrintOutLOA) ? claim.PrintOut : claim.PrintOutLOA;
             litPrintOutLOA.Text = BuildPrintOutHtml(printOut);
             btnRePrintLOA.Enabled = !string.IsNullOrWhiteSpace(claim.ClID);
+            btnGetClaimStatus.Enabled =
+                !string.IsNullOrWhiteSpace(claim.CardNo) &&
+                !string.IsNullOrWhiteSpace(claim.ClID);
         }
 
         protected void btnRePrintLOA_Click(object sender, EventArgs e)
@@ -151,6 +155,48 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
                 LoadDetail();
                 ShowInformationHeader("Re-request LOA berhasil.");
+            }
+            catch (Exception ex)
+            {
+                ShowInformationHeader(ex.Message);
+            }
+        }
+
+        protected void btnGetClaimStatus_Click(object sender, EventArgs e)
+        {
+            var claim = new AdmedikaClaimTransaction();
+            if (!claim.LoadByPrimaryKey(ClaimTransactionID))
+            {
+                ShowInformationHeader("Data eligibility tidak ditemukan.");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(claim.CardNo) ||
+                string.IsNullOrWhiteSpace(claim.ClID))
+            {
+                ShowInformationHeader("Card No atau ClID tidak tersedia.");
+                return;
+            }
+
+            var service = new AdmedikaService();
+
+            try
+            {
+                var result = service.CheckMemberClaimTxnStatus(claim.CardNo, claim.ClID);
+
+                string message;
+                if (!service.IsOk(result, out message))
+                {
+                    ShowInformationHeader(message);
+                    return;
+                }
+
+                claim.ClStatus = result.ClStatus;
+                claim.ClDesc = result.ClDesc;
+                claim.Save();
+
+                LoadDetail();
+                ShowInformationHeader("Check Claim Status berhasil.");
             }
             catch (Exception ex)
             {
