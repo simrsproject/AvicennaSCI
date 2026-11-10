@@ -150,7 +150,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 claim.Save();
 
                 LoadDetail();
-                ShowInformationHeader("Re-print LOA berhasil.");
+                ShowInformationHeader("Re-request LOA berhasil.");
             }
             catch (Exception ex)
             {
@@ -181,7 +181,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                             "oWnd.Show();" +
                             "oWnd.Maximize();";
 
-            ScriptManager.RegisterStartupScript(this, GetType(), "printLOA", script, true);
+            Helper.RegisterStartupScript(this, "printLOA", script);
         }
 
         private static string Value(string value)

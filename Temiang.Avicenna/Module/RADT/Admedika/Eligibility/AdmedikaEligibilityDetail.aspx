@@ -7,6 +7,7 @@
     <telerik:RadWindow ID="winPrint" runat="server" Animation="None"
         Width="1000px" Height="500px" ShowContentDuringLoad="false"
         Behavior="Close,Resize,Maximize" VisibleStatusbar="false" Modal="true" />
+    <div style="padding: 20px;">
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td width="50%" valign="top" style="padding-right: 8px;">
@@ -120,9 +121,9 @@
     <br />
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-            <td style="font-weight: bold; font-size: 13px;">Print Out LOA</td>
+            <td style="font-weight: bold; font-size: 13px;">Letter of Authorization (LOA) Content</td>
             <td style="text-align: right; white-space: nowrap;">
-                <asp:Button ID="btnRePrintLOA" runat="server" Text="Re-print LOA"
+                <asp:Button ID="btnRePrintLOA" runat="server" Text="Re-request LOA"
                     OnClick="btnRePrintLOA_Click" />
                 &nbsp;
                 <asp:ImageButton ID="btnPrintLOA" runat="server"
@@ -134,4 +135,5 @@
         </tr>
     </table>
     <asp:Literal ID="litPrintOutLOA" runat="server" />
+    </div>
 </asp:Content>
