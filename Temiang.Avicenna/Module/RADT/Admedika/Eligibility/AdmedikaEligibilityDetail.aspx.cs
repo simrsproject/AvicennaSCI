@@ -166,24 +166,23 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         {
             lblClaimStatusMessage.Text = string.Empty;
 
-            var claim = new AdmedikaClaimTransaction();
-            if (!claim.LoadByPrimaryKey(ClaimTransactionID))
-            {
-                SetClaimStatusMessage("Data eligibility tidak ditemukan.", true);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(claim.CardNo) ||
-                string.IsNullOrWhiteSpace(claim.ClID))
-            {
-                SetClaimStatusMessage("Card No atau ClID tidak tersedia.", true);
-                return;
-            }
-
-            var service = new AdmedikaService();
-
             try
             {
+                var claim = new AdmedikaClaimTransaction();
+                if (!claim.LoadByPrimaryKey(ClaimTransactionID))
+                {
+                    SetClaimStatusMessage("Data eligibility tidak ditemukan.", true);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(claim.CardNo) ||
+                    string.IsNullOrWhiteSpace(claim.ClID))
+                {
+                    SetClaimStatusMessage("Card No atau ClID tidak tersedia.", true);
+                    return;
+                }
+
+                var service = new AdmedikaService();
                 var result = service.CheckMemberClaimTxnStatus(claim.CardNo, claim.ClID);
 
                 string message;

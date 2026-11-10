@@ -8,11 +8,26 @@
         Width="1000px" Height="500px" ShowContentDuringLoad="false"
         Behavior="Close,Resize,Maximize" VisibleStatusbar="false" Modal="true" />
     <script type="text/javascript">
-        function showClaimLoading() {
-            var el = document.getElementById('<%= pnlClaimLoading.ClientID %>');
-            if (el) el.style.display = 'block';
-            return true;
-        }
+        Sys.Application.add_load(function () {
+            var prm = Sys.WebForms.PageRequestManager.getInstance();
+            if (!prm) return;
+
+            prm.add_endRequest(function (sender, args) {
+                if (args.get_error()) {
+                    var message = args.get_error().get_message();
+                    var lbl = document.getElementById('<%= lblClaimStatusMessage.ClientID %>');
+
+                    if (lbl) {
+                        lbl.textContent = message;
+                        lbl.style.color = 'red';
+                    } else {
+                        alert(message);
+                    }
+
+                    args.set_errorHandled(true);
+                }
+            });
+        });
     </script>
     <div style="padding: 20px;">
     <table width="100%" cellpadding="0" cellspacing="0">
@@ -49,12 +64,7 @@
                             <td class="entry" style="text-align: right;">
                                 <asp:Button ID="btnGetClaimStatus" runat="server"
                                     Text="Check Claim Status"
-                                    OnClick="btnGetClaimStatus_Click"
-                                    OnClientClick="return showClaimLoading();" />
-                                <asp:Panel ID="pnlClaimLoading" runat="server"
-                                    style="display: none; margin-top: 4px; color: #0d6efd; font-weight: bold;">
-                                    Loading...
-                                </asp:Panel>
+                                    OnClick="btnGetClaimStatus_Click" />
                                 <asp:Label ID="lblClaimStatusMessage" runat="server"
                                     style="display: block; margin-top: 6px; font-weight: bold;" />
                             </td>
