@@ -2,7 +2,11 @@
     CodeBehind="AdmedikaEligibilityDetail.aspx.cs"
     Inherits="Temiang.Avicenna.Module.RADT.Admedika.AdmedikaEligibilityDetail" %>
 
+<%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+    <telerik:RadWindow ID="winPrint" runat="server" Animation="None"
+        Width="1000px" Height="500px" ShowContentDuringLoad="false"
+        Behavior="Close,Resize,Maximize" VisibleStatusbar="false" Modal="true" />
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td width="50%" valign="top" style="padding-right: 8px;">
@@ -117,9 +121,15 @@
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
             <td style="font-weight: bold; font-size: 13px;">Print Out LOA</td>
-            <td style="text-align: right;">
+            <td style="text-align: right; white-space: nowrap;">
                 <asp:Button ID="btnRePrintLOA" runat="server" Text="Re-print LOA"
                     OnClick="btnRePrintLOA_Click" />
+                &nbsp;
+                <asp:ImageButton ID="btnPrintLOA" runat="server"
+                    ImageUrl="~/Images/Toolbar/print16.png"
+                    ToolTip="Print LOA"
+                    OnClick="btnPrintLOA_Click"
+                    CausesValidation="false" />
             </td>
         </tr>
     </table>

@@ -1,5 +1,6 @@
 using System;
 using System.Web;
+using System.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using Temiang.Avicenna.Common.Admedika;
@@ -155,6 +156,32 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             {
                 ShowInformationHeader(ex.Message);
             }
+        }
+
+        protected void btnPrintLOA_Click(object sender, EventArgs e)
+        {
+            var claim = new AdmedikaClaimTransaction();
+            if (!claim.LoadByPrimaryKey(ClaimTransactionID) ||
+                string.IsNullOrWhiteSpace(claim.ClID))
+            {
+                ShowInformationHeader("ClaimID tidak tersedia.");
+                return;
+            }
+
+            var jobParameters = new PrintJobParameterCollection();
+            var claimParameter = jobParameters.AddNew();
+            claimParameter.Name = "ClaimID";
+            claimParameter.ValueString = claim.ClID;
+
+            AppSession.PrintJobReportID = AppConstant.Report.AdmedikaPrintLOA;
+            AppSession.PrintJobParameters = jobParameters;
+
+            string script = @"var oWnd = $find('" + winPrint.ClientID + "');" +
+                            "oWnd.SetUrl('" + Page.ResolveUrl("~/Module/Reports/ReportViewer.aspx") + "');" +
+                            "oWnd.Show();" +
+                            "oWnd.Maximize();";
+
+            ScriptManager.RegisterStartupScript(this, GetType(), "printLOA", script, true);
         }
 
         private static string Value(string value)

@@ -15,6 +15,15 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
     public partial class AdmedikaEligibilityDetail {
         
         /// <summary>
+        /// winPrint control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadWindow winPrint;
+        
+        /// <summary>
         /// pnlClaim control.
         /// </summary>
         /// <remarks>
@@ -247,6 +256,15 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnRePrintLOA;
+        
+        /// <summary>
+        /// btnPrintLOA control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnPrintLOA;
         
         /// <summary>
         /// litPrintOutLOA control.
