@@ -8,6 +8,23 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 {
     public static class PurchaseRequestUsageHistory
     {
+        internal static bool ShouldUseItemUnits(string itemType)
+        {
+            if (itemType == ItemType.Medical)
+            {
+                var setting = Convert.ToString(AppParameter.GetParameterNullableValue(
+                    AppParameter.ParameterItem.IsPurchaseRequestUsageHistoryMedicalUsingItemUnit)).Trim();
+                if (string.Equals(setting, "Yes", StringComparison.OrdinalIgnoreCase))
+                    return true;
+                if (string.Equals(setting, "No", StringComparison.OrdinalIgnoreCase))
+                    return false;
+            }
+
+            var existingSetting = Convert.ToString(AppParameter.GetParameterNullableValue(
+                AppParameter.ParameterItem.IsPurchaseRequestsUsingItemUnit)).Trim();
+            return AppParameter.IsYes(existingSetting);
+        }
+
         public static void UseItemUnits(DataTable items)
         {
             foreach (DataRow row in items.Rows)

@@ -203,8 +203,10 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
             // Preserve item-unit requests from the usage-history picker when editing.
             // Existing requests in purchase units retain their original unit and quantity.
-            if (!chkIsNonMasterOrder.Checked && !string.IsNullOrEmpty(unitConversion) &&
-                cboSRItemUnit.SelectedValue == unitConversion && txtQtyUnitConversion.Value == 1)
+            if (!chkIsNonMasterOrder.Checked && cboSRItemType.SelectedValue == BusinessObject.Reference.ItemType.Medical &&
+                !string.IsNullOrEmpty(unitConversion) &&
+                cboSRItemUnit.SelectedValue == unitConversion && txtQtyUnitConversion.Value == 1 &&
+                PurchaseRequestUsageHistory.ShouldUseItemUnits(cboSRItemType.SelectedValue))
             {
                 ViewState["UseItemUnit"] = true;
                 RestrictToItemUnit(unitConversion);
