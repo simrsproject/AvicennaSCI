@@ -188,6 +188,18 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 string message;
                 if (!service.IsOk(result, out message))
                 {
+                    if (!string.IsNullOrEmpty(message) && message.Contains("1840"))
+                    {
+                        claim.ClStatus = AdmedikaConstant.ClaimStatusID.ClaimsRejected;
+                        claim.ClDesc = AdmedikaClaimStatus.GetDescription(
+                            AdmedikaConstant.ClaimStatusID.ClaimsRejected);
+                        claim.Save();
+
+                        LoadDetail();
+                        SetClaimStatusMessage("No open claims found. Status updated to Claims rejected (22).", false);
+                        return;
+                    }
+
                     SetClaimStatusMessage(message, true);
                     return;
                 }

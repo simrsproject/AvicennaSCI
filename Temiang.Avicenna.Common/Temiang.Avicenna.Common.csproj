@@ -273,6 +273,7 @@
     <Compile Include="Admedika\TokenGenerator.cs" />
     <Compile Include="Admedika\AdmedikaDocType.cs" />
     <Compile Include="Admedika\AdmedikaCoverageType.cs" />
+    <Compile Include="Admedika\AdmedikaClaimStatus.cs" />
     <Compile Include="Admedika\AdmedikaConfig.cs" />
     <Compile Include="Admedika\AdmedikaConstant.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
