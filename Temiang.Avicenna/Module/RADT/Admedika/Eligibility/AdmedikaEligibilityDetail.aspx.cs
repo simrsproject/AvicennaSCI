@@ -36,11 +36,11 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         {
             base.OnLoadComplete(e);
 
-            ToolBarMenuAdd.Visible = false;
-            ToolBarMenuEdit.Visible = false;
-            ToolBarMenuDelete.Visible = false;
-            ToolBarMenuSave.Visible = false;
-            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuAdd.Enabled = false;
+            ToolBarMenuEdit.Enabled = false;
+            ToolBarMenuDelete.Enabled = false;
+            ToolBarMenuSave.Enabled = false;
+            ToolBarMenuSearch.Enabled = false;
             ToolBarMenuMovePrev.Visible = false;
             ToolBarMenuMoveNext.Visible = false;
             ToolBarMenuApproval.Visible = false;
