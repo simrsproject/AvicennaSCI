@@ -1,34 +1,84 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MedicationHistCtl.ascx.cs" Inherits="Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication.MedicationHistCtl" %>
 <%@ Import Namespace="Temiang.Avicenna.Common" %>
-<telerik:RadGrid ID="grdMedicationHist" runat="server" Width="2000px"
+<telerik:RadGrid ID="grdMedicationHist" runat="server" Width="100%"
     AutoGenerateColumns="False" GridLines="None" AllowPaging="False">
     <MasterTableView>
         <Columns>
             <telerik:GridTemplateColumn UniqueName="ItemDescription" HeaderStyle-Width="300px" HeaderText="Item" ItemStyle-VerticalAlign="Top">
                 <ItemTemplate>
+                    <%--Setup By Name dan Advised --%>
+                    <div style="min-height: 280px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
                     <%# Temiang.Avicenna.BusinessObject.MedicationReceive.PrescriptionItemDescription(DataBinder.Eval( Container.DataItem, "RefTransactionNo"), DataBinder.Eval( Container.DataItem, "RefSequenceNo"), DataBinder.Eval( Container.DataItem, "ItemDescription"),false,DataBinder.Eval( Container.DataItem, "SRMedicationRoute"))%><br />
                     <br />
                     Start Time: <%# DataBinder.Eval(Container.DataItem, "StartDateTime") == DBNull.Value? String.Empty: Convert.ToDateTime(DataBinder.Eval(Container.DataItem, "StartDateTime")).ToString(AppConstant.DisplayFormat.DateHourMinute)%>
                     <%# MedicationEditHtml(DataBinder.Eval(Container.DataItem, "MedicationReceiveNo"),PatientID) %>
                     <br />
-                    <%# MedicationChangeConsumeMethodHtml(DataBinder.Eval(Container.DataItem, "MedicationReceiveNo"),DataBinder.Eval(Container.DataItem, "SRConsumeMethodName"),DataBinder.Eval(Container.DataItem, "PatientID"),DataBinder.Eval(Container.DataItem, "BalanceQty"), 
-    DataBinder.Eval(Container.DataItem, "IsAntibiotic"), DataBinder.Eval(Container.DataItem, "IsVoid"), DataBinder.Eval(Container.DataItem, "IsContinue")) %>
-
-                    <%# DataBinder.Eval(Container.DataItem, "SRConsumeMethodName")%>&nbsp;@<%# DataBinder.Eval(Container.DataItem, "ConsumeQtyInString")%>&nbsp;<%# DataBinder.Eval(Container.DataItem, "SRConsumeUnit")%>&nbsp;
-                    
-                    <%# DataBinder.Eval(Container.DataItem, "SRMedicationConsumeName")==DBNull.Value?string.Empty:String.Format("{0}<br,>",DataBinder.Eval(Container.DataItem, "SRMedicationConsumeName"))%><br />
-                    Schedule: <%# MedicationScheduleSetupHtml(Container)%>)<br />
                     <%# MedicationStopContinueHtml(DataBinder.Eval(Container.DataItem, "MedicationReceiveNo"),DataBinder.Eval(Container.DataItem, "IsVoid"),DataBinder.Eval(Container.DataItem, "IsContinue"),DataBinder.Eval(Container.DataItem, "PatientID")) %>&nbsp;&nbsp;
                     <%# MedicationVoidHtml(DataBinder.Eval(Container.DataItem, "MedicationReceiveNo"),DataBinder.Eval(Container.DataItem, "IsVoid"),DataBinder.Eval(Container.DataItem, "PatientID")) %>&nbsp;&nbsp;
                     <%--Presc No:&nbsp;<a style="cursor: pointer;" onclick="showPrescription('<%#DataBinder.Eval(Container.DataItem, "RefTransactionNo") %>')"><img src="<%#Helper.UrlRoot() %>/Images/Toolbar/views16.png" />&nbsp;<%#DataBinder.Eval(Container.DataItem, "RefTransactionNo") %></a>--%>
                     <%#!0.Equals(Eval("RasproSeqNo"))? string.Format("&nbsp;&nbsp;<a href=\"#\" onclick=\"javascript:openRasproFormView('{0}','{1}','{2}'); return false;\"><img src=\"{4}/Images/Toolbar/views16.png\" border=\"0\" alt=\"Raspro Form\" title=\"Raspro Form\" />&nbsp;{3}</a>",
                                             PatientID,RegistrationNo,Eval("RasproSeqNo"),Eval("SRRaspro"),Helper.UrlRoot()):string.Empty %>
+                    </div>
+                    <div style="font-size: 11px; font-style: italic; padding-bottom: 5px;">
+                        Setup by: <%# Eval("SetupByName") %>
+                    </div>
+
+                </div>
                 </ItemTemplate>
+            </telerik:GridTemplateColumn>
+            <telerik:GridTemplateColumn
+                UniqueName="ConsumeMethod"
+                HeaderText="Consume Method"
+                HeaderStyle-Width="160px"
+                HeaderStyle-HorizontalAlign="Center"
+                ItemStyle-Width="160px"
+                ItemStyle-VerticalAlign="Top">
+
+                <ItemTemplate>
+                <div style="
+                    min-height: 280px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    padding: 4px;
+                ">
+
+                    <div>
+                        <div style="text-align: center; margin-bottom: 12px;">
+                            <%# Eval("SRConsumeMethodName") %>
+                            @<%# Eval("ConsumeQtyInString") %>
+                            <%# Eval("SRConsumeUnit") %>
+                            <%# Eval("SRMedicationConsumeName") == DBNull.Value
+                                ? string.Empty
+                                : ", " + Eval("SRMedicationConsumeName") %>
+                        </div>
+
+                        <div style="text-align: left;">
+                            <%# MedicationChangeConsumeMethodHtml(
+                                Eval("MedicationReceiveNo"),
+                                Eval("SRConsumeMethodName"),
+                                Eval("PatientID"),
+                                Eval("BalanceQty"),
+                                Eval("IsAntibiotic"),
+                                Eval("IsVoid"),
+                                Eval("IsContinue")
+                            ) %>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 11px; font-style: italic; padding-bottom: 5px;">
+                        Advised by: <%# Eval("AdvisedByName") %>
+                    </div>
+
+                </div>
+            </ItemTemplate>
             </telerik:GridTemplateColumn>
             <telerik:GridNumericColumn DataField="ReceiveQty" UniqueName="ReceiveQty" HeaderText="Qty" HeaderStyle-Width="50px" ItemStyle-VerticalAlign="Top" Visible="false" />
             <telerik:GridNumericColumn DataField="BalanceQty" UniqueName="BalanceQty" HeaderText="Bal. (Setup)" HeaderStyle-Width="50px" ItemStyle-VerticalAlign="Top" />
             <telerik:GridNumericColumn DataField="BalanceRealQty" UniqueName="BalanceRealQty" HeaderText="Bal. (Real)" HeaderStyle-Width="50px" ItemStyle-VerticalAlign="Top" />
             <telerik:GridBoundColumn DataField="SRConsumeUnit" UniqueName="SRConsumeUnit" HeaderText="Unit" HeaderStyle-Width="60px" ItemStyle-VerticalAlign="Top" />
+
 
             <telerik:GridTemplateColumn UniqueName="TemplateItemName3" HeaderStyle-Width="70px" HeaderText="">
                 <ItemTemplate>
@@ -137,6 +187,11 @@
     </MasterTableView>
     <ClientSettings EnableRowHoverStyle="False">
         <Selecting AllowRowSelect="False" />
-        <Scrolling AllowScroll="True" UseStaticHeaders="True" SaveScrollPosition="true"  FrozenColumnsCount="6"></Scrolling>
+        <Scrolling
+            AllowScroll="True"
+            UseStaticHeaders="True"
+            SaveScrollPosition="true"
+            FrozenColumnsCount="2">
+        </Scrolling>
     </ClientSettings>
 </telerik:RadGrid>

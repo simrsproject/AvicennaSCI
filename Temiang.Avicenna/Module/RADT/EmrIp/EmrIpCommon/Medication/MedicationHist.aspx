@@ -73,6 +73,11 @@
                 visibility: visible;
                 opacity: 1;
             }
+
+            html,
+            body {
+                overflow-x: hidden;
+            }
     </style>
     <telerik:RadCodeBlock ID="radCodeBlock" runat="server">
         <script type="text/javascript" language="javascript">
@@ -290,5 +295,5 @@
             </td>
         </tr>
     </table>
-    <cc:MedicationHistCtl runat="server" ID="medicationHistCtl" IsConsumeMethodChangeAble="False" />
+    <cc:MedicationHistCtl runat="server" ID="medicationHistCtl" IsConsumeMethodChangeAble="True" />
 </asp:Content>

@@ -76,21 +76,51 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication
             dtb.Columns.Add("RasproSeqNo", typeof(int));
             dtb.Columns.Add("SRRaspro", typeof(string));
 
+            // Tambahan informasi Setup By dan Advised
+            dtb.Columns.Add("SetupByName", typeof(string));
+            dtb.Columns.Add("AdvisedByName", typeof(string));
+
             // Update History Realisasi
             foreach (DataRow row in dtb.Rows)
             {
                 var tp = new TransPrescription();
-                if (tp.LoadByPrimaryKey(row["RefTransactionNo"].ToString()) && tp.RasproSeqNo.ToInt() > 0)
+
+                row["AdvisedByName"] = string.Empty;
+
+                if (tp.LoadByPrimaryKey(row["RefTransactionNo"].ToString()))
                 {
-                    row["RasproSeqNo"] = tp.RasproSeqNo;
-                    var rr = new RegistrationRaspro();
-                    rr.LoadByPrimaryKey(RegistrationNo, tp.RasproSeqNo ?? 0);
-                    row["SRRaspro"] = rr.SRRaspro;
+                    // Ambil nama dokter dari tabel Paramedic
+                    if (tp.ParamedicID != null)
+                    {
+                        var paramedic = new Paramedic();
+
+                        if (paramedic.LoadByPrimaryKey(tp.ParamedicID))
+                        {
+                            row["AdvisedByName"] = paramedic.ParamedicName;
+                        }
+                    }
+
+                    // Logic Raspro tetap dipertahankan
+                    if (tp.RasproSeqNo.ToInt() > 0)
+                    {
+                        row["RasproSeqNo"] = tp.RasproSeqNo;
+
+                        var rr = new RegistrationRaspro();
+                        rr.LoadByPrimaryKey(RegistrationNo, tp.RasproSeqNo ?? 0);
+
+                        row["SRRaspro"] = rr.SRRaspro;
+                    }
+                    else
+                    {
+                        row["RasproSeqNo"] = 0;
+                        row["SRRaspro"] = string.Empty;
+                    }
                 }
                 else
                 {
                     row["RasproSeqNo"] = 0;
                     row["SRRaspro"] = string.Empty;
+                    row["AdvisedByName"] = string.Empty;
                 }
 
                 // Ganti break line
@@ -101,6 +131,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication
                 qr.OrderBy(qr.SequenceNo.Ascending);
                 var medUseds = new MedicationReceiveUsedCollection();
                 medUseds.Load(qr);
+                row["SetupByName"] = string.Empty;
 
                 var balance = row["ReceiveQty"].ToDecimal();
                 var scheduleDate = DateTime.Today.AddDays(10);
@@ -108,6 +139,13 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication
                 var colNo = 1;
                 foreach (var used in medUseds)
                 {
+                    // Ambil nama user yang pertama melakukan setup
+                    if (string.IsNullOrWhiteSpace(row["SetupByName"].ToString()) &&
+                        !string.IsNullOrWhiteSpace(used.SetupByUserID))
+                    {
+                        row["SetupByName"] = AppUser.GetUserName(used.SetupByUserID);
+                    }
+
                     if (colNo > 5) // Hanya ambil sampai konsumsi ke 5 di tgl yg sama (disesuaikan dg cetakan form Daftar Obat)
                         continue;
 
