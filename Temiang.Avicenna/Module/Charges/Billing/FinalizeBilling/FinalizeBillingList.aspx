@@ -113,46 +113,67 @@
             <telerik:AjaxSetting AjaxControlID="btnFilterDate">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterDischargePlanDate">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterRegistration">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterRegistrationType">
                 <UpdatedControls>
-                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterServiceUnit">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterName">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterGuarantor">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterReadyToDischarge">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdRegisterOpenList">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="tmrReadyToDischargeNotification">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="lbtnReadyToDischargeNotification">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="chkReadyToDischarge" />
+                    <telerik:AjaxUpdatedControl ControlID="grdRegisterOpenList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="pnlReadyToDischargeNotification" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
         </AjaxSettings>
@@ -284,6 +305,18 @@
                             </td>
                             <td></td>
                         </tr>
+                        <tr>
+                            <td colspan="4">
+                                <asp:Panel ID="pnlReadyToDischargeNotification" runat="server" role="status" aria-live="polite"
+                                    CssClass="info" Style="margin: 6px 0;">
+                                    <asp:LinkButton ID="lbtnReadyToDischargeNotification" runat="server" CausesValidation="false"
+                                        OnClick="lbtnReadyToDischargeNotification_Click" OnPreRender="lbtnReadyToDischargeNotification_PreRender"
+                                        ToolTip="Tampilkan daftar Ready To Discharge sesuai filter pencarian" Font-Bold="true" />
+                                    <br />
+                                    <span>Sesuai filter pencarian dan akses unit Anda. Diperbarui otomatis setiap 60 detik. Klik pesan untuk melihat daftar.</span>
+                                </asp:Panel>
+                            </td>
+                        </tr>
                     </table>
                 </td>
                 <td style="vertical-align: top; width: 20%">
@@ -306,6 +339,7 @@
             </tr>
         </table>
     </cc:CollapsePanel>
+    <asp:Timer ID="tmrReadyToDischargeNotification" runat="server" Interval="60000" />
     <telerik:RadGrid ID="grdRegisterOpenList" runat="server" AutoGenerateColumns="false"
         OnNeedDataSource="grdRegisterOpenList_NeedDataSource" OnItemDataBound="grdRegisterOpenList_ItemDataBound"
         AllowPaging="True" PageSize="15">
@@ -401,7 +435,7 @@
                     <HeaderStyle HorizontalAlign="Center" Width="120px" />
                     <ItemStyle HorizontalAlign="Center" />
                 </telerik:GridBoundColumn>
-                <telerik:GridBoundColumn DataField="DischargePlanDate" HeaderStyle-Width="90px" DataFormatString="{0:dd/MM/yyyy}"
+                <telerik:GridBoundColumn DataField="DischargePlanDate" HeaderStyle-Width="120px" DataFormatString="{0:dd/MM/yyyy HH:mm}"
                     UniqueName="DischargePlanDate" HeaderText="Discharge Plan Date" SortExpression="DischargePlanDate"
                     HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridBoundColumn DataField="DischargeDate" HeaderStyle-Width="90px" DataFormatString="{0:dd/MM/yyyy}"

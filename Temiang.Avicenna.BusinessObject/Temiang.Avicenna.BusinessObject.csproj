@@ -789,6 +789,7 @@
     <Compile Include="Custom\UserHostPrinterOther.cs" />
     <Compile Include="Custom\PrintJobParameterCollection.cs" />
     <Compile Include="Custom\VwEmployeeTable.cs" />
+    <Compile Include="Custom\VwGuarantorAdmedika.cs" />
     <Compile Include="Custom\VwHasilPasienVanslab.cs" />
     <Compile Include="Custom\VwPatientsPaidOff.cs" />
     <Compile Include="Custom\WageTransactionItem.cs" />
@@ -1148,6 +1149,7 @@
     <Compile Include="Generated\VisitQueue.cs" />
     <Compile Include="Generated\VisitQueueBarcode.cs" />
     <Compile Include="Generated\VwEmployeeOrganizationUnit.cs" />
+    <Compile Include="Generated\VwGuarantorAdmedika.cs" />
     <Compile Include="Generated\VwItemProductFabric.cs" />
     <Compile Include="Generated\VwPOPreComputeQtyFinished.cs" />
     <Compile Include="Generated\WageBase.cs" />
