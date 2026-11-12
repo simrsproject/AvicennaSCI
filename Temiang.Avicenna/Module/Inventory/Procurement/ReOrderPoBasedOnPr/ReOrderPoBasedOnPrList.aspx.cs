@@ -1106,6 +1106,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -1302,6 +1303,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -1485,6 +1487,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -1661,6 +1664,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -1890,6 +1894,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -2087,6 +2092,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -2300,6 +2306,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
@@ -2504,6 +2511,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                                             entity.TransactionNo = _autoNumber.LastCompleteNumber;
                                             entity.TransactionCode = TransactionCode.PurchaseOrder;
+                                            entity.IsNewTaxCalculation = true;
                                             entity.TransactionDate = dateTransaction;
                                             entity.BusinessPartnerID = group.SupplierID;
                                             entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;
