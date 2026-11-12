@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using Newtonsoft.Json;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.BusinessObject.JsonField;
+using Temiang.Avicenna.Common;
 using Telerik.Web.UI;
 namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
 {
@@ -42,6 +43,48 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             }
             message = string.Empty;
             return true;
+        }
+
+        public string GetEmptyOutpatientControlPlanConfirmationScript()
+        {
+            var dateClientIds = new List<string>();
+            for (var i = 1; i <= 5; i++)
+            {
+                var date = (RadDateTimePicker)FindControl("txtControlPlanDateTime" + i.ToString("00"));
+                dateClientIds.Add(string.Format("'{0}'", date.ClientID));
+            }
+
+            var message = HttpUtility.JavaScriptStringEncode(
+                AppMessage.GetMessageText(AppMessage.MessageIdEnum.EmptyOutpatientControlPlanConfirmation));
+
+            return string.Format(@"
+                var controlPlanDateIds = [{0}];
+                var hasOutpatientControlPlanDate = false;
+                for (var controlPlanDateIndex = 0; controlPlanDateIndex < controlPlanDateIds.length; controlPlanDateIndex++) {{
+                    var controlPlanDatePicker = $find(controlPlanDateIds[controlPlanDateIndex]);
+                    if (controlPlanDatePicker && controlPlanDatePicker.get_selectedDate()) {{
+                        hasOutpatientControlPlanDate = true;
+                        break;
+                    }}
+                }}
+                if (!hasOutpatientControlPlanDate && window.confirm('{1}')) {{
+                    args.set_cancel(true);
+                    fw_lastTbiDisabled.enable();
+                    fw_lastTbiDisabled = null;
+                    ContinueAutoSave();
+                    return;
+                }}", string.Join(",", dateClientIds), message);
+        }
+
+        public string GetEmptyOutpatientControlPlanConfirmationScript(Registration registration)
+        {
+            if (registration == null || AppSession.Parameter.HealthcareInitial != "RSI" ||
+                registration.SRRegistrationType != AppConstant.RegistrationType.OutPatient ||
+                !AppSession.Parameter.GuarantorAskesID.Contains(registration.GuarantorID) ||
+                string.IsNullOrWhiteSpace(registration.BpjsSepNo))
+                return string.Empty;
+
+            return GetEmptyOutpatientControlPlanConfirmationScript();
         }
 
         private void AddControlPlanItem(List<ControlPlanItem> itemPlans, RadDateTimePicker txtControlPlanDateTime, RadComboBox cboServiceUnitID
