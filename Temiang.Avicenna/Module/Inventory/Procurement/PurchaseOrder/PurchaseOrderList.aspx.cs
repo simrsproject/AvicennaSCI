@@ -300,7 +300,12 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                 if (cboSearchStatus.SelectedValue == "1")
                     query.Where(query.IsApproved == true);
                 if (cboSearchStatus.SelectedValue == "2")
-                    query.Where(query.IsClosed == false);
+                    {
+                        query.Where(
+                            query.IsClosed == false,
+                            query.IsVoid == false
+                        );
+                    }
                 if (cboSearchStatus.SelectedValue == "3")
                     query.Where(query.IsClosed == true);
                 if (cboSearchStatus.SelectedValue == "4")
