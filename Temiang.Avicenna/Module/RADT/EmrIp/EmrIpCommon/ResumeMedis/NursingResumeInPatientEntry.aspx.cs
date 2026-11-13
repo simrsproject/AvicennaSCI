@@ -479,6 +479,12 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             var reg = new Registration();
             reg.LoadByPrimaryKey(RegistrationNo);
 
+            if (Common.BPJS.VClaim.InpatientControlPlan.IsSentOnDischarge(reg))
+            {
+                dsByNurse.ControlPlan = JsonConvert.SerializeObject(controlPlanCtl.GetControlPlan(true));
+                return string.Empty;
+            }
+
             var nosep = string.Empty;
 
             if (!string.IsNullOrWhiteSpace(reg.BpjsSepNo))

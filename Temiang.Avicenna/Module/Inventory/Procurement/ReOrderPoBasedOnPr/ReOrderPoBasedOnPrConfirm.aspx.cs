@@ -375,6 +375,7 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
                         var entity = new ItemTransaction();
                         entity.TransactionNo = autoNumber.LastCompleteNumber;
                         entity.TransactionCode = TransactionCode.PurchaseOrder;
+                        entity.IsNewTaxCalculation = true;
                         entity.TransactionDate = dateTransaction;
                         entity.BusinessPartnerID = @itemGrouped.SupplierID;
                         entity.CurrencyID = AppSession.Parameter.CurrencyRupiahID;

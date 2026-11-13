@@ -1324,8 +1324,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                 query.Select(@"<CONVERT(decimal(10,2),COALESCE(c.Balance,0)) AS refToItemBalance_BalanceSG>",
                     @"<CONVERT(decimal(10,2),COALESCE(bl.Balance,0)) AS refToItemBalance_Balance>",
-                    @"<CONVERT(decimal(10,2),COALESCE(c.Minimum,0)) AS refToItemBalance_Minimum>",
-                    @"<CONVERT(decimal(10,2),COALESCE(c.Maximum,0)) AS refToItemBalance_Maximum>",
+                    @"<CONVERT(decimal(10,2),COALESCE(CASE WHEN c.Maximum > 0 THEN c.Minimum ELSE bl.Minimum END,0)) AS refToItemBalance_Minimum>",
+                    @"<CONVERT(decimal(10,2),COALESCE(CASE WHEN c.Maximum > 0 THEN c.Maximum ELSE bl.Maximum END,0)) AS refToItemBalance_Maximum>",
                     @"<i2.SRItemUnit AS refToItemProduct_SRItemUnit>"
                     );
             }
@@ -1483,21 +1483,22 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
                 if (chkIsInventoryItem.Checked && AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsPOWithStockInfo))
                 {
+                    var locationID = cboLocationID.SelectedValue ?? string.Empty;
+                    ProcurementUtils.PopulateBalanceInfoByLocation(entity, cboSRItemType.SelectedValue, locationID);
+
                     if (AppSession.Parameter.IsYes(AppParameter.ParameterItem.IsPorByStockGroup))
                     {
-                        var stockGroup = "abcd";
                         var loc = new Location();
-                        loc.LoadByPrimaryKey(cboLocationID.SelectedValue ?? string.Empty);
-                        if (!string.IsNullOrEmpty(loc.SRStockGroup))
-                            stockGroup = loc.SRStockGroup;
-
-                        ProcurementUtils.PopulateBalanceInfoByStockGroup(entity, stockGroup, cboLocationID.SelectedValue ?? string.Empty);
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(cboSRItemType.SelectedValue))
+                        var groupBalance = new ItemBalanceByStockGroup();
+                        if (loc.LoadByPrimaryKey(locationID) && !string.IsNullOrEmpty(loc.SRStockGroup) &&
+                            groupBalance.LoadByPrimaryKey(loc.SRStockGroup, entity.ItemID))
                         {
-                            ProcurementUtils.PopulateBalanceInfoByItemType(entity, cboSRItemType.SelectedValue);
+                            entity.BalanceSG = groupBalance.Balance ?? 0;
+                            if (groupBalance.Maximum > 0)
+                            {
+                                entity.Minimum = groupBalance.Minimum ?? 0;
+                                entity.Maximum = groupBalance.Maximum;
+                            }
                         }
                     }
                 }

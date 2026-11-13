@@ -106,6 +106,8 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
 
         protected override void OnDataBinding(EventArgs e)
         {
+            ViewState["UseItemUnit"] = false;
+            cboSRItemUnit.Enabled = true;
             pnlBudgetPlan.Visible = false;
             tblPriceInfo.Visible = false;
             if (!string.IsNullOrEmpty(Session["PurchaseRequestForWorkOrder" + Request.UserHostName].ToString()))
@@ -199,11 +201,29 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             cboSRItemUnit.SelectedValue = (String)DataBinder.Eval(DataItem, ItemTransactionItemMetadata.ColumnNames.SRItemUnit);
             txtItemUnitConversion.Text = unitConversion;
 
+            // Preserve item-unit requests from the usage-history picker when editing.
+            // Existing requests in purchase units retain their original unit and quantity.
+            if (!chkIsNonMasterOrder.Checked && cboSRItemType.SelectedValue == BusinessObject.Reference.ItemType.Medical &&
+                !string.IsNullOrEmpty(unitConversion) &&
+                cboSRItemUnit.SelectedValue == unitConversion && txtQtyUnitConversion.Value == 1 &&
+                PurchaseRequestUsageHistory.ShouldUseItemUnits(cboSRItemType.SelectedValue))
+            {
+                ViewState["UseItemUnit"] = true;
+                RestrictToItemUnit(unitConversion);
+            }
+
             PopulateBudgetPlan(cboItemID.SelectedValue);
         }
 
         protected void customValidator_ServerValidate(object source, ServerValidateEventArgs args)
         {
+            if ((bool?)ViewState["UseItemUnit"] == true &&
+                (cboSRItemUnit.SelectedValue != txtItemUnitConversion.Text || txtQtyUnitConversion.Value != 1))
+            {
+                args.IsValid = false;
+                ((CustomValidator)source).ErrorMessage = "Request must use the item unit with conversion 1.";
+                return;
+            }
             if (txtQuantity.Value <= 0)
             {
                 args.IsValid = false;
@@ -419,6 +439,15 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             ComboBox.ItemItemDataBound(e);
         }
 
+        private void RestrictToItemUnit(string itemUnit)
+        {
+            cboSRItemUnit.Items.Clear();
+            cboSRItemUnit.Items.Add(new RadComboBoxItem(itemUnit, itemUnit));
+            cboSRItemUnit.SelectedValue = itemUnit;
+            cboSRItemUnit.Enabled = false;
+            txtQtyUnitConversion.Value = 1;
+        }
+
         protected void cboItemID_SelectedIndexChanged(object o, RadComboBoxSelectedIndexChangedEventArgs e)
         {
             var itemType = cboSRItemType.SelectedValue ?? string.Empty;
@@ -440,6 +469,14 @@ namespace Temiang.Avicenna.Module.Inventory.Procurement
             decimal convertionPurchaseUnitToBaseUnit = 1;
             var supplierID = cboBusinessPartnerID.SelectedValue ?? string.Empty;
             ProcurementUtils.PopulateWithHistPrice(entity, itemType, supplierID, ref  purchaseUnit, ref  baseUnit, ref  convertionPurchaseUnitToBaseUnit);
+
+            if ((bool?)ViewState["UseItemUnit"] == true && !string.IsNullOrEmpty(baseUnit))
+            {
+                purchaseUnit = baseUnit;
+                convertionPurchaseUnitToBaseUnit = 1;
+                RestrictToItemUnit(baseUnit);
+                ProcurementUtils.PopulateWithHistPrice(entity, itemType, supplierID, baseUnit);
+            }
 
             SRMasterBaseUnit = baseUnit;
             txtDiscount1Percentage.Value = (double)(entity.Discount1Percentage ?? 0);
