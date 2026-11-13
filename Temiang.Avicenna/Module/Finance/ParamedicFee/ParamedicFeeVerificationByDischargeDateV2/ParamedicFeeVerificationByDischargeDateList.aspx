@@ -353,12 +353,13 @@
                     </tr>
                     <tr>
                         <td class="label">
-                            <asp:Label ID="Label2" runat="server" Text="Service Unit"></asp:Label>
+                            <asp:Label ID="Label2" runat="server" Text="Service Unit (like)"></asp:Label>
                         </td>
                         <td class="entry">
                             <telerik:RadComboBox ID="cboServiceUnit" runat="server" Width="300px" AllowCustomText="true"
-                                Filter="Contains">
+                                Filter="Contains" Visible="false">
                             </telerik:RadComboBox>
+                            <telerik:RadTextBox ID="txtServiceUnitName" runat="server" Width="300px" MaxLength="100" />
                         </td>
                         <td style="text-align: left">
                             <asp:ImageButton ID="btnFilterSU" runat="server" ImageUrl="~/Images/Toolbar/search16.png"

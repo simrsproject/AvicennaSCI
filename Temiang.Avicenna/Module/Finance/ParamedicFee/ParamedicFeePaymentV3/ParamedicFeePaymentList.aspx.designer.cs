@@ -249,6 +249,33 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.ParamedicFeePaymentV3
         protected global::System.Web.UI.WebControls.ImageButton btnFilterParamedic;
 
         /// <summary>
+        /// Label15 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label Label15;
+
+        /// <summary>
+        /// txtServiceUnitName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtServiceUnitName;
+
+        /// <summary>
+        /// btnFilterServiceUnit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterServiceUnit;
+
+        /// <summary>
         /// Label3 control.
         /// </summary>
         /// <remarks>

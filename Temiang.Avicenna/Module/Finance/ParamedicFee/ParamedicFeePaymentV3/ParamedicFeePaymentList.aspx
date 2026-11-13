@@ -122,6 +122,12 @@
                     <telerik:AjaxUpdatedControl ControlID="grdListVGN" LoadingPanelID="RadAjaxLoadingPanel1" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterServiceUnit">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="RadAjaxLoadingPanel1" />
+                    <telerik:AjaxUpdatedControl ControlID="grdListVGN" LoadingPanelID="RadAjaxLoadingPanel1" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
 
             <telerik:AjaxSetting AjaxControlID="btnRegistrationNo">
                 <UpdatedControls>
@@ -347,6 +353,19 @@
                         </td>
                         <td style="text-align: left">
                             <asp:ImageButton ID="btnFilterParamedic" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
+                                OnClick="btnFilter_Click" ToolTip="Search" />
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="label">
+                            <asp:Label ID="Label15" runat="server" Text="Service Unit (like)"></asp:Label>
+                        </td>
+                        <td class="entry">
+                            <telerik:RadTextBox ID="txtServiceUnitName" runat="server" Width="300px" MaxLength="100" />
+                        </td>
+                        <td style="text-align: left">
+                            <asp:ImageButton ID="btnFilterServiceUnit" runat="server" ImageUrl="~/Images/Toolbar/search16.png"
                                 OnClick="btnFilter_Click" ToolTip="Search" />
                         </td>
                         <td></td>
