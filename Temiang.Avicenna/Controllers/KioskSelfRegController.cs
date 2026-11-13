@@ -945,19 +945,70 @@ namespace Temiang.Avicenna.Controllers
                 // 2. DECRYPT QR CODE
                 string decryptedData = DecryptAppointmentQRCode(qrCode.Trim());
 
-                string appointmentNo;
+                string appointmentNo = null;
 
-                // 3. PARSE HASIL DEKRIPSI
                 try
                 {
-                    JObject payload = JObject.Parse(decryptedData);
+                    JToken payload = JToken.Parse(decryptedData);
+
+                    // Antisipasi jika payload ternyata JSON string yang di-encode dua kali.
+                    if (payload.Type == JTokenType.String)
+                    {
+                        payload = JToken.Parse(payload.ToString());
+                    }
+
                     appointmentNo =
                         Convert.ToString(payload["appointment_no"])
                         ?? Convert.ToString(payload["AppointmentNo"]);
+
+                    // Validasi masa berlaku QR
+                    long expiresAt = Convert.ToInt64(payload["expires_at"]);
+
+                    if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiresAt)
+                    {
+                        return Json(new
+                        {
+                            status = "ERR",
+                            message = "QR Code sudah kedaluwarsa. Silakan gunakan QR Code terbaru."
+                        });
+                    }
+
+                    // Validasi tipe QR
+                    string qrType = Convert.ToString(payload["type"]);
+                    string checkinKey = Convert.ToString(payload["checkin_key"]);
+
+                    if (qrType != "appointment_checkin" ||
+                        checkinKey != "CheckinKey")
+                    {
+                        return Json(new
+                        {
+                            status = "ERR",
+                            message = "Format QR Code tidak valid."
+                        });
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    appointmentNo = decryptedData;
+                    System.Diagnostics.Debug.WriteLine(
+                        "[QR PAYLOAD ERROR] " + ex
+                    );
+
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "Format data QR Code tidak valid."
+                    });
+                }
+
+                appointmentNo = appointmentNo?.Trim();
+
+                if (string.IsNullOrWhiteSpace(appointmentNo))
+                {
+                    return Json(new
+                    {
+                        status = "ERR",
+                        message = "AppointmentNo tidak ditemukan dalam QR Code."
+                    });
                 }
 
                 appointmentNo = appointmentNo?.Trim();
