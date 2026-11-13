@@ -7573,7 +7573,7 @@ namespace Temiang.Avicenna.BusinessObject
         private DataTable GetParamedicFeeByTeam(DateTime? paymentDateFrom, DateTime? paymentDateTo,
             string paramedicID, DateTime? dischargeDateFrom, DateTime? dischargeDateTo, DateTime? planningDate,
             string registrationNo, string medicalNo, string patientName, string guarantorID, string srGuarantorType,
-            string paymentGroupNoDraft, string verificationNo) {
+            string paymentGroupNoDraft, string verificationNo, string serviceUnitName) {
             var feeBt = new ParamedicFeeTransChargesItemCompByTeamQuery("feeBt");
             var fee = new ParamedicFeeTransChargesItemCompByDischargeDateQuery("fee");
             var ver = new ParamedicFeeVerificationQuery("ver");
@@ -7652,6 +7652,15 @@ namespace Temiang.Avicenna.BusinessObject
                 feeBt.Where(guar.SRGuarantorType == srGuarantorType);
             }
 
+            if (!string.IsNullOrEmpty(serviceUnitName))
+            {
+                var tc = new TransChargesQuery("tc");
+                var su = new ServiceUnitQuery("su");
+                feeBt.InnerJoin(tc).On(feeBt.TransactionNo == tc.TransactionNo);
+                feeBt.InnerJoin(su).On(tc.ToServiceUnitID == su.ServiceUnitID);
+                feeBt.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
+            }
+
             var dtfee = feeBt.LoadDataTable();
 
             if (!string.IsNullOrEmpty(paymentGroupNoDraft))
@@ -7677,6 +7686,15 @@ namespace Temiang.Avicenna.BusinessObject
 
                 feeBt.Where(feeBt.PaymentGroupNo == paymentGroupNoDraft, feeBt.VerificationNo.IsNotNull(), ver.IsApproved == true);//.GroupBy(par.ParamedicID, par.ParamedicName)
 
+                if (!string.IsNullOrEmpty(serviceUnitName))
+                {
+                    var tc = new TransChargesQuery("tc");
+                    var su = new ServiceUnitQuery("su");
+                    feeBt.InnerJoin(tc).On(feeBt.TransactionNo == tc.TransactionNo);
+                    feeBt.InnerJoin(su).On(tc.ToServiceUnitID == su.ServiceUnitID);
+                    feeBt.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
+                }
+
                 var dtfee2 = feeBt.LoadDataTable();
 
                 dtfee.Merge(dtfee2);
@@ -7688,7 +7706,7 @@ namespace Temiang.Avicenna.BusinessObject
             DateTime? paymentDateFrom, DateTime? paymentDateTo,
             string paramedicID, DateTime? dischargeDateFrom, DateTime? dischargeDateTo, DateTime? planningDate,
             string registrationNo, string medicalNo, string patientName, string guarantorID, string srGuarantorType,
-            string paymentGroupNoDraft, string verificationNo)
+            string paymentGroupNoDraft, string verificationNo, string serviceUnitName)
         {
             var payt = new ParamedicFeeTransPaymentQuery("payt");
             var fee = new ParamedicFeeTransChargesItemCompByDischargeDateQuery("fee");
@@ -7767,6 +7785,15 @@ namespace Temiang.Avicenna.BusinessObject
                 payt.Where(guar.SRGuarantorType == srGuarantorType);
             }
 
+            if (!string.IsNullOrEmpty(serviceUnitName))
+            {
+                var tc = new TransChargesQuery("tc");
+                var su = new ServiceUnitQuery("su");
+                payt.InnerJoin(tc).On(fee.TransactionNo == tc.TransactionNo);
+                payt.InnerJoin(su).On(tc.ToServiceUnitID == su.ServiceUnitID);
+                payt.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
+            }
+
             dtfee = payt.LoadDataTable();
 
             if (!string.IsNullOrEmpty(paymentGroupNoDraft))
@@ -7789,6 +7816,15 @@ namespace Temiang.Avicenna.BusinessObject
 
                 payt.Where(payt.IsVoid == false, payt.PaymentGroupNo == paymentGroupNoDraft, fee.VerificationNo.IsNotNull(), ver.IsApproved == true);//.GroupBy(par.ParamedicID, par.ParamedicName)
 
+                if (!string.IsNullOrEmpty(serviceUnitName))
+                {
+                    var tc = new TransChargesQuery("tc");
+                    var su = new ServiceUnitQuery("su");
+                    payt.InnerJoin(tc).On(fee.TransactionNo == tc.TransactionNo);
+                    payt.InnerJoin(su).On(tc.ToServiceUnitID == su.ServiceUnitID);
+                    payt.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
+                }
+
                 var dtfee2 = payt.LoadDataTable();
 
                 dtfee.Merge(dtfee2);
@@ -7797,7 +7833,7 @@ namespace Temiang.Avicenna.BusinessObject
             var dtfeeBt = GetParamedicFeeByTeam(paymentDateFrom, paymentDateTo,
                 paramedicID, dischargeDateFrom, dischargeDateTo, planningDate,
                 registrationNo, medicalNo, patientName, guarantorID, srGuarantorType,
-                paymentGroupNoDraft, verificationNo);
+                paymentGroupNoDraft, verificationNo, serviceUnitName);
 
             dtfee.Merge(dtfeeBt);
 
@@ -7851,7 +7887,7 @@ namespace Temiang.Avicenna.BusinessObject
 
         public DataTable GetParamedicFeeProrataBayarGroupByParamedic(DateTime? paymentDateFrom, DateTime? paymentDateTo,
             string paramedicID, DateTime? dischargeDateFrom, DateTime? dischargeDateTo,
-            string registrationNo, string medicalNo, string patientName)
+            string registrationNo, string medicalNo, string patientName, string serviceUnitName)
         {
             var payt = new ParamedicFeeTransPaymentQuery("payt");
             var fee = new ParamedicFeeTransChargesItemCompByDischargeDateQuery("fee");
@@ -7869,6 +7905,15 @@ namespace Temiang.Avicenna.BusinessObject
             if (!string.IsNullOrEmpty(paramedicID))
             {
                 payt.Where(fee.ParamedicID == paramedicID);
+            }
+
+            if (!string.IsNullOrEmpty(serviceUnitName))
+            {
+                var tc = new TransChargesQuery("tc");
+                var su = new ServiceUnitQuery("su");
+                payt.InnerJoin(tc).On(fee.TransactionNo == tc.TransactionNo);
+                payt.InnerJoin(su).On(tc.ToServiceUnitID == su.ServiceUnitID);
+                payt.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
             }
             if (paymentDateFrom.HasValue)
             {
