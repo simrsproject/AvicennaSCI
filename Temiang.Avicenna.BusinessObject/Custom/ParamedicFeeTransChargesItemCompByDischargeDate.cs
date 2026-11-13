@@ -5563,7 +5563,7 @@ namespace Temiang.Avicenna.BusinessObject
         #region GetList -->> Static Function
         public static DataTable GetParamedicByTeam(DateTime? dischargeDateFrom, DateTime? dischargeDateTo,
             DateTime? paymentDateFrom, DateTime? paymentDateTo,
-            string registrationNo, string serviceUnitID, string paramedicID,
+            string registrationNo, string serviceUnitName, string paramedicID,
             string itemName, bool isIPR, bool isOPR,
             List<string> tcs, bool isAllComponentSelected,
             List<string> pts, bool isPhysiciantype,
@@ -5764,9 +5764,11 @@ namespace Temiang.Avicenna.BusinessObject
                 }
             }
 
-            if (!string.IsNullOrEmpty(serviceUnitID))
+            if (!string.IsNullOrEmpty(serviceUnitName))
             {
-                query.Where(txhQ.ToServiceUnitID == serviceUnitID);
+                var su = new ServiceUnitQuery("su");
+                query.InnerJoin(su).On(txhQ.ToServiceUnitID == su.ServiceUnitID);
+                query.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
             }
             if (!string.IsNullOrEmpty(paramedicID))
             {
@@ -5899,7 +5901,7 @@ namespace Temiang.Avicenna.BusinessObject
 
         public static DataTable GetParamedicFee(DateTime? dischargeDateFrom, DateTime? dischargeDateTo,
             DateTime? paymentDateFrom, DateTime? paymentDateTo,
-            string registrationNo, string serviceUnitID, string paramedicID,
+            string registrationNo, string serviceUnitName, string paramedicID,
             string itemName, bool isIPR, bool isOPR,
             List<string> tcs, bool isAllComponentSelected,
             List<string> pts, bool isPhysiciantype,
@@ -6111,9 +6113,11 @@ namespace Temiang.Avicenna.BusinessObject
                 }
             }
 
-            if (!string.IsNullOrEmpty(serviceUnitID))
+            if (!string.IsNullOrEmpty(serviceUnitName))
             {
-                query.Where(txhQ.ToServiceUnitID == serviceUnitID);
+                var su = new ServiceUnitQuery("su");
+                query.InnerJoin(su).On(txhQ.ToServiceUnitID == su.ServiceUnitID);
+                query.Where(su.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
             }
             if (!string.IsNullOrEmpty(paramedicID))
             {
@@ -6244,7 +6248,7 @@ namespace Temiang.Avicenna.BusinessObject
             dtb = query.LoadDataTable();
             var dtbMember = GetParamedicByTeam(dischargeDateFrom, dischargeDateTo,
                 paymentDateFrom, paymentDateTo,
-                registrationNo, serviceUnitID, paramedicID,
+                registrationNo, serviceUnitName, paramedicID,
                 itemName, isIPR, isOPR,
                 tcs, isAllComponentSelected,
                 pts, isPhysiciantype,
@@ -6397,9 +6401,11 @@ namespace Temiang.Avicenna.BusinessObject
                 );
             }
 
-            if (!string.IsNullOrEmpty(serviceUnitID))
+            if (!string.IsNullOrEmpty(serviceUnitName))
             {
-                queryAR.Where(regQAR.ServiceUnitID == serviceUnitID);
+                var suAR = new ServiceUnitQuery("su");
+                queryAR.InnerJoin(suAR).On(regQAR.ServiceUnitID == suAR.ServiceUnitID);
+                queryAR.Where(suAR.ServiceUnitName.Like(string.Format("%{0}%", serviceUnitName)));
             }
             if (!string.IsNullOrEmpty(paramedicID))
             {

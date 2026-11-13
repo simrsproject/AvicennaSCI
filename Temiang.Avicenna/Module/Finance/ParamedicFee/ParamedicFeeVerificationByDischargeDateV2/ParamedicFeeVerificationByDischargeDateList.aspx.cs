@@ -104,27 +104,8 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
                 }
 
 
-                var suColl = new ServiceUnitCollection();
-                suColl.Query.Where
-                    (
-                        suColl.Query.IsActive == true,
-                        suColl.Query.SRRegistrationType.In(
-                        AppConstant.RegistrationType.ClusterPatient,
-                        AppConstant.RegistrationType.EmergencyPatient,
-                        AppConstant.RegistrationType.InPatient,
-                        AppConstant.RegistrationType.OutPatient,
-                        AppConstant.RegistrationType.MedicalCheckUp
-                        )
-
-                    );
-                suColl.Query.OrderBy(suColl.Query.ServiceUnitName.Ascending);
-                suColl.LoadAll();
-
-                cboServiceUnit.Items.Add(new RadComboBoxItem(string.Empty, string.Empty));
-                foreach (ServiceUnit entity in suColl)
-                {
-                    cboServiceUnit.Items.Add(new RadComboBoxItem(entity.ServiceUnitName, entity.ServiceUnitID));
-                }
+                // service unit (free text, searched by name)
+                // populating cboServiceUnit is no longer needed because the filter uses txtServiceUnitName
 
                 // guarantor type
                 StandardReference.InitializeIncludeSpace(cboGuarantorType, AppEnum.StandardReference.GuarantorType);
@@ -169,7 +150,7 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.V2
 
             return ParamedicFeeTransChargesItemCompByDischargeDateCollection.GetParamedicFee(txtDischargeDateFrom.SelectedDate, txtDischargeDateTo.SelectedDate,
                 txtPaymentDateFrom.SelectedDate, txtPaymentDateTo.SelectedDate,
-                txtRegistrationNo.Text, cboServiceUnit.SelectedValue, cboParamedicID.SelectedValue,
+                txtRegistrationNo.Text, txtServiceUnitName.Text, cboParamedicID.SelectedValue,
                 txtNamaLayanan.Text, cblRegType.Items[0].Selected, cblRegType.Items[1].Selected,
                 tcs, isAllComponentSelected, pts, isPhysiciantype,
                 AppSession.Parameter.IsPhysicianFeeVerificationPaidOnly,
