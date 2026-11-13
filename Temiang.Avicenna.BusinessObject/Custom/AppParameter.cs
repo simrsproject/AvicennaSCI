@@ -1298,7 +1298,9 @@ namespace Temiang.Avicenna.BusinessObject
             IsUsingSuggestion,
 
             IsAllowZeroNewPriceForTariff,
-            IsUsingUniqueACSN
+            IsUsingUniqueACSN,
+            IsPurchaseRequestUsageHistoryMedicalUsingItemUnit
+
         }
 
         public class DefaultRecordValue
@@ -1973,6 +1975,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string IsDistributionRequestBasedOnItemsPerLocation = "Is Distribution Request Based On Items Per Location? (Yes/No)|No;RSMM:Yes| |True";
             public const string IsOperatingRoomResetPriceHighestClass = "Is Operating Room Reset Price Highest Class (Yes/No)|No| |False";
             public const string IsPurchaseRequestsUsingItemUnit = "Is Purchase Requests Using Item Unit? (Yes/No)|No;RSMM:Yes| |True";
+            public const string IsPurchaseRequestUsageHistoryMedicalUsingItemUnit = "Use Item Unit for Medical Purchase Requests from Usage History? (Yes/No; blank follows existing setting)|| |True";
             public const string QuestionIdBodyMassIndex = "Question ID For Body Mass Index|GEN.SGN.03| |False";
             public const string RadiologyNoAutoCreate = "Radiology No Auto Create? (Yes/No)|Yes;RSMM:No| |True";
             public const string IsAllowPaymentReturnFromCashEntry = "Is Allow Payment Return From Cash Entry (Yes/No)|No;RSUI:Yes;RSPM:Yes;EMC:Yes| |True";

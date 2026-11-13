@@ -441,6 +441,9 @@
                 <telerik:GridBoundColumn DataField="DischargeDate" HeaderStyle-Width="90px" DataFormatString="{0:dd/MM/yyyy}"
                     UniqueName="DischargeDate" HeaderText="Discharge Date" SortExpression="DischargeDate"
                     HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />
+                <telerik:GridBoundColumn DataField="SentToBillingDateTime" HeaderStyle-Width="140px" DataFormatString="{0:dd/MM/yyyy HH:mm}"
+                    UniqueName="SentToBillingDateTime" HeaderText="Received by Billing Date/Time" SortExpression="SentToBillingDateTime"
+                    HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" />
                 <telerik:GridCheckBoxColumn DataField="IsHoldTransactionEntry" HeaderText="Locked"
                     UniqueName="IsHoldTransactionEntry" SortExpression="IsHoldTransactionEntry" Visible="false">
                     <HeaderStyle HorizontalAlign="Center" Width="60px" />

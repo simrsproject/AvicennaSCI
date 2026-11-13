@@ -205,6 +205,7 @@ namespace Temiang.Avicenna.Module.Charges
                         @"<CASE WHEN h.NoteCount <= 0 THEN NULL ELSE h.NoteCount END AS NoteCount>",
                         @"<CASE WHEN dc.LineNumber IS NULL OR (dc.LineNumber - h.DocumentCheckListCount) <= 0 THEN NULL ELSE (dc.LineNumber - h.DocumentCheckListCount) END AS DocumentCheckListCountRemains>",
                         qr.DischargeDate,
+                        qr.SentToBillingDateTime,
                         "<CASE WHEN r.DischargeDate IS NULL THEN CAST(0 AS BIT) ELSE CAST(1 AS BIT) END AS IsDischarge>",
                         qr.ChargeClassID, qr.CoverageClassID, qr.ClassID, @"<ISNULL(bd.DefaultChargeClassID, r.ChargeClassID) AS DefaultClassID>",
                         qr.PlavonAmount, sal.ItemName.As("SalutationName"),
