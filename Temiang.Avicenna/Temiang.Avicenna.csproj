@@ -2995,7 +2995,6 @@
     <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsList.aspx" />
     <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsDetail.aspx" />
     <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsUploadDialog.aspx" />
-    <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsFile.ashx" />
     <Content Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineDashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineReference.aspx" />
@@ -15875,9 +15874,6 @@
     </Compile>
     <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsUploadDialog.aspx.designer.cs">
       <DependentUpon>AdmedikaEdocsUploadDialog.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsFile.ashx.cs">
-      <DependentUpon>AdmedikaEdocsFile.ashx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsHelper.cs" />
     <Compile Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx.cs">

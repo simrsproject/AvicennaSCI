@@ -20,6 +20,30 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             return new AdmedikaConfig().UploadDocumentPath ?? string.Empty;
         }
 
+        public static string GetVirtualDocUrl()
+        {
+            var url = new AdmedikaConfig().VirtualDocUrl ?? string.Empty;
+            return url.TrimEnd('/');
+        }
+
+        /// <summary>
+        /// URL preview file melalui virtual directory yang menunjuk ke folder upload.
+        /// </summary>
+        public static string BuildFileUrl(AdmedikaClaimTransaction claim, string fileName)
+        {
+            var baseUrl = GetVirtualDocUrl();
+            if (string.IsNullOrWhiteSpace(baseUrl) || claim == null) return string.Empty;
+
+            var cardNo = SanitizeFolderName(claim.CardNo);
+            var clID = SanitizeFolderName(claim.ClID);
+
+            return string.Format("{0}/{1}/{2}/{3}",
+                baseUrl,
+                Uri.EscapeDataString(string.IsNullOrEmpty(cardNo) ? "UNKNOWN" : cardNo),
+                Uri.EscapeDataString(string.IsNullOrEmpty(clID) ? "UNKNOWN" : clID),
+                Uri.EscapeDataString(SanitizeFileName(fileName)));
+        }
+
         public static string RemoveSpaces(string value)
         {
             return string.IsNullOrWhiteSpace(value)

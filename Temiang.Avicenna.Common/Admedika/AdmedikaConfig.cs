@@ -19,6 +19,7 @@ namespace Temiang.Avicenna.Common.Admedika
         public int TimeoutSeconds { get; set; }
         public bool IsLogEnabled { get; set; }
         public string UploadDocumentPath { get; set; } = string.Empty;
+        public string VirtualDocUrl { get; set; } = string.Empty;
 
         public AdmedikaConfig()
         {
@@ -31,6 +32,7 @@ namespace Temiang.Avicenna.Common.Admedika
             TimeoutSeconds = GetInt("AdmedikaTimeoutSeconds", 60);
             IsLogEnabled = GetBool("AdmedikaIsLogEnabled", true);
             UploadDocumentPath = GetString("AdmedikaUploadEdocsPath", string.Empty);
+            VirtualDocUrl = GetString("AdmedikaVirtualDocUrl", string.Empty);
         }
 
         private static string GetString(string key, string fallback)

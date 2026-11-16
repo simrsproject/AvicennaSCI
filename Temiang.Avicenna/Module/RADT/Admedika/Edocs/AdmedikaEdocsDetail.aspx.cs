@@ -30,6 +30,23 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             }
         }
 
+        private AdmedikaClaimTransaction _currentClaim;
+
+        private AdmedikaClaimTransaction CurrentClaim
+        {
+            get
+            {
+                if (_currentClaim == null)
+                {
+                    var claim = new AdmedikaClaimTransaction();
+                    if (claim.LoadByPrimaryKey(ClaimTransactionID))
+                        _currentClaim = claim;
+                }
+
+                return _currentClaim;
+            }
+        }
+
         protected void Page_Init(object sender, EventArgs e)
         {
             ProgramID = AppConstant.Program.AdmedikaEdocs;
@@ -47,7 +64,6 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             base.OnLoadComplete(e);
 
             ToolBarMenuAdd.Enabled = false;
-            ToolBarMenuEdit.Enabled = false;
             ToolBarMenuDelete.Enabled = false;
             ToolBarMenuSave.Enabled = false;
             ToolBarMenuSearch.Enabled = false;
@@ -63,8 +79,8 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         private void LoadDetail()
         {
-            var claim = new AdmedikaClaimTransaction();
-            if (!claim.LoadByPrimaryKey(ClaimTransactionID))
+            var claim = CurrentClaim;
+            if (claim == null)
             {
                 ShowInformationHeader("Data klaim tidak ditemukan.");
                 btnUpload.Enabled = false;
@@ -136,8 +152,8 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             long documentID;
             if (!long.TryParse(Convert.ToString(e.CommandArgument), out documentID)) return;
 
-            var claim = new AdmedikaClaimTransaction();
-            if (!claim.LoadByPrimaryKey(ClaimTransactionID))
+            var claim = CurrentClaim;
+            if (claim == null)
             {
                 ShowInformationHeader("Data klaim tidak ditemukan.");
                 return;
@@ -192,6 +208,23 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             }
 
             return html;
+        }
+
+        protected string BuildFileUrl(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var claim = CurrentClaim;
+            if (claim == null) return string.Empty;
+
+            var fileName = Convert.ToString(row[AdmedikaDocumentMetadata.ColumnNames.FileName]);
+            return AdmedikaEdocsHelper.BuildFileUrl(claim, fileName);
+        }
+
+        protected bool IsOpenVisible(object dataItem)
+        {
+            return !string.IsNullOrEmpty(BuildFileUrl(dataItem));
         }
 
         protected string GetStatusText(object dataItem)

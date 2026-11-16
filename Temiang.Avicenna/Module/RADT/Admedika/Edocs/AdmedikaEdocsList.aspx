@@ -127,6 +127,7 @@
     <telerik:RadAjaxPanel ID="RadAjaxPanel1" runat="server" Width="100%" LoadingPanelID="fw_ajxLoadingPanel"
         EnableEmbeddedScripts="false" HorizontalAlign="NotSet">
         <telerik:RadGrid ID="grdList" runat="server" OnNeedDataSource="grdList_NeedDataSource"
+            OnItemDataBound="grdList_ItemDataBound"
             OnDetailTableDataBind="grdList_DetailTableDataBind"
             AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
             <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">
@@ -134,9 +135,18 @@
                     <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                         UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
                         ItemStyle-Font-Bold="true" />
-                    <telerik:GridDateTimeColumn DataField="RegistrationDate" HeaderText="Registration Date"
-                        UniqueName="RegistrationDate" SortExpression="RegistrationDate" DataType="System.DateTime"
-                        DataFormatString="{0:MM/dd/yyyy}" HeaderStyle-Width="120px" />
+                    <telerik:GridTemplateColumn DataField="RegistrationDate" HeaderText="Registration Date"
+                        UniqueName="RegistrationDate" SortExpression="RegistrationDate" HeaderStyle-Width="140px">
+                        <ItemTemplate>
+                            <%# BuildRegistrationDateHtml(Container.DataItem) %>
+                        </ItemTemplate>
+                    </telerik:GridTemplateColumn>
+                    <telerik:GridTemplateColumn DataField="GuarantorID" HeaderText="Guarantor ID / Name"
+                        UniqueName="Guarantor" SortExpression="GuarantorID" HeaderStyle-Width="200px">
+                        <ItemTemplate>
+                            <%# BuildGuarantorHtml(Container.DataItem) %>
+                        </ItemTemplate>
+                    </telerik:GridTemplateColumn>
                     <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
                         UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px"
                         ItemStyle-Font-Bold="true" />
@@ -145,6 +155,14 @@
                         ItemStyle-Font-Bold="true" />
                     <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
                         UniqueName="PatientName" SortExpression="PatientName" />
+                    <telerik:GridBoundColumn DataField="CovID" HeaderText="CovID"
+                        UniqueName="CovID" SortExpression="CovID" HeaderStyle-Width="70px" />
+                    <telerik:GridTemplateColumn DataField="CovCode" HeaderText="CovCode"
+                        UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="150px">
+                        <ItemTemplate>
+                            <%# BuildCovCodeHtml(Container.DataItem) %>
+                        </ItemTemplate>
+                    </telerik:GridTemplateColumn>
                     <telerik:GridBoundColumn DataField="JumlahFile" HeaderText="Jumlah File"
                         UniqueName="JumlahFile" SortExpression="JumlahFile" HeaderStyle-Width="90px"
                         HeaderStyle-HorizontalAlign="Right" ItemStyle-HorizontalAlign="Right" />

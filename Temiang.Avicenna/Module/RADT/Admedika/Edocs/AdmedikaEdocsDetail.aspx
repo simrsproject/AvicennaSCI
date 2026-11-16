@@ -142,7 +142,9 @@
                         HeaderStyle-Width="150px" HeaderStyle-HorizontalAlign="Center"
                         ItemStyle-HorizontalAlign="Center">
                         <ItemTemplate>
-                            <a href='AdmedikaEdocsFile.ashx?id=<%# Eval("AdmedikaDocumentID") %>' target="_blank">Open File</a>
+                            <asp:HyperLink ID="lnkOpen" runat="server" Target="_blank" Text="Open File"
+                                NavigateUrl='<%# BuildFileUrl(Container.DataItem) %>'
+                                Visible='<%# IsOpenVisible(Container.DataItem) %>' />
                             <asp:LinkButton ID="lnkSend" runat="server" CausesValidation="false"
                                 CommandName="SendDocument"
                                 CommandArgument='<%# Eval("AdmedikaDocumentID") %>'
