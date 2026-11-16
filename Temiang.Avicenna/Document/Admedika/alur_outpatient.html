@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alur Integrasi AdMedika — Rawat Jalan</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #5f6b7a;
+    --line: #e3e7ec;
+    --accent: #0f766e;
+    --accent-soft: #e6f4f1;
+    --warn: #b45309;
+    --warn-soft: #fdf3e3;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+    --info: #1d4ed8;
+    --info-soft: #e8eefc;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141a;
+      --card: #161c24;
+      --text: #e6edf3;
+      --muted: #9aa7b5;
+      --line: #26303b;
+      --accent: #2dd4bf;
+      --accent-soft: #12312d;
+      --warn: #fbbf24;
+      --warn-soft: #33270e;
+      --danger: #f87171;
+      --danger-soft: #331414;
+      --info: #93c5fd;
+      --info-soft: #14213d;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.65 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 28px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 12px 0 8px; }
+  .subtitle { color: var(--muted); margin: 0; max-width: 760px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  h2 { font-size: 20px; margin: 0 0 6px; }
+  h3 { font-size: 16px; margin: 22px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { color: var(--muted); margin-top: 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1px 6px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+  .b-required { color: var(--danger); background: var(--danger-soft); }
+  .b-optional { color: var(--info); background: var(--info-soft); }
+  .b-conditional { color: var(--warn); background: var(--warn-soft); }
+  .b-none { color: var(--muted); background: var(--bg); }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    margin: 16px 0 4px;
+  }
+  .node {
+    flex: 1 1 150px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--bg);
+    min-width: 140px;
+  }
+  .node strong { display: block; font-size: 13px; }
+  .node span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .node.key { border-color: var(--accent); background: var(--accent-soft); }
+  .node.key strong { color: var(--accent); }
+  .arrow {
+    align-self: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+  }
+  @media (max-width: 620px) {
+    .arrow { display: none; }
+    .node { flex-basis: 100%; }
+  }
+
+  .steps { list-style: none; padding: 0; margin: 16px 0 0; counter-reset: step; }
+  .steps > li {
+    position: relative;
+    padding: 0 0 22px 44px;
+    margin: 0;
+    border-left: 2px solid var(--line);
+    margin-left: 15px;
+  }
+  .steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .steps > li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+  }
+  .steps h3 { margin: 2px 0 4px; font-size: 15px; }
+  .steps p { margin: 4px 0; color: var(--muted); }
+  .steps .out { font-size: 13px; color: var(--text); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  .center { text-align: center; }
+  .nowrap { white-space: nowrap; }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .note p { margin: 4px 0; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .terminal {
+    background: #0b1220;
+    color: #d7e2ee;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 12px 0;
+  }
+  .terminal .c { color: #7dd3fc; }
+  .terminal .g { color: #86efac; }
+  .terminal .r { color: #fca5a5; }
+  .terminal .m { color: #94a3b8; }
+  .terminal .k { color: #93c5fd; }
+  .terminal .s { color: #86efac; }
+  .terminal .n { color: #fcd34d; }
+  .json-cap {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    color: var(--accent);
+    margin: 14px 0 -4px;
+  }
+  .json-cap.fail { color: var(--danger); }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 28px; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    section { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Dokumentasi Integrasi</span>
+    <h1>Alur AdMedika — Rawat Jalan</h1>
+    <p class="subtitle">
+      Urutan pemanggilan endpoint, arti klaim terbuka, serta cara menangani kondisi
+      yang paling sering terjadi saat integrasi rawat jalan berjalan.
+    </p>
+    <p class="meta">Sumber: <em>CustomerHost_ProviderBridging - OUTPATIENT.pdf</em>,
+      <em>CANCEL_OPEN_CLAIMS_TXN.pdf</em>, <em>EDOCS_UPLOAD v.Rustlang.pdf</em>,
+      <em>RE_PRINT_OUT.pdf</em>, <em>INVOICE_TRACKING.pdf</em>.</p>
+  </header>
+
+  <section>
+    <h2>1. Konsep: klaim terbuka</h2>
+    <p class="lead">Satu kunjungan rawat jalan = satu “case” klaim di AdMedika.</p>
+
+    <div class="flow">
+      <div class="node key">
+        <strong>ELIGIBILITY</strong>
+        <span>membuka klaim · status 08 · terbit LOA</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node">
+        <strong>Pelayanan pasien</strong>
+        <span>diagnosis, tindakan, obat, dokumen</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node key">
+        <strong>DISCHARGE_OP</strong>
+        <span>menutup klaim · status 40 · terbit LOC</span>
+      </div>
+    </div>
+
+    <p>
+      Klaim disebut <strong>terbuka</strong> selama sudah dibuka lewat <code>Eligibility</code>
+      tetapi belum ditutup lewat <code>DischargeOp</code>. AdMedika hanya mengizinkan
+      <strong>satu klaim terbuka per member</strong> untuk coverage yang sama.
+    </p>
+
+    <h3>Status klaim yang perlu dikenal</h3>
+    <table>
+      <thead>
+        <tr><th class="nowrap">clStatus</th><th>Arti</th><th>Terbuka?</th><th>Implikasi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>08</code></td><td>Eligibility approved</td><td><span class="badge b-required">Ya</span></td><td>Sudah terdaftar, belum discharge</td></tr>
+        <tr><td><code>39</code></td><td>Claims on hold</td><td><span class="badge b-conditional">Ya</span></td><td>Masih menggantung, perlu tindak lanjut</td></tr>
+        <tr><td><code>40</code></td><td>Valid claim</td><td><span class="badge b-none">Tidak</span></td><td>Sudah ditutup; boleh eligibility baru</td></tr>
+        <tr><td><code>41</code></td><td>Incomplete documents</td><td><span class="badge b-conditional">Dalam proses</span></td><td>Lengkapi dokumen</td></tr>
+        <tr><td><code>22</code></td><td>Claims rejected</td><td><span class="badge b-none">Tidak</span></td><td>Ditolak</td></tr>
+        <tr><td><code>42/43/44</code></td><td>Reimbursement</td><td><span class="badge b-none">Di luar alur</span></td><td>Bukan alur rawat jalan provider</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note warn">
+      <p><strong>Akibat jika membuat eligibility saat masih ada klaim terbuka:</strong></p>
+      <p>AdMedika menolak dengan <code>1998</code>, misalnya
+        <em>“Have a pending outpatient claims … Please proceed with discharge transaction!”</em></p>
+    </div>
+
+    <h3>Cara memeriksa dan menangani</h3>
+    <div class="grid2">
+      <div>
+        <p><strong>Periksa status</strong></p>
+        <p>Panggil <code>CheckMemberClaimTxnStatus</code> dengan <code>cardNo</code>.
+          Kosongkan <code>clID</code> untuk melihat klaim terbaru.</p>
+        <ul>
+          <li><code>clStatus 08</code> → ada klaim terbuka.</li>
+          <li><code>1840</code> → tidak ada klaim terbuka.</li>
+        </ul>
+      </div>
+      <div>
+        <p><strong>Tindakan</strong></p>
+        <ul>
+          <li>Klaim berjalan → lanjutkan <code>GetEntitlement</code>,
+            <code>EdocsUpload</code>, lalu <code>DischargeOp</code>.</li>
+          <li>Klaim salah → <code>CancelOpenClaimsTxn</code> dengan
+            <code>remarks</code>, lalu <code>Eligibility</code> baru.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Urutan pemanggilan rawat jalan</h2>
+    <p class="lead">Tiga langkah inti; sisanya opsional atau bersyarat.</p>
+
+    <div class="flow">
+      <div class="node"><strong>1. Cek status</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>2. Cek ICD</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>3. Eligibility</strong><span>wajib</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>4. Entitlement / dokumen</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>5. Discharge</strong><span>wajib</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>6. Reprint</strong><span>opsional</span></div>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <h3>HelloWorld <span class="badge b-optional">Opsional</span></h3>
+        <p>Memastikan URL dev/prod, kredensial, dan token bekerja.</p>
+        <p class="out">Hasil: <code>statusCode 0</code> dan pesan sapaan dari gateway.</p>
+      </li>
+      <li>
+        <h3>CheckMemberClaimTxnStatus <span class="badge b-optional">Opsional</span></h3>
+        <p>Mendeteksi klaim terbuka sebelum mendaftarkan kunjungan baru.</p>
+        <p class="out">Butuh <code>terminalID</code> + <code>cardNo</code>; <code>clID</code> boleh kosong.</p>
+      </li>
+      <li>
+        <h3>CheckIcdExclusion <span class="badge b-optional">Opsional</span></h3>
+        <p>Memeriksa apakah diagnosis termasuk pengecualian plan.</p>
+        <p class="out">Butuh <code>cardNo</code>, <code>covID</code>, dan daftar ICD-10.</p>
+      </li>
+      <li>
+        <h3>CancelOpenClaimsTxn <span class="badge b-conditional">Bersyarat</span></h3>
+        <p>Hanya jika ada klaim terbuka yang salah dan perlu dibatalkan.</p>
+        <p class="out">Butuh <code>terminalID</code>, <code>cardNo</code>, dan <code>remarks</code> alasan.</p>
+      </li>
+      <li>
+        <h3>Eligibility <span class="badge b-required">Wajib</span></h3>
+        <p>Membuka klaim rawat jalan. Menghasilkan <code>clID</code>, entitlement,
+          dan <code>printOut</code> LOA.</p>
+        <p class="out">Butuh <code>terminalID</code>, <code>cardNo</code>, <code>covID</code>,
+          diagnosis. Tidak boleh ada klaim terbuka lain.</p>
+      </li>
+      <li>
+        <h3>GetEntitlement <span class="badge b-optional">Opsional</span></h3>
+        <p>Mengambil benefit terkini dari klaim yang sedang berjalan.</p>
+        <p class="out">Butuh klaim terbuka; tanpa itu gateway menjawab <code>1840</code>.</p>
+      </li>
+      <li>
+        <h3>EdocsUpload <span class="badge b-conditional">Sesuai kebutuhan</span></h3>
+        <p>Mengunggah dokumen pendukung (surat jaminan, hasil lab, resume medis, dll.).</p>
+        <p class="out">Butuh <code>clID</code> dan <code>docType</code> yang valid.</p>
+      </li>
+      <li>
+        <h3>DischargeOp <span class="badge b-required">Wajib</span></h3>
+        <p>Menutup klaim dengan diagnosis dan rincian biaya. Menghasilkan nominal
+          approved dan <code>printOut</code> LOC.</p>
+        <p class="out">Butuh klaim terbuka, <code>diagnosisCodeList</code>, dan array
+          <code>entitlement</code> berisi <code>benItemList</code>.</p>
+      </li>
+      <li>
+        <h3>RePrintOut <span class="badge b-optional">Opsional</span></h3>
+        <p>Mencetak ulang dokumen: <code>E</code> = LOA, <code>D</code> = LOC,
+          <code>X</code> = LOR.</p>
+        <p class="out">Butuh <code>clID</code> dan <code>rePrintType</code>.</p>
+      </li>
+    </ol>
+
+    <div class="note">
+      <p><strong>Urutan minimal:</strong>
+        <code>Eligibility</code> → <code>DischargeOp</code>.
+        Tambahkan <code>GetEntitlement</code> / <code>EdocsUpload</code> bila diperlukan.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Contoh pemanggilan dari kode aplikasi</h2>
+    <p class="lead">
+      Memakai kelas <code>Service</code> langsung, tanpa SOAP/HTTP tambahan.
+      Semua contoh memakai helper <code>srv.IsOk(...)</code> yang memeriksa
+      <code>TechnicalError</code> lebih dulu, lalu <code>IsSuccess</code>, dan
+      merangkum error menjadi <code>[kode] deskripsi</code>.
+    </p>
+
+    <pre class="terminal"><span class="m">// menggunakan Temiang.Avicenna.Common.Admedika</span>
+using Temiang.Avicenna.Common.Admedika;
+
+var srv = new Temiang.Avicenna.Common.Admedika.Service();
+string message;
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// teknis atau bisnis, sudah terangkum</span>
+    return;
+}</pre>
+
+    <h3>3.1 HelloWorld</h3>
+    <pre class="terminal">var result = srv.HelloWorld();
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.Message + " | " + result.ApiName + " " + result.ApiVersion);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="n">929297</span>,
+    <span class="k">"statusCode"</span>: <span class="n">0</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"helloResponse"</span>: {
+        <span class="k">"hello"</span>: {
+          <span class="k">"message"</span>: <span class="s">"Hi there"</span>,
+          <span class="k">"apiName"</span>: <span class="s">"Gateway@AdMedika"</span>,
+          <span class="k">"apiVersion"</span>: <span class="s">"Rusty v1.0.0"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095150"</span>
+  }
+}</pre>
+
+    <h3>3.2 CheckIcdExclusion</h3>
+    <pre class="terminal">var result = srv.CheckIcdExclusion(
+    "8000991200072646",       <span class="m">// cardNo</span>
+    "02",                     <span class="m">// covID: 01-08</span>
+    "J06, B01.9");            <span class="m">// diagnosisCodeList</span>
+
+if (!srv.IsOk(result, out message))
+{
+    <span class="m">// ErrorCode "1833" = diagnosis exclusion</span>
+    ShowError(message);
+    return;
+}
+
+ShowInfo("Tidak ada exclusion untuk " + result.PatientName);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"222074"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"checkIcdExclusionResponse"</span>: {
+        <span class="k">"checkIcdExclusion"</span>: {
+          <span class="k">"PayorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"covID"</span>: <span class="s">"02"</span>,
+          <span class="k">"diagnosisCodeList"</span>: <span class="s">"J06, B01.9"</span>,
+          <span class="k">"dob"</span>: <span class="s">"Jan-02-1999"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"payorMemberID"</span>: <span class="s">"ADM_002X"</span>,
+          <span class="k">"pd"</span>: <span class="s">"Principal"</span>,
+          <span class="k">"planCode"</span>: <span class="s">"GP-003"</span>,
+          <span class="k">"policyDate"</span>: <span class="s">"Jan-01-2026 to Dec-31-2026"</span>,
+          <span class="k">"policyNo"</span>: <span class="s">"ADM_002X"</span>,
+          <span class="k">"principalName"</span>: <span class="s">""</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261030143012"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — diagnosis exclusion (1833)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"222075"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"checkIcdExclusionResponse"</span>: {
+        <span class="k">"checkIcdExclusion"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1833</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Rejected -&gt; Diagnosis [B01.9] was exclusion on Plan Level [GP]"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261030143013"</span>
+  }
+}</pre>
+
+    <h3>3.3 Eligibility</h3>
+    <pre class="terminal">var result = srv.Eligibility(
+    cardNo: "8000991200072646",
+    covID: "02",
+    diagnosisCodeList: "J06",
+    providerTransID: "RJ-20261103-001",
+    nationalID: null,
+    familyCardID: null,
+    physicianName: "dr. Nama Dokter",
+    accidentFlag: "N",
+    surgicalFlag: "N",
+    roomType: null,
+    roomPrice: null,
+    remarks: "Registrasi rawat jalan");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+var clID = result.ClID;             <span class="m">// contoh: 28651305</span>
+var status = result.ClStatus;       <span class="m">// "08"</span>
+var loa = result.PrintOut;          <span class="m">// teks LOA multi-baris</span>
+var benefits = result.Entitlement;  <span class="m">// daftar benefit</span>
+
+ShowInfo(string.Format("Eligibility {0} untuk {1}", status, result.PatientName));</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="n">929364</span>,
+    <span class="k">"statusCode"</span>: <span class="n">0</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"eligibilityResponse"</span>: {
+        <span class="k">"eligibility"</span>: {
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"08"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"ELIGIBILITY APPROVED"</span>,
+          <span class="k">"payorCode"</span>: <span class="s">"ADMEDKA"</span>,
+          <span class="k">"payorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"dob"</span>: <span class="s">"Dec-11-1991"</span>,
+          <span class="k">"policyNo"</span>: <span class="s">"ADM_002X"</span>,
+          <span class="k">"payorMemberID"</span>: <span class="s">"ADM_002X"</span>,
+          <span class="k">"policyDate"</span>: <span class="s">"Jan-01-2026 to Dec-31-2026"</span>,
+          <span class="k">"planCode"</span>: <span class="s">"GP-003"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"pd"</span>: <span class="s">"Principal"</span>,
+          <span class="k">"principalName"</span>: <span class="s">""</span>,
+          <span class="k">"referral_info_flag"</span>: <span class="s">"N"</span>,
+          <span class="k">"previous_icd_code"</span>: <span class="s">"F81.2"</span>,
+          <span class="k">"printOut"</span>: <span class="s">"PENDAFTARAN PASIEN\nJAMINAN KESEHATAN"</span>,
+          <span class="k">"entitlement"</span>: [
+            { <span class="k">"benID"</span>: <span class="s">"01"</span>, <span class="k">"shortName"</span>: <span class="s">"B.ADMIN"</span>, <span class="k">"longName"</span>: <span class="s">"Biaya Administrasi"</span> },
+            { <span class="k">"benID"</span>: <span class="s">"39"</span>, <span class="k">"shortName"</span>: <span class="s">"B.DR.UMUM"</span>, <span class="k">"longName"</span>: <span class="s">"Konsultasi Dokter Umum"</span> }
+          ]
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095200"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — masih ada klaim terbuka (1998)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"3002"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"eligibilityResponse"</span>: {
+        <span class="k">"eligibility"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1998</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Rejected -&gt; Have a pending outpatient claims with claim ID [28651304]. Please proceed with discharge transaction!"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095201"</span>
+  }
+}</pre>
+
+    <h3>3.4 GetEntitlement</h3>
+    <pre class="terminal">var result = srv.GetEntitlement("8000991200072646");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila tidak ada klaim terbuka</span>
+    return;
+}
+
+foreach (var benefit in result.Entitlement)
+{
+    <span class="m">// benefit.BenID, ShortName, LongName</span>
+    <span class="m">// benefit.AvailLimit, FreqDesc, LimitDesc</span>
+}</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="n">929318</span>,
+    <span class="k">"statusCode"</span>: <span class="n">0</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"getEntitlementResponse"</span>: {
+        <span class="k">"getEntitlement"</span>: {
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28650934"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"GP"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"08"</span>,
+          <span class="k">"clStatusDesc"</span>: <span class="s">"ELIGIBILITY APPROVED"</span>,
+          <span class="k">"PayorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"entitlement"</span>: [
+            {
+              <span class="k">"benID"</span>: <span class="s">"01"</span>,
+              <span class="k">"shortName"</span>: <span class="s">"B.ADMIN"</span>,
+              <span class="k">"longName"</span>: <span class="s">"Biaya Administrasi"</span>,
+              <span class="k">"availLimit"</span>: <span class="s">"n/a"</span>,
+              <span class="k">"freqDesc"</span>: <span class="s">"YEARLY"</span>,
+              <span class="k">"limitDesc"</span>: <span class="s">"MAX DOLLAR AMOUNT"</span>
+            }
+          ]
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095230"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — tidak ada klaim terbuka (1840)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"3102"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"getEntitlementResponse"</span>: {
+        <span class="k">"getEntitlement"</span>: {
+          <span class="k">"errorCode"</span>: <span class="s">"1840"</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"No open claims found"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095231"</span>
+  }
+}</pre>
+
+    <h3>3.5 DischargeOp</h3>
+    <pre class="terminal">var entitlement = new[]
+{
+    new DischargeEntitlementInput
+    {
+        BenID = "39",
+        BenAmount = "250000.00",
+        BenItemList = new[]
+        {
+            new DischargeBenItemInput
+            {
+                Code = "S2080000xx",
+                Name = "Biaya Dokter Umum",
+                DateIssue = "03112026",   <span class="m">// ddmmyyyy</span>
+                Qty = "1",
+                TotPrice = "250000.00"
+            }
+        }
+    }
+};
+
+var result = srv.DischargeOp(
+    "8000991200072646", "J06", "3", "RJ-20261103-001",
+    null, null, "dr. Nama Dokter", "N", "N",
+    null, null, "Discharge rawat jalan", entitlement);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.ClStatus + " | " + result.TotAmtApproved + " | " + result.PrintOut);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="n">929370</span>,
+    <span class="k">"statusCode"</span>: <span class="n">0</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"dischargeResponse"</span>: {
+        <span class="k">"discharge"</span>: {
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"providerTransID"</span>: <span class="s">"RJ-20261103-001"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"40"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"VALID CLAIM"</span>,
+          <span class="k">"payorCode"</span>: <span class="s">"ADMEDKA"</span>,
+          <span class="k">"payorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"dob"</span>: <span class="s">"Dec-11-1991"</span>,
+          <span class="k">"policyNo"</span>: <span class="s">"ADM_002X"</span>,
+          <span class="k">"payorMemberID"</span>: <span class="s">"ADM_002X"</span>,
+          <span class="k">"policyDate"</span>: <span class="s">"Jan-01-2026 to Dec-31-2026"</span>,
+          <span class="k">"planCode"</span>: <span class="s">"GP-003"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"GP"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"pd"</span>: <span class="s">"Principal"</span>,
+          <span class="k">"principalName"</span>: <span class="s">""</span>,
+          <span class="k">"totAmtIncurred"</span>: <span class="s">"375000"</span>,
+          <span class="k">"totAmtApproved"</span>: <span class="s">"375000"</span>,
+          <span class="k">"totAmtNotApproved"</span>: <span class="s">"0"</span>,
+          <span class="k">"entitlement"</span>: [
+            {
+              <span class="k">"benID"</span>: <span class="s">"39"</span>,
+              <span class="k">"shortName"</span>: <span class="s">"B.DR.UMUM"</span>,
+              <span class="k">"longName"</span>: <span class="s">"Biaya Dokter Umum Per Tahun"</span>,
+              <span class="k">"amtIncurred"</span>: <span class="s">"250000"</span>,
+              <span class="k">"amtApproved"</span>: <span class="s">"250000"</span>,
+              <span class="k">"amtNotApproved"</span>: <span class="s">"0"</span>
+            }
+          ],
+          <span class="k">"printOut"</span>: <span class="s">"PENGESAHAN &amp; TAGIHAN\nJUM.BIAYA :375000"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095300"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — benefit tidak dijamin (1998)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"3202"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"999"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Error"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"dischargeResponse"</span>: {
+        <span class="k">"discharge"</span>: {
+          <span class="k">"errorCode"</span>: <span class="s">"1998"</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Rejected -&gt; benefit not covered"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095301"</span>
+  }
+}</pre>
+
+    <h3>3.6 CancelOpenClaimsTxn</h3>
+    <pre class="terminal">var result = srv.CancelOpenClaimsTxn(
+    "8000991200072646",
+    "Salah pendaftaran, ulang eligibility");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.Msg);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"5001"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"cancelOpenClaimTxnResponse"</span>: {
+        <span class="k">"cancelOpenClaimTxn"</span>: {
+          <span class="k">"msg"</span>: <span class="s">"Success. Open Claims was Canceled @[claimsid: 28651305] ready to do ELIGIBILITY"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095400"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — klaim milik provider lain (1998)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"5002"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"cancelOpenClaimTxnResponse"</span>: {
+        <span class="k">"cancelOpenClaimTxn"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1998</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Rejected -&gt; This member has a pending Claims with another provider"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095401"</span>
+  }
+}</pre>
+
+    <h3>3.7 CheckMemberClaimTxnStatus</h3>
+    <pre class="terminal"><span class="m">// clID null = periksa klaim terbaru member</span>
+var result = srv.CheckMemberClaimTxnStatus("8000991200072646", null);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila tidak ada klaim terbuka</span>
+    return;
+}
+
+ShowInfo(result.ClStatus + " - " + result.ClDesc);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"4001"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"checkMemberClaimTxnStatusResponse"</span>: {
+        <span class="k">"checkMemberClaimTxnStatus"</span>: {
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"dob"</span>: <span class="s">"Jan-02-1999"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"GP"</span>,
+          <span class="k">"icdCode"</span>: <span class="s">"J06"</span>,
+          <span class="k">"icdDesc"</span>: <span class="s">"Acute Upper Respiratory Infections"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"08"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"ELIGIBILITY APPROVED"</span>,
+          <span class="k">"PayorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"totAmtIncurred"</span>: <span class="s">"0.00"</span>,
+          <span class="k">"totAmtApproved"</span>: <span class="s">"0.00"</span>,
+          <span class="k">"totAmtNotApproved"</span>: <span class="s">"0.00"</span>,
+          <span class="k">"entitlement"</span>: [
+            { <span class="k">"benID"</span>: <span class="s">"02"</span>, <span class="k">"shortName"</span>: <span class="s">"BIAYA"</span>, <span class="k">"longName"</span>: <span class="s">"Biaya"</span> }
+          ],
+          <span class="k">"remarks"</span>: <span class="s">"Registrasi rawat jalan"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095500"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — tidak ada klaim terbuka (1840)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"4002"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"checkMemberClaimTxnStatusResponse"</span>: {
+        <span class="k">"checkMemberClaimTxnStatus"</span>: {
+          <span class="k">"errorCode"</span>: <span class="s">"1840"</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"No open claims found. Please do the Eligibility first!"</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095501"</span>
+  }
+}</pre>
+
+    <h3>3.8 GetMemberEnrolledPlanTc</h3>
+    <pre class="terminal">var result = srv.GetMemberEnrolledPlanTc(
+    "8000991200072646", "02", "obat");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+foreach (var plan in result.EnrolledPlan)
+{
+    foreach (var term in plan.TermCondition)
+    {
+        <span class="m">// term.TcDesc, term.GuaranteeFlag (Y/N), term.Remarks</span>
+    }
+}</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="n">929382</span>,
+    <span class="k">"statusCode"</span>: <span class="n">0</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"getMemberEnrolledPlanTCResponse"</span>: {
+        <span class="k">"getMemberEnrolledPlanTC"</span>: {
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"dob"</span>: <span class="s">"Jan-02-1999"</span>,
+          <span class="k">"payorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"covID"</span>: <span class="s">"02"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"GP"</span>,
+          <span class="k">"enrolledPlan"</span>: [
+            {
+              <span class="k">"covCode"</span>: <span class="s">"GP"</span>,
+              <span class="k">"planID"</span>: <span class="s">"GP-003"</span>,
+              <span class="k">"desc"</span>: <span class="s">"RAWAT JALAN"</span>,
+              <span class="k">"termCondition"</span>: [
+                { <span class="k">"tcDesc"</span>: <span class="s">"Obat"</span>, <span class="k">"guaranteeFlag"</span>: <span class="s">"Y"</span>, <span class="k">"remarks"</span>: <span class="s">"Dijamin"</span> },
+                { <span class="k">"tcDesc"</span>: <span class="s">"Obat Herbal"</span>, <span class="k">"guaranteeFlag"</span>: <span class="s">"N"</span>, <span class="k">"remarks"</span>: <span class="s">"Tidak dijamin"</span> }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095600"</span>
+  }
+}</pre>
+
+    <h3>3.9 EdocsUpload</h3>
+    <pre class="terminal"><span class="m">// perlu: using System.IO;</span>
+var files = new[]
+{
+    new AdmedikaFile
+    {
+        FileName = "surat-jaminan.pdf",
+        ContentType = "application/pdf",
+        Content = File.ReadAllBytes(@"C:\dokumen\surat-jaminan.pdf")
+    }
+};
+
+var result = srv.EdocsUpload(
+    cardNo,
+    clID,
+    "GL",                       <span class="m">// docType, lihat AdmedikaDocType</span>
+    "Surat jaminan biaya",
+    patientName,
+    "user01",
+    files);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+ShowInfo(result.Msg);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"7001"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"edocsUploadResponse"</span>: {
+        <span class="k">"edocsUpload"</span>: {
+          <span class="k">"msg"</span>: <span class="s">"Successfully"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095700"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — clID tidak ditemukan (1838)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"7002"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"edocsUploadResponse"</span>: {
+        <span class="k">"edocsUpload"</span>: {
+          <span class="k">"errorCode"</span>: <span class="s">"1838"</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"claims ID not found"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095701"</span>
+  }
+}</pre>
+
+    <h3>3.10 RePrintOut</h3>
+    <pre class="terminal">var result = srv.RePrintOut(
+    clID,
+    "D");   <span class="m">// E = LOA, D = LOC, X = LOR</span>
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1997 bila tipe tidak valid</span>
+    return;
+}
+
+ShowInfo(result.PrintOut);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"9001"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"rePrintOutResponse"</span>: {
+        <span class="k">"rePrintOut"</span>: {
+          <span class="k">"printOut"</span>: <span class="s">"PENGESAHAN &amp; TAGIHAN\nB. ADMIN 15,000.00\nJUM.BIAYA : 2,892,900.00"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095800"</span>
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — tipe reprint tidak valid (1997)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"referenceID"</span>: <span class="s">"9002"</span>,
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"format"</span>: <span class="s">"JSON"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"rePrintOutResponse"</span>: {
+        <span class="k">"rePrintOut"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1997</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Invalid rePrintType [S]. Default value [E = ELIGIBILITY (LOA)] [D = DISCHARGE (LOC)] [X = REJECT (LOR)]"</span>
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261103095801"</span>
+  }
+}</pre>
+
+    <p class="lead">
+      <code>ShowError</code> dan <code>ShowInfo</code> hanya placeholder untuk
+      mekanisme tampilan aplikasi Anda. <code>DailyMonitoring</code> dan
+      <code>InvoiceTracking</code> tidak dicantumkan di sini karena alur datanya
+      berbeda.
+    </p>
+
+    <div class="grid2">
+      <div>
+        <h3>Yang perlu diketahui</h3>
+        <ul>
+          <li><code>terminalID</code> tidak menjadi parameter; diambil dari <code>Web.config</code>.</li>
+          <li><code>covID</code> divalidasi lokal: kosong → <code>1999</code>, tidak valid → <code>1820</code>.</li>
+          <li>Field opsional yang <code>null</code> tidak dikirim.</li>
+          <li><code>Eligibility</code> menghasilkan <code>ClID</code>, <code>ClStatus</code> (<code>08</code>), <code>PrintOut</code> (LOA), dan <code>Entitlement</code>.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Jangan lupa</h3>
+        <ul>
+          <li>Jangan memanggil <code>Eligibility</code> bila masih ada klaim terbuka; cek dengan <code>CheckMemberClaimTxnStatus</code> atau batalkan lewat <code>CancelOpenClaimsTxn</code>.</li>
+          <li>Simpan <code>ClID</code> karena dibutuhkan <code>GetEntitlement</code>, <code>EdocsUpload</code>, <code>DischargeOp</code>, dan <code>RePrintOut</code>.</li>
+          <li>Respons bisnis tetap HTTP 200; periksa <code>IsSuccess</code>, bukan HTTP status.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note">
+      <p><strong>Tentang contoh JSON di atas:</strong>
+        JSON ditampilkan apa adanya mengikuti bentuk respons gateway, hanya nilai
+        contoh yang disesuaikan agar konsisten dengan contoh kode.</p>
+      <p><code>statusCode</code> bisa berupa <code>"00"</code> atau angka <code>0</code>,
+        dan <code>errorCode</code> bisa berupa string maupun angka. Nama wrapper pada
+        <code>txnData</code> juga bisa berbeda antarversi gateway (misalnya
+        <code>dischargeResponse</code> atau <code>dischargeRequestResponse</code>);
+        parser mengambil payload pertama di dalam wrapper, jadi penentuan sukses tetap
+        memakai <code>IsSuccess</code>, bukan nama wrapper atau HTTP status.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Cabang: klaim terbuka yang salah</h2>
+    <div class="terminal"><span class="m"># klaim terbuka ditemukan (clStatus 08)</span>
+CheckMemberClaimTxnStatus
+        <span class="c">↓</span>
+CancelOpenClaimsTxn          <span class="m">remarks: alasan pembatalan</span>
+        <span class="c">↓</span>
+Eligibility                  <span class="m">klaim baru, clID baru</span>
+        <span class="c">↓</span>
+DischargeOp                  <span class="m">menutup klaim</span></div>
+    <p>
+      Jangan membuat <code>Eligibility</code> baru tanpa membatalkan atau menutup
+      klaim lama; gateway akan menolak dengan <code>1998</code>.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. Referensi endpoint</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>terminalID</th>
+          <th>Prasyarat klaim</th>
+          <th>Kegunaan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>HelloWorld</code></td><td>Tidak</td><td>Tidak ada</td><td>Uji konektivitas dan token</td></tr>
+        <tr><td><code>CheckIcdExclusion</code></td><td>Tidak</td><td>Tidak ada</td><td>Cek exclusion diagnosis</td></tr>
+        <tr><td><code>Eligibility</code></td><td>Ya</td><td>Tidak boleh ada klaim terbuka</td><td>Buka klaim rawat jalan</td></tr>
+        <tr><td><code>GetEntitlement</code></td><td>Ya</td><td>Klaim terbuka</td><td>Ambil benefit berjalan</td></tr>
+        <tr><td><code>DischargeOp</code></td><td>Ya</td><td>Klaim terbuka</td><td>Tutup klaim + hitung approved</td></tr>
+        <tr><td><code>CheckMemberClaimTxnStatus</code></td><td>Ya</td><td>Tidak ada</td><td>Cek status klaim member</td></tr>
+        <tr><td><code>GetMemberEnrolledPlanTc</code></td><td>Tidak</td><td>Tidak ada</td><td>Plan + term &amp; condition</td></tr>
+        <tr><td><code>CancelOpenClaimsTxn</code></td><td>Ya</td><td>Klaim terbuka</td><td>Batalkan klaim terbuka</td></tr>
+        <tr><td><code>EdocsUpload</code></td><td>Tidak</td><td><code>clID</code> valid</td><td>Unggah dokumen pendukung</td></tr>
+        <tr><td><code>RePrintOut</code></td><td>Tidak</td><td><code>clID</code> valid</td><td>Cetak ulang LOA/LOC/LOR</td></tr>
+        <tr><td><code>InvoiceTracking</code></td><td>Ya</td><td>Invoice sudah terbentuk</td><td>Lacak status invoice</td></tr>
+        <tr><td><code>DailyMonitoring</code></td><td>Ya</td><td>Klaim rawat inap terbuka</td><td>Form monitoring rawat inap</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>6. Membaca respons</h2>
+    <p>
+      Semua respons bisnis AdMedika dikembalikan sebagai <strong>HTTP 200</strong>.
+      Jangan menentukan sukses dari HTTP status; periksa field berikut secara berurutan.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Urutan</th><th>Field</th><th>Arti</th><th>Tindakan</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td><code>TechnicalError</code></td><td>Gagal teknis: timeout, TLS, body bukan JSON</td><td>Tampilkan error konektivitas; jangan baca field bisnis</td></tr>
+        <tr><td>2</td><td><code>IsSuccess</code></td><td><code>statusCode</code> bernilai nol (<code>0</code> / <code>00</code>)</td><td>Jika true, lanjut baca data hasil</td></tr>
+        <tr><td>3</td><td><code>ErrorCode</code>, <code>ErrorDesc</code></td><td>Kegagalan bisnis dari <code>txnData</code></td><td>Tampilkan ke pengguna; mis. <code>1998</code>, <code>1840</code>, <code>1823</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Kode yang sering muncul</h3>
+    <table>
+      <thead><tr><th class="nowrap">Kode</th><th>Arti</th><th>Biasanya muncul saat</th></tr></thead>
+      <tbody>
+        <tr><td><code>1998</code></td><td>Rejected</td><td>Masih ada klaim terbuka; eligibility ditolak</td></tr>
+        <tr><td><code>1840</code></td><td>Not found</td><td>Tidak ada klaim terbuka, invoice/ICD tidak ditemukan</td></tr>
+        <tr><td><code>1823</code></td><td>Policy expired</td><td>Masa berlaku policy sudah lewat</td></tr>
+        <tr><td><code>1997</code></td><td>Invalid</td><td>Klaim milik provider lain atau tipe tidak valid</td></tr>
+        <tr><td><code>1838</code></td><td>Claims ID not found</td><td><code>clID</code> salah pada upload/reprint</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>7. Contoh urutan yang sudah diverifikasi</h2>
+    <div class="terminal"><span class="m"># kunjungan baru, tidak ada klaim terbuka</span>
+CheckMemberClaimTxnStatus   <span class="g">→ 1840, tidak ada klaim</span>
+Eligibility                 <span class="g">→ clID baru, status 08</span>
+GetEntitlement              <span class="g">→ daftar benefit</span>
+DischargeOp                 <span class="g">→ status 40, approved + LOC</span>
+RePrintOut (D)              <span class="g">→ printOut LOC</span></div>
+
+    <div class="terminal"><span class="m"># ada klaim terbuka yang salah</span>
+CheckMemberClaimTxnStatus   <span class="g">→ clStatus 08</span>
+CancelOpenClaimsTxn         <span class="g">→ klaim dibatalkan</span>
+Eligibility                 <span class="g">→ clID baru</span></div>
+
+    <div class="terminal"><span class="m"># klaim masih terbuka, lanjutkan kunjungan yang sama</span>
+GetEntitlement              <span class="g">→ benefit berjalan</span>
+EdocsUpload                 <span class="g">→ dokumen terlampir</span>
+DischargeOp                 <span class="g">→ klaim ditutup</span></div>
+  </section>
+
+  <section>
+    <h2>8. Catatan operasional</h2>
+    <ul>
+      <li>Satu member hanya boleh punya satu klaim terbuka per coverage. Selesaikan atau batalkan sebelum membuat yang baru.</li>
+      <li>Simpan <code>clID</code> dari <code>Eligibility</code>; dipakai untuk upload dokumen dan reprint.</li>
+      <li><code>terminalID</code> berasal dari konfigurasi, bukan parameter pemanggil.</li>
+      <li>Jangan mengandalkan HTTP status untuk menentukan sukses; gunakan <code>IsSuccess</code>.</li>
+      <li><code>DailyMonitoring</code> hanya untuk rawat inap; pada klaim rawat jalan akan ditolak.</li>
+      <li>Untuk rawat jalan, klaim yang sudah <code>40</code> tidak bisa di-discharge ulang; buat eligibility baru bila pasien datang lagi.</li>
+      <li>Nominal dan <code>printOut</code> diteruskan apa adanya; jangan memformat ulang sebelum menyimpan.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Avicenna × Gateway@AdMedika — dokumen internal. Diperbarui 3 November 2026.
+  </footer>
+</div>
+</body>
+</html>

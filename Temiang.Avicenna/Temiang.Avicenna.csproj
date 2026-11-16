@@ -1875,6 +1875,20 @@
     <Content Include="AudioAvicenna.rar" />
     <Content Include="Document\2026\10\02\CR-EMR-Correction-MDS-Attachment-Implementation.md" />
     <Content Include="Document\2026\10\23\CR-SRK-Inpatient-On-Discharge.md" />
+    <Content Include="Document\2026\11\03\01.CreateTable_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\2026\11\05\02.INSERT_INTO_Admedika_Menu.sql" />
+    <Content Include="Document\2026\11\06\01.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\2026\11\06\02.spxml_AdmedikaPrintLOA.sql" />
+    <Content Include="Document\2026\11\06\03.INSERT_INTO_AppProgram_PrintLOA.sql" />
+    <Content Include="Document\2026\11\06\04.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
+    <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
+    <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
+    <Content Include="Document\Admedika\CustomerHost_ProviderBridging - OUTPATIENT.pdf" />
+    <Content Include="Document\Admedika\DAILY_MONITORING.pdf" />
+    <Content Include="Document\Admedika\EDOCS_UPLOAD v.Rustlang.pdf" />
+    <Content Include="Document\Admedika\INVOICE_TRACKING.pdf" />
+    <Content Include="Document\Admedika\RE_PRINT_OUT.pdf" />
     <None Include="Document\Bpjs Face Scan\Readme.md" />
     <Content Include="Document\2026\05\13\AntrianRSI\001-CREATE-TABLE-AutoNumberSemantic.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\002-CREATE-TABLE-VisitQueue.sql" />
@@ -1940,6 +1954,7 @@
     <Content Include="Document\2026\09\01\01. PPRA Non PPAB Approval Parameter and Flag.sql" />
     <Content Include="Document\2026\10\02\01.CR-EMR-Correction-MDS-Attachment.sql" />
     <Content Include="Document\2026\10\29\1.CREATE_View_Vw_GuarantorAdmedika.sql" />
+    <Content Include="Document\Admedika\alur_outpatient.html" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />
     <None Include="Document\dll\Antlr3.Runtime.dll" />
@@ -2972,6 +2987,10 @@
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleDetail.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleList.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx" />
+    <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx" />
+    <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx" />
+    <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDetail.aspx" />
+    <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaPatientDialogList.aspx" />
     <Content Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineDashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineReference.aspx" />
@@ -5250,6 +5269,7 @@
     <Content Include="MyHome\MyHome.aspx" />
     <Content Include="Resources\Checked16.png" />
     <Content Include="Resources\UnChecked16.png" />
+    <Content Include="WebService\AdmedikaWS.asmx" />
     <Content Include="WebService\Applicares.asmx" />
     <Content Include="WebService\AppointmentWS.asmx" />
     <Content Include="WebService\AutoCompleteBoxDataService.asmx" />
@@ -15802,6 +15822,34 @@
     <Compile Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx.designer.cs">
       <DependentUpon>WorkingScheduleSearch.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx.cs">
+      <DependentUpon>AdmedikaEligibilityList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx.designer.cs">
+      <DependentUpon>AdmedikaEligibilityList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx.cs">
+      <DependentUpon>AdmedikaEligibilityDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx.designer.cs">
+      <DependentUpon>AdmedikaEligibilityDialog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDetail.aspx.cs">
+      <DependentUpon>AdmedikaEligibilityDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDetail.aspx.designer.cs">
+      <DependentUpon>AdmedikaEligibilityDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaPatientDialogList.aspx.cs">
+      <DependentUpon>AdmedikaPatientDialogList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaPatientDialogList.aspx.designer.cs">
+      <DependentUpon>AdmedikaPatientDialogList.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -22637,6 +22685,10 @@
     </Compile>
     <Compile Include="WebService\Antrol.asmx.cs">
       <DependentUpon>Antrol.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebService\AdmedikaWS.asmx.cs">
+      <DependentUpon>AdmedikaWS.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebService\Applicares.asmx.cs">

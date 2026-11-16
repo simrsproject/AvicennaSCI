@@ -1,0 +1,27 @@
+using System.Collections.Generic;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
+
+namespace Temiang.Avicenna.Common.Admedika
+{
+    [XmlRoot("AdmedikaGetEntitlementResponse")]
+    public class GetEntitlementResponse : AdmedikaResponse
+    {
+        [JsonProperty("cardNo")] public string CardNo { get; set; }
+        [JsonProperty("patientName")] public string PatientName { get; set; }
+        [JsonProperty("clID")] public string ClID { get; set; }
+        [JsonProperty("clStatus")] public string ClStatus { get; set; }
+        [JsonProperty("clDesc")] public string ClDesc { get; set; }
+        [JsonProperty("clStatusDesc")] public string ClStatusDesc { get; set; }
+        [JsonProperty("covCode")] public string CovCode { get; set; }
+        [JsonProperty("payorName")] public string PayorName { get; set; }
+        private List<BenefitItem> _entitlement = new List<BenefitItem>();
+
+        [JsonProperty("entitlement")]
+        public List<BenefitItem> Entitlement
+        {
+            get { return _entitlement; }
+            set { _entitlement = value ?? new List<BenefitItem>(); }
+        }
+    }
+}

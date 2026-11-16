@@ -50,6 +50,10 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Temiang.Dal.Core">
       <HintPath>..\Reference\Temiang.Dal.Core.dll</HintPath>
     </Reference>
@@ -75,6 +79,21 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Admedika\AdmedikaCancelClaimTests.cs" />
+    <Compile Include="Admedika\AdmedikaClaimStatusTests.cs" />
+    <Compile Include="Admedika\AdmedikaConfigTests.cs" />
+    <Compile Include="Admedika\AdmedikaCoverageValidationTests.cs" />
+    <Compile Include="Admedika\AdmedikaDailyMonitoringTests.cs" />
+    <Compile Include="Admedika\AdmedikaDocTypeTests.cs" />
+    <Compile Include="Admedika\AdmedikaEdocsUploadTests.cs" />
+    <Compile Include="Admedika\AdmedikaInvoiceTrackingTests.cs" />
+    <Compile Include="Admedika\AdmedikaMaskTests.cs" />
+    <Compile Include="Admedika\AdmedikaOutpatientTests.cs" />
+    <Compile Include="Admedika\AdmedikaResponseParserTests.cs" />
+    <Compile Include="Admedika\AdmedikaRePrintOutTests.cs" />
+    <Compile Include="Admedika\AdmedikaWSRegistrationTests.cs" />
+    <Compile Include="Admedika\AdmedikaServiceTests.cs" />
+    <Compile Include="Admedika\AdmedikaTokenTests.cs" />
     <Compile Include="Bridging\Controllers\AntrolControllerTests.cs" />
     <Compile Include="ClassDispose.cs" />
     <Compile Include="QueryTest.cs" />

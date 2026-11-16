@@ -1,0 +1,531 @@
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using Newtonsoft.Json;
+
+namespace Temiang.Avicenna.Common.Admedika
+{
+    public class Service
+    {
+        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.None
+        };
+
+        private readonly AdmedikaConfig _config;
+        private readonly IAdmedikaTransport _transport;
+        private readonly IAdmedikaLogger _logger;
+
+        public Service()
+        {
+            _config = new AdmedikaConfig();
+            _transport = new HttpAdmedikaTransport();
+            _logger = new WebServiceApiLogger(_config);
+        }
+
+        public Service(AdmedikaConfig config, IAdmedikaTransport transport, IAdmedikaLogger logger)
+        {
+            _config = config ?? new AdmedikaConfig();
+            _transport = transport ?? new HttpAdmedikaTransport();
+            _logger = logger ?? new NullAdmedikaLogger();
+        }
+
+        public AdmedikaConfig Config
+        {
+            get { return _config; }
+        }
+
+        /// <summary>
+        /// Menentukan apakah respons AdMedika dianggap sukses.
+        /// TechnicalError diperiksa lebih dulu, lalu IsSuccess.
+        /// </summary>
+        public bool IsOk(AdmedikaResponse result, out string message)
+        {
+            message = null;
+
+            if (result == null)
+            {
+                message = "Respons AdMedika kosong.";
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(result.TechnicalError))
+            {
+                message = result.TechnicalError;
+                return false;
+            }
+
+            if (!result.IsSuccess)
+            {
+                var code = result.ErrorCode ?? result.StatusCode;
+                var description = result.ErrorDesc ?? result.StatusMsg;
+
+                message = string.IsNullOrEmpty(code)
+                    ? description
+                    : string.Format("[{0}] {1}", code, description);
+
+                if (string.IsNullOrEmpty(message))
+                    message = "Permintaan AdMedika gagal.";
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public HelloWorldResponse HelloWorld()
+        {
+            return Send<HelloWorldResponse>(
+                AdmedikaConstant.ServiceID.HelloWorld,
+                new HelloWorldTxnData
+                {
+                    Request = new HelloWorldRequest { CustomerID = _config.CustomerID }
+                });
+        }
+
+        private bool RequireCoverageId(string covID, AdmedikaResponse response, out string normalized)
+        {
+            normalized = covID == null ? null : covID.Trim();
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                response.ErrorCode = "1999";
+                response.ErrorDesc = "covID cannot be empty.";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            if (!AdmedikaCoverageType.IsValid(normalized))
+            {
+                response.ErrorCode = "1820";
+                response.ErrorDesc = "Coverage code is invalid. Allowed coverage ID: "
+                                     + AdmedikaCoverageType.AllowedText() + ".";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            return true;
+        }
+
+        public CheckIcdExclusionResponse CheckIcdExclusion(string cardNo, string covID, string diagnosisCodeList)
+        {
+            var response = new CheckIcdExclusionResponse();
+            string normalizedCovID;
+            if (!RequireCoverageId(covID, response, out normalizedCovID)) return response;
+
+            return Send<CheckIcdExclusionResponse>(
+                AdmedikaConstant.ServiceID.CheckIcdExclusion,
+                new CheckIcdExclusionTxnData
+                {
+                    Request = new CheckIcdExclusionRequest
+                    {
+                        CheckIcdExclusion = new CheckIcdExclusionPayload
+                        {
+                            CardNo = cardNo,
+                            CovID = normalizedCovID,
+                            DiagnosisCodeList = diagnosisCodeList
+                        }
+                    }
+                });
+        }
+
+        private bool RequireTerminalId(AdmedikaResponse response)
+        {
+            if (!string.IsNullOrWhiteSpace(_config.TerminalID)) return true;
+
+            response.TechnicalError = "AdMedika terminalID belum dikonfigurasi (AdmedikaTerminalID).";
+            response.StatusMsg = response.TechnicalError;
+            return false;
+        }
+
+        public EligibilityResponse Eligibility(string cardNo, string covID, string diagnosisCodeList,
+            string providerTransID, string nationalID, string familyCardID, string physicianName,
+            string accidentFlag, string surgicalFlag, string roomType, string roomPrice, string remarks)
+        {
+            var response = new EligibilityResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            string normalizedCovID;
+            if (!RequireCoverageId(covID, response, out normalizedCovID)) return response;
+
+            return Send<EligibilityResponse>(
+                AdmedikaConstant.ServiceID.Eligibility,
+                new EligibilityTxnData
+                {
+                    Request = new EligibilityRequest
+                    {
+                        Eligibility = new EligibilityPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            CovID = normalizedCovID,
+                            DiagnosisCodeList = diagnosisCodeList,
+                            ProviderTransID = providerTransID,
+                            NationalID = nationalID,
+                            FamilyCardID = familyCardID,
+                            PhysicianName = physicianName,
+                            AccidentFlag = accidentFlag,
+                            SurgicalFlag = surgicalFlag,
+                            RoomType = roomType,
+                            RoomPrice = roomPrice,
+                            Remarks = remarks
+                        }
+                    }
+                });
+        }
+
+        public GetEntitlementResponse GetEntitlement(string cardNo)
+        {
+            var response = new GetEntitlementResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<GetEntitlementResponse>(
+                AdmedikaConstant.ServiceID.GetEntitlement,
+                new GetEntitlementTxnData
+                {
+                    Request = new GetEntitlementRequest
+                    {
+                        GetEntitlement = new GetEntitlementPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo
+                        }
+                    }
+                });
+        }
+
+        public DischargeOpResponse DischargeOp(string cardNo, string diagnosisCodeList, string mcDays,
+            string providerTransID, string nationalID, string familyCardID, string physicianName,
+            string accidentFlag, string surgicalFlag, string roomType, string roomPrice, string remarks,
+            DischargeEntitlementInput[] entitlement)
+        {
+            var response = new DischargeOpResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<DischargeOpResponse>(
+                AdmedikaConstant.ServiceID.DischargeOp,
+                new DischargeOpTxnData
+                {
+                    Request = new DischargeOpRequest
+                    {
+                        Discharge = new DischargeOpPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            DiagnosisCodeList = diagnosisCodeList,
+                            McDays = mcDays,
+                            ProviderTransID = providerTransID,
+                            NationalID = nationalID,
+                            FamilyCardID = familyCardID,
+                            PhysicianName = physicianName,
+                            AccidentFlag = accidentFlag,
+                            SurgicalFlag = surgicalFlag,
+                            RoomType = roomType,
+                            RoomPrice = roomPrice,
+                            Remarks = remarks,
+                            Entitlement = entitlement
+                        }
+                    }
+                });
+        }
+
+        public CheckMemberClaimTxnStatusResponse CheckMemberClaimTxnStatus(string cardNo, string clID)
+        {
+            var response = new CheckMemberClaimTxnStatusResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<CheckMemberClaimTxnStatusResponse>(
+                AdmedikaConstant.ServiceID.CheckMemberClaimTxnStatus,
+                new CheckMemberClaimTxnStatusTxnData
+                {
+                    Request = new CheckMemberClaimTxnStatusRequest
+                    {
+                        CheckMemberClaimTxnStatus = new CheckMemberClaimTxnStatusPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            ClID = clID
+                        }
+                    }
+                });
+        }
+
+        public GetMemberEnrolledPlanTcResponse GetMemberEnrolledPlanTc(string cardNo, string covID,
+            string searchForTermCondition)
+        {
+            var response = new GetMemberEnrolledPlanTcResponse();
+            string normalizedCovID;
+            if (!RequireCoverageId(covID, response, out normalizedCovID)) return response;
+
+            return Send<GetMemberEnrolledPlanTcResponse>(
+                AdmedikaConstant.ServiceID.GetMemberEnrolledPlanTc,
+                new GetMemberEnrolledPlanTcTxnData
+                {
+                    Request = new GetMemberEnrolledPlanTcRequest
+                    {
+                        GetMemberEnrolledPlanTC = new GetMemberEnrolledPlanTcPayload
+                        {
+                            CardNo = cardNo,
+                            CovID = normalizedCovID,
+                            SearchForTermCondition = searchForTermCondition
+                        }
+                    }
+                });
+        }
+
+        public CancelOpenClaimsTxnResponse CancelOpenClaimsTxn(string cardNo, string remarks)
+        {
+            var response = new CancelOpenClaimsTxnResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<CancelOpenClaimsTxnResponse>(
+                AdmedikaConstant.ServiceID.CancelOpenClaimsTxn,
+                new CancelOpenClaimsTxnTxnData
+                {
+                    Request = new CancelOpenClaimsTxnRequest
+                    {
+                        CancelOpenClaimTxn = new CancelOpenClaimsTxnPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            Remarks = remarks
+                        }
+                    }
+                });
+        }
+
+        public DailyMonitoringResponse DailyMonitoring(string cardNo, string providerTransID, string clID,
+            string dmUser, DailyMonitoringForm[] dmForms)
+        {
+            var response = new DailyMonitoringResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<DailyMonitoringResponse>(
+                AdmedikaConstant.ServiceID.DailyMonitoring,
+                new DailyMonitoringTxnData
+                {
+                    Request = new DailyMonitoringRequest
+                    {
+                        DailyMonitoring = new DailyMonitoringPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            ProviderTransID = providerTransID,
+                            ClID = clID,
+                            DmUser = dmUser,
+                            DmForms = dmForms
+                        }
+                    }
+                });
+        }
+
+        private bool RequireDocType(string docType, AdmedikaResponse response, out string normalized)
+        {
+            normalized = docType == null ? null : docType.Trim();
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                response.ErrorCode = "1999";
+                response.ErrorDesc = "docType cannot be empty.";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            var type = AdmedikaDocType.Get(normalized);
+            if (type == null)
+            {
+                response.ErrorCode = "1997";
+                response.ErrorDesc = "Invalid docType. Allowed: "
+                                     + AdmedikaDocType.AllowedText() + ".";
+                response.StatusMsg = response.ErrorDesc;
+                return false;
+            }
+
+            normalized = type.Code;
+            return true;
+        }
+
+        public EdocsUploadResponse EdocsUpload(string cardNo, string clID, string docType, string remarks,
+            string patientName, string userBy, AdmedikaFile[] files)
+        {
+            var response = new EdocsUploadResponse();
+            string normalizedDocType;
+            if (!RequireDocType(docType, response, out normalizedDocType)) return response;
+
+            return SendMultipart<EdocsUploadResponse>(
+                AdmedikaConstant.ServiceID.EdocsUpload,
+                new EdocsUploadTxnData
+                {
+                    Request = new EdocsUploadRequest
+                    {
+                        EdocsUpload = new EdocsUploadPayload
+                        {
+                            CardNo = cardNo,
+                            ClID = clID,
+                            DocType = normalizedDocType,
+                            Remarks = remarks,
+                            PatientName = patientName,
+                            UserBy = userBy
+                        }
+                    }
+                },
+                files);
+        }
+
+        public InvoiceTrackingResponse InvoiceTracking(string invoiceNo, string dateName, string dateFrom,
+            string dateTo)
+        {
+            var response = new InvoiceTrackingResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            return Send<InvoiceTrackingResponse>(
+                AdmedikaConstant.ServiceID.InvoiceTracking,
+                new InvoiceTrackingTxnData
+                {
+                    Request = new InvoiceTrackingRequest
+                    {
+                        InvoiceTracking = new InvoiceTrackingPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            InvoiceNo = invoiceNo,
+                            DateName = dateName,
+                            DateFrom = dateFrom,
+                            DateTo = dateTo
+                        }
+                    }
+                });
+        }
+
+        public RePrintOutResponse RePrintOut(string clID, string rePrintType)
+        {
+            return Send<RePrintOutResponse>(
+                AdmedikaConstant.ServiceID.RePrintOut,
+                new RePrintOutTxnData
+                {
+                    Request = new RePrintOutRequest
+                    {
+                        RePrintOut = new RePrintOutPayload
+                        {
+                            ClID = clID,
+                            RePrintType = rePrintType
+                        }
+                    }
+                });
+        }
+
+        private TResponse Send<TResponse>(string serviceId, object txnData)
+            where TResponse : AdmedikaResponse, new()
+        {
+            var body = BuildBody(serviceId, txnData);
+            return SendCore<TResponse>(serviceId, body,
+                () => _transport.Post(_config.ServiceUrl, body, _config.TimeoutSeconds));
+        }
+
+        private TResponse SendMultipart<TResponse>(string serviceId, object txnData, AdmedikaFile[] files)
+            where TResponse : AdmedikaResponse, new()
+        {
+            var body = BuildBody(serviceId, txnData);
+            return SendCore<TResponse>(serviceId, body,
+                () => _transport.PostMultipart(_config.ApiServiceUrl, body, files, _config.TimeoutSeconds));
+        }
+
+        public static string FormatRequestDateTime(DateTime utcNow, string timeZoneId)
+        {
+            var value = utcNow;
+
+            if (!string.IsNullOrWhiteSpace(timeZoneId))
+            {
+                try
+                {
+                    var zone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                    value = TimeZoneInfo.ConvertTimeFromUtc(utcNow, zone);
+                }
+                catch (TimeZoneNotFoundException)
+                {
+                }
+                catch (InvalidTimeZoneException)
+                {
+                }
+            }
+
+            return value.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+        }
+
+        private string BuildBody(string serviceId, object txnData)
+        {
+            var requestDateTime = FormatRequestDateTime(DateTime.UtcNow, _config.TimeZoneId);
+            var requestId = RequestIdGenerator.Next();
+
+            var request = new AdmedikaRequest<object>
+            {
+                TokenAuth = TokenGenerator.CreateToken(
+                    _config.CustomerID, _config.SecurityWord, requestDateTime, requestId, serviceId),
+                ServiceID = serviceId,
+                CustomerID = _config.CustomerID,
+                RequestID = requestId,
+                TxnData = txnData,
+                TxnRequestDateTime = requestDateTime
+            };
+
+            return JsonConvert.SerializeObject(new { input = request }, SerializerSettings);
+        }
+
+        private TResponse SendCore<TResponse>(string serviceId, string body, Func<string> send)
+            where TResponse : AdmedikaResponse, new()
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            try
+            {
+                var raw = send();
+                stopwatch.Stop();
+
+                var response = ResponseParser.Parse<TResponse>(raw);
+                WriteLog(serviceId, body, raw, stopwatch.ElapsedMilliseconds);
+                return response;
+            }
+            catch (AdmedikaTransportException ex)
+            {
+                stopwatch.Stop();
+
+                var failed = string.IsNullOrWhiteSpace(ex.ResponseBody)
+                    ? new TResponse()
+                    : ResponseParser.Parse<TResponse>(ex.ResponseBody);
+
+                if (string.IsNullOrEmpty(failed.TechnicalError)) failed.TechnicalError = ex.Message;
+                if (string.IsNullOrEmpty(failed.StatusMsg)) failed.StatusMsg = ex.Message;
+
+                WriteLog(serviceId, body, ex.ResponseBody, stopwatch.ElapsedMilliseconds);
+                return failed;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+
+                var failed = new TResponse
+                {
+                    TechnicalError = ex.Message,
+                    StatusMsg = ex.Message
+                };
+
+                WriteLog(serviceId, body, null, stopwatch.ElapsedMilliseconds);
+                return failed;
+            }
+        }
+
+        private void WriteLog(string serviceId, string requestBody, string responseBody, long elapsedMs)
+        {
+            if (_logger == null) return;
+
+            try
+            {
+                _logger.Log(serviceId, requestBody, responseBody, elapsedMs);
+            }
+            catch (Exception)
+            {
+                // Logging tidak boleh menggagalkan transaksi.
+            }
+        }
+    }
+}
