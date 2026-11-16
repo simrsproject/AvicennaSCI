@@ -6570,6 +6570,7 @@
       <DependentUpon>FinalizeBillingVerification.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Module\Charges\Billing\FinalizeBilling\FinalizeBillingVerification.Admedika.cs" />
     <Compile Include="Module\Charges\Billing\FinalizeBilling\FinalizeBillingVerification.aspx.designer.cs">
       <DependentUpon>FinalizeBillingVerification.aspx</DependentUpon>
     </Compile>

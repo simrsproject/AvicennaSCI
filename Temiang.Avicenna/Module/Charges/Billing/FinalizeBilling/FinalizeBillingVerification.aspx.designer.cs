@@ -13,6 +13,7 @@ namespace Temiang.Avicenna.Module.Charges
 
     public partial class FinalizeBillingVerification
     {
+        protected global::Telerik.Web.UI.RadWindow winAdmedikaDischarge;
 
         /// <summary>
         /// RadCodeBlock1 control.

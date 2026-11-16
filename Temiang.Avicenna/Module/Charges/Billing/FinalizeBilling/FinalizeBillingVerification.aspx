@@ -81,6 +81,17 @@
             function OnClientButtonClicking(sender, args) {
                 var val = args.get_item().get_value();
 
+                if (val === 'admedikaDischarge') {
+                    args.set_cancel(true);
+                    var claimID = args.get_item().get_attributes().getAttribute('claimTransactionID');
+                    if (!claimID) return;
+                    var dischargeWindow = $find('<%= winAdmedikaDischarge.ClientID %>');
+                    dischargeWindow.argument = null;
+                    dischargeWindow.setUrl('<%= ResolveUrl("~/Module/RADT/Admedika/Discharge/AdmedikaDischargeDialog.aspx") %>?id=' + encodeURIComponent(claimID));
+                    dischargeWindow.show();
+                    return;
+                }
+
                 var tabStrip;
                 var tab;
                 if (val != 'list') {
@@ -697,7 +708,8 @@
             </telerik:AjaxSetting>
         </AjaxSettings>
     </telerik:RadAjaxManagerProxy>
-    <telerik:RadToolBar ID="RadToolBar2" runat="server" Width="100%" OnClientButtonClicking="OnClientButtonClicking">
+    <telerik:RadToolBar ID="RadToolBar2" runat="server" Width="100%" OnClientButtonClicking="OnClientButtonClicking"
+        OnPreRender="AdmedikaToolbar_PreRender">
         <Items>
             <telerik:RadToolBarButton runat="server" Text="List" Value="list" ImageUrl="~/Images/Toolbar/details16.png"
                 HoveredImageUrl="~/Images/Toolbar/details16_h.png" DisabledImageUrl="~/Images/Toolbar/details16_d.png" />
@@ -803,11 +815,18 @@
             <telerik:RadToolBarButton runat="server" Text="Print (Surgical Billing)" Value="printOt"
                 ImageUrl="~/Images/Toolbar/print16.png" HoveredImageUrl="~/Images/Toolbar/print16_h.png"
                 DisabledImageUrl="~/Images/Toolbar/print16_d.png" />
+            <telerik:RadToolBarButton runat="server" Text="AdMedika Discharge" Value="admedikaDischarge"
+                Visible="false" ImageUrl="~/Images/Toolbar/process16.png"
+                HoveredImageUrl="~/Images/Toolbar/process16_h.png"
+                DisabledImageUrl="~/Images/Toolbar/process16_d.png" />
         </Items>
     </telerik:RadToolBar>
     <telerik:RadAjaxPanel ID="RadAjaxPanel1" runat="server" Width="100%" LoadingPanelID="fw_ajxLoadingPanel"
         EnableEmbeddedScripts="false">
     </telerik:RadAjaxPanel>
+    <telerik:RadWindow ID="winAdmedikaDischarge" runat="server" Animation="None"
+        Width="1200px" Height="720px" Behavior="Close,Move,Resize,Maximize"
+        ShowContentDuringLoad="false" VisibleStatusbar="false" Modal="true" />
     <telerik:RadWindow ID="winPrint" Animation="None" Width="1000px" Height="500px" runat="server"
         ShowContentDuringLoad="false" Behavior="Maximize,Close" VisibleStatusbar="false"
         Modal="true">
