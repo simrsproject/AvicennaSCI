@@ -18,6 +18,7 @@ namespace Temiang.Avicenna.Common.Admedika
         public string TimeZoneId { get; set; }
         public int TimeoutSeconds { get; set; }
         public bool IsLogEnabled { get; set; }
+        public string UploadDocumentPath { get; set; } = string.Empty;
 
         public AdmedikaConfig()
         {
@@ -29,6 +30,7 @@ namespace Temiang.Avicenna.Common.Admedika
             TimeZoneId = GetString("AdmedikaTimeZoneId", string.Empty);
             TimeoutSeconds = GetInt("AdmedikaTimeoutSeconds", 60);
             IsLogEnabled = GetBool("AdmedikaIsLogEnabled", true);
+            UploadDocumentPath = GetString("AdmedikaUploadEdocsPath", string.Empty);
         }
 
         private static string GetString(string key, string fallback)
