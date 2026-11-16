@@ -272,7 +272,6 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             query.Where(
                 query.RegistrationNo == claim.RegistrationNo,
                 query.IsVoid == false,
-                query.IsConfirmed == true,
                 query.DiagnoseID.IsNotNull(),
                 query.DiagnoseID != string.Empty);
             query.OrderBy(query.SequenceNo.Ascending);
