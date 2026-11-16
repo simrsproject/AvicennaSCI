@@ -209,7 +209,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     "WHERE d.AdmedikaClaimTransactionID = a.AdmedikaClaimTransactionID), 0) AS JumlahFile>"
                 );
 
-                query.Where(query.RegistrationNo.IsNotNull(), query.RegistrationNo != string.Empty);
+                query.Where(query.RegistrationNo.IsNotNull(), query.RegistrationNo != string.Empty, query.DischargeDateTime.IsNotNull());
 
                 if (!txtRegistrationDate.IsEmpty)
                     query.Where(registration.RegistrationDate >= txtRegistrationDate.SelectedDate.Value.Date);
