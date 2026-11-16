@@ -27,12 +27,18 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         public override void OnMenuViewClick(GridDataItem[] dataItems)
         {
-            // TODO: arahkan ke AdmedikaEdocsDetail.aspx?md=view&id=... saat halaman detail dibuat.
+            RedirectToPageDetail(dataItems[0], "view");
         }
 
         public override void OnMenuEditClick(GridDataItem[] dataItems)
         {
-            // TODO: arahkan ke AdmedikaEdocsDetail.aspx?md=edit&id=... saat halaman detail dibuat.
+            RedirectToPageDetail(dataItems[0], "edit");
+        }
+
+        private void RedirectToPageDetail(GridDataItem dataItem, string mode)
+        {
+            string id = dataItem.GetDataKeyValue(AdmedikaClaimTransactionMetadata.ColumnNames.AdmedikaClaimTransactionID).ToString();
+            Page.Response.Redirect("AdmedikaEdocsDetail.aspx?md=" + mode + "&id=" + id, true);
         }
 
         protected void grdList_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
