@@ -243,7 +243,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         private void CloseDialog(string mode)
         {
-            AjaxManager.ResponseScripts.Add(
+            // Full postback pada dialog tidak mengeksekusi RadAjaxManager.ResponseScripts,
+            // jadi gunakan helper yang mendaftarkan script lewat ScriptManager + Sys.Application.load.
+            Helper.RegisterStartupScript(this, "admedikaEdocsClose",
                 "var oWnd = GetRadWindow();" +
                 "if (oWnd) {" +
                 "oWnd.argument = oWnd.argument || {};" +
