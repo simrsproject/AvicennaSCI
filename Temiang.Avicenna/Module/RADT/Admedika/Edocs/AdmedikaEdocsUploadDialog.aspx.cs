@@ -226,7 +226,34 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 return false;
             }
 
-            return documentID > 0;
+            // Pengaman bila identity tidak ter-refresh oleh entity setelah Save().
+            if (documentID <= 0)
+                documentID = FindDocumentID(ClaimTransactionID, fileName);
+
+            if (documentID <= 0)
+            {
+                ShowMessage("Dokumen tersimpan tetapi ID dokumen tidak dapat dibaca. " +
+                            "Silakan tutup dialog dan muat ulang halaman.");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static long FindDocumentID(long claimTransactionID, string fileName)
+        {
+            var query = new AdmedikaDocumentQuery("a");
+            query.Select(query.AdmedikaDocumentID);
+            query.Where(
+                query.AdmedikaClaimTransactionID == claimTransactionID,
+                query.FileName == fileName);
+            query.OrderBy(query.AdmedikaDocumentID.Descending);
+            query.es.Top = 1;
+
+            var dtb = query.LoadDataTable();
+            return dtb.Rows.Count == 0
+                ? 0
+                : Convert.ToInt64(dtb.Rows[0][AdmedikaDocumentMetadata.ColumnNames.AdmedikaDocumentID]);
         }
 
         private void ShowMessage(string message)

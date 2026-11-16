@@ -1898,6 +1898,7 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.AdmedikaClaimTransactionID, 0, typeof(System.Int64), esSystemType.Int64);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.AdmedikaClaimTransactionID;
             c.IsInPrimaryKey = true;
+            c.IsAutoIncrement = true;
             c.NumericPrecision = 19;
             _columns.Add(c);
 
