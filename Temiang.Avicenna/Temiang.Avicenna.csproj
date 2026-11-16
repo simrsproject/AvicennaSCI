@@ -2987,6 +2987,10 @@
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleDetail.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleList.aspx" />
     <Content Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx" />
+    <Content Include="Images\Admedika\logo.png" />
+    <Content Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeDialog.aspx" />
+    <Content Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeList.aspx" />
+    <Content Include="Module\RADT\Admedika\Discharge\AdmedikaPrintOut.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDetail.aspx" />
@@ -15820,6 +15824,28 @@
     </Compile>
     <Compile Include="Module\Payroll\WorkingSchedule\WorkingScheduleSearch.aspx.designer.cs">
       <DependentUpon>WorkingScheduleSearch.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeBillingProvider.cs" />
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeDialog.aspx.cs">
+      <DependentUpon>AdmedikaDischargeDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeDialog.aspx.designer.cs">
+      <DependentUpon>AdmedikaDischargeDialog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeList.aspx.cs">
+      <DependentUpon>AdmedikaDischargeList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaDischargeList.aspx.designer.cs">
+      <DependentUpon>AdmedikaDischargeList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaPrintOut.aspx.cs">
+      <DependentUpon>AdmedikaPrintOut.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Discharge\AdmedikaPrintOut.aspx.designer.cs">
+      <DependentUpon>AdmedikaPrintOut.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityList.aspx.cs">
       <DependentUpon>AdmedikaEligibilityList.aspx</DependentUpon>

@@ -328,7 +328,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                     new DischargeEntitlementInput
                     {
                         BenID = "41",
-                        BenAmount = "210,000",
+                        BenAmount = "150,000",
                         BenItemList = new[]
                         {
                             new DischargeBenItemInput { Code = "001-1", Name = "Obat A", Qty = "6", TotPrice = "125,000" },
@@ -352,11 +352,119 @@ namespace Temiang.Avicenna.Tests.Admedika
             var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
 
             var response = service.DischargeOp("8000991200054479", "J06", null, null,
-                null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null,
+                new[]
+                {
+                    new DischargeEntitlementInput
+                    {
+                        BenID = "39",
+                        BenAmount = "100000",
+                        BenItemList = new[]
+                        {
+                            new DischargeBenItemInput
+                            {
+                                Code = "DR-01", Name = "Doctor", Qty = "1", TotPrice = "100000"
+                            }
+                        }
+                    }
+                });
 
             Assert.IsFalse(response.IsSuccess);
             Assert.AreEqual("1998", response.ErrorCode);
             StringAssert.Contains(response.ErrorDesc, "not covered");
+        }
+
+        [TestMethod]
+        public void DischargeOp_MismatchedBenefitAmount_IsRejectedBeforeTransport()
+        {
+            var transport = new FakeTransport { NextResponse = DischargeSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.DischargeOp("8000991200054479", "J06", null, null,
+                null, null, null, "N", "N", null, null, null,
+                new[]
+                {
+                    new DischargeEntitlementInput
+                    {
+                        BenID = "41",
+                        BenAmount = "200000",
+                        BenItemList = new[]
+                        {
+                            new DischargeBenItemInput
+                            {
+                                Code = "OBAT-01", Name = "Obat A", Qty = "1", TotPrice = "150000"
+                            }
+                        }
+                    }
+                });
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1809", response.ErrorCode);
+            Assert.AreEqual(0, transport.CallCount);
+        }
+
+        [TestMethod]
+        public void DischargeOp_NonNumericCardNumber_IsRejectedBeforeTransport()
+        {
+            var transport = new FakeTransport { NextResponse = DischargeSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.DischargeOp("80009912000544AB", "J06", null, null,
+                null, null, null, null, null, null, null, null,
+                new[]
+                {
+                    new DischargeEntitlementInput
+                    {
+                        BenID = "39",
+                        BenAmount = "100000",
+                        BenItemList = new[]
+                        {
+                            new DischargeBenItemInput
+                            {
+                                Code = "DR-01", Name = "Doctor", Qty = "1", TotPrice = "100000"
+                            }
+                        }
+                    }
+                });
+
+            Assert.IsFalse(response.IsSuccess);
+            Assert.AreEqual("1997", response.ErrorCode);
+            Assert.AreEqual(0, transport.CallCount);
+        }
+
+        [TestMethod]
+        public void DischargeOp_NormalizesBenefitIdAndAmounts()
+        {
+            var transport = new FakeTransport { NextResponse = DischargeSuccessJson };
+            var service = new Service(CreateConfig(), transport, new NullAdmedikaLogger());
+
+            var response = service.DischargeOp("8000991200054479", "J06", "2", "RJ-001",
+                null, null, null, "n", "N", null, null, null,
+                new[]
+                {
+                    new DischargeEntitlementInput
+                    {
+                        BenID = " 41 ",
+                        BenAmount = "150,000.00",
+                        BenItemList = new[]
+                        {
+                            new DischargeBenItemInput
+                            {
+                                Code = "OBAT-01", Name = "Obat A", Qty = "1",
+                                TotPrice = "150,000.00"
+                            }
+                        }
+                    }
+                });
+
+            Assert.IsTrue(response.IsSuccess);
+            var payload = JObject.Parse(transport.LastBody)["input"]["txnData"]
+                ["dischargeRequest"]["discharge"];
+            Assert.AreEqual("41", payload["entitlement"][0]["benID"].ToString());
+            Assert.AreEqual("150000", payload["entitlement"][0]["benAmount"].ToString());
+            Assert.AreEqual("150000", payload["entitlement"][0]["benItemList"][0]
+                ["totPrice"].ToString());
+            Assert.AreEqual("N", payload["accidentFlag"].ToString());
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using Newtonsoft.Json;
@@ -203,6 +204,10 @@ namespace Temiang.Avicenna.Common.Admedika
             var response = new DischargeOpResponse();
             if (!RequireTerminalId(response)) return response;
 
+            if (!ValidateAndNormalizeDischarge(response, ref cardNo, ref diagnosisCodeList, ref mcDays,
+                ref accidentFlag, ref surgicalFlag, ref remarks, entitlement))
+                return response;
+
             return Send<DischargeOpResponse>(
                 AdmedikaConstant.ServiceID.DischargeOp,
                 new DischargeOpTxnData
@@ -228,6 +233,172 @@ namespace Temiang.Avicenna.Common.Admedika
                         }
                     }
                 });
+        }
+
+        private static bool ValidateAndNormalizeDischarge(AdmedikaResponse response,
+            ref string cardNo, ref string diagnosisCodeList, ref string mcDays,
+            ref string accidentFlag, ref string surgicalFlag, ref string remarks,
+            DischargeEntitlementInput[] entitlement)
+        {
+            cardNo = Normalize(cardNo);
+            diagnosisCodeList = Normalize(diagnosisCodeList);
+            mcDays = Normalize(mcDays);
+            accidentFlag = NormalizeFlag(accidentFlag);
+            surgicalFlag = NormalizeFlag(surgicalFlag);
+            remarks = Normalize(remarks);
+
+            if (string.IsNullOrEmpty(cardNo))
+                return SetValidationError(response, "cardNo cannot be empty.");
+
+            if (cardNo.Length != 16 || !ContainsDigitsOnly(cardNo))
+                return SetValidationError(response, "cardNo must contain exactly 16 digits.", "1997");
+
+            if (string.IsNullOrEmpty(diagnosisCodeList))
+                return SetValidationError(response, "diagnosisCodeList cannot be empty.", "1830");
+
+            int days;
+            if (!string.IsNullOrEmpty(mcDays) &&
+                (!int.TryParse(mcDays, NumberStyles.None, CultureInfo.InvariantCulture, out days) ||
+                 days < 0 || days > 99))
+                return SetValidationError(response, "mcDays must be a number from 0 to 99.", "1997");
+
+            if (!IsOptionalFlagValid(accidentFlag))
+                return SetValidationError(response, "accidentFlag must be Y or N.", "1997");
+
+            if (!IsOptionalFlagValid(surgicalFlag))
+                return SetValidationError(response, "surgicalFlag must be Y or N.", "1997");
+
+            if (!string.IsNullOrEmpty(remarks) && remarks.Length > 500)
+                return SetValidationError(response, "remarks cannot exceed 500 characters.", "1997");
+
+            if (entitlement == null || entitlement.Length == 0)
+                return SetValidationError(response, "entitlement cannot be empty.");
+
+            var benefitIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var benefit in entitlement)
+            {
+                if (benefit == null)
+                    return SetValidationError(response, "entitlement contains an empty benefit.", "1997");
+
+                benefit.BenID = Normalize(benefit.BenID);
+                if (string.IsNullOrEmpty(benefit.BenID))
+                    return SetValidationError(response, "benID cannot be empty.");
+
+                if (benefit.BenID.Length > 2)
+                    return SetValidationError(response, "benID cannot exceed 2 characters.", "1997");
+
+                if (!benefitIds.Add(benefit.BenID))
+                    return SetValidationError(response, "Duplicate benID " + benefit.BenID + ".", "1997");
+
+                if (benefit.BenItemList == null || benefit.BenItemList.Length == 0)
+                    return SetValidationError(response,
+                        "benItemList cannot be empty for benID " + benefit.BenID + ".");
+
+                decimal benefitAmount;
+                if (!TryParseAmount(benefit.BenAmount, out benefitAmount) || benefitAmount < 0)
+                    return SetValidationError(response,
+                        "Invalid benAmount for benID " + benefit.BenID + ".", "1997");
+
+                decimal itemTotal = 0;
+                foreach (var item in benefit.BenItemList)
+                {
+                    if (item == null)
+                        return SetValidationError(response,
+                            "benItemList contains an empty item for benID " + benefit.BenID + ".", "1997");
+
+                    item.Code = Normalize(item.Code);
+                    item.Name = Normalize(item.Name);
+                    item.DateIssue = Normalize(item.DateIssue);
+                    item.Qty = Normalize(item.Qty);
+
+                    if (string.IsNullOrEmpty(item.Code) || item.Code.Length > 50)
+                        return SetValidationError(response,
+                            "Item code is required and cannot exceed 50 characters.", "1997");
+
+                    if (string.IsNullOrEmpty(item.Name) || item.Name.Length > 50)
+                        return SetValidationError(response,
+                            "Item name is required and cannot exceed 50 characters.", "1997");
+
+                    DateTime issueDate;
+                    if (!string.IsNullOrEmpty(item.DateIssue) &&
+                        !DateTime.TryParseExact(item.DateIssue, "ddMMyyyy", CultureInfo.InvariantCulture,
+                            DateTimeStyles.None, out issueDate))
+                        return SetValidationError(response,
+                            "dateIssue must use DDMMYYYY format.", "1829");
+
+                    decimal quantity;
+                    if (!string.IsNullOrEmpty(item.Qty) &&
+                        (!decimal.TryParse(item.Qty, NumberStyles.Number, CultureInfo.InvariantCulture,
+                             out quantity) || quantity < 0 || quantity > 999))
+                        return SetValidationError(response,
+                            "qty must be a number from 0 to 999.", "1997");
+
+                    decimal price;
+                    if (!TryParseAmount(item.TotPrice, out price) || price < 0)
+                        return SetValidationError(response,
+                            "Invalid totPrice for item " + item.Code + ".", "1997");
+
+                    item.TotPrice = FormatAmount(price);
+                    itemTotal += price;
+                }
+
+                if (benefitAmount != itemTotal)
+                    return SetValidationError(response,
+                        string.Format(CultureInfo.InvariantCulture,
+                            "benAmount for benID {0} ({1}) does not match item total ({2}).",
+                            benefit.BenID, FormatAmount(benefitAmount), FormatAmount(itemTotal)), "1809");
+
+                benefit.BenAmount = FormatAmount(benefitAmount);
+            }
+
+            return true;
+        }
+
+        private static bool SetValidationError(AdmedikaResponse response, string message,
+            string errorCode = "1999")
+        {
+            response.ErrorCode = errorCode;
+            response.ErrorDesc = message;
+            response.StatusMsg = message;
+            return false;
+        }
+
+        private static string Normalize(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+        }
+
+        private static string NormalizeFlag(string value)
+        {
+            var normalized = Normalize(value);
+            return normalized == null ? null : normalized.ToUpperInvariant();
+        }
+
+        private static bool IsOptionalFlagValid(string value)
+        {
+            return string.IsNullOrEmpty(value) || value == "Y" || value == "N";
+        }
+
+        private static bool ContainsDigitsOnly(string value)
+        {
+            foreach (var character in value)
+            {
+                if (character < '0' || character > '9') return false;
+            }
+
+            return true;
+        }
+
+        private static bool TryParseAmount(string value, out decimal amount)
+        {
+            return decimal.TryParse(Normalize(value), NumberStyles.Number,
+                CultureInfo.InvariantCulture, out amount);
+        }
+
+        private static string FormatAmount(decimal value)
+        {
+            return value.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
         public CheckMemberClaimTxnStatusResponse CheckMemberClaimTxnStatus(string cardNo, string clID)

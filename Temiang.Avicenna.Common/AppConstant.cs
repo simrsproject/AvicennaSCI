@@ -1572,6 +1572,7 @@ namespace Temiang.Avicenna.Common
             public const string TemplatePpaNotes = "SLP.10.0009";
 
             public const string AdmedikaPrintLOA = "XML.01.2101";
+            public const string AdmedikaPrintLOC = "XML.01.2102";
         }
 
         public class Message
