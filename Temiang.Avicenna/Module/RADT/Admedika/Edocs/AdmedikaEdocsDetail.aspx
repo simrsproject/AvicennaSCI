@@ -8,7 +8,8 @@
         <script type="text/javascript">
             function openUploadDialog() {
                 var oWnd = $find("<%= winUpload.ClientID %>");
-                oWnd.setUrl("AdmedikaEdocsUploadDialog.aspx?id=<%= ClaimTransactionID %>");
+                oWnd.setUrl("AdmedikaEdocsUploadDialog.aspx?id=<%= ClaimTransactionID %>&wnd=" +
+                    encodeURIComponent("<%= winUpload.ClientID %>"));
                 oWnd.show();
             }
 

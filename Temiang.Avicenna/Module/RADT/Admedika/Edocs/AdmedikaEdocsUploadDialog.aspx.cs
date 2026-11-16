@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Web;
 using System.Web.UI;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
@@ -243,15 +244,19 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         private void CloseDialog(string mode)
         {
-            // Full postback pada dialog tidak mengeksekusi RadAjaxManager.ResponseScripts,
-            // jadi gunakan helper yang mendaftarkan script lewat ScriptManager + Sys.Application.load.
-            Helper.RegisterStartupScript(this, "admedikaEdocsClose",
-                "var oWnd = GetRadWindow();" +
+            // Tutup RadWindow dari sisi halaman parent (detail) agar tidak bergantung
+            // pada GetRadWindow()/Sys.Application di dalam iframe dialog.
+            var windowClientID = HttpUtility.JavaScriptStringEncode(Request.QueryString["wnd"] ?? string.Empty);
+            if (string.IsNullOrEmpty(windowClientID)) return;
+
+            var script =
+                "var oWnd = (window.parent.$find('" + windowClientID + "') || GetRadWindow());" +
                 "if (oWnd) {" +
-                "oWnd.argument = oWnd.argument || {};" +
-                "oWnd.argument.mode = '" + mode + "';" +
+                "oWnd.argument = { mode: '" + mode + "' };" +
                 "oWnd.close();" +
-                "}");
+                "}";
+
+            Page.ClientScript.RegisterStartupScript(GetType(), "admedikaEdocsClose", script, true);
         }
     }
 }

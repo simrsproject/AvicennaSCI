@@ -75,7 +75,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         public static string SanitizeFileName(string fileName)
         {
             var name = Path.GetFileName(fileName ?? string.Empty);
-            name = RemoveSpaces(name);
+
+            // Spasi pada nama file diganti dengan underscore.
+            name = Regex.Replace(name, @"\s", "_");
 
             foreach (var invalidChar in Path.GetInvalidFileNameChars())
                 name = name.Replace(invalidChar.ToString(), string.Empty);
