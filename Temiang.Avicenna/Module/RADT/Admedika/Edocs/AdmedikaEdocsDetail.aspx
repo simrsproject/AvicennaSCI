@@ -151,6 +151,13 @@
                                 Text='<%# GetSendText(Container.DataItem) %>'
                                 Visible='<%# IsSendVisible(Container.DataItem) %>'
                                 style="margin-left: 8px;" />
+                            <asp:ImageButton ID="btnDelete" runat="server" CausesValidation="false"
+                                ImageUrl="~/Images/Toolbar/delete16.png" ToolTip="Delete"
+                                CommandName="DeleteDocument"
+                                CommandArgument='<%# Eval("AdmedikaDocumentID") %>'
+                                Visible='<%# IsDeleteVisible(Container.DataItem) %>'
+                                OnClientClick="return confirm('Hapus dokumen ini?');"
+                                style="margin-left: 8px; vertical-align: middle;" />
                         </ItemTemplate>
                     </telerik:GridTemplateColumn>
                 </Columns>

@@ -63,6 +63,13 @@
                         OnClick="btnUploadAndSend_Click" />
                 </td>
             </tr>
+            <tr>
+                <td></td>
+                <td class="entry">
+                    <asp:Label ID="lblMessage" runat="server" Visible="false"
+                        style="display: block; margin-top: 8px; font-weight: bold; color: #b00020;" />
+                </td>
+            </tr>
         </table>
     </asp:Panel>
 </asp:Content>

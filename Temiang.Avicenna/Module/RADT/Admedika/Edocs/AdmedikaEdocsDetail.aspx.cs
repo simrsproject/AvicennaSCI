@@ -22,12 +22,17 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             }
         }
 
-        private bool IsEditMode
+        private bool IsListEditMode
         {
             get
             {
                 return string.Equals(Request.QueryString["md"], "edit", StringComparison.OrdinalIgnoreCase);
             }
+        }
+
+        private bool IsEditMode
+        {
+            get { return DataModeCurrent != AppEnum.DataMode.Read; }
         }
 
         private AdmedikaClaimTransaction _currentClaim;
@@ -55,8 +60,22 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-                LoadDetail();
+            if (IsPostBack) return;
+
+            // Tombol Edit di list membuka halaman dalam mode edit.
+            if (IsListEditMode && DataModeCurrent == AppEnum.DataMode.Read)
+                DataModeCurrent = AppEnum.DataMode.Edit;
+
+            LoadDetail();
+        }
+
+        protected override void OnDataModeChanged(AppEnum.DataMode oldVal, AppEnum.DataMode newVal)
+        {
+            base.OnDataModeChanged(oldVal, newVal);
+
+            // Tombol Send/Re-send pada grid mengikuti mode, jadi grid perlu di-rebind.
+            if (grdDocuments != null)
+                grdDocuments.Rebind();
         }
 
         protected override void OnLoadComplete(EventArgs e)
@@ -65,7 +84,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             ToolBarMenuAdd.Enabled = false;
             ToolBarMenuDelete.Enabled = false;
-            ToolBarMenuSave.Enabled = false;
+            ToolBarMenuSave.Visible = false;
             ToolBarMenuSearch.Enabled = false;
             ToolBarMenuMovePrev.Visible = false;
             ToolBarMenuMoveNext.Visible = false;
@@ -74,7 +93,9 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             ToolBarMenuVoid.Visible = false;
             ToolBarMenuUnVoid.Visible = false;
 
-            btnUpload.Visible = IsEditMode;
+            var hasClaim = CurrentClaim != null;
+            btnUpload.Visible = IsEditMode && hasClaim;
+            btnUpload.Enabled = btnUpload.Visible;
         }
 
         private void LoadDetail()
@@ -83,7 +104,6 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             if (claim == null)
             {
                 ShowInformationHeader("Data klaim tidak ditemukan.");
-                btnUpload.Enabled = false;
                 return;
             }
 
@@ -118,8 +138,6 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 ? Value(registration.GuarantorID) + (guarantorLoaded ? " / " + Value(guarantor.GuarantorName) : string.Empty)
                 : "-";
             lblIsVoid.Text = registrationLoaded ? (registration.IsVoid == true ? "Yes" : "No") : "-";
-
-            btnUpload.Enabled = IsEditMode;
         }
 
         protected void grdDocuments_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
@@ -146,11 +164,18 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         protected void grdDocuments_ItemCommand(object source, GridCommandEventArgs e)
         {
-            if (e.CommandName != "SendDocument") return;
             if (!IsEditMode) return;
 
             long documentID;
             if (!long.TryParse(Convert.ToString(e.CommandArgument), out documentID)) return;
+
+            if (e.CommandName == "DeleteDocument")
+            {
+                DeleteDocument(documentID);
+                return;
+            }
+
+            if (e.CommandName != "SendDocument") return;
 
             var claim = CurrentClaim;
             if (claim == null)
@@ -171,6 +196,52 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             grdDocuments.Rebind();
             ShowInformationHeader(message);
+        }
+
+        private void DeleteDocument(long documentID)
+        {
+            var document = new AdmedikaDocument();
+            if (!document.LoadByPrimaryKey(documentID))
+            {
+                grdDocuments.Rebind();
+                ShowInformationHeader("Dokumen tidak ditemukan.");
+                return;
+            }
+
+            if (document.IsSentSuccess != null)
+            {
+                grdDocuments.Rebind();
+                ShowInformationHeader("Dokumen sudah pernah dikirim dan tidak dapat dihapus.");
+                return;
+            }
+
+            var claim = CurrentClaim;
+
+            try
+            {
+                var filePath = AdmedikaEdocsHelper.GetDocumentFilePath(document, claim);
+                if (!string.IsNullOrWhiteSpace(filePath) && System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                grdDocuments.Rebind();
+                ShowInformationHeader("Gagal menghapus file: " + ex.Message);
+                return;
+            }
+
+            try
+            {
+                document.MarkAsDeleted();
+                document.Save();
+                ShowInformationHeader("Dokumen berhasil dihapus.");
+            }
+            catch (Exception ex)
+            {
+                ShowInformationHeader("Gagal menghapus data dokumen: " + ex.Message);
+            }
+
+            grdDocuments.Rebind();
         }
 
         protected override void RaisePostBackEvent(IPostBackEventHandler sourceControl, string eventArgument)
@@ -256,6 +327,17 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             var isSent = row[AdmedikaDocumentMetadata.ColumnNames.IsSentSuccess];
             return isSent == DBNull.Value || !Convert.ToBoolean(isSent);
+        }
+
+        protected bool IsDeleteVisible(object dataItem)
+        {
+            if (!IsEditMode) return false;
+
+            var row = dataItem as DataRowView;
+            if (row == null) return false;
+
+            // Hanya dokumen yang belum pernah dikirim yang boleh dihapus.
+            return row[AdmedikaDocumentMetadata.ColumnNames.IsSentSuccess] == DBNull.Value;
         }
 
         private DataTable DocumentsTable

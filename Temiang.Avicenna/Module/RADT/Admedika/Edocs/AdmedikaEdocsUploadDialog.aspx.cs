@@ -66,7 +66,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             var claim = new AdmedikaClaimTransaction();
             if (!claim.LoadByPrimaryKey(ClaimTransactionID))
             {
-                ShowInformationHeader("Data klaim tidak ditemukan.");
+                ShowMessage("Data klaim tidak ditemukan.");
                 btnUpload.Enabled = false;
                 btnUploadAndSend.Enabled = false;
                 return null;
@@ -95,14 +95,14 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         private void Process(bool send)
         {
-            HideInformationHeader();
+            HideMessage();
 
             var claim = LoadClaim();
             if (claim == null) return;
 
             if (string.IsNullOrWhiteSpace(AdmedikaEdocsHelper.GetRootPath()))
             {
-                ShowInformationHeader("Folder upload (AdmedikaUploadEdocsPath) belum dikonfigurasi.");
+                ShowMessage("Folder upload (AdmedikaUploadEdocsPath) belum dikonfigurasi.");
                 return;
             }
 
@@ -125,7 +125,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             var document = new AdmedikaDocument();
             if (!document.LoadByPrimaryKey(documentID))
             {
-                ShowInformationHeader("Dokumen tidak ditemukan.");
+                ShowMessage("Dokumen tidak ditemukan.");
                 return;
             }
 
@@ -139,7 +139,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 // File sudah tersimpan; tombol Upload tidak diperlukan lagi, cukup retry kirim.
                 btnUpload.Enabled = false;
                 btnUploadAndSend.Text = "Re-send";
-                ShowInformationHeader(message);
+                ShowMessage(message);
             }
         }
 
@@ -150,13 +150,13 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             var docType = cboDocType.SelectedValue;
             if (!AdmedikaDocType.IsValid(docType))
             {
-                ShowInformationHeader("File Type wajib dipilih.");
+                ShowMessage("File Type wajib dipilih.");
                 return false;
             }
 
             if (uplFile.UploadedFiles.Count == 0)
             {
-                ShowInformationHeader("File wajib dipilih.");
+                ShowMessage("File wajib dipilih.");
                 return false;
             }
 
@@ -165,13 +165,13 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
             if (!AdmedikaEdocsHelper.IsAllowedExtension(originalName))
             {
-                ShowInformationHeader("Jenis file tidak diizinkan. Gunakan PDF, JPG, atau PNG.");
+                ShowMessage("Jenis file tidak diizinkan. Gunakan PDF, JPG, atau PNG.");
                 return false;
             }
 
             if (uploadedFile.ContentLength > AdmedikaEdocsHelper.MaxFileSizeBytes)
             {
-                ShowInformationHeader("Ukuran file melebihi 10 MB.");
+                ShowMessage("Ukuran file melebihi 10 MB.");
                 return false;
             }
 
@@ -192,7 +192,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             }
             catch (Exception ex)
             {
-                ShowInformationHeader("Gagal menyimpan file: " + ex.Message);
+                ShowMessage("Gagal menyimpan file: " + ex.Message);
                 return false;
             }
 
@@ -221,11 +221,24 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     // abaikan kegagalan hapus file
                 }
 
-                ShowInformationHeader("Gagal menyimpan data dokumen: " + ex.Message);
+                ShowMessage("Gagal menyimpan data dokumen: " + ex.Message);
                 return false;
             }
 
             return documentID > 0;
+        }
+
+        private void ShowMessage(string message)
+        {
+            lblMessage.Text = message;
+            lblMessage.ForeColor = System.Drawing.Color.Red;
+            lblMessage.Visible = !string.IsNullOrWhiteSpace(message);
+        }
+
+        private void HideMessage()
+        {
+            lblMessage.Text = string.Empty;
+            lblMessage.Visible = false;
         }
 
         private void CloseDialog(string mode)

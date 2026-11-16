@@ -132,6 +132,9 @@
             AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
             <MasterTableView DataKeyNames="AdmedikaClaimTransactionID" ClientDataKeyNames="AdmedikaClaimTransactionID">
                 <Columns>
+                    <telerik:GridBoundColumn DataField="JumlahFile" HeaderText="Jumlah File"
+                        UniqueName="JumlahFile" SortExpression="JumlahFile" HeaderStyle-Width="90px"
+                        HeaderStyle-HorizontalAlign="Right" ItemStyle-HorizontalAlign="Right" />
                     <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                         UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
                         ItemStyle-Font-Bold="true" />
@@ -163,9 +166,6 @@
                             <%# BuildCovCodeHtml(Container.DataItem) %>
                         </ItemTemplate>
                     </telerik:GridTemplateColumn>
-                    <telerik:GridBoundColumn DataField="JumlahFile" HeaderText="Jumlah File"
-                        UniqueName="JumlahFile" SortExpression="JumlahFile" HeaderStyle-Width="90px"
-                        HeaderStyle-HorizontalAlign="Right" ItemStyle-HorizontalAlign="Right" />
                 </Columns>
                 <DetailTables>
                     <telerik:GridTableView DataKeyNames="AdmedikaDocumentID" Name="grdDocuments"

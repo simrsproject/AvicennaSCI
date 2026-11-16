@@ -170,6 +170,15 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                 string message;
                 success = service.IsOk(result, out message);
 
+                if (!success && string.IsNullOrWhiteSpace(message))
+                {
+                    message = !string.IsNullOrWhiteSpace(result.StatusMsg)
+                        ? result.StatusMsg
+                        : (!string.IsNullOrWhiteSpace(result.Msg)
+                            ? result.Msg
+                            : "Permintaan AdMedika gagal.");
+                }
+
                 document.IsSentSuccess = success;
                 document.SentDateTime = DateTime.Now;
                 document.SentByUserID = AppSession.UserLogin.UserID;
