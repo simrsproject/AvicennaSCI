@@ -671,6 +671,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.MainContent
                         row["RegistrationNo"] = orderItem["RegistrationNo"];
                         row["ResultValue"] = orderItem["ResultValue"];
                         row["ResultReadByPhysicianID"] = orderItem["ResultReadByPhysicianID"];
+                        row["ResultAcsn"] = orderItem["ResultAcsn"] == DBNull.Value ? string.Empty : orderItem["ResultAcsn"].ToString();
 
                         //cek ACSN first 14 digit numbers
                         if (!string.IsNullOrEmpty(row["ResultAcsn"].ToString()) 
