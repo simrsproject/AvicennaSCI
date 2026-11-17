@@ -250,7 +250,7 @@
                 <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
                     UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />
-                <telerik:GridBoundColumn DataField="ClID" HeaderText="ClID (Claim ID)"
+                <telerik:GridBoundColumn DataField="ClID" HeaderText="Claim ID"
                     UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px"
                     ItemStyle-Font-Bold="true" />
                 <telerik:GridTemplateColumn DataField="CovCode" HeaderText="Coverage Code"
