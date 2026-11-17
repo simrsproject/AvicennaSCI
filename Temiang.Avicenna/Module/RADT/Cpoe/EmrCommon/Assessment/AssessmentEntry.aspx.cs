@@ -602,6 +602,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             return string.Empty;
         }
 
+        public override string OnGetScriptToolBarSaveAndEditClicking()
+        {
+            return OnGetScriptToolBarSaveClicking();
+        }
+
         public override string OnGetScriptToolBarSaveClicking()
         {
             var script = new StringBuilder();

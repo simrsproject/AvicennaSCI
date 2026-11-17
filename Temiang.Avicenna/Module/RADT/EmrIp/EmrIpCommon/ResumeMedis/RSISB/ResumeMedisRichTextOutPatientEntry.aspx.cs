@@ -1257,6 +1257,11 @@ break;";
         {
             return string.Empty;
         }
+        public override string OnGetScriptToolBarSaveAndEditClicking()
+        {
+            return OnGetScriptToolBarSaveClicking();
+        }
+
         public override string OnGetScriptToolBarSaveClicking()
         {
             return controlPlanCtl.GetEmptyOutpatientControlPlanConfirmationScript(RegistrationCurrent);

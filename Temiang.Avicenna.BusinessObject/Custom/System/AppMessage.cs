@@ -65,6 +65,7 @@ namespace Temiang.Avicenna.BusinessObject
             ConfirmNewPasswordWrong,
             SaveConfirmation,
             EmptyOutpatientControlPlanConfirmation,
+            OutpatientControlPlanReturnConfirmation,
             DischargeConfirmation,
             ValueMustNumeric,
             ArgumentNumberMustSame,
@@ -193,6 +194,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string ReviewConfirmation = "Review this data, continue ?";
             public const string SaveConfirmation = "Save this data, continue ?";
             public const string EmptyOutpatientControlPlanConfirmation = "Tanggal kontrol rawat jalan masih kosong, pasien akan kontrol lagi atau tidak?\n\nPilih OK jika pasien akan kontrol lagi dan kembali isi rencana kontrol. Pilih Cancel jika pasien tidak akan kontrol lagi dan data tetap disimpan.";
+            public const string OutpatientControlPlanReturnConfirmation = "Tanggal kontrol rawat jalan masih kosong. Apakah pasien akan kontrol kembali?";
             public const string DischargeConfirmation = "Patient already discharged at {0}. Do you want to continue?";
             public const string ProsesSaveConfirmation = "Process and Save this data, continue ?";
             public const string VoidReviewConfirmation = "Void this data, continue ?";

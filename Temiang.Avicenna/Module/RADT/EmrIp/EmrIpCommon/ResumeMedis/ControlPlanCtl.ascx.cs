@@ -55,7 +55,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             }
 
             var message = HttpUtility.JavaScriptStringEncode(
-                AppMessage.GetMessageText(AppMessage.MessageIdEnum.EmptyOutpatientControlPlanConfirmation));
+                AppMessage.GetMessageText(AppMessage.MessageIdEnum.OutpatientControlPlanReturnConfirmation));
 
             return string.Format(@"
                 var controlPlanDateIds = [{0}];
@@ -67,11 +67,62 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                         break;
                     }}
                 }}
-                if (!hasOutpatientControlPlanDate && window.confirm('{1}')) {{
+                if (!hasOutpatientControlPlanDate && !window.controlPlanSaveConfirmed) {{
                     args.set_cancel(true);
+                    var controlPlanSaveButton = args.get_item();
                     fw_lastTbiDisabled.enable();
                     fw_lastTbiDisabled = null;
-                    ContinueAutoSave();
+                    var controlPlanDialog = radconfirm('{1}', function (willReturn) {{
+                        if (willReturn === false) {{
+                            window.controlPlanSaveConfirmed = true;
+                            try {{ controlPlanSaveButton.click(); }}
+                            finally {{ window.controlPlanSaveConfirmed = false; }}
+                        }} else {{
+                            ContinueAutoSave();
+                            if (willReturn === true) {{
+                                var firstControlPlanDate = $find(controlPlanDateIds[0]);
+                                if (firstControlPlanDate) firstControlPlanDate.get_dateInput().focus();
+                            }}
+                        }}
+                    }}, 520, 190, null, 'Rencana Kontrol Rawat Jalan');
+                    var controlPlanDialogElement = controlPlanDialog.get_popupElement();
+                    var controlPlanWindowIcon = controlPlanDialogElement.querySelector('.rwIcon');
+                    if (controlPlanWindowIcon) controlPlanWindowIcon.style.display = 'none';
+                    var controlPlanContent = controlPlanDialog.get_contentElement();
+                    controlPlanContent.style.position = 'relative';
+                    controlPlanContent.style.height = '100%';
+                    var controlPlanFooter = document.createElement('div');
+                    controlPlanFooter.style.cssText = 'position:absolute;right:20px;bottom:32px;display:flex;justify-content:flex-end;align-items:center;gap:8px;';
+                    var controlPlanButtons = controlPlanDialogElement.querySelectorAll('input[type=button], button, .rwPopupButton, .rwOkBtn, .rwCancelBtn');
+                    for (var buttonIndex = 0; buttonIndex < controlPlanButtons.length; buttonIndex++) {{
+                        var dialogButton = controlPlanButtons[buttonIndex];
+                        var buttonText = (dialogButton.value || dialogButton.textContent || '').replace(/^\s+|\s+$/g, '').toLowerCase();
+                        var buttonLabel = buttonText === 'ok' ? 'Ya, akan kontrol' :
+                            buttonText === 'cancel' ? 'Tidak, lanjut simpan' : null;
+                        if (buttonLabel) {{
+                            if (dialogButton.tagName.toLowerCase() === 'input') dialogButton.value = buttonLabel;
+                            else {{
+                                var labelElement = dialogButton.querySelector('.rwInnerSpan') || dialogButton;
+                                labelElement.textContent = buttonLabel;
+                            }}
+                            var themedButton = document.createElement('input');
+                            themedButton.type = 'button';
+                            themedButton.value = buttonLabel;
+                            themedButton.onclick = (function (originalButton) {{
+                                return function () {{ originalButton.click(); }};
+                            }})(dialogButton);
+                            dialogButton.style.display = 'none';
+                            controlPlanFooter.appendChild(themedButton);
+                        }}
+                    }}
+                    controlPlanContent.appendChild(controlPlanFooter);
+                    var pageComponents = Sys.Application.getComponents();
+                    for (var componentIndex = 0; componentIndex < pageComponents.length; componentIndex++) {{
+                        if (Telerik.Web.UI.RadFormDecorator.isInstanceOfType(pageComponents[componentIndex])) {{
+                            pageComponents[componentIndex].decorate(controlPlanFooter);
+                            break;
+                        }}
+                    }}
                     return;
                 }}", string.Join(",", dateClientIds), message);
         }
