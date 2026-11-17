@@ -31,16 +31,23 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
         /// </summary>
         public static string BuildFileUrl(AdmedikaClaimTransaction claim, string fileName)
         {
-            var baseUrl = GetVirtualDocUrl();
-            if (string.IsNullOrWhiteSpace(baseUrl) || claim == null) return string.Empty;
+            return claim == null
+                ? string.Empty
+                : BuildFileUrl(claim.CardNo, claim.ClID, fileName);
+        }
 
-            var cardNo = SanitizeFolderName(claim.CardNo);
-            var clID = SanitizeFolderName(claim.ClID);
+        public static string BuildFileUrl(string cardNo, string clID, string fileName)
+        {
+            var baseUrl = GetVirtualDocUrl();
+            if (string.IsNullOrWhiteSpace(baseUrl)) return string.Empty;
+
+            var card = SanitizeFolderName(cardNo);
+            var claim = SanitizeFolderName(clID);
 
             return string.Format("{0}/{1}/{2}/{3}",
                 baseUrl,
-                Uri.EscapeDataString(string.IsNullOrEmpty(cardNo) ? "UNKNOWN" : cardNo),
-                Uri.EscapeDataString(string.IsNullOrEmpty(clID) ? "UNKNOWN" : clID),
+                Uri.EscapeDataString(string.IsNullOrEmpty(card) ? "UNKNOWN" : card),
+                Uri.EscapeDataString(string.IsNullOrEmpty(claim) ? "UNKNOWN" : claim),
                 Uri.EscapeDataString(SanitizeFileName(fileName)));
         }
 

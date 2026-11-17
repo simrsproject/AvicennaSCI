@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Globalization;
+using System.Web;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -83,9 +84,14 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             }
 
             var query = new AdmedikaDocumentQuery("a");
-            query.es.WithNoLock = true;
+            var claim = new AdmedikaClaimTransactionQuery("b");
 
-            query.Select(query);
+            query.es.WithNoLock = true;
+            claim.es.WithNoLock = true;
+
+            query.InnerJoin(claim).On(claim.AdmedikaClaimTransactionID == query.AdmedikaClaimTransactionID);
+
+            query.Select(query, claim.CardNo, claim.ClID);
             query.Where(query.AdmedikaClaimTransactionID == transactionID);
             query.OrderBy(query.CreatedDateTime.Descending, query.AdmedikaDocumentID.Descending);
 
@@ -136,6 +142,25 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             }
 
             return html;
+        }
+
+        protected string BuildFileNameHtml(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var fileName = Convert.ToString(row[AdmedikaDocumentMetadata.ColumnNames.FileName]);
+            var encodedName = Server.HtmlEncode(fileName);
+
+            var url = AdmedikaEdocsHelper.BuildFileUrl(
+                Convert.ToString(row[AdmedikaClaimTransactionMetadata.ColumnNames.CardNo]),
+                Convert.ToString(row[AdmedikaClaimTransactionMetadata.ColumnNames.ClID]),
+                fileName);
+
+            if (string.IsNullOrEmpty(url)) return encodedName;
+
+            return string.Format("<a href=\"{0}\" target=\"_blank\">{1}</a>",
+                HttpUtility.HtmlAttributeEncode(url), encodedName);
         }
 
         protected string BuildCovCodeHtml(object dataItem)

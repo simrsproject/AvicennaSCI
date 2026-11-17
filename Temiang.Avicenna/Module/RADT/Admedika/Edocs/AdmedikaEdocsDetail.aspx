@@ -112,7 +112,7 @@
             AutoGenerateColumns="false" ShowGroupPanel="false" GridLines="None">
             <MasterTableView DataKeyNames="AdmedikaDocumentID" ClientDataKeyNames="AdmedikaDocumentID">
                 <Columns>
-                    <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Created Date"
+                    <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Upload Date"
                         UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
                         DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="130px" />
                     <telerik:GridTemplateColumn DataField="DocType" HeaderText="Kode &amp; Jenis File"
@@ -125,7 +125,7 @@
                         UniqueName="FileName" SortExpression="FileName" />
                     <telerik:GridBoundColumn DataField="CreatedByUserID" HeaderText="Upload By"
                         UniqueName="CreatedByUserID" SortExpression="CreatedByUserID" HeaderStyle-Width="110px" />
-                    <telerik:GridDateTimeColumn DataField="SentDateTime" HeaderText="Sent Time"
+                    <telerik:GridDateTimeColumn DataField="SentDateTime" HeaderText="Sent Date"
                         UniqueName="SentDateTime" SortExpression="SentDateTime" DataType="System.DateTime"
                         DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="130px" />
                     <telerik:GridBoundColumn DataField="SentByUserID" HeaderText="Sent By"
