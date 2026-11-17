@@ -161,18 +161,18 @@
                         ItemStyle-Font-Bold="true" />
                     <telerik:GridBoundColumn DataField="PatientName" HeaderText="Patient Name"
                         UniqueName="PatientName" SortExpression="PatientName" />
-                    <telerik:GridBoundColumn DataField="CovID" HeaderText="CovID"
-                        UniqueName="CovID" SortExpression="CovID" HeaderStyle-Width="70px" />
-                    <telerik:GridTemplateColumn DataField="CovCode" HeaderText="CovCode"
-                        UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="150px">
+                    <telerik:GridTemplateColumn DataField="CovCode" HeaderText="Coverage Code"
+                        UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="200px">
                         <ItemTemplate>
                             <%# BuildCovCodeHtml(Container.DataItem) %>
                         </ItemTemplate>
                     </telerik:GridTemplateColumn>
-                    <telerik:GridBoundColumn DataField="ClStatus" HeaderText="ClStatus"
-                        UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="70px" />
-                    <telerik:GridBoundColumn DataField="ClDesc" HeaderText="ClDesc"
-                        UniqueName="ClDesc" SortExpression="ClDesc" />
+                    <telerik:GridTemplateColumn DataField="ClStatus" HeaderText="Claim Status"
+                        UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="200px">
+                        <ItemTemplate>
+                            <%# BuildClaimStatusHtml(Container.DataItem) %>
+                        </ItemTemplate>
+                    </telerik:GridTemplateColumn>
                 </Columns>
                 <DetailTables>
                     <telerik:GridTableView DataKeyNames="AdmedikaDocumentID" Name="grdDocuments"

@@ -147,12 +147,39 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             var covID = Convert.ToString(row["CovID"]);
             var coverage = AdmedikaCoverageType.Get(covID);
 
-            var html = Server.HtmlEncode(covCode);
+            var firstLine = covCode;
+            if (!string.IsNullOrWhiteSpace(covID))
+                firstLine = string.IsNullOrWhiteSpace(firstLine)
+                    ? covID
+                    : firstLine + " (" + covID + ")";
+
+            var html = Server.HtmlEncode(firstLine);
 
             if (coverage != null && !string.IsNullOrWhiteSpace(coverage.Description))
             {
                 if (html.Length > 0) html += "<br />";
                 html += Server.HtmlEncode(coverage.Description);
+            }
+
+            return html;
+        }
+
+        protected string BuildClaimStatusHtml(object dataItem)
+        {
+            var row = dataItem as DataRowView;
+            if (row == null) return string.Empty;
+
+            var status = Convert.ToString(row["ClStatus"]);
+            var description = Convert.ToString(row["ClDesc"]);
+
+            var html = string.IsNullOrWhiteSpace(status)
+                ? string.Empty
+                : "<b>" + Server.HtmlEncode(status) + "</b>";
+
+            if (!string.IsNullOrWhiteSpace(description))
+            {
+                if (html.Length > 0) html += "<br />";
+                html += Server.HtmlEncode(description);
             }
 
             return html;
