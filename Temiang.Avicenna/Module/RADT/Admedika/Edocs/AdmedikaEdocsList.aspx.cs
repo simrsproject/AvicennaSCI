@@ -106,7 +106,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
             if (dateValue == DBNull.Value) return string.Empty;
 
             var result = Convert.ToDateTime(dateValue)
-                .ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+                .ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
 
             var time = Convert.ToString(row[RegistrationMetadata.ColumnNames.RegistrationTime]);
             if (!string.IsNullOrWhiteSpace(time))
@@ -198,6 +198,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.RegistrationNo,
                     registration.RegistrationDate,
                     registration.RegistrationTime,
+                    query.DischargeDateTime,
                     guarantor.GuarantorID,
                     guarantor.GuarantorName,
                     query.CardNo,
@@ -205,6 +206,8 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
                     query.PatientName,
                     query.CovID,
                     query.CovCode,
+                    query.ClStatus,
+                    query.ClDesc,
                     "<ISNULL((SELECT COUNT(*) FROM AdmedikaDocument d " +
                     "WHERE d.AdmedikaClaimTransactionID = a.AdmedikaClaimTransactionID), 0) AS JumlahFile>"
                 );

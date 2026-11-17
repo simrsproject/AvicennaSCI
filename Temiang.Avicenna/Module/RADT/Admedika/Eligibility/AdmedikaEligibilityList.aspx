@@ -224,7 +224,7 @@
             <Columns>
                 <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Created Date Time"
                     UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
-                    DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="140px" />
+                    DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="140px" />
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />

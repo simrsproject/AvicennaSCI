@@ -362,7 +362,7 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         private static string FormatDate(DateTime? value)
         {
-            return value.HasValue ? value.Value.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture) : "-";
+            return value.HasValue ? value.Value.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture) : "-";
         }
     }
 }

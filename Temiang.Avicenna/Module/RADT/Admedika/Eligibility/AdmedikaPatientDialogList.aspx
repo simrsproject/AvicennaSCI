@@ -78,7 +78,7 @@
                     UniqueName="Gender" SortExpression="Gender" HeaderStyle-Width="70px" />
                 <telerik:GridDateTimeColumn DataField="DateOfBirth" HeaderText="Date of Birth"
                     UniqueName="DateOfBirth" SortExpression="DateOfBirth" DataType="System.DateTime"
-                    DataFormatString="{0:MM/dd/yyyy}" HeaderStyle-Width="90px" />
+                    DataFormatString="{0:dd/MM/yyyy}" HeaderStyle-Width="90px" />
                 <telerik:GridBoundColumn DataField="Address" HeaderText="Address"
                     UniqueName="Address" SortExpression="Address" />
                 <telerik:GridBoundColumn DataField="PhoneNo" HeaderText="Phone No"

@@ -258,12 +258,12 @@ namespace Temiang.Avicenna.Module.RADT.Admedika
 
         private static string FormatDateTime(DateTime? value)
         {
-            return value.HasValue ? value.Value.ToString("MM/dd/yyyy HH:mm") : "-";
+            return value.HasValue ? value.Value.ToString("dd/MM/yyyy HH:mm") : "-";
         }
 
         private static string FormatDate(DateTime? value)
         {
-            return value.HasValue ? value.Value.ToString("MM/dd/yyyy") : "-";
+            return value.HasValue ? value.Value.ToString("dd/MM/yyyy") : "-";
         }
 
         private static string BuildPrintOutHtml(string value)

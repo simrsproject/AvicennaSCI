@@ -144,6 +144,9 @@
                             <%# BuildRegistrationDateHtml(Container.DataItem) %>
                         </ItemTemplate>
                     </telerik:GridTemplateColumn>
+                    <telerik:GridDateTimeColumn DataField="DischargeDateTime" HeaderText="Discharge Date"
+                        UniqueName="DischargeDateTime" SortExpression="DischargeDateTime" DataType="System.DateTime"
+                        DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="140px" />
                     <telerik:GridTemplateColumn DataField="GuarantorID" HeaderText="Guarantor ID / Name"
                         UniqueName="Guarantor" SortExpression="GuarantorID" HeaderStyle-Width="200px">
                         <ItemTemplate>
@@ -166,6 +169,10 @@
                             <%# BuildCovCodeHtml(Container.DataItem) %>
                         </ItemTemplate>
                     </telerik:GridTemplateColumn>
+                    <telerik:GridBoundColumn DataField="ClStatus" HeaderText="ClStatus"
+                        UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="70px" />
+                    <telerik:GridBoundColumn DataField="ClDesc" HeaderText="ClDesc"
+                        UniqueName="ClDesc" SortExpression="ClDesc" />
                 </Columns>
                 <DetailTables>
                     <telerik:GridTableView DataKeyNames="AdmedikaDocumentID" Name="grdDocuments"
@@ -173,7 +180,7 @@
                         <Columns>
                             <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Created Date"
                                 UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
-                                DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="130px" />
+                                DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="130px" />
                             <telerik:GridTemplateColumn DataField="DocType" HeaderText="Kode &amp; Jenis File"
                                 UniqueName="DocType" SortExpression="DocType" HeaderStyle-Width="250px">
                                 <ItemTemplate>
@@ -186,7 +193,7 @@
                                 UniqueName="CreatedByUserID" SortExpression="CreatedByUserID" HeaderStyle-Width="110px" />
                             <telerik:GridDateTimeColumn DataField="SentDateTime" HeaderText="Sent Time"
                                 UniqueName="SentDateTime" SortExpression="SentDateTime" DataType="System.DateTime"
-                                DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="130px" />
+                                DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="130px" />
                             <telerik:GridBoundColumn DataField="SentByUserID" HeaderText="Sent By"
                                 UniqueName="SentByUserID" SortExpression="SentByUserID" HeaderStyle-Width="110px" />
                             <telerik:GridBoundColumn DataField="ResponseMessage" HeaderText="Response Message"
