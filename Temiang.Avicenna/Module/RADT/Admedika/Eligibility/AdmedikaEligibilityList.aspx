@@ -152,7 +152,7 @@
                         </tr>
                         <tr>
                             <td class="label">
-                                ClID (Claim ID)
+                                Claim ID
                             </td>
                             <td class="entry">
                                 <telerik:RadTextBox ID="txtClID" runat="server" Width="300px" MaxLength="20" />
