@@ -179,6 +179,15 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             return GetControlPlan(false);
         }
 
+        public ControlPlan GetOutpatientControlPlan(Registration registration)
+        {
+            var keepUndated = registration != null && AppSession.Parameter.HealthcareInitial == "RSI"
+                && registration.SRRegistrationType == AppConstant.RegistrationType.OutPatient
+                && AppSession.Parameter.GuarantorAskesID.Contains(registration.GuarantorID)
+                && !string.IsNullOrWhiteSpace(registration.BpjsSepNo);
+            return GetControlPlan(keepUndated);
+        }
+
         public ControlPlan GetControlPlan(bool includeUndatedPlans)
         {
             var itemPlans = new List<ControlPlanItem>();

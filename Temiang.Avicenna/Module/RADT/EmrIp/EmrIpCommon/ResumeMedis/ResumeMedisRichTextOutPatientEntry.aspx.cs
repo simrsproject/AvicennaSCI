@@ -1763,7 +1763,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
 
         private void SavePlanControl(ValidateArgs args)
         {
-            var oplan = controlPlanCtl.GetControlPlan();
+            var oplan = controlPlanCtl.GetOutpatientControlPlan(RegistrationCurrent);
 
             if (IsCallFromCaseMix)
             {
@@ -2228,7 +2228,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             var ent = new MedicalDischargeSummaryByNurse();
             if (!ent.LoadByPrimaryKey(RegistrationNo))
             {
-                if (oplan.Items.Count > 0)
+                if (oplan.Items.Count > 0 || (oplan.UndatedItems != null && oplan.UndatedItems.Count > 0))
                 {
                     ent.RegistrationNo = RegistrationNo;
                     ent.ControlPlan = JsonConvert.SerializeObject(oplan);
