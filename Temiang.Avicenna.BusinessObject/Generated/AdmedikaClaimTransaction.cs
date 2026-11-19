@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-11-09 04:48:48 PM
+                    Date Generated       : 2026-11-18 09:18:08 AM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -199,6 +199,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "DischargeRequestJson": this.str.DischargeRequestJson = (string)value; break;
                         case "MedicalNo": this.str.MedicalNo = (string)value; break;
                         case "DischargeDateTime": this.str.DischargeDateTime = (string)value; break;
+                        case "DischargeRequestJson": this.str.DischargeRequestJson = (string)value; break;
                     }
                 }
                 else
@@ -761,6 +762,21 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemDateTime(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, value);
             }
         }
+        /// <summary>
+        /// Maps to AdmedikaClaimTransaction.DischargeRequestJson
+        /// </summary>
+        virtual public System.String DischargeRequestJson
+        {
+            get
+            {
+                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson);
+            }
+
+            set
+            {
+                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson, value);
+            }
+        }
 
 
         #endregion
@@ -1273,6 +1289,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.DischargeDateTime = Convert.ToDateTime(value);
                 }
             }
+            public System.String DischargeRequestJson
+            {
+                get
+                {
+                    System.String data = entity.DischargeRequestJson;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.DischargeRequestJson = null;
+                    else entity.DischargeRequestJson = Convert.ToString(value);
+                }
+            }
 
             private esAdmedikaClaimTransaction entity;
         }
@@ -1549,6 +1579,13 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.DischargeDateTime, esSystemType.DateTime);
+            }
+        }
+        public esQueryItem DischargeRequestJson
+        {
+            get
+            {
+                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson, esSystemType.String);
             }
         }
     }
@@ -1935,6 +1972,7 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.AdmedikaClaimTransactionID, 0, typeof(System.Int64), esSystemType.Int64);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.AdmedikaClaimTransactionID;
             c.IsInPrimaryKey = true;
+            c.IsAutoIncrement = true;
             c.NumericPrecision = 19;
             _columns.Add(c);
 
@@ -2121,6 +2159,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DischargeDateTime;
             c.IsNullable = true;
             _columns.Add(c);
+
+            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson, 32, typeof(System.String), esSystemType.String);
+            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DischargeRequestJson;
+            c.IsNullable = true;
+            _columns.Add(c);
         }
         #endregion
 
@@ -2180,6 +2223,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string DischargeRequestJson = "DischargeRequestJson";
             public const string MedicalNo = "MedicalNo";
             public const string DischargeDateTime = "DischargeDateTime";
+            public const string DischargeRequestJson = "DischargeRequestJson";
         }
         #endregion
 
@@ -2219,6 +2263,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string DischargeRequestJson = "DischargeRequestJson";
             public const string MedicalNo = "MedicalNo";
             public const string DischargeDateTime = "DischargeDateTime";
+            public const string DischargeRequestJson = "DischargeRequestJson";
         }
         #endregion
 
@@ -2295,6 +2340,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("DischargeRequestJson", new esTypeMap("nvarchar", "System.String"));
                 meta.AddTypeMap("MedicalNo", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("DischargeDateTime", new esTypeMap("datetime", "System.DateTime"));
+                meta.AddTypeMap("DischargeRequestJson", new esTypeMap("nvarchar", "System.String"));
 
 
                 meta.Source = "AdmedikaClaimTransaction";

@@ -152,7 +152,7 @@
                         </tr>
                         <tr>
                             <td class="label">
-                                ClID (Claim ID)
+                                Claim ID
                             </td>
                             <td class="entry">
                                 <telerik:RadTextBox ID="txtClID" runat="server" Width="300px" MaxLength="20" />
@@ -224,7 +224,7 @@
             <Columns>
                 <telerik:GridDateTimeColumn DataField="CreatedDateTime" HeaderText="Created Date Time"
                     UniqueName="CreatedDateTime" SortExpression="CreatedDateTime" DataType="System.DateTime"
-                    DataFormatString="{0:MM/dd/yyyy HH:mm}" HeaderStyle-Width="140px" />
+                    DataFormatString="{0:dd/MM/yyyy HH:mm}" HeaderStyle-Width="140px" />
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No"
                     UniqueName="RegistrationNo" SortExpression="RegistrationNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />
@@ -237,7 +237,7 @@
                 <telerik:GridCheckBoxColumn DataField="IsVoid" HeaderText="Is Void Reg"
                     UniqueName="IsVoid" SortExpression="IsVoid" HeaderStyle-Width="60px"
                     ItemStyle-HorizontalAlign="Center" />
-                <telerik:GridTemplateColumn DataField="PatientID" HeaderText="PatientID"
+                <telerik:GridTemplateColumn DataField="PatientID" HeaderText="Patient ID"
                     UniqueName="PatientID" SortExpression="PatientID" HeaderStyle-Width="200px">
                     <ItemTemplate>
                         <%# BuildPatientIdHtml(Container.DataItem) %>
@@ -250,21 +250,21 @@
                 <telerik:GridBoundColumn DataField="CardNo" HeaderText="Card No"
                     UniqueName="CardNo" SortExpression="CardNo" HeaderStyle-Width="150px"
                     ItemStyle-Font-Bold="true" />
-                <telerik:GridBoundColumn DataField="ClID" HeaderText="ClID (Claim ID)"
+                <telerik:GridBoundColumn DataField="ClID" HeaderText="Claim ID"
                     UniqueName="ClID" SortExpression="ClID" HeaderStyle-Width="110px"
                     ItemStyle-Font-Bold="true" />
-                <telerik:GridBoundColumn DataField="CovID" HeaderText="CovID"
-                    UniqueName="CovID" SortExpression="CovID" HeaderStyle-Width="70px" />
-                <telerik:GridTemplateColumn DataField="CovCode" HeaderText="CovCode"
-                    UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="150px">
+                <telerik:GridTemplateColumn DataField="CovCode" HeaderText="Coverage Code"
+                    UniqueName="CovCode" SortExpression="CovCode" HeaderStyle-Width="200px">
                     <ItemTemplate>
                         <%# BuildCovCodeHtml(Container.DataItem) %>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
-                <telerik:GridBoundColumn DataField="ClStatus" HeaderText="ClStatus"
-                    UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="70px" />
-                <telerik:GridBoundColumn DataField="ClDesc" HeaderText="ClDesc"
-                    UniqueName="ClDesc" SortExpression="ClDesc" />
+                <telerik:GridTemplateColumn DataField="ClStatus" HeaderText="Claim Status"
+                    UniqueName="ClStatus" SortExpression="ClStatus" HeaderStyle-Width="200px">
+                    <ItemTemplate>
+                        <%# BuildClaimStatusHtml(Container.DataItem) %>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridCheckBoxColumn DataField="IsClosed" HeaderText="Is Closed"
                     UniqueName="IsClosed" SortExpression="IsClosed" HeaderStyle-Width="50px"
                     ItemStyle-HorizontalAlign="Center" />

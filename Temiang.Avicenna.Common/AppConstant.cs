@@ -1177,6 +1177,7 @@ namespace Temiang.Avicenna.Common
             public const string AdmedikaEligibility = "01.21.01";
             public const string AdmedikaDischargeOp = "01.21.02";
             public const string AdmedikaDischargeIp = "01.21.03";
+            public const string AdmedikaEdocs = "01.21.04";
         }
 
         public class Report

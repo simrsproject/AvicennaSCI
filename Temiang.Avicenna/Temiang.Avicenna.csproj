@@ -1881,6 +1881,7 @@
     <Content Include="Document\2026\11\06\02.spxml_AdmedikaPrintLOA.sql" />
     <Content Include="Document\2026\11\06\03.INSERT_INTO_AppProgram_PrintLOA.sql" />
     <Content Include="Document\2026\11\06\04.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
+    <Content Include="Document\2026\11\16\01.CREATE_TABLE_AdmedikaDocument.sql" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
@@ -2995,6 +2996,9 @@
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDialog.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDetail.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaPatientDialogList.aspx" />
+    <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsList.aspx" />
+    <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsDetail.aspx" />
+    <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsUploadDialog.aspx" />
     <Content Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineDashboard.aspx" />
     <Content Include="Module\RADT\Bpjs\ApotekOnline\ApotekOnlineReference.aspx" />
@@ -13432,6 +13436,7 @@
       <DependentUpon>MergePurchaseOrderList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\Inventory\Procurement\ProcurementUtils.cs" />
+    <Compile Include="Module\Inventory\Procurement\RequestOrder\PurchaseRequestUsageHistory.cs" />
     <Compile Include="Module\Inventory\Procurement\PurchaseOrder\RequestOrderSelection.aspx.cs">
       <DependentUpon>RequestOrderSelection.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -15876,6 +15881,28 @@
     <Compile Include="Module\RADT\Admedika\Eligibility\AdmedikaPatientDialogList.aspx.designer.cs">
       <DependentUpon>AdmedikaPatientDialogList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsList.aspx.cs">
+      <DependentUpon>AdmedikaEdocsList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsList.aspx.designer.cs">
+      <DependentUpon>AdmedikaEdocsList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsDetail.aspx.cs">
+      <DependentUpon>AdmedikaEdocsDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsDetail.aspx.designer.cs">
+      <DependentUpon>AdmedikaEdocsDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsUploadDialog.aspx.cs">
+      <DependentUpon>AdmedikaEdocsUploadDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsUploadDialog.aspx.designer.cs">
+      <DependentUpon>AdmedikaEdocsUploadDialog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsHelper.cs" />
     <Compile Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -25720,6 +25747,7 @@
     <Folder Include="Document\2025\11\06\" />
     <Folder Include="Module\Charges\Billing\MergeBillingSt\" />
     <Folder Include="Module\HR\EmployeeHR\PersonalInfo\Images\" />
+    <Folder Include="Module\RADT\Admedika\Edocs\" />
     <Folder Include="Module\RADT\Cpoe\Common\Refer\" />
     <Folder Include="Module\RADT\EmrIp\EmrIpCommon\Assessment\" />
     <Folder Include="Module\RADT\EmrIp\EmrIpCommon\ReferInPatient\" />
