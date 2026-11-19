@@ -201,7 +201,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
             var reg = new Registration();
             reg.LoadByPrimaryKey(RegistrationNo);
 
-            var oplan = controlPlanCtl.GetControlPlan();
+            var oplan = controlPlanCtl.GetOutpatientControlPlan(reg);
 
             //if (IsCallFromCaseMix)
             //{
@@ -558,7 +558,7 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
             var ent = new MedicalDischargeSummaryByNurse();
             if (!ent.LoadByPrimaryKey(RegistrationNo))
             {
-                if (oplan.Items.Count > 0)
+                if (oplan.Items.Count > 0 || (oplan.UndatedItems != null && oplan.UndatedItems.Count > 0))
                 {
                     ent.RegistrationNo = RegistrationNo;
                     ent.ControlPlan = JsonConvert.SerializeObject(oplan);
