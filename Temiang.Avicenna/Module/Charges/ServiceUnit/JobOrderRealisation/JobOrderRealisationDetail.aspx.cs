@@ -744,6 +744,11 @@ namespace Temiang.Avicenna.Module.Charges
                                 _amplopFilmAutoNumber = Helper.GetNewAutoNumber(DateTime.Now.Date, AppEnum.AutoNumber.CTRadiologyFilmNo);
                                 detail.FilmNo = _amplopFilmAutoNumber.LastCompleteNumber;
                                 _amplopFilmAutoNumber.Save();
+                            }else if(i.ItemIDExternal == "MR")
+                            {
+                                _amplopFilmAutoNumber = Helper.GetNewAutoNumber(DateTime.Now.Date, AppEnum.AutoNumber.MRRadiologyFilmNo);
+                                detail.FilmNo = _amplopFilmAutoNumber.LastCompleteNumber;
+                                _amplopFilmAutoNumber.Save();
                             }
                         }
                     }

@@ -1049,6 +1049,7 @@ namespace Temiang.Avicenna.Common
             //Khusus Film No Radiology di RSI
             CRRadiologyFilmNo,
             CTRadiologyFilmNo,
+            MRRadiologyFilmNo,
 
             VehicleTransactionNo,
             GeneralCleanlinessNo,
