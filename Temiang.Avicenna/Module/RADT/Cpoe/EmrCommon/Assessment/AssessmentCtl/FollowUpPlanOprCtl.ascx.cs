@@ -168,6 +168,15 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
             SavePlanControl(args);
         }
 
+        public override string OnGetScriptToolBarSaveClicking()
+        {
+            var registration = new Registration();
+            if (!registration.LoadByPrimaryKey(RegistrationNo))
+                return string.Empty;
+
+            return controlPlanCtl.GetEmptyOutpatientControlPlanConfirmationScript(registration);
+        }
+
         protected override void OnDataModeChanged(bool isEdited)
         {
             if (isEdited)

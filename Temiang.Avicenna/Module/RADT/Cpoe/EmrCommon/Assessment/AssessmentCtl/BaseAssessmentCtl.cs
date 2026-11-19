@@ -275,6 +275,11 @@ namespace Temiang.Avicenna.Module.RADT.Emr.AssessmentCtl
         public virtual void OnMenuNewClick()
         {
         }
+
+        public virtual string OnGetScriptToolBarSaveClicking()
+        {
+            return string.Empty;
+        }
         #endregion
 
 

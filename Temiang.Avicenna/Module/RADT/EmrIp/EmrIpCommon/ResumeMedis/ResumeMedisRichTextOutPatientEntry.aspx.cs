@@ -1646,9 +1646,14 @@ namespace Temiang.Avicenna.Module.RADT.Emr
         {
             return string.Empty;
         }
+        public override string OnGetScriptToolBarSaveAndEditClicking()
+        {
+            return OnGetScriptToolBarSaveClicking();
+        }
+
         public override string OnGetScriptToolBarSaveClicking()
         {
-            return string.Empty;
+            return controlPlanCtl.GetEmptyOutpatientControlPlanConfirmationScript(RegistrationCurrent);
         }
         public override bool OnGetStatusMenuEdit()
         {
