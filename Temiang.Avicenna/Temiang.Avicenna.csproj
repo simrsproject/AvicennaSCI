@@ -6574,7 +6574,9 @@
       <DependentUpon>FinalizeBillingVerification.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Module\Charges\Billing\FinalizeBilling\FinalizeBillingVerification.Admedika.cs" />
+    <Compile Include="Module\Charges\Billing\FinalizeBilling\FinalizeBillingVerification.Admedika.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="Module\Charges\Billing\FinalizeBilling\FinalizeBillingVerification.aspx.designer.cs">
       <DependentUpon>FinalizeBillingVerification.aspx</DependentUpon>
     </Compile>
@@ -25747,7 +25749,6 @@
     <Folder Include="Document\2025\11\06\" />
     <Folder Include="Module\Charges\Billing\MergeBillingSt\" />
     <Folder Include="Module\HR\EmployeeHR\PersonalInfo\Images\" />
-    <Folder Include="Module\RADT\Admedika\Edocs\" />
     <Folder Include="Module\RADT\Cpoe\Common\Refer\" />
     <Folder Include="Module\RADT\EmrIp\EmrIpCommon\Assessment\" />
     <Folder Include="Module\RADT\EmrIp\EmrIpCommon\ReferInPatient\" />

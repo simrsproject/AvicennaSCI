@@ -196,7 +196,6 @@ namespace Temiang.Avicenna.BusinessObject
                         case "PolicyNo": this.str.PolicyNo = (string)value; break;
                         case "PayorMemberID": this.str.PayorMemberID = (string)value; break;
                         case "PolicyDate": this.str.PolicyDate = (string)value; break;
-                        case "DischargeRequestJson": this.str.DischargeRequestJson = (string)value; break;
                         case "MedicalNo": this.str.MedicalNo = (string)value; break;
                         case "DischargeDateTime": this.str.DischargeDateTime = (string)value; break;
                         case "DischargeRequestJson": this.str.DischargeRequestJson = (string)value; break;
@@ -718,21 +717,6 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
         /// <summary>
-        /// Maps to AdmedikaClaimTransaction.DischargeRequestJson
-        /// </summary>
-        virtual public System.String DischargeRequestJson
-        {
-            get
-            {
-                return base.GetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson);
-            }
-
-            set
-            {
-                base.SetSystemString(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson, value);
-            }
-        }
-        /// <summary>
         /// Maps to AdmedikaClaimTransaction.MedicalNo
         /// </summary>
         virtual public System.String MedicalNo
@@ -1247,20 +1231,6 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.PolicyDate = Convert.ToString(value);
                 }
             }
-            public System.String DischargeRequestJson
-            {
-                get
-                {
-                    System.String data = entity.DischargeRequestJson;
-                    return (data == null) ? String.Empty : Convert.ToString(data);
-                }
-
-                set
-                {
-                    if (value == null || value.Length == 0) entity.DischargeRequestJson = null;
-                    else entity.DischargeRequestJson = Convert.ToString(value);
-                }
-            }
             public System.String MedicalNo
             {
                 get
@@ -1558,13 +1528,6 @@ namespace Temiang.Avicenna.BusinessObject
             get
             {
                 return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.PolicyDate, esSystemType.String);
-            }
-        }
-        public esQueryItem DischargeRequestJson
-        {
-            get
-            {
-                return new esQueryItem(this, AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson, esSystemType.String);
             }
         }
         public esQueryItem MedicalNo
@@ -2143,12 +2106,6 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.DischargeRequestJson, 32, typeof(System.String), esSystemType.String);
-            c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.DischargeRequestJson;
-            c.CharacterMaxLength = -1;
-            c.IsNullable = true;
-            _columns.Add(c);
-
             c = new esColumnMetadata(AdmedikaClaimTransactionMetadata.ColumnNames.MedicalNo, 30, typeof(System.String), esSystemType.String);
             c.PropertyName = AdmedikaClaimTransactionMetadata.PropertyNames.MedicalNo;
             c.CharacterMaxLength = 15;
@@ -2220,7 +2177,6 @@ namespace Temiang.Avicenna.BusinessObject
             public const string PolicyNo = "PolicyNo";
             public const string PayorMemberID = "PayorMemberID";
             public const string PolicyDate = "PolicyDate";
-            public const string DischargeRequestJson = "DischargeRequestJson";
             public const string MedicalNo = "MedicalNo";
             public const string DischargeDateTime = "DischargeDateTime";
             public const string DischargeRequestJson = "DischargeRequestJson";
@@ -2260,7 +2216,6 @@ namespace Temiang.Avicenna.BusinessObject
             public const string PolicyNo = "PolicyNo";
             public const string PayorMemberID = "PayorMemberID";
             public const string PolicyDate = "PolicyDate";
-            public const string DischargeRequestJson = "DischargeRequestJson";
             public const string MedicalNo = "MedicalNo";
             public const string DischargeDateTime = "DischargeDateTime";
             public const string DischargeRequestJson = "DischargeRequestJson";
@@ -2337,7 +2292,6 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("PolicyNo", new esTypeMap("nvarchar", "System.String"));
                 meta.AddTypeMap("PayorMemberID", new esTypeMap("nvarchar", "System.String"));
                 meta.AddTypeMap("PolicyDate", new esTypeMap("nvarchar", "System.String"));
-                meta.AddTypeMap("DischargeRequestJson", new esTypeMap("nvarchar", "System.String"));
                 meta.AddTypeMap("MedicalNo", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("DischargeDateTime", new esTypeMap("datetime", "System.DateTime"));
                 meta.AddTypeMap("DischargeRequestJson", new esTypeMap("nvarchar", "System.String"));
