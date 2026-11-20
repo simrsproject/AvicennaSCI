@@ -28,7 +28,7 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaIsLogEnabled` | `true` | Logging ke `WebServiceAPILog`. |
 | `TilakaCallbackBaseUrl` | `https://<host>` | **Tidak dipakai kode**; callback didaftarkan di portal Tilaka (lihat 0.3). |
 | `TilakaCallbackToleranceMinutes` | `5` | Toleransi `x-request-timestamp`; jam server harus sinkron (NTP). |
-| `TilakaCallbackAllowedIps` | `<ip-tilaka>` | Dicatat; belum ditegakkan oleh controller (lihat Known limitations). |
+| `TilakaCallbackAllowedIps` | `<ip-tilaka>` | **Ditegakkan** oleh `TilakaCallbackController.IsIpAllowed` (lihat catatan di bawah tabel). |
 | `TilakaRegistrationExpireDays` | `7` | Nilai > 7 otomatis dibatasi 7. |
 | `TilakaConsentTextFile` | `C:\Tilaka\TilakaConsent.txt` | File teks TnC, UTF-8. |
 | `TilakaConsentVersion` | `TNT-v.1.0.1` | Harus sama dengan versi TnC yang disepakati; ikut di-hash saat registrasi. |
@@ -39,6 +39,12 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaClientCertificatePassword` | _(kosong)_ | |
 
 - [ ] Ke-18 kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
+- [ ] `TilakaCallbackAllowedIps` menunjuk alamat yang benar. Perilaku: nilai kosong = izinkan semua;
+      daftar dipisah koma/titik koma; `*` hanya di akhir sebagai wildcard (mis. `10.15.37.*`).
+      **Caveat deployment:** `Request.UserHostAddress` adalah TCP peer, bukan `X-Forwarded-For` — bila
+      aplikasi di belakang reverse proxy/load balancer, daftarkan IP proxy tersebut. Alamat
+      IPv4-mapped IPv6 (mis. `::ffff:10.15.37.5`) **tidak** cocok dengan entri IPv4 (`10.15.37.5`),
+      jadi kosongkan atau sesuaikan entri bila IIS menerima koneksi dalam bentuk itu.
 - [ ] `TilakaWebviewRedirectUrl` menunjuk ke host uji (bukan `domain-rs.example`), memakai HTTPS.
 
 ### 0.2 Folder server dan ACL
@@ -316,12 +322,15 @@ Invoke-RestMethod -Method Post -Uri "https://<host>/WebService/TilakaWS.asmx/Rec
 - [ ] `checked` ≤ `max`.
 - [ ] **Jangan** mengandalkan `checked = changed + failed`: pada `TilakaWS.asmx.cs`, kegagalan
       `checkcertstatus` menambah `failed` lalu tetap mengeksekusi `changed++` untuk record yang sama,
-      sehingga bisa muncul `checked = 1, changed = 1, failed = 1`. Verifikasi kegagalan lewat
-      `messages` dan kolom `LastErrorMessage` record terkait, bukan dari selisih counter.
-- [ ] Bila `messages` berisi kegagalan, periksa `LastErrorMessage` pada baris terkait.
+      sehingga bisa muncul `checked = 1, changed = 1, failed = 1`. Gunakan `messages` sebagai sinyal
+      kegagalan, bukan selisih counter.
+- [ ] Bila `messages` berisi kegagalan `checkcertstatus`, tidak ada kolom `LastErrorMessage` yang
+      menjamin isi pesan tersebut (jalur ini hanya menambah `messages`); periksa `messages` dan
+      `CertificateStatus` record terkait. `LastErrorMessage` hanya diisi oleh kegagalan
+      `userregstatus` dan exception.
 - [ ] Setelah rekonsiliasi, `LastCheckSource` = `reconcile` dan
-      `LastCheckedDateTime`/`RegistrationState` diperbarui untuk record yang diperiksa (record yang
-      gagal tetap dicoba disimpan dengan `LastErrorMessage` terisi).
+      `LastCheckedDateTime`/`RegistrationState` diperbarui untuk record yang diperiksa (termasuk
+      record yang gagal `checkcertstatus`, yang tetap disimpan tanpa `LastErrorMessage`).
 
 Catatan: respons ASMX dapat dibungkus `{"d":"{...}"}` (string JSON). Bila demikian, parse `d`
 sekali lagi dengan `ConvertFrom-Json` sebelum membaca field.
@@ -361,7 +370,9 @@ sekali lagi dengan `ConvertFrom-Json` sebelum membaca field.
   belum disediakan.
 - `Temiang.Avicenna.BusinessObject/Generated/TilakaRegistration.cs` dan kolom `Paramedic.NamaKTP`
   **disediakan oleh pemilik repo**; jangan mengedit `Generated/` secara manual.
-- `TilakaCallbackAllowedIps` baru dibaca ke config dan **belum ditegakkan** di `TilakaCallbackController`;
-  pembatasan IP saat ini mengandalkan firewall/reverse proxy.
+- `TilakaCallbackAllowedIps` **ditegakkan** oleh `TilakaCallbackController` (kosong = izinkan semua;
+  daftar koma/titik koma; `*` di akhir sebagai wildcard). Batasannya: yang diperiksa adalah TCP peer
+  (`Request.UserHostAddress`), sehingga di belakang reverse proxy IP proxy yang harus didaftarkan, dan
+  alamat IPv4-mapped IPv6 tidak cocok dengan entri IPv4.
 - Rekonsiliasi massal via `TilakaWS.asmx` belum punya penjadwalan otomatis; harus dipanggil manual
   (tombol UI atau endpoint ASMX).
