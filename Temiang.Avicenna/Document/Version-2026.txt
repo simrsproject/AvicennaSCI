@@ -1,4 +1,10 @@
-﻿---[02-01-2026 - Apip]---
+﻿---[20-11-2026 - Tilaka]---
+1. Integrasi Tilaka Sign Plus: registrasi & aktivasi sertifikat dokter
+   - Script ada di Document/2026/11/20/
+   - Menu: 01.23 (Tilaka E-Signature), 01.23.01 (Monitoring & Registrasi)
+   - Web.config: key Tilaka* (lihat dokumen rencana)
+   - Folder server: C:\Tilaka\ (TnC read-only) dan C:\Tilaka\KTP (write)
+---[02-01-2026 - Apip]---
 1.	- Modif Perhitungan dAmt jadi taxamount di simpan dibawah, jurnal Return POR 
 
 ---[07-01-2026 - Luthfi]---
