@@ -301,6 +301,8 @@
     <Compile Include="Tilaka\Logging\WebServiceApiLogger.cs" />
     <Compile Include="Tilaka\Service.cs" />
     <Compile Include="Tilaka\Service.Auth.cs" />
+    <Compile Include="Tilaka\Service.Registration.cs" />
+    <Compile Include="Tilaka\Service.Certificate.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
     <Compile Include="BPJS\Applicare\Service.cs" />
     <Compile Include="BPJS\Helper.cs" />
