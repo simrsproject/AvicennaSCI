@@ -96,6 +96,7 @@
     <Compile Include="Admedika\AdmedikaTokenTests.cs" />
     <Compile Include="Tilaka\TilakaConfigTests.cs" />
     <Compile Include="Tilaka\TilakaSignatureTests.cs" />
+    <Compile Include="Tilaka\TilakaTransportTests.cs" />
     <Compile Include="Tilaka\TilakaUrlsTests.cs" />
     <Compile Include="Bridging\Controllers\AntrolControllerTests.cs" />
     <Compile Include="ClassDispose.cs" />
