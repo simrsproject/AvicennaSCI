@@ -68,7 +68,6 @@ namespace Temiang.Avicenna.Module.RADT.Emr
             }
         }
 
-
         protected void Page_Load(object sender, EventArgs e)
         {
             ButtonCancel.Text = "Close";

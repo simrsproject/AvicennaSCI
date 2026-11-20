@@ -443,6 +443,33 @@
                 }
             }
 
+            function openMedicationSetupStatusFromHistory(url) {
+                var wnd = radopen(url, "winDialog");
+
+                if (wnd) {
+                    wnd.set_modal(true);
+
+                    wnd.set_behaviors(
+                        Telerik.Web.UI.WindowBehaviors.Maximize |
+                        Telerik.Web.UI.WindowBehaviors.Close |
+                        Telerik.Web.UI.WindowBehaviors.Move
+                    );
+
+                    wnd.setSize(
+                        window.innerWidth - 40,
+                        window.innerHeight - 40
+                    );
+
+                    wnd.show();
+
+                    // Tunggu window selesai dirender, lalu posisikan di tengah
+                    setTimeout(function () {
+                        wnd.center();
+                        wnd.setActive(true);
+                    }, 300);
+                }
+            }
+
             function openAuditLogView(tbnm, fnm, pkd) {
                 var url = "<%=Helper.UrlRoot()%>/Module/ControlPanel/AuditLog/Common/AuditLogViewHist.aspx?tbnm=" + tbnm + "&fnm=" + fnm + "&pkd=" + pkd;
                 openWinEntryMaxHeight(url, 800);

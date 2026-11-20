@@ -47,8 +47,34 @@ namespace Temiang.Avicenna.Module.RADT.Medication
 
             if (!IsPostBack)
             {
-                StandardReference.InitializeIncludeSpace(cboSRMedicationConsume, AppEnum.StandardReference.MedicationConsume);
-                StandardReference.InitializeIncludeSpace(cboSRMedicationRoute, AppEnum.StandardReference.Route);
+                StandardReference.InitializeIncludeSpace(
+                    cboSRMedicationConsume,
+                    AppEnum.StandardReference.MedicationConsume);
+
+                StandardReference.InitializeIncludeSpace(
+                    cboSRMedicationRoute,
+                    AppEnum.StandardReference.Route);
+
+                BindConsumeMethod();
+            }
+        }
+
+        private void BindConsumeMethod()
+        {
+            cboConsumeMethod.Items.Clear();
+
+            var consumes = new ConsumeMethodCollection();
+            consumes.Query.OrderBy("<LEFT(SRConsumeMethodName, 5)>");
+            consumes.LoadAll();
+
+            foreach (var consume in consumes)
+            {
+                cboConsumeMethod.Items.Add(
+                    new RadComboBoxItem(
+                        consume.SRConsumeMethodName,
+                        consume.SRConsumeMethod
+                    )
+                );
             }
         }
 
@@ -76,8 +102,7 @@ namespace Temiang.Avicenna.Module.RADT.Medication
             txtItemUnit2.Text = med.SRConsumeUnit;
 
             var cm = new ConsumeMethod();
-            if (cm.LoadByPrimaryKey(med.SRConsumeMethod))
-                txtConsumeMethod.Text = string.Format("{0} ({1}) @{2} {3}", cm.SygnaText, cm.SRConsumeMethodName, med.ConsumeQty, med.SRConsumeUnit);
+            cboConsumeMethod.SelectedValue = med.SRConsumeMethod;
 
             txtStartDateTime.SelectedDate = med.StartDateTime;
             txtReceiveQty.Value = Convert.ToDouble(med.ReceiveQty ?? 0);
@@ -120,6 +145,9 @@ namespace Temiang.Avicenna.Module.RADT.Medication
             var med = new MedicationReceive();
             med.LoadByPrimaryKey(MedicationReceiveNo);
             med.StartDateTime = txtStartDateTime.SelectedDate;
+
+            // Update Consume Method
+            med.SRConsumeMethod = cboConsumeMethod.SelectedValue;
             med.SRMedicationConsume = cboSRMedicationConsume.SelectedValue;
             med.SRMedicationRoute = cboSRMedicationRoute.SelectedValue;
             if (txtBalanceRealQty.Value != txtReceiveQty.Value) // Receive diedit
