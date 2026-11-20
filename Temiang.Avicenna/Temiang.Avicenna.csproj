@@ -3437,6 +3437,7 @@
     <Content Include="SesssionStretch.aspx" />
     <Content Include="Module\Reports\OptionControl\TariffTypeCtl.ascx" />
     <Content Include="Views\Home\SOP.cshtml" />
+    <Content Include="Views\TilakaWebview\Return.cshtml" />
     <Content Include="Views\Home\SOP2.cshtml" />
     <Content Include="Views\Queueing\DisplayPoliByPhysician.cshtml" />
     <Content Include="WebService\AntrianRSI.asmx" />
@@ -5550,6 +5551,7 @@
     <Compile Include="Controllers\QueueingController.cs" />
     <Compile Include="Controllers\PosController.cs" />
     <Compile Include="Controllers\TilakaCallbackController.cs" />
+    <Compile Include="Controllers\TilakaWebviewController.cs" />
     <Compile Include="CustomControl\AddressCtl.ascx.cs">
       <DependentUpon>AddressCtl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -24314,13 +24316,6 @@
     <Compile Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx.designer.cs">
       <DependentUpon>TilakaRegistrationDetail.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Module\RADT\Tilaka\TilakaWebviewReturn.aspx.cs">
-      <DependentUpon>TilakaWebviewReturn.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Module\RADT\Tilaka\TilakaWebviewReturn.aspx.designer.cs">
-      <DependentUpon>TilakaWebviewReturn.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx.cs">
       <DependentUpon>TilakaKtpImageHandler.ashx</DependentUpon>
     </Compile>
@@ -25432,7 +25427,6 @@
     <Content Include="Module\RADT\Master\ImageTemplate\ImageTemplateSearch.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx" />
-    <Content Include="Module\RADT\Tilaka\TilakaWebviewReturn.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx" />
     <Content Include="SearchPopUp\StandardPopUp.aspx" />
   </ItemGroup>

@@ -33,7 +33,7 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaConsentVersion` | `TNT-v.1.0.1` | Harus sama dengan versi TnC yang disepakati; ikut di-hash saat registrasi. |
 | `TilakaUploadKTPImage` | `C:\Tilaka\KTP` | Root penyimpanan foto KTP. |
 | `TilakaMaxKtpSizeKb` | `1024` | Batas ukuran **setelah kompresi** (1 MB). Kontrol upload sendiri menerima ≤ 2 MB (`MaxFileSize=2097152`). |
-| `TilakaWebviewRedirectUrl` | `https://<host>/Module/RADT/Tilaka/TilakaWebviewReturn.aspx` | Harus halaman return yang ada. |
+| `TilakaWebviewRedirectUrl` | `https://<host>/TilakaWebview/Return` | Halaman pendaratan setelah webview Tilaka (MVC). |
 | `TilakaClientCertificatePath` | _(kosong)_ | Isi hanya bila Tilaka mewajibkan mTLS. |
 | `TilakaClientCertificatePassword` | _(kosong)_ | |
 
@@ -71,12 +71,12 @@ icacls "C:\Tilaka\TilakaConsent.txt" /grant "IIS APPPOOL\<AppPoolName>:(R)"
 
 - [ ] Callback registrasi: `https://<host>/TilakaCallback/Registration`
 - [ ] Callback certificate status: `https://<host>/TilakaCallback/CertificateStatus`
-- [ ] Redirect webview: `https://<host>/Module/RADT/Tilaka/TilakaWebviewReturn.aspx`
+- [ ] Redirect webview: `https://<host>/TilakaWebview/Return`
 
 Catatan redirect: `TilakaUrls` mengirim `redirect_url` **persis seperti nilai konfigurasi**, tanpa
 menambahkan `request-id`. Menurut PRD Tilaka §6.3, Tilaka yang menambahkan parameter `request-id`
 (dan `tilaka-name`) ke URL redirect tersebut saat webview selesai. Halaman
-`TilakaWebviewReturn.aspx` mewajibkan `?request-id=`; bila parameter tidak ada, halaman menampilkan
+`TilakaWebview/Return` mewajibkan `?request-id=`; bila parameter tidak ada, halaman menampilkan
 "Parameter request-id tidak ditemukan." — dalam kasus itu gunakan tombol **Cek Status** di halaman
 detail (lihat 5.1).
 
@@ -296,7 +296,7 @@ Invoke-WebRequest -Method Post -Uri "https://<host>/TilakaCallback/CertificateSt
       menampilkan `Parameter request-id tidak ditemukan.` atau
       `Nama Tilaka belum tersedia. Silakan gunakan tombol Cek Status di Avicenna.`, gunakan tombol
       **Cek Status** pada halaman detail sebagai fallback.
-- [ ] Bila redirect membawa `request-id`, halaman `TilakaWebviewReturn.aspx?request-id=<request-id>`
+- [ ] Bila redirect membawa `request-id`, halaman `TilakaWebview/Return?request-id=<request-id>`
       menampilkan `Aktivasi selesai. Status: Aktif`.
 - [ ] `CertificateStatus` = `3`, `RegistrationState` = `Aktif`, `LastCheckSource` = `callback`
       (atau `manual` bila aktivasi diverifikasi lewat **Cek Status**).
