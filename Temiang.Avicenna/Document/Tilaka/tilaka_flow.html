@@ -139,7 +139,7 @@
     <tr><td>Docker</td><td>Docker Engine/Desktop + Compose untuk menjalankan <code>tilaka-lite</code>, MinIO, MariaDB.</td></tr>
     <tr><td>Jaringan</td><td>Server Avicenna ↔ <code>tilaka-lite</code> pada port yang disepakati; server Avicenna harus dapat diakses internet untuk callback Sign Plus.</td></tr>
     <tr><td>Waktu</td><td>NTP aktif di server Avicenna dan <code>tilaka-lite</code>; HMAC callback memakai timestamp.</td></tr>
-    <tr><td>Penyimpanan</td><td><code>C:\Tilaka\</code> (TnC read-only), <code>C:\Tilaka\KTP</code> (write), <code>C:\Tilaka\Signed</code> (write), dan lokasi file Casemix yang sudah ada (dibaca saja). Semuanya masuk kebijakan backup.</td></tr>
+    <tr><td>Penyimpanan</td><td><code>C:\Tilaka\</code> (TnC read-only), <code>C:\Tilaka\KTP</code> (write), <code>C:\Tilaka\TemplateSign</code> (write), <code>C:\Tilaka\Signed</code> (write), dan lokasi file Casemix yang sudah ada (dibaca saja). Semuanya masuk kebijakan backup.</td></tr>
   </table>
 
   <h3>2.2 Kredensial dan pendaftaran ke Tilaka</h3>
@@ -333,23 +333,37 @@ Content-Type: application/json
   <p>Respons berisi status per email. Error yang mungkin: <em>User does not exist</em>, <em>User is already registered for Quicksign</em>, <em>User does not have active certificate</em>, <em>Interval tidak valid, sertifikat user akan expired pada ...</em>.</p>
 
   <h3>4.3 Template tanda tangan</h3>
-  <p>Setiap signer membutuhkan template yang terdaftar. Satu user boleh punya lebih dari satu template.</p>
+  <p>Template adalah <strong>PDF terpisah dari dokumen bisnis</strong>. Template didaftarkan sekali per dokter,
+  lalu dipakai berulang saat signing. Dokumen Casemix tetap diunggah lewat <code>/api/v1/upload</code>.</p>
+
+  <p>Di Avicenna, template dikelola lewat tabel <code>TilakaTemplateSignFile</code>:</p>
+  <ul>
+    <li>Admin mengunggah PDF template untuk dokter tertentu.</li>
+    <li><code>TemplateNo</code> dibuat otomatis dengan pola <code>TTD-{ParamedicID}-{XX}</code>, mis. <code>TTD-DR001-01</code>.</li>
+    <li>File disimpan di <code>C:\Tilaka\TemplateSign\{ParamedicID}\{TemplateNo}_{yyyyMMddHHmmss}.pdf</code>.</li>
+    <li>Template pertama untuk dokter menjadi <code>IsDefault = 1</code>; Process Signature memakai default tersebut.</li>
+    <li>Setelah terdaftar di Tilaka, <code>IsRegistered = 1</code> dan <code>RegisteredDateTime</code> diisi.</li>
+  </ul>
+
   <pre><code>POST {TilakaLiteBaseUrl}/quicksign-addtemplates
 Authorization: Bearer &lt;access_token&gt;
 
 {
   "templates": [
     {
-      "file_name": "Template TTD Dokter",
-      "template_number": "TTD-DR-01",
-      "template_file": "&lt;base64 PDF&gt;",
+      "file_name": "Template TTD Dokter DR001",
+      "template_number": "TTD-DR001-01",
+      "template_file": "&lt;base64 PDF template&gt;",
       "assigned_users": [
         { "user_identifier": "dokter001", "email": "dokter@rs.example" }
       ]
     }
   ]
 }</code></pre>
-  <p>Batas 5 template/user per panggilan. Menambah template baru <strong>membatalkan auth session</strong> user; user harus aktivasi ulang.</p>
+  <p>Batas 5 template/user per panggilan. Menambah template baru <strong>membatalkan auth session</strong>
+  user dan memotong kuota; user harus aktivasi ulang sebelum signing.</p>
+  <div class="note">Jangan menaruh file Casemix ke <code>template_file</code>. Template adalah specimen
+  tanda tangan; dokumen yang ditandatangani dikirim lewat <code>list_pdf[].filename</code>.</div>
 
   <h3>4.4 Membuat request tanda tangan</h3>
   <div class="flow">
@@ -392,7 +406,7 @@ Authorization: Bearer &lt;access_token&gt;
   "list_pdf": [
     {
       "filename": "b95d459d34cb4836977d_Test Document.pdf",
-      "template_no": "TTD-DR-01",
+      "template_no": "TTD-DR001-01",
       "signatures": [
         {
           "user_identifier": "dokter001",
@@ -584,7 +598,7 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
     <li>Data <code>TilakaCasemixFile</code> sudah tersedia dan dapat dibaca; kolom RegistrationNo/ParamedicID/FileName/FilePath terisi.</li>
     <li><code>tilaka-lite</code> berjalan; MinIO dan MariaDB sehat; versi sesuai dukungan Tilaka.</li>
     <li>Key <code>TilakaLite*</code> terisi; folder <code>C:\Tilaka\Signed</code> siap.</li>
-    <li>Dokter uji terdaftar sebagai Quick Sign user dan punya template.</li>
+    <li>Dokter uji terdaftar sebagai Quick Sign user dan punya template yang sudah <code>IsRegistered = 1</code>.</li>
     <li>Request sign satu signer berhasil sampai <code>DONE</code>.</li>
     <li>Callback signing dan polling sama-sama teruji; status tidak mundur.</li>
     <li>Salinan PDF tersimpan lokal dan dapat diunduh lewat handler.</li>
