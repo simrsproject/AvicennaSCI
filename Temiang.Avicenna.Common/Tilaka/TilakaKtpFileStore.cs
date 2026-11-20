@@ -22,7 +22,7 @@ namespace Temiang.Avicenna.Common.Tilaka
             _maxSizeKb = maxSizeKb <= 0 ? 1024 : maxSizeKb;
         }
 
-        public string Save(string relatedId, byte[] content, string contentType, DateTime now)
+        public string Save(string relatedId, string ssn, byte[] content, string contentType, DateTime now)
         {
             if (content == null || content.Length == 0)
                 throw new InvalidOperationException("Isi file KTP kosong.");
@@ -43,8 +43,8 @@ namespace Temiang.Avicenna.Common.Tilaka
                     throw new InvalidOperationException(
                         string.Format("Ukuran foto KTP melebihi {0} KB setelah kompresi.", _maxSizeKb));
 
-                var relative = string.Format("{0:yyyy}/{0:MM}/{0:dd}/{1}_{0:yyyyMMdd_HHmmss}.jpg",
-                    now, SafeName(relatedId));
+                var relative = string.Format("{0}/{1}_{2:yyyyMMddHHmmss}.jpg",
+                    SafeName(relatedId), SafeName(ssn), now);
                 var fullPath = ResolveFullPath(relative);
                 Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
                 File.WriteAllBytes(fullPath, bytes);

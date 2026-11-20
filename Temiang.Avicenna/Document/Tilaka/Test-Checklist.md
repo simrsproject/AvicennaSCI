@@ -47,7 +47,7 @@ langkah dijalankan oleh operator di server uji.
 
 - [ ] Folder `C:\Tilaka\` dibuat.
 - [ ] File `C:\Tilaka\TilakaConsent.txt` dibuat (UTF-8, teks TnC lengkap, tidak kosong).
-- [ ] Folder `C:\Tilaka\KTP` dibuat (rekursif: aplikasi membuat subfolder `yyyy\MM\dd`).
+- [ ] Folder `C:\Tilaka\KTP` dibuat (aplikasi membuat subfolder `{ParamedicID}` otomatis).
 - [ ] Identitas aplikasi (IIS App Pool, mis. `IIS APPPOOL\<AppPoolName>`) diberi:
   - **Read** pada `C:\Tilaka\TilakaConsent.txt` (disarankan hanya Read; tidak perlu Write).
   - **Modify** pada `C:\Tilaka\KTP` (dan pewarisan ke subfolder).
@@ -159,7 +159,7 @@ Buka menu **Tilaka E-Signature → Monitoring & Registrasi Sertifikat Dokter**
 - [ ] Klik **Daftar**.
       Expected: pesan `UUID Tilaka berhasil dibuat. Lanjutkan dengan Kirim Data KYC.`
 - [ ] **Setelah Daftar**, pratinjau KTP muncul (`imgKtp` baru terikat saat record tersimpan punya
-      `KtpFilePath`) dan file ada di `C:\Tilaka\KTP\yyyy\MM\dd\<ParamedicID>_yyyyMMdd_HHmmss.jpg`.
+      `KtpFilePath`) dan file ada di `C:\Tilaka\KTP\<ParamedicID>\<ssn>_yyyyMMddHHmmss.jpg`.
       Bila pratinjau tidak muncul, buka
       `~/Module/RADT/Tilaka/TilakaKtpImageHandler.ashx?id=<TilakaRegistrationID>`.
 - [ ] Klik **Kirim Data KYC**.

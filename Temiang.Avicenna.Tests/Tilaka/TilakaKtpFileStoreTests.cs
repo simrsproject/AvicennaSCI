@@ -20,9 +20,9 @@ namespace Temiang.Avicenna.Tests.Tilaka
             using (var stream = new MemoryStream())
             {
                 bitmap.Save(stream, ImageFormat.Jpeg);
-                var relative = store.Save("DR001", stream.ToArray(), "image/jpeg", new DateTime(2026, 11, 20, 14, 35, 1));
+                var relative = store.Save("DR001", "3273010101900001", stream.ToArray(), "image/jpeg", new DateTime(2026, 11, 20, 14, 35, 1));
 
-                Assert.AreEqual("2026/11/20/DR001_20261120_143501.jpg", relative);
+                Assert.AreEqual("DR001/3273010101900001_20261120143501.jpg", relative);
                 Assert.IsTrue(File.Exists(Path.Combine(root, relative.Replace('/', '\\'))));
             }
 
@@ -37,7 +37,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
 
             try
             {
-                store.Save("DR001", new byte[] { 1, 2, 3 }, "application/pdf", DateTime.Now);
+                store.Save("DR001", "3273010101900001", new byte[] { 1, 2, 3 }, "application/pdf", DateTime.Now);
                 Assert.Fail("Harus menolak konten non-image.");
             }
             catch (InvalidOperationException)

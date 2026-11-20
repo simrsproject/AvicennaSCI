@@ -174,7 +174,7 @@
     <li><code>Paramedic.NamaKTP</code> terisi sesuai KTP (bukan nama bergelar).</li>
     <li><code>Paramedic.Ssn</code> berisi NIK tepat 16 digit dan tidak dipakai dokter lain.</li>
     <li><code>Paramedic.Email</code> terisi dan aktif (dipakai OTP).</li>
-    <li>Admin mengunggah foto KTP di halaman Tilaka; file disimpan di <code>C:\Tilaka\KTP\yyyy\MM\dd\</code>.</li>
+    <li>Admin mengunggah foto KTP di halaman Tilaka; file disimpan di <code>C:\Tilaka\KTP\{ParamedicID}\{ssn}_{yyyyMMddHHmmss}.jpg</code>.</li>
   </ol>
 
   <h3>3.2 Langkah registrasi</h3>
@@ -229,7 +229,7 @@
   <ol start="5">
     <li>Periksa <strong>Nama sesuai KTP</strong>, <strong>NIK (SSN)</strong>, dan <strong>Email</strong>.
         Bila salah, perbaiki di master dokter lalu buka ulang halaman ini.</li>
-    <li>Unggah <strong>Foto KTP</strong> (JPEG/PNG). File disimpan ke <code>C:\Tilaka\KTP\yyyy\MM\dd\</code>.</li>
+    <li>Unggah <strong>Foto KTP</strong> (JPEG/PNG). File disimpan ke <code>C:\Tilaka\KTP\{ParamedicID}\{ssn}_{yyyyMMddHHmmss}.jpg</code>.</li>
     <li>Centang <strong>“Dokter telah membaca dan menyetujui TnC Tilaka.”</strong></li>
     <li>Klik <strong>Daftar</strong>. Sistem memanggil <code>/generateUUID</code>. Status berubah menjadi
         <code>UuidTerbit</code> dan muncul pesan untuk melanjutkan Kirim Data KYC.</li>

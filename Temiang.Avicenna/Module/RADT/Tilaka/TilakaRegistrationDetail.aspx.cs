@@ -214,7 +214,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     using (var stream = new MemoryStream())
                     {
                         file.InputStream.CopyTo(stream);
-                        ktpPath = store.Save(ParamedicID, stream.ToArray(), file.ContentType, DateTime.Now);
+                        ktpPath = store.Save(ParamedicID, paramedic.Ssn, stream.ToArray(), file.ContentType, DateTime.Now);
                     }
 
                     ktpFileName = file.GetName();
