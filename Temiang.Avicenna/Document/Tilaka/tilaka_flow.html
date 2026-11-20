@@ -211,7 +211,86 @@
     </ul>
   </div>
 
-  <h3>3.3 Status yang akan terlihat</h3>
+  <h3>3.3 Panduan langkah demi langkah (operator)</h3>
+  <p>Bagian ini adalah urutan klik di aplikasi, dari daftar dokter sampai webview Tilaka terbuka.</p>
+
+  <h4>A. Membuka halaman registrasi</h4>
+  <ol>
+    <li>Login ke Avicenna dengan user yang memiliki akses menu <code>01.23.01</code>.</li>
+    <li>Buka menu <strong>Tilaka E-Signature → Monitoring &amp; Registrasi Sertifikat Dokter</strong>
+        (<code>Module/RADT/Tilaka/TilakaRegistrationList.aspx</code>).</li>
+    <li>Isi kolom <strong>Dokter</strong> atau pilih status <strong>Belum terdaftar</strong>, lalu klik
+        <strong>Search</strong>.</li>
+    <li>Pada baris dokter, klik <strong>Detail</strong> di kolom Action. Halaman terbuka:
+        <code>TilakaRegistrationDetail.aspx?md=view&amp;id=&lt;ParamedicID&gt;</code>.</li>
+  </ol>
+
+  <h4>B. Memeriksa data dan memulai pendaftaran</h4>
+  <ol start="5">
+    <li>Periksa <strong>Nama sesuai KTP</strong>, <strong>NIK (SSN)</strong>, dan <strong>Email</strong>.
+        Bila salah, perbaiki di master dokter lalu buka ulang halaman ini.</li>
+    <li>Unggah <strong>Foto KTP</strong> (JPEG/PNG). File disimpan ke <code>C:\Tilaka\KTP\yyyy\MM\dd\</code>.</li>
+    <li>Centang <strong>“Dokter telah membaca dan menyetujui TnC Tilaka.”</strong></li>
+    <li>Klik <strong>Daftar</strong>. Sistem memanggil <code>/generateUUID</code>. Status berubah menjadi
+        <code>UuidTerbit</code> dan muncul pesan untuk melanjutkan Kirim Data KYC.</li>
+    <li>Klik <strong>Kirim Data KYC</strong>. Sistem mengirim data + foto KTP + consent ke
+        <code>/registerForKycCheck</code>. Status menjadi <code>MenungguKyc</code>.</li>
+  </ol>
+
+  <h4>C. Membuka webview registrasi</h4>
+  <p>Tombol <strong>Buka Webview</strong> muncul saat status <code>MenungguKyc</code>, atau
+  <code>KycGagal</code> untuk melanjutkan <strong>manual form</strong>. Pada status
+  <code>UuidTerbit</code> tombol ini belum tersedia — selesaikan dulu <strong>Kirim Data KYC</strong>.</p>
+  <ol start="10">
+    <li>Klik <strong>Buka Webview</strong>. Tab baru terbuka ke
+        <code>personal-webview/guide?request_id=...&amp;redirect_url=...</code>.</li>
+    <li>Di webview: masukkan <strong>OTP</strong> yang dikirim ke email dokter, lalu ikuti
+        <strong>liveness</strong>.</li>
+    <li>Buat <strong>Tilaka Name</strong> dan <strong>kata sandi</strong>. Bila gagal Dukcapil, ikuti
+        <strong>Manual Form</strong> (data harus sama persis dengan yang dikirim).</li>
+    <li>Setelah halaman selesai, klik <strong>Kembali ke Halaman Utama</strong>. Browser kembali ke
+        <code>/TilakaWebview/Return?request-id=...</code>.</li>
+    <li>Kembali ke halaman detail Avicenna, klik <strong>Cek Status</strong> bila status belum berubah.</li>
+  </ol>
+
+  <h4>D. Aktivasi sertifikat</h4>
+  <p>Setelah callback Certificate Status masuk dan status menjadi <code>SertifikatTerbit</code>, tombol
+  <strong>Buka Webview</strong> yang sama sekarang membuka <strong>webview aktivasi</strong>
+  (<code>link-account</code>), bukan webview registrasi.</p>
+  <ol start="15">
+    <li>Klik <strong>Buka Webview</strong>.</li>
+    <li>Login dengan Tilaka Name dan kata sandi, setujui informasi sertifikat, atur tampilan tanda tangan
+        dan MFA.</li>
+    <li>Klik <strong>Kembali ke Halaman Utama</strong>; halaman return menampilkan
+        <em>“Aktivasi selesai. Status: Aktif”</em>.</li>
+    <li>Klik <strong>Cek Status</strong> untuk memastikan status akhir <code>Aktif</code>.</li>
+  </ol>
+
+  <div class="note">
+    <strong>Bila macet:</strong> gunakan <strong>Cek Status</strong> di halaman detail. Callback Tilaka bisa
+    tertunda; tombol ini memanggil <code>/userregstatus</code> lalu <code>/checkcertstatus</code>.
+    Tombol <strong>Cek Status Massal</strong> di halaman list memeriksa maksimal 5 record per klik.
+  </div>
+
+  <h4>Tombol yang muncul sesuai status</h4>
+  <table>
+    <tr><th>Status</th><th>Tombol yang tersedia</th><th>Langkah berikutnya</th></tr>
+    <tr><td><code>BelumTerdaftar</code></td><td>Daftar, unggah KTP, centang TnC</td><td>Klik Daftar</td></tr>
+    <tr><td><code>UuidTerbit</code></td><td>Kirim Data KYC, Cek Status</td><td>Kirim data, lalu buka webview</td></tr>
+    <tr><td><code>MenungguKyc</code></td><td>Buka Webview, Cek Status</td><td>Selesaikan webview registrasi</td></tr>
+    <tr><td><code>KycGagal</code></td><td>Buka Webview, Daftar, Cek Status</td><td>Lanjutkan manual form lewat webview; Daftar hanya bila sudah kedaluwarsa</td></tr>
+    <tr><td><code>MenungguVerifikasi</code></td><td>Cek Status</td><td>Tunggu verifikator/validator</td></tr>
+    <tr><td><code>SertifikatTerbit</code></td><td>Buka Webview (aktivasi), Cek Status</td><td>Setujui sertifikat di webview</td></tr>
+    <tr><td><code>Aktif</code></td><td>Cek Status</td><td>Lanjut Fase 2 (Quick Sign)</td></tr>
+    <tr><td><code>Kedaluwarsa</code> / <code>Ditolak</code></td><td>Daftar, Cek Status</td><td>Perbaiki data lalu daftar ulang</td></tr>
+  </table>
+
+  <div class="warn">
+    <strong>Jangan buat UUID baru saat masih ada proses berjalan.</strong> Bila Tilaka membalas
+    “NIK sedang dalam proses pendaftaran/verifikasi”, gunakan webview yang sudah ada, bukan Daftar lagi.
+  </div>
+
+  <h3>3.4 Status yang akan terlihat</h3>
   <table>
     <tr><th>Status internal</th><th>Arti</th><th>Tindakan admin</th></tr>
     <tr><td><code>BelumTerdaftar</code></td><td>Belum ada pendaftaran</td><td>Daftar</td></tr>
@@ -235,11 +314,10 @@
     <li>Modul membaca baris <code>TilakaCasemixFile</code> dan menampilkan <strong>RegistrationNo, ParamedicID, FileName, FilePath</strong>.</li>
     <li>File fisik dibaca dari <code>FilePath</code> saat request signing; isinya harus PDF (Quick Sign tidak menerima format lain).</li>
     <li>Kolom <strong>Action</strong> berisi tombol <strong>Process Signature</strong> yang hanya tampil untuk baris yang <em>belum diproses</em>.</li>
-    <li>Menekan tombol menjalankan request sign dengan signer = dokter `ParamedicID`, posisi tanda tangan 1/1/1/1/1, lalu menampilkan status per signer dan tautan auth webview.</li>
+    <li>Menekan tombol menjalankan request sign dengan signer = dokter <code>ParamedicID</code>, posisi tanda tangan 1/1/1/1/1, lalu menampilkan status per signer dan tautan auth webview.</li>
     <li>Baris yang sudah diproses menampilkan status request terbaru; tombol Process Signature tidak ditampilkan lagi.</li>
   </ol>
-  <div class="note">Status file diturunkan dari request terbaru: <em>Belum diproses</em>, <em>Requested</em>, <em>InProgress</em>, <em>Completed</em>, <em>Failed</em>. Tidak ada kolom status terpisah di <code>TilakaCasemixFile</code>.</div>
-  <div class="note">Satu file boleh diajukan lebih dari sekali (mis. signing gagal atau perlu koreksi). Status file diturunkan dari request terbaru: <em>Belum diajukan</em>, <em>Requested</em>, <em>InProgress</em>, <em>Completed</em>, <em>Failed</em>.</div>
+  <div class="note">Satu file boleh diajukan lebih dari sekali (mis. signing gagal atau perlu koreksi). Status file diturunkan dari request terbaru: <em>Belum diproses</em>, <em>Requested</em>, <em>InProgress</em>, <em>Completed</em>, <em>Failed</em>. Tidak ada kolom status terpisah di <code>TilakaCasemixFile</code>.</div>
 
   <h3>4.2 Onboarding Quick Sign user</h3>
   <p>Syarat: sertifikat dokter <strong>Aktif</strong> dan <code>TilakaName</code> terisi.</p>
