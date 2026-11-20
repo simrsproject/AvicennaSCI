@@ -296,6 +296,9 @@
     <Compile Include="Tilaka\Transport\ITilakaTransport.cs" />
     <Compile Include="Tilaka\Transport\TilakaTransportException.cs" />
     <Compile Include="Tilaka\Transport\TilakaTransportResult.cs" />
+    <Compile Include="Tilaka\Logging\ITilakaLogger.cs" />
+    <Compile Include="Tilaka\Logging\NullTilakaLogger.cs" />
+    <Compile Include="Tilaka\Logging\WebServiceApiLogger.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
     <Compile Include="BPJS\Applicare\Service.cs" />
     <Compile Include="BPJS\Helper.cs" />
