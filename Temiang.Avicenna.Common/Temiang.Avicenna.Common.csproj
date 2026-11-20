@@ -310,6 +310,9 @@
     <Compile Include="Tilaka\TilakaRegistrationGuard.cs" />
     <Compile Include="Tilaka\ITilakaKtpFileStore.cs" />
     <Compile Include="Tilaka\TilakaKtpFileStore.cs" />
+    <Compile Include="Tilaka\Callback\CallbackCertificateStatusRequest.cs" />
+    <Compile Include="Tilaka\Callback\CallbackRegistrationRequest.cs" />
+    <Compile Include="Tilaka\TilakaCallbackProcessor.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
     <Compile Include="BPJS\Applicare\Service.cs" />
     <Compile Include="BPJS\Helper.cs" />
