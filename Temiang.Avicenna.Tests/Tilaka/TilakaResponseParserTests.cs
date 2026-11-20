@@ -61,6 +61,16 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
+        public void Parse_CheckCertStatus_PreservesDateStrings()
+        {
+            var json = "{\"success\":true,\"status\":1,\"message\":\"Aktif\",\"data\":[{\"status\":\"Registered\",\"serialnumber\":\"ABC\",\"start_active_date\":\"2025-05-17 14:39:07\",\"expiry_date\":\"2026-05-17 14:39:07\"}]}";
+            var result = TilakaResponseParser.Parse<CheckCertStatusResponse>(json, 200);
+
+            Assert.AreEqual("2025-05-17 14:39:07", result.Data[0].StartActiveDate);
+            Assert.AreEqual("2026-05-17 14:39:07", result.Data[0].ExpiryDate);
+        }
+
+        [TestMethod]
         public void Parse_NonJson_SetsTechnicalError()
         {
             var result = TilakaResponseParser.Parse<GenerateUuidResponse>("<html>error</html>", 500);

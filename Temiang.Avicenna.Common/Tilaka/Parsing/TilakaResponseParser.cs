@@ -5,6 +5,12 @@ namespace Temiang.Avicenna.Common.Tilaka
 {
     public static class TilakaResponseParser
     {
+        private static readonly JsonSerializerSettings Settings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DateParseHandling = DateParseHandling.None
+        };
+
         public static T Parse<T>(string json, int httpStatus) where T : TilakaResponse, new()
         {
             var result = new T { RawResponse = json, HttpStatus = httpStatus };
@@ -17,10 +23,7 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             try
             {
-                JsonConvert.PopulateObject(json, result, new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore
-                });
+                JsonConvert.PopulateObject(json, result, Settings);
             }
             catch (Exception ex)
             {
