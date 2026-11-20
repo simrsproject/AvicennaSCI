@@ -116,8 +116,84 @@ namespace Temiang.Avicenna.Tests.Tilaka
             processor.ProcessCertificateStatus(payload, DateTime.Now);
             var second = processor.ProcessCertificateStatus(payload, DateTime.Now);
 
-            Assert.IsTrue(second.Applied);
             Assert.AreEqual(3, repo.Record.CertificateStatus);
+            Assert.IsFalse(second.Applied);
+            Assert.AreEqual("status-regression", second.Reason);
+        }
+
+        [TestMethod]
+        public void CertificateStatus_SuccessFalse_DoesNotChangeStatus()
+        {
+            var repo = new FakeRepository();
+            repo.Record.CertificateStatus = TilakaConstant.CertificateStatus.Registered;
+            var processor = new TilakaCallbackProcessor(repo);
+
+            var outcome = processor.ProcessCertificateStatus(new CallbackCertificateStatusRequest
+            {
+                RequestId = "uuid-1",
+                UserIdentifier = "anita001",
+                Success = false,
+                Status = TilakaConstant.CertificateStatus.Active
+            }, DateTime.Now);
+
+            Assert.IsFalse(outcome.Applied);
+            Assert.AreEqual("success-false", outcome.Reason);
+            Assert.AreEqual(TilakaConstant.CertificateStatus.Registered, repo.Record.CertificateStatus);
+        }
+
+        [TestMethod]
+        public void CertificateStatus_StatusZero_DoesNotChangeStatus()
+        {
+            var repo = new FakeRepository();
+            repo.Record.CertificateStatus = TilakaConstant.CertificateStatus.Registered;
+            var processor = new TilakaCallbackProcessor(repo);
+
+            var outcome = processor.ProcessCertificateStatus(new CallbackCertificateStatusRequest
+            {
+                RequestId = "uuid-1",
+                Success = true,
+                Status = TilakaConstant.CertificateStatus.None
+            }, DateTime.Now);
+
+            Assert.IsFalse(outcome.Applied);
+            Assert.AreEqual(TilakaConstant.CertificateStatus.Registered, repo.Record.CertificateStatus);
+        }
+
+        [TestMethod]
+        public void CertificateStatus_ActiveThenLowerStatus_IsIgnored()
+        {
+            var repo = new FakeRepository();
+            repo.Record.CertificateStatus = TilakaConstant.CertificateStatus.Active;
+            var processor = new TilakaCallbackProcessor(repo);
+
+            var outcome = processor.ProcessCertificateStatus(new CallbackCertificateStatusRequest
+            {
+                RequestId = "uuid-1",
+                Success = true,
+                Status = TilakaConstant.CertificateStatus.Registered
+            }, DateTime.Now);
+
+            Assert.IsFalse(outcome.Applied);
+            Assert.AreEqual("status-regression", outcome.Reason);
+            Assert.AreEqual(TilakaConstant.CertificateStatus.Active, repo.Record.CertificateStatus);
+        }
+
+        [TestMethod]
+        public void CertificateStatus_HigherStatus_IsApplied()
+        {
+            var repo = new FakeRepository();
+            repo.Record.CertificateStatus = TilakaConstant.CertificateStatus.InVerification;
+            var processor = new TilakaCallbackProcessor(repo);
+
+            var outcome = processor.ProcessCertificateStatus(new CallbackCertificateStatusRequest
+            {
+                RequestId = "uuid-1",
+                Success = true,
+                Status = TilakaConstant.CertificateStatus.Registered
+            }, DateTime.Now);
+
+            Assert.IsTrue(outcome.Applied);
+            Assert.AreEqual(TilakaConstant.CertificateStatus.Registered, repo.Record.CertificateStatus);
         }
     }
 }

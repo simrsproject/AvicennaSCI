@@ -12,6 +12,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
             public int FormCalls;
             public int JsonCalls;
             public readonly List<int> JsonStatuses = new List<int>();
+            public bool ThrowOn401;
             public string TokenResponse = "{\"access_token\":\"tok-1\",\"expires_in\":300,\"token_type\":\"Bearer\"}";
             public string JsonResponse = "{\"success\":true,\"message\":\"ok\"}";
 
@@ -26,6 +27,10 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 JsonCalls++;
                 var status = JsonStatuses.Count > 0 ? JsonStatuses[0] : 200;
                 if (JsonStatuses.Count > 0) JsonStatuses.RemoveAt(0);
+
+                if (ThrowOn401 && status == 401)
+                    throw new TilakaTransportException("unauthorized", 401, JsonResponse);
+
                 return new TilakaTransportResult { StatusCode = status, Body = JsonResponse };
             }
         }
@@ -70,6 +75,37 @@ namespace Temiang.Avicenna.Tests.Tilaka
             var result = service.Execute<GenerateUuidResponse>("GenerateUUID", "https://x/generateUUID", "{}");
 
             Assert.IsTrue(result.IsOk);
+            Assert.AreEqual(2, transport.FormCalls);
+            Assert.AreEqual(2, transport.JsonCalls);
+        }
+
+        [TestMethod]
+        public void Execute_OnThrown401_RefreshesTokenAndRetriesOnce()
+        {
+            var transport = new FakeTransport { ThrowOn401 = true };
+            transport.JsonStatuses.Add(401);
+            transport.JsonStatuses.Add(200);
+            var service = new Temiang.Avicenna.Common.Tilaka.Service(Config(), transport, new NullTilakaLogger());
+
+            var result = service.Execute<GenerateUuidResponse>("GenerateUUID", "https://x/generateUUID", "{}");
+
+            Assert.IsTrue(result.IsOk);
+            Assert.AreEqual(2, transport.FormCalls);
+            Assert.AreEqual(2, transport.JsonCalls);
+        }
+
+        [TestMethod]
+        public void Execute_OnThrown401Twice_GivesUpWithoutLooping()
+        {
+            var transport = new FakeTransport { ThrowOn401 = true };
+            transport.JsonStatuses.Add(401);
+            transport.JsonStatuses.Add(401);
+            var service = new Temiang.Avicenna.Common.Tilaka.Service(Config(), transport, new NullTilakaLogger());
+
+            var result = service.Execute<GenerateUuidResponse>("GenerateUUID", "https://x/generateUUID", "{}");
+
+            Assert.IsFalse(result.IsOk);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(result.TechnicalError));
             Assert.AreEqual(2, transport.FormCalls);
             Assert.AreEqual(2, transport.JsonCalls);
         }

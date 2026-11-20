@@ -90,5 +90,20 @@ namespace Temiang.Avicenna.Tests.Tilaka
             StringAssert.Contains(transport.LastJsonBody, "\"registration_id\":\"uuid-1\"");
             Assert.IsFalse(transport.LastJsonBody.Contains("nationality_type"));
         }
+        [TestMethod]
+        public void IsOk_UsesCertificateMessageInfoWhenBaseMessageEmpty()
+        {
+            var service = new Temiang.Avicenna.Common.Tilaka.Service(Config(), new FakeTransport(), new NullTilakaLogger());
+            string message;
+
+            var ok = service.IsOk(new CheckCertStatusResponse
+            {
+                Success = false,
+                Message = new TilakaCertMessage { Info = "Sertifikat tidak ditemukan" }
+            }, out message);
+
+            Assert.IsFalse(ok);
+            Assert.AreEqual("Sertifikat tidak ditemukan", message);
+        }
     }
 }

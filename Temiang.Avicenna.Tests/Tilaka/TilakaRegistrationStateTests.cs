@@ -12,6 +12,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
             return new TilakaRegistrationRecord
             {
                 RegistrationRequestID = "uuid-1",
+                RegistrationDateTime = DateTime.Now.AddMinutes(-1),
                 DateExpire = DateTime.Now.AddDays(3)
             };
         }
@@ -84,7 +85,34 @@ namespace Temiang.Avicenna.Tests.Tilaka
             var record = new TilakaRegistrationRecord
             {
                 RegistrationRequestID = "uuid-1",
+                RegistrationDateTime = DateTime.Now.AddMinutes(-1),
                 DateExpire = null
+            };
+
+            Assert.AreEqual(TilakaRegistrationState.MenungguKyc, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void RequestIdWithoutRegistrationDate_IsUuidTerbit()
+        {
+            var record = new TilakaRegistrationRecord
+            {
+                RegistrationRequestID = "uuid-1",
+                RegistrationDateTime = null,
+                DateExpire = DateTime.Now.AddDays(3)
+            };
+
+            Assert.AreEqual(TilakaRegistrationState.UuidTerbit, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void RequestIdWithRegistrationDate_IsMenungguKyc()
+        {
+            var record = new TilakaRegistrationRecord
+            {
+                RegistrationRequestID = "uuid-1",
+                RegistrationDateTime = DateTime.Now,
+                DateExpire = DateTime.Now.AddDays(3)
             };
 
             Assert.AreEqual(TilakaRegistrationState.MenungguKyc, TilakaRegistrationState.Evaluate(record, DateTime.Now));
