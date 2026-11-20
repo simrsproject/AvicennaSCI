@@ -34,7 +34,7 @@ namespace Temiang.Avicenna.Common.Tilaka
             query.Where(query.IsLatest == true);
             query.Where(query.CertificateStatus.IsNull() || (query.CertificateStatus < TilakaConstant.CertificateStatus.Active));
             query.es.Top = max;
-            query.OrderBy(query.TilakaRegistrationID.Ascending);
+            query.OrderBy(query.LastCheckedDateTime.Ascending, query.TilakaRegistrationID.Ascending);
 
             var collection = new TilakaRegistrationCollection();
             collection.Load(query);
