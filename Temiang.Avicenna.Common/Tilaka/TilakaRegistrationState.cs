@@ -32,7 +32,7 @@ namespace Temiang.Avicenna.Common.Tilaka
                 || record.KycStatus == TilakaConstant.KycStatus.Error)
                 return KycGagal;
 
-            if (!record.DateExpire.HasValue || record.DateExpire.Value < now) return Kedaluwarsa;
+            if (record.DateExpire.HasValue && record.DateExpire.Value < now) return Kedaluwarsa;
 
             return string.IsNullOrWhiteSpace(record.RegistrationRequestID) ? UuidTerbit : MenungguKyc;
         }

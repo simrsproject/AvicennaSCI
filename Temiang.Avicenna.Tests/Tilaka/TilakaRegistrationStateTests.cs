@@ -77,5 +77,43 @@ namespace Temiang.Avicenna.Tests.Tilaka
             var record = new TilakaRegistrationRecord { DateExpire = DateTime.Now.AddDays(3) };
             Assert.AreEqual(TilakaRegistrationState.UuidTerbit, TilakaRegistrationState.Evaluate(record, DateTime.Now));
         }
+
+        [TestMethod]
+        public void NoExpiry_WithRequestId_IsMenungguKyc()
+        {
+            var record = new TilakaRegistrationRecord
+            {
+                RegistrationRequestID = "uuid-1",
+                DateExpire = null
+            };
+
+            Assert.AreEqual(TilakaRegistrationState.MenungguKyc, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void NoExpiry_WithoutRequestId_IsUuidTerbit()
+        {
+            var record = new TilakaRegistrationRecord { DateExpire = null };
+
+            Assert.AreEqual(TilakaRegistrationState.UuidTerbit, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void CertificateRejected_IsDitolak()
+        {
+            var record = Record();
+            record.CertificateStatus = 4;
+
+            Assert.AreEqual(TilakaRegistrationState.Ditolak, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void CertificateRegistered_IsSertifikatTerbit()
+        {
+            var record = Record();
+            record.CertificateStatus = 2;
+
+            Assert.AreEqual(TilakaRegistrationState.SertifikatTerbit, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
     }
 }

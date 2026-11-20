@@ -62,9 +62,8 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
 
             entity.LastUpdateDateTime = DateTime.Now;
-            entity.LastUpdateByUserID = record.LastCheckedDateTime.HasValue
-                ? record.ConsentApprovedByUserID
-                : entity.LastUpdateByUserID;
+            if (!string.IsNullOrWhiteSpace(record.ConsentApprovedByUserID))
+                entity.LastUpdateByUserID = record.ConsentApprovedByUserID;
 
             using (var scope = new esTransactionScope())
             {
