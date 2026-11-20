@@ -303,6 +303,10 @@
     <Compile Include="Tilaka\Service.Auth.cs" />
     <Compile Include="Tilaka\Service.Registration.cs" />
     <Compile Include="Tilaka\Service.Certificate.cs" />
+    <Compile Include="Tilaka\TilakaRegistrationRecord.cs" />
+    <Compile Include="Tilaka\ITilakaRegistrationRepository.cs" />
+    <Compile Include="Tilaka\TilakaRegistrationRepository.cs" />
+    <Compile Include="Tilaka\TilakaRegistrationState.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
     <Compile Include="BPJS\Applicare\Service.cs" />
     <Compile Include="BPJS\Helper.cs" />

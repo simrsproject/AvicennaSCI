@@ -102,6 +102,7 @@
     <Compile Include="Tilaka\TilakaLoggerTests.cs" />
     <Compile Include="Tilaka\TilakaAuthTests.cs" />
     <Compile Include="Tilaka\TilakaServiceTests.cs" />
+    <Compile Include="Tilaka\TilakaRegistrationStateTests.cs" />
     <Compile Include="Bridging\Controllers\AntrolControllerTests.cs" />
     <Compile Include="ClassDispose.cs" />
     <Compile Include="QueryTest.cs" />
