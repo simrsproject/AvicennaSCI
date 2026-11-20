@@ -3053,8 +3053,14 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
                         var lastPage = document.Pages.AddPage();
                         var editor = new FixedContentEditor(lastPage);
 
-                        editor.Position.Translate(offsetX: 50, offsetY: 50);
-                        editor.DrawImage(imageSource);
+                        const double margin = 50;
+                        // Fit oversized images within the page without changing their aspect ratio.
+                        var scale = Math.Min(1d, Math.Min(
+                            (lastPage.Size.Width - 2 * margin) / imageSource.Width,
+                            (lastPage.Size.Height - 2 * margin) / imageSource.Height));
+
+                        editor.Position.Translate(offsetX: margin, offsetY: margin);
+                        editor.DrawImage(imageSource, imageSource.Width * scale, imageSource.Height * scale);
                     }
                 }
             }

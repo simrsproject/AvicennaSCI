@@ -963,6 +963,29 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 {
                     new Identifier() { System = string.Format("http://sys-ids.kemkes.go.id/encounter/{0}",OrganizationID), Value = reg.RegistrationNo }
                 };
+
+                //mengakomodasi error 10165
+                postData.Location[0].Extension[0].ExtensionItem.Add(new ExtensionItem()
+                {
+                    Url = "upgradeClassIndicator",
+                    ValueCodeableConcept = new Code()
+                    {
+                        Coding = new List<Coding>()
+                            {
+                                new Coding()
+                                {
+                                    System = "http://terminology.kemkes.go.id/CodeSystem/locationUpgradeClass",
+                                    Code = "kelas-tetap",
+                                    Display = "Kelas Tetap Perawatan"
+                                }
+                            }
+                    }
+                });
+
+                postData.Location[0].Period = new Bridging.SatuSehat.BusinessObject.Period()
+                {
+                    Start = string.Format("{0}+00:00", arrivedTime.AddHours(GmtDif).ToString(DateFormatLong))
+                };
             }
 
             return postData;
@@ -2048,6 +2071,8 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                     Reference = String.Format("Encounter/{0}", encounterId),
                     Display = string.Format("Pemeriksaan Fisik {0} di hari {1}, {2}", patSs.BridgingName, DayNames[vitalSignDateTime.DayOfWeek.ToInt()], vitalSignDateTime.ToString("dd MMM yyyy"))
                 };
+
+                postData.Issued = string.Format("{0}+00:00",vitalSignDateTime.AddHours(GmtDif).ToString(DateFormatLong));
             }
 
             // YYYY-MM-DDThh:mm:ss+00:00
