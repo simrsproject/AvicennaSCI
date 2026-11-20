@@ -276,6 +276,7 @@
     <Compile Include="Admedika\AdmedikaClaimStatus.cs" />
     <Compile Include="Admedika\AdmedikaConfig.cs" />
     <Compile Include="Admedika\AdmedikaConstant.cs" />
+    <Compile Include="Tilaka\TilakaConfig.cs" />
     <Compile Include="BPJS\Applicare\Class.cs" />
     <Compile Include="BPJS\Applicare\Service.cs" />
     <Compile Include="BPJS\Helper.cs" />

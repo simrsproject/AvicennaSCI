@@ -94,6 +94,7 @@
     <Compile Include="Admedika\AdmedikaWSRegistrationTests.cs" />
     <Compile Include="Admedika\AdmedikaServiceTests.cs" />
     <Compile Include="Admedika\AdmedikaTokenTests.cs" />
+    <Compile Include="Tilaka\TilakaConfigTests.cs" />
     <Compile Include="Bridging\Controllers\AntrolControllerTests.cs" />
     <Compile Include="ClassDispose.cs" />
     <Compile Include="QueryTest.cs" />
