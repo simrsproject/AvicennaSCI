@@ -105,7 +105,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         private static bool IsWebviewState(string state)
         {
             return state == TilakaRegistrationState.MenungguKyc
-                   || state == TilakaRegistrationState.KycGagal;
+                   || state == TilakaRegistrationState.KycGagal
+                   || state == TilakaRegistrationState.SertifikatTerbit;
         }
 
         private void ConfigureConsent(TilakaConfig config)
