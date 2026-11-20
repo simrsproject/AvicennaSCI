@@ -10,6 +10,7 @@ using System.Windows.Input;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
+using System.Globalization;
 
 namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication
 {
@@ -289,285 +290,328 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication
         {
 
         }
+
         protected object MedicationRealizationHtml(GridItem container, int dayNo)
         {
-            if (DataBinder.Eval(container.DataItem, string.Format("ScheduleDate_{0:00}", dayNo)) == DBNull.Value)
-                return @"
-<table id='medused'>
-    <tr>
-        <th colspan='5'>&nbsp;</th>
-    </tr>
-    <tr>
-        <td style='width:20px'>&nbsp;</td>
-        <td style = 'width: 20px'></td>
-        <td style = 'width: 20px'></td>
-        <td style = 'width: 20px'></td>
-        <td style = 'width: 20px'></td>
-     </tr>
-     <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        </tr>
-     <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-     <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        </tr>
-     <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-</table> ";
-
-            var htmlScript = string.Format(@"
-<table id='medused'>
-    <tr>
-        <th colspan='5'>{0}</th>
-    </tr>
-    <tr>
-        <td style='width:20px'>&nbsp;{1}</td>
-        <td style = 'width: 20px'>{2}</td>
-        <td style = 'width: 20px'>{3}</td>
-        <td style = 'width: 20px'>{4}</td>
-        <td style = 'width: 20px'>{5}</td>
-     </tr>
-
-    <tr>
-        <td>&nbsp;{6}</td>
-        <td>{7}</td>
-        <td>{8}</td>
-        <td>{9}</td>
-        <td>{10}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;{11}</td>
-        <td>{12}</td>
-        <td>{13}</td>
-        <td>{14}</td>
-        <td>{15}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;{16}</td>
-        <td>{17}</td>
-        <td>{18}</td>
-        <td>{19}</td>
-        <td>{20}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;{21}</td>
-        <td>{22}</td>
-        <td>{23}</td>
-        <td>{24}</td>
-        <td>{25}</td>
-    </tr>
-     <tr>
-        <td>&nbsp;{26}</td>
-        <td>{27}</td>
-        <td>{28}</td>
-        <td>{29}</td>
-        <td>{30}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;{31}</td>
-        <td>{32}</td>
-        <td>{33}</td>
-        <td>{34}</td>
-        <td>{35}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;{36}</td>
-        <td>{37}</td>
-        <td>{38}</td>
-        <td>{39}</td>
-        <td>{40}</td>
-    </tr>
-    <tr>
-        <td>&nbsp;{41}</td>
-        <td>{42}</td>
-        <td>{43}</td>
-        <td>{44}</td>
-        <td>{45}</td>
-    </tr>
-    <tr>
-        <td>{46}</td>
-        <td>{47}</td>
-        <td>{48}</td>
-        <td>{49}</td>
-        <td>{50}</td>
-    </tr>
-    <tr>
-        <td>{51}</td>
-        <td>{52}</td>
-        <td>{53}</td>
-        <td>{54}</td>
-        <td>{55}</td>
-    </tr>
-    <tr>
-        <td>{56}</td>
-        <td>{57}</td>
-        <td>{58}</td>
-        <td>{59}</td>
-        <td>{60}</td>
-    </tr>
-<tr>
-        <td>{61}</td>
-        <td>{62}</td>
-        <td>{63}</td>
-        <td>{64}</td>
-        <td>{65}</td>
-    </tr>
-                </table> ", DataBinder.Eval(container.DataItem, string.Format("ScheduleDate_{0:00}", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("ScheduleHour_{0:00}_1", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("ScheduleHour_{0:00}_2", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("ScheduleHour_{0:00}_3", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("ScheduleHour_{0:00}_4", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("ScheduleHour_{0:00}_5", dayNo)),
-
-                DataBinder.Eval(container.DataItem, string.Format("HoHour_{0:00}_1", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("HoHour_{0:00}_2", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("HoHour_{0:00}_3", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("HoHour_{0:00}_4", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("HoHour_{0:00}_5", dayNo)),
-
-                DataBinder.Eval(container.DataItem, string.Format("RealHour_{0:00}_1", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("RealHour_{0:00}_2", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("RealHour_{0:00}_3", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("RealHour_{0:00}_4", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("RealHour_{0:00}_5", dayNo)),
-
-                DataBinder.Eval(container.DataItem, string.Format("Balance_{0:00}_1", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Balance_{0:00}_2", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Balance_{0:00}_3", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Balance_{0:00}_4", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Balance_{0:00}_5", dayNo)),
-
-                TextWithToolTip(container, string.Format("SetupBy_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("SetupBy_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("SetupBy_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("SetupBy_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("SetupBy_{0:00}_5", dayNo)),
-
-                TextWithToolTip(container, string.Format("HoBy_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("HoBy_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("HoBy_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("HoBy_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("HoBy_{0:00}_5", dayNo)),
-
-                TextWithToolTip(container, string.Format("HoTo_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("HoTo_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("HoTo_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("HoTo_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("HoTo_{0:00}_5", dayNo)),
-
-                TextWithToolTip(container, string.Format("VerifBy_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("VerifBy_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("VerifBy_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("VerifBy_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("VerifBy_{0:00}_5", dayNo)),
-
-                TextWithToolTip(container, string.Format("RealBy_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("RealBy_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("RealBy_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("RealBy_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("RealBy_{0:00}_5", dayNo)),
-
-                ConsumedIcon(DataBinder.Eval(container.DataItem, string.Format("Consumed_{0:00}_1", dayNo))),
-                ConsumedIcon(DataBinder.Eval(container.DataItem, string.Format("Consumed_{0:00}_2", dayNo))),
-                ConsumedIcon(DataBinder.Eval(container.DataItem, string.Format("Consumed_{0:00}_3", dayNo))),
-                ConsumedIcon(DataBinder.Eval(container.DataItem, string.Format("Consumed_{0:00}_4", dayNo))),
-                ConsumedIcon(DataBinder.Eval(container.DataItem, string.Format("Consumed_{0:00}_5", dayNo))),
-
-                TextWithToolTip(container, string.Format("ServiceUnit_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("ServiceUnit_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("ServiceUnit_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("ServiceUnit_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("ServiceUnit_{0:00}_5", dayNo)),
-
-                TextWithToolTip(container, string.Format("Note_{0:00}_1", dayNo)),
-                TextWithToolTip(container, string.Format("Note_{0:00}_2", dayNo)),
-                TextWithToolTip(container, string.Format("Note_{0:00}_3", dayNo)),
-                TextWithToolTip(container, string.Format("Note_{0:00}_4", dayNo)),
-                TextWithToolTip(container, string.Format("Note_{0:00}_5", dayNo)),
-
-                DataBinder.Eval(container.DataItem, string.Format("Sign_{0:00}_1", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Sign_{0:00}_2", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Sign_{0:00}_3", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Sign_{0:00}_4", dayNo)),
-                DataBinder.Eval(container.DataItem, string.Format("Sign_{0:00}_5", dayNo))
+            var dateValue = DataBinder.Eval(
+                container.DataItem,
+                string.Format("ScheduleDate_{0:00}", dayNo)
             );
 
-            return htmlScript;
+            var dateText = dateValue == null || dateValue == DBNull.Value
+                ? "&nbsp;"
+                : HttpUtility.HtmlEncode(Convert.ToString(dateValue));
+
+            var sb = new StringBuilder();
+
+            sb.Append("<table class='medused'>");
+            sb.Append("<tbody>");
+
+            // ==========================================
+            // ROW 1 : DATE
+            // ==========================================
+            sb.AppendFormat(
+                "<tr class='row-date'><th colspan='5'>{0}</th></tr>",
+                dateText
+            );
+
+            // ==========================================
+            // ROW 2 : SCHEDULE TIME
+            // ==========================================
+            sb.Append("<tr class='row-schedule'>");
+
+            for (int i = 1; i <= 5; i++)
+            {
+                sb.AppendFormat(
+                    "<td>{0}</td>",
+                    MedicationScheduleEditCell(container, dayNo, i)
+                );
+            }
+
+            sb.Append("</tr>");
+
+            // ROW 3 : VERIF
+            sb.Append("<tr class='row-verif'>");
+
+            for (int i = 1; i <= 5; i++)
+            {
+                sb.AppendFormat(
+                    "<td>{0}</td>",
+                    TextWithToolTip(
+                        container,
+                        string.Format("VerifBy_{0:00}_{1}", dayNo, i)
+                    )
+                );
+            }
+
+            sb.Append("</tr>");
+
+            // ROW 4 : REALIZATION
+            sb.Append("<tr class='row-realization'>");
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var realHour = GetMedicationCell(
+                    container,
+                    string.Format("RealHour_{0:00}_{1}", dayNo, i)
+                );
+
+                sb.AppendFormat("<td>{0}</td>", realHour);
+            }
+
+            sb.Append("</tr>");
+
+            // ROW 5 : BALANCE RECEIVE
+            sb.Append("<tr class='row-balance-receive'>");
+
+            // Cari tanggal pertama yang memiliki jadwal
+            int firstAvailableDay = 0;
+
+            for (int d = 1; d <= 10; d++)
+            {
+                var checkDate = DataBinder.Eval(
+                    container.DataItem,
+                    string.Format("ScheduleDate_{0:00}", d)
+                );
+
+                if (checkDate != null && checkDate != DBNull.Value)
+                {
+                    firstAvailableDay = d;
+                    break;
+                }
+            }
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var receiveQty = "&nbsp;";
+
+                if (dayNo == firstAvailableDay && i == 1)
+                {
+                    receiveQty = GetMedicationCell(
+                        container,
+                        "ReceiveQty"
+                    );
+                }
+
+                sb.AppendFormat("<td>{0}</td>", receiveQty);
+            }
+
+            sb.Append("</tr>");
+
+            // ==========================================
+            // ROW 6 : BALANCE AFTER USED
+            // ==========================================
+            sb.Append("<tr class='row-balance-used'>");
+
+            for (int i = 1; i <= 5; i++)
+            {
+                sb.AppendFormat(
+                    "<td>{0}</td>",
+                    GetMedicationCell(container,
+                        string.Format("Balance_{0:00}_{1}", dayNo, i))
+                );
+            }
+
+            sb.Append("</tr>");
+
+            // ==========================================
+            // ROW 7 : HIGH ALERT DOUBLE CHECK
+            // ==========================================
+            sb.Append("<tr class='row-high-alert'>");
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var consumed = DataBinder.Eval(
+                    container.DataItem,
+                    string.Format("Consumed_{0:00}_{1}", dayNo, i)
+                );
+
+                var sign = DataBinder.Eval(
+                    container.DataItem,
+                    string.Format("Sign_{0:00}_{1}", dayNo, i)
+                );
+
+                sb.Append("<td>");
+
+                sb.Append(ConsumedIcon(consumed));
+
+                if (sign != null && sign != DBNull.Value)
+                {
+                    sb.Append("&nbsp;");
+                    sb.Append(Convert.ToString(sign));
+                }
+
+                sb.Append("</td>");
+            }
+
+            sb.Append("</tr>");
+
+            // ==========================================
+            // ROW 8 : NOTES
+            // ==========================================
+            sb.Append("<tr class='row-notes'>");
+
+            for (int i = 1; i <= 5; i++)
+            {
+                var serviceUnit = GetMedicationCell(
+                    container,
+                    string.Format("ServiceUnit_{0:00}_{1}", dayNo, i)
+                );
+
+                var note = GetMedicationCell(
+                    container,
+                    string.Format("Note_{0:00}_{1}", dayNo, i)
+                );
+
+                sb.Append("<td>");
+
+                if (serviceUnit != "&nbsp;")
+                {
+                    sb.Append("<strong>");
+                    sb.Append(serviceUnit);
+                    sb.Append("</strong>");
+                }
+
+                if (note != "&nbsp;")
+                {
+                    if (serviceUnit != "&nbsp;")
+                        sb.Append("<br/>");
+
+                    sb.Append("<div class='medused-note'>");
+                    sb.Append(note);
+                    sb.Append("</div>");
+                }
+
+                sb.Append("</td>");
+            }
+
+            sb.Append("</tr>");
+
+            sb.Append("</tbody>");
+            sb.Append("</table>");
+
+            return sb.ToString();
+        }
+
+        private string MedicationScheduleEditCell(
+            GridItem container,
+            int dayNo,
+            int scheduleNo)
+        {
+            var timeValue = DataBinder.Eval(
+                container.DataItem,
+                string.Format("ScheduleHour_{0:00}_{1}", dayNo, scheduleNo)
+            );
+
+            if (timeValue == null || timeValue == DBNull.Value)
+                return "&nbsp;";
+
+            var timeText = Convert.ToString(timeValue);
+
+            if (string.IsNullOrWhiteSpace(timeText))
+                return "&nbsp;";
+
+            var dateValue = DataBinder.Eval(
+                container.DataItem,
+                string.Format("ScheduleDate_{0:00}", dayNo)
+            );
+
+            if (dateValue == null || dateValue == DBNull.Value)
+                return HttpUtility.HtmlEncode(timeText);
+
+            DateTime scheduleDate;
+
+            if (!DateTime.TryParseExact(
+                Convert.ToString(dateValue),
+                AppConstant.DisplayFormat.Date,
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out scheduleDate))
+            {
+                return HttpUtility.HtmlEncode(timeText);
+            }
+
+            var timeParts = timeText.Split(':');
+
+            if (timeParts.Length < 2)
+                return HttpUtility.HtmlEncode(timeText);
+
+            int hour;
+            int minute;
+
+            if (!int.TryParse(timeParts[0], out hour) ||
+                !int.TryParse(timeParts[1], out minute))
+                return HttpUtility.HtmlEncode(timeText);
+
+            var scheduleDateTime = new DateTime(
+                scheduleDate.Year,
+                scheduleDate.Month,
+                scheduleDate.Day,
+                hour,
+                minute,
+                0
+            );
+
+            var medNo = Convert.ToInt32(
+                DataBinder.Eval(container.DataItem, "MedicationReceiveNo")
+            );
+
+            var isVoid = DataBinder.Eval(container.DataItem, "IsVoid");
+            var isContinue = DataBinder.Eval(container.DataItem, "IsContinue");
+
+            var sb = new StringBuilder();
+
+            sb.Append(HttpUtility.HtmlEncode(timeText));
+
+            // Jadwal yang sudah lewat tidak boleh diedit.
+            // Mode view, obat void, dan terapi yang sudah dihentikan juga dikunci.
+            if (Request.QueryString["mod"] == "view" ||
+                true.Equals(isVoid) ||
+                false.Equals(isContinue) ||
+                scheduleDateTime <= DateTime.Now)
+            {
+                return sb.ToString();
+            }
+
+            var scheduleDateText = scheduleDate.ToString("yyyy-MM-dd");
+
+            sb.AppendFormat(
+                "&nbsp;<a href=\"#\" title=\"Edit Schedule Time\" " +
+                "onclick=\"javascript:entryMedicationScheduleSetup('{0}', '{1}', '{2}', '{3}'); return false;\">" +
+                "<img style=\"width:14px;height:14px;vertical-align:middle;\" " +
+                "src=\"{4}/Images/Toolbar/edit16.png\" alt=\"Edit\" />" +
+                "</a>",
+                medNo,
+                scheduleDateText,
+                scheduleNo,
+                timeText,
+                Helper.UrlRoot()
+            );
+
+            return sb.ToString();
+        }
+
+        // ==========================================
+        // HELPER : GET CELL VALUE
+        // ==========================================
+        private static string GetMedicationCell(
+            GridItem container,
+            string fieldName)
+        {
+            var value = DataBinder.Eval(
+                container.DataItem,
+                fieldName
+            );
+
+            if (value == null || value == DBNull.Value)
+                return "&nbsp;";
+
+            var text = Convert.ToString(value);
+
+            if (string.IsNullOrWhiteSpace(text))
+                return "&nbsp;";
+
+            return HttpUtility.HtmlEncode(text);
         }
 
         private static string ConsumedIcon(object status)
@@ -677,6 +721,20 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.Medication
                 medNo, patientID, Helper.UrlRoot());
 
             return url;
+        }
+
+        public string MedicationSetupStatusUrl
+        {
+            get
+            {
+                return string.Format(
+                    "{0}/Module/RADT/MedicationStatus/MedicationStatusPerPatient.aspx?stat=S&progid=&wintype=max&patid={1}&regno={2}&fregno={3}",
+                    Helper.UrlRoot(),
+                    HttpUtility.UrlEncode(PatientID),
+                    HttpUtility.UrlEncode(RegistrationNo),
+                    HttpUtility.UrlEncode(FromRegistrationNo)
+                );
+            }
         }
 
         #region Schedule Setup

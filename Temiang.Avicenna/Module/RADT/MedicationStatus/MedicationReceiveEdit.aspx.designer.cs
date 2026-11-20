@@ -87,13 +87,13 @@ namespace Temiang.Avicenna.Module.RADT.Medication
         protected global::Telerik.Web.UI.RadTextBox txtItemUnit;
 
         /// <summary>
-        /// txtConsumeMethod control.
+        /// cboConsumeMethod control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::Telerik.Web.UI.RadTextBox txtConsumeMethod;
+        protected global::Telerik.Web.UI.RadComboBox cboConsumeMethod;
 
         /// <summary>
         /// txtStartDateTime control.

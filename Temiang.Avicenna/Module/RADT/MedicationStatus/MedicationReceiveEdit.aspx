@@ -57,10 +57,17 @@
             </td>
             <td width="20px"></td>
         </tr>
-        <tr>
-            <td class="label">Consume Method</td>
+       <tr>
+        <td class="label">Consume Method</td>
             <td class="entry">
-                <telerik:RadTextBox ID="txtConsumeMethod" runat="server" Width="100%" Enabled="False" />
+                <telerik:RadComboBox
+                    ID="cboConsumeMethod"
+                    runat="server"
+                    Width="100%"
+                    EmptyMessage="Select Consume Method"
+                    MarkFirstMatch="true"
+                    Filter="Contains"
+                    AllowCustomText="false" />
             </td>
         </tr>
     </table>
