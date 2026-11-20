@@ -65,6 +65,7 @@ namespace Temiang.Avicenna.Common.Tilaka
             request.Method = method;
             request.ContentType = contentType;
             request.Accept = "application/json";
+            request.AllowAutoRedirect = false;
             request.KeepAlive = false;
             request.Timeout = timeoutSeconds * 1000;
             request.ReadWriteTimeout = timeoutSeconds * 1000;
@@ -83,12 +84,25 @@ namespace Temiang.Avicenna.Common.Tilaka
                 }
 
                 using (var response = (HttpWebResponse)request.GetResponse())
-                using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
                 {
+                    var statusCode = (int)response.StatusCode;
+                    string responseBody;
+                    using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+                    {
+                        responseBody = reader.ReadToEnd();
+                    }
+
+                    if (statusCode < 200 || statusCode > 299)
+                    {
+                        throw new TilakaTransportException(
+                            "Tilaka request failed with HTTP status " + statusCode + ".",
+                            statusCode, responseBody);
+                    }
+
                     return new TilakaTransportResult
                     {
-                        StatusCode = (int)response.StatusCode,
-                        Body = reader.ReadToEnd()
+                        StatusCode = statusCode,
+                        Body = responseBody
                     };
                 }
             }
