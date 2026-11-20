@@ -15,7 +15,7 @@ langkah dijalankan oleh operator di server uji.
 
 ## 0. Prasyarat
 
-### 0.1 Kunci konfigurasi `Web.config` (appSettings)
+### 0.1 Kunci konfigurasi `Web.config` (appSettings, 18 kunci)
 
 | Kunci | Nilai untuk uji | Catatan |
 |---|---|---|
@@ -26,19 +26,19 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaChannelType` | `Company` | Harus sesuai tipe channel yang terdaftar di Tilaka. |
 | `TilakaTimeoutSeconds` | `60` | |
 | `TilakaIsLogEnabled` | `true` | Logging ke `WebServiceAPILog`. |
-| `TilakaCallbackBaseUrl` | `https://<host>` | Base URL callback (tanpa slash di akhir). |
+| `TilakaCallbackBaseUrl` | `https://<host>` | **Tidak dipakai kode**; callback didaftarkan di portal Tilaka (lihat 0.3). |
 | `TilakaCallbackToleranceMinutes` | `5` | Toleransi `x-request-timestamp`; jam server harus sinkron (NTP). |
 | `TilakaCallbackAllowedIps` | `<ip-tilaka>` | Dicatat; belum ditegakkan oleh controller (lihat Known limitations). |
 | `TilakaRegistrationExpireDays` | `7` | Nilai > 7 otomatis dibatasi 7. |
 | `TilakaConsentTextFile` | `C:\Tilaka\TilakaConsent.txt` | File teks TnC, UTF-8. |
 | `TilakaConsentVersion` | `TNT-v.1.0.1` | Harus sama dengan versi TnC yang disepakati; ikut di-hash saat registrasi. |
 | `TilakaUploadKTPImage` | `C:\Tilaka\KTP` | Root penyimpanan foto KTP. |
-| `TilakaMaxKtpSizeKb` | `1024` | Batas ukuran setelah kompresi. |
+| `TilakaMaxKtpSizeKb` | `1024` | Batas ukuran **setelah kompresi** (1 MB). Kontrol upload sendiri menerima ≤ 2 MB (`MaxFileSize=2097152`). |
 | `TilakaWebviewRedirectUrl` | `https://<host>/Module/RADT/Tilaka/TilakaWebviewReturn.aspx` | Harus halaman return yang ada. |
 | `TilakaClientCertificatePath` | _(kosong)_ | Isi hanya bila Tilaka mewajibkan mTLS. |
 | `TilakaClientCertificatePassword` | _(kosong)_ | |
 
-- [ ] Semua kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
+- [ ] Ke-18 kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
 - [ ] `TilakaWebviewRedirectUrl` menunjuk ke host uji (bukan `domain-rs.example`), memakai HTTPS.
 
 ### 0.2 Folder server dan ACL
@@ -50,7 +50,7 @@ langkah dijalankan oleh operator di server uji.
   - **Read** pada `C:\Tilaka\TilakaConsent.txt` (disarankan hanya Read; tidak perlu Write).
   - **Modify** pada `C:\Tilaka\KTP` (dan pewarisan ke subfolder).
 - [ ] `C:\Tilaka` **tidak** diekspos sebagai static file oleh IIS; foto KTP hanya dilayani lewat
-      `TilakaKtpImageHandler.ashx?id=<TilakaRegistrationID>`.
+      `~/Module/RADT/Tilaka/TilakaKtpImageHandler.ashx?id=<TilakaRegistrationID>`.
 - [ ] Backup/antivirus tidak mengunci folder KTP saat unggah (uji tulis file kecil).
 
 Perkiraan ACL PowerShell (jalankan sebagai Administrator, sesuaikan nama App Pool):
@@ -71,8 +71,15 @@ icacls "C:\Tilaka\TilakaConsent.txt" /grant "IIS APPPOOL\<AppPoolName>:(R)"
 - [ ] Callback certificate status: `https://<host>/TilakaCallback/CertificateStatus`
 - [ ] Redirect webview: `https://<host>/Module/RADT/Tilaka/TilakaWebviewReturn.aspx`
 
-Catatan: endpoint callback harus dapat diakses publik via HTTPS, tanpa autentikasi form/cookie, dan
-mengembalikan HTTP 200. Callback selalu dibalas `OK` (termasuk saat signature ditolak) agar Tilaka
+Catatan redirect: `TilakaUrls` mengirim `redirect_url` **persis seperti nilai konfigurasi**, tanpa
+menambahkan `request-id`. Menurut PRD Tilaka §6.3, Tilaka yang menambahkan parameter `request-id`
+(dan `tilaka-name`) ke URL redirect tersebut saat webview selesai. Halaman
+`TilakaWebviewReturn.aspx` mewajibkan `?request-id=`; bila parameter tidak ada, halaman menampilkan
+"Parameter request-id tidak ditemukan." — dalam kasus itu gunakan tombol **Cek Status** di halaman
+detail (lihat 5.1).
+
+Catatan callback: endpoint callback harus dapat diakses publik via HTTPS, tanpa autentikasi form/cookie,
+dan mengembalikan HTTP 200. Callback selalu dibalas `OK` (termasuk saat signature ditolak) agar Tilaka
 tidak melakukan retry tanpa henti.
 
 ### 0.4 Variabel sesi PowerShell
@@ -98,27 +105,66 @@ Invoke-RestMethod -Method Post -Uri "https://sb-api.tilaka.id/auth" -Body $body
 - [ ] `access_token` terisi (bukan null/kosong).
 - [ ] `expires_in` bernilai `300`.
 - [ ] Tidak ada error HTTP 401/403 (bila ada, periksa `TilakaChannelId`/`TilakaChannelSecret`).
-- [ ] Catat waktu respons untuk perbandingan dengan log di `WebServiceAPILog` (operasi auth).
+- [ ] Catat bahwa **`/auth` tidak menulis log**: `Service.GetAccessToken` tidak memakai
+      `ITilakaLogger`, jadi jangan mencari baris operasi auth di `WebServiceAPILog`. Verifikasi
+      logging dilakukan pada langkah berikutnya lewat operasi `GenerateUUID`, `RegisterForKycCheck`,
+      atau `CheckCertStatus`.
 
 ---
 
 ## 2. Verifikasi registrasi
 
+### 2.0 Prasyarat data dokter uji
+
+`TilakaRegistrationGuard.Check` memblokir pendaftaran bila data master tidak lengkap. Siapkan satu
+dokter uji (bukan data pasien/dokter nyata) dengan kondisi berikut:
+
+- [ ] `Paramedic.NamaKTP` terisi (nama sesuai KTP; dipakai untuk `GenerateUuid`).
+- [ ] `Paramedic.Ssn` berisi NIK **tepat 16 digit angka** dan **tidak dipakai dokter lain**. Cek dengan:
+
+```sql
+SELECT ParamedicID, ParamedicName, NamaKTP, Ssn, Email
+FROM Paramedic
+WHERE Ssn = '<NIK>';
+```
+
+  Expected: hanya satu baris, yaitu dokter uji. Lebih dari satu baris akan memicu
+  "NIK sudah dipakai dokter lain." (guard membandingkan lewat `IsNikUsedByOther`).
+- [ ] `Paramedic.Email` terisi dan valid.
+- [ ] Tersedia file foto KTP dokter uji (JPEG/PNG) untuk diunggah.
+- [ ] Checkbox TnC tersedia: state dokter `BelumTerdaftar` **dan** `TilakaConsentTextFile` ada/terbaca.
+
+Bila salah satu tidak terpenuhi, tombol **Daftar** menghasilkan pesan guard berikut dan tidak ada
+record yang dibuat: "Nama sesuai KTP belum diisi.", "NIK (SSN) harus tepat 16 digit angka.",
+"NIK sudah dipakai dokter lain.", "Email dokter belum diisi.", "Foto KTP belum diunggah.", atau
+"Persetujuan TnC Tilaka belum dicentang.".
+
 ### 2.1 Alur UI
 
 Buka menu **Tilaka E-Signature → Monitoring & Registrasi Sertifikat Dokter**
-(`~/Module/RADT/Tilaka/TilakaRegistrationList.aspx`), cari satu dokter uji, lalu klik **Detail**.
+(`~/Module/RADT/Tilaka/TilakaRegistrationList.aspx`), cari dokter uji dari 2.0, lalu klik **Detail**.
 
 - [ ] Pilih dokter uji yang **belum** punya baris `TilakaRegistration` (`IsLatest = 1`).
-- [ ] Unggah foto KTP (JPEG/PNG, ≤ 1024 KB) pada kontrol upload.
-- [ ] Pratinjau KTP tampil dan file tersimpan di bawah `C:\Tilaka\KTP\yyyy\MM\dd\`.
-- [ ] Centang **"Dokter telah membaca dan menyetujui TnC Tilaka."** (link **Lihat TnC** membuka file TnC).
+- [ ] Unggah foto KTP (JPEG/PNG) pada kontrol upload. Kontrol menerima file ≤ 2 MB
+      (`MaxFileSize=2097152`); hasil kompresi harus ≤ `TilakaMaxKtpSizeKb` (1024 KB).
+      Sebelum **Daftar**, yang terlihat hanya nama file pada kontrol upload — belum ada pratinjau
+      dan belum ada file di `C:\Tilaka\KTP` (file baru ditulis di dalam `RegisterRegistration()`).
+- [ ] Centang **"Dokter telah membaca dan menyetujui TnC Tilaka."**.
+      Catatan: link **Lihat TnC** hanya tampil bila `TilakaConsentTextFile` berawalan `~/`
+      (`ConfigureConsent`). Dengan `C:\Tilaka\TilakaConsent.txt` link tersebut **tersembunyi**;
+      keberadaan/isi TnC diverifikasi tidak langsung dari keberhasilan **Daftar** (file dibaca ulang
+      saat submit) atau dengan membuka file di server.
 - [ ] Klik **Daftar**.
       Expected: pesan `UUID Tilaka berhasil dibuat. Lanjutkan dengan Kirim Data KYC.`
+- [ ] **Setelah Daftar**, pratinjau KTP muncul (`imgKtp` baru terikat saat record tersimpan punya
+      `KtpFilePath`) dan file ada di `C:\Tilaka\KTP\yyyy\MM\dd\<ParamedicID>_yyyyMMdd_HHmmss.jpg`.
+      Bila pratinjau tidak muncul, buka
+      `~/Module/RADT/Tilaka/TilakaKtpImageHandler.ashx?id=<TilakaRegistrationID>`.
 - [ ] Klik **Kirim Data KYC**.
       Expected: pesan `Data KYC terkirim. Silakan buka webview registrasi.`
 - [ ] Klik **Buka Webview**, lalu selesaikan OTP + liveness + pembuatan Tilaka Name di webview Tilaka.
-- [ ] Setelah webview selesai, kembali ke Avicenna; gunakan **Cek Status** bila status belum berubah.
+- [ ] Setelah webview selesai, kembali ke Avicenna; gunakan **Cek Status** bila status belum berubah
+      (dan bila halaman return melaporkan `request-id` tidak ditemukan — lihat 5.1).
 
 ### 2.2 Verifikasi data
 
@@ -134,13 +180,25 @@ ORDER BY TilakaRegistrationID DESC;
 - [ ] `KycStatus` terisi (mis. `S`/`B` sesuai respons Tilaka).
 - [ ] `TilakaName` terisi setelah webview selesai.
 - [ ] `RegistrationState` menjadi `MenungguVerifikasi` atau `MenungguKyc`.
-- [ ] `LastCheckSource` = `manual` (dari tombol **Cek Status**) atau `callback`.
+- [ ] `LastCheckSource` **NULL** sampai pemeriksaan pertama (Cek Status/callback/rekonsiliasi);
+      setelah itu bernilai `manual`, `callback`, atau `reconcile`. `NULL` bukan kegagalan.
 - [ ] `Paramedic.NamaKTP` pada dokter uji sesuai nama di KTP (dipakai untuk pencocokan).
 - [ ] `TilakaRegistration` lama untuk dokter yang sama sudah `IsLatest = 0` (bila ada pendaftaran ulang).
+- [ ] Logging API tercatat (bukan `/auth`) dengan operasi `GenerateUUID`, `RegisterForKycCheck`, dan
+      `CheckCertStatus`:
+
+```sql
+SELECT TOP (20) DateRequest, UrlAddress, Params, Response
+FROM WebServiceAPILog
+WHERE IPAddress = 'TILAKA'
+ORDER BY DateRequest DESC;
+```
 
 ---
 
 ## 3. Verifikasi callback dengan HMAC lokal
+
+### 3.1 Callback certificate status
 
 Ganti `<tilaka-name>` dengan `TilakaName` dan `<request-id>` dengan `RegistrationRequestID` dari
 langkah 2. Jalankan blok berikut **sekaligus** (timestamp dihitung saat itu juga; toleransi 5 menit).
@@ -176,11 +234,38 @@ ORDER BY DateRequest DESC;
 Catatan: timestamp memakai format `yyyy-MM-dd HH:mm:ss` waktu lokal server; selisih jam server uji
 dan mesin operator > 5 menit akan menghasilkan `timestamp-out-of-range`.
 
+### 3.2 Callback registrasi
+
+Payload registrasi memakai key `RegisterID` (huruf besar) yang berisi `RegistrationRequestID`.
+Jalankan blok berikut **sekaligus** setelah mengganti placeholder:
+
+```powershell
+$ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$body = '{"RegisterID":"<request-id>","success":true,"message":"OK","data":{"status":"B","tilaka_name":"<tilaka-name>","manual_registration_status":"V"}}'
+$key = [Text.Encoding]::UTF8.GetBytes($env:TILAKA_SECRET)
+$msg = [Text.Encoding]::UTF8.GetBytes("$env:TILAKA_ID$ts$body")
+$hmac = [System.Security.Cryptography.HMACSHA256]::new($key)
+$token = ($hmac.ComputeHash($msg) | ForEach-Object { $_.ToString("x2") }) -join ""
+Invoke-WebRequest -Method Post -Uri "https://<host>/TilakaCallback/Registration" -Body $body `
+  -ContentType "application/json" -Headers @{ "x-request-timestamp" = $ts; "x-validation-token" = $token }
+```
+
+- [ ] Respons HTTP `200` dan body `OK`.
+- [ ] `KycStatus` menjadi `B` (atau nilai `data.status` yang dikirim).
+- [ ] `ManualRegistrationStatus` menjadi `V`, `TilakaName` terisi dari `data.tilaka_name`.
+- [ ] `LastCheckSource` menjadi `callback`; `RegistrationState` menjadi `MenungguVerifikasi`.
+- [ ] `WebServiceAPILog` berisi `Callback-Registration` dengan respons `applied`.
+- [ ] Bila `RegisterID` tidak dikenal, tidak ada perubahan data dan log berisi `Callback-Registration`
+      dengan respons `register-id-unknown` (tetap HTTP 200).
+
+Catatan: callback certificate status (3.1) dan registrasi (3.2) boleh diuji dalam urutan mana pun;
+processor menangani callback yang datang lebih dulu tanpa menghapus field KYC yang sudah ada.
+
 ---
 
 ## 4. Verifikasi negatif (signature tidak valid)
 
-- [ ] Ulangi langkah 3 dengan `x-validation-token` acak, misalnya:
+- [ ] Ulangi langkah 3.1 dengan `x-validation-token` acak, misalnya:
 
 ```powershell
 $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -204,9 +289,15 @@ Invoke-WebRequest -Method Post -Uri "https://<host>/TilakaCallback/CertificateSt
 - [ ] Pada detail dokter, pastikan state `SertifikatTerbit` sehingga tombol **Buka Webview** membuka
       webview **aktivasi** (`ActivationWebview`, memakai `RegistrationRequestID`).
 - [ ] Setujui sertifikat di webview Tilaka.
-- [ ] Kembali ke halaman return `TilakaWebviewReturn.aspx?request-id=<request-id>`.
-      Expected: pesan `Aktivasi selesai. Status: Aktif`.
-- [ ] `CertificateStatus` = `3`, `RegistrationState` = `Aktif`, `LastCheckSource` = `callback`.
+- [ ] Kembali ke halaman return. `TilakaUrls` mengirim `redirect_url` tanpa `request-id`; menurut
+      PRD Tilaka §6.3 Tilaka menambahkan `request-id`/`tilaka-name` ke URL tersebut. Bila halaman
+      menampilkan `Parameter request-id tidak ditemukan.` atau
+      `Nama Tilaka belum tersedia. Silakan gunakan tombol Cek Status di Avicenna.`, gunakan tombol
+      **Cek Status** pada halaman detail sebagai fallback.
+- [ ] Bila redirect membawa `request-id`, halaman `TilakaWebviewReturn.aspx?request-id=<request-id>`
+      menampilkan `Aktivasi selesai. Status: Aktif`.
+- [ ] `CertificateStatus` = `3`, `RegistrationState` = `Aktif`, `LastCheckSource` = `callback`
+      (atau `manual` bila aktivasi diverifikasi lewat **Cek Status**).
 
 ### 5.2 Rekonsiliasi massal (ASMX)
 
@@ -216,16 +307,21 @@ Gunakan `accessKey` valid dari tabel `WebServiceAccessKey` (tanggal mulai/berakh
 - [ ] Jalankan:
 
 ```powershell
+$body = @{ accessKey = "<key>"; max = 5 } | ConvertTo-Json
 Invoke-RestMethod -Method Post -Uri "https://<host>/WebService/TilakaWS.asmx/ReconcilePending" `
-  -Body @{ accessKey = "<key>"; max = 5 }
+  -ContentType "application/json" -Body $body
 ```
 
 - [ ] Respons sukses dan memuat field `checked`, `changed`, `failed`, `messages`.
-- [ ] `checked` ≤ `max`; setiap record yang diperiksa menambah `changed` atau `failed`, sehingga
-      `checked = changed + failed`.
+- [ ] `checked` ≤ `max`.
+- [ ] **Jangan** mengandalkan `checked = changed + failed`: pada `TilakaWS.asmx.cs`, kegagalan
+      `checkcertstatus` menambah `failed` lalu tetap mengeksekusi `changed++` untuk record yang sama,
+      sehingga bisa muncul `checked = 1, changed = 1, failed = 1`. Verifikasi kegagalan lewat
+      `messages` dan kolom `LastErrorMessage` record terkait, bukan dari selisih counter.
 - [ ] Bila `messages` berisi kegagalan, periksa `LastErrorMessage` pada baris terkait.
 - [ ] Setelah rekonsiliasi, `LastCheckSource` = `reconcile` dan
-      `LastCheckedDateTime`/`RegistrationState` diperbarui untuk record yang diperiksa.
+      `LastCheckedDateTime`/`RegistrationState` diperbarui untuk record yang diperiksa (record yang
+      gagal tetap dicoba disimpan dengan `LastErrorMessage` terisi).
 
 Catatan: respons ASMX dapat dibungkus `{"d":"{...}"}` (string JSON). Bila demikian, parse `d`
 sekali lagi dengan `ConvertFrom-Json` sebelum membaca field.
@@ -241,8 +337,13 @@ sekali lagi dengan `ConvertFrom-Json` sebelum membaca field.
 ## 6. Verifikasi tambahan yang disarankan
 
 - [ ] Login sebagai user tanpa hak ProgramID `01.23.01` → menu tidak muncul / akses ditolak.
-- [ ] Unggah file bukan gambar (mis. PDF) → ditolak dengan pesan "Foto KTP harus berupa gambar JPEG atau PNG."
-- [ ] Unggah gambar > 1024 KB setelah kompresi → ditolak dengan pesan ukuran melebihi batas.
+- [ ] **(Best-effort)** Unggah file bukan gambar (mis. PDF) → ditolak dengan pesan "Foto KTP harus
+      berupa gambar JPEG atau PNG." Kontrol `RadAsyncUpload` sudah memfilter ekstensi di sisi klien
+      (`.jpg,.jpeg,.png`), jadi penolakan server sulit dipicu lewat UI normal; uji hanya bila bisa
+      mengirim file dengan `Content-Type`/ekstensi menyimpang.
+- [ ] **(Best-effort)** Unggah gambar yang setelah kompresi masih > 1024 KB → ditolak dengan pesan
+      ukuran melebihi batas. Kompresi (resize maks 1600 px + JPEG) membuat ini sulit dipicu; gunakan
+      gambar sangat detail mendekati 2 MB.
 - [ ] Hapus sementara `C:\Tilaka\TilakaConsent.txt` → tombol **Daftar** nonaktif dan pesan file TnC
       tidak ditemukan muncul (kembalikan file setelah uji).
 - [ ] Callback dengan `status` dikirim sebagai string (`"2"`) tetap diterima (parser fleksibel).
