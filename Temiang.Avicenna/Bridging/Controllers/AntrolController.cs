@@ -3995,6 +3995,7 @@ namespace Temiang.Avicenna.Bridging.Controllers
         // tipePencarian : 1 = by no antrian, 2 = by no mr
         public HttpResponseMessage PostSelfCheckIn(Antrol.CheckIn.Request.SelfChechkIn param)
         {
+            var checkInStartedAt = DateTimeOffset.Now;
             var log = new WebServiceAPILog();
 
             if (AppSession.Parameter.HealthcareInitial == "RSI")
@@ -6422,23 +6423,8 @@ namespace Temiang.Avicenna.Bridging.Controllers
                         });
                     }
 
-                    {
-                        logTask = new WebServiceAPILog();
-                        logTask.DateRequest = DateTime.Now;
-                        logTask.IPAddress = string.Empty;
-                        logTask.UrlAddress = "SelfChechkIn";
-                        logTask.Params = JsonConvert.SerializeObject(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
-                        {
-                            Kodebooking = appt.AppointmentNo,
-                            Taskid = 3,
-                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                        });
-
-                        var svcAntrol = new Common.BPJS.Antrian.Service();
-                        var responseAntrol = svcAntrol.UpdateWaktuAntrian(JsonConvert.DeserializeObject<Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root>(logTask.Params));
-                        logTask.Response = JsonConvert.SerializeObject(responseAntrol);
-                        logTask.Save();
-                    }
+                    if (!isEnable || CanSendRsiSelfCheckInTask3(appt.AppointmentNo, checkInStartedAt))
+                        SendSelfCheckInTask(appt.AppointmentNo, 3, DateTimeOffset.Now);
                 }
 
                 // auto print SEP
@@ -6533,6 +6519,78 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     Message = "OK"
                 }
             });
+        }
+
+        private bool CanSendRsiSelfCheckInTask3(string bookingNo, DateTimeOffset checkInStartedAt)
+        {
+            var request = new Common.BPJS.Antrian.List.TaskId.Request.Root { Kodebooking = bookingNo };
+            var lookupLog = new WebServiceAPILog
+            {
+                DateRequest = DateTime.Now,
+                UrlAddress = "SelfCheckIn - GetListWaktuTaskId",
+                Params = JsonConvert.SerializeObject(request)
+            };
+
+            Common.BPJS.Antrian.List.TaskId.Response.Root result = null;
+            try
+            {
+                result = new Common.BPJS.Antrian.Service().GetListWaktuTaskId(request, 3000);
+                lookupLog.Response = JsonConvert.SerializeObject(result);
+            }
+            catch (Exception ex)
+            {
+                lookupLog.Response = JsonConvert.SerializeObject(new { ex.Source, ex.Message });
+            }
+
+            lookupLog.Save();
+            if (result?.Metadata?.IsAntrolValid != true || result.Response == null)
+            {
+                // Preserve the existing task 3 attempt if the lookup is unavailable.
+                return true;
+            }
+
+            var taskIds = result.Response.Where(task => task != null).Select(task => task.Taskid).ToList();
+            if (taskIds.Contains(3) || taskIds.Contains(99))
+                return false;
+
+            if (!taskIds.Contains(1) || taskIds.Contains(2))
+                return true;
+
+            return SendSelfCheckInTask(bookingNo, 2, checkInStartedAt);
+        }
+
+        private bool SendSelfCheckInTask(string bookingNo, int taskId, DateTimeOffset occurredAt)
+        {
+            var request = new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root
+            {
+                Kodebooking = bookingNo,
+                Taskid = taskId,
+                Waktu = occurredAt.ToUnixTimeMilliseconds()
+            };
+            var taskLog = new WebServiceAPILog
+            {
+                DateRequest = DateTime.Now,
+                IPAddress = string.Empty,
+                UrlAddress = "SelfChechkIn",
+                Params = JsonConvert.SerializeObject(request)
+            };
+
+            Common.BPJS.MetadataResponse result;
+            try
+            {
+                result = new Common.BPJS.Antrian.Service().UpdateWaktuAntrian(request);
+            }
+            catch (Exception ex)
+            {
+                taskLog.Response = JsonConvert.SerializeObject(new { ex.Source, ex.Message });
+                taskLog.Save();
+                if (taskId != 2) throw;
+                return false;
+            }
+
+            taskLog.Response = JsonConvert.SerializeObject(result);
+            taskLog.Save();
+            return result?.Metadata?.IsAntrolValid == true;
         }
 
         //self check-in

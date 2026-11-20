@@ -49,9 +49,20 @@ namespace Temiang.Avicenna.Common.BPJS.Antrian
 
         public HttpWebRequest PopulateWebRequest(string url, Helper.WebRequestMethod method, Helper.WebRequestContentType contentType, string parameter, out string timeStamp)
         {
+            return PopulateWebRequest(url, method, contentType, parameter, out timeStamp, null);
+        }
+
+        private HttpWebRequest PopulateWebRequest(string url, Helper.WebRequestMethod method, Helper.WebRequestContentType contentType, string parameter, out string timeStamp, int? timeoutMilliseconds)
+        {
             Helper.IgnoreBadCertificates();
 
             var webrequest = (HttpWebRequest)System.Net.WebRequest.Create(url);
+            if (timeoutMilliseconds.HasValue)
+            {
+                webrequest.Timeout = timeoutMilliseconds.Value;
+                webrequest.ReadWriteTimeout = timeoutMilliseconds.Value;
+            }
+
             webrequest.Method = method.ToString();
 
             if (method != Helper.WebRequestMethod.GET) webrequest.ContentType = contentType.ToString();
@@ -440,9 +451,16 @@ namespace Temiang.Avicenna.Common.BPJS.Antrian
 
         public List.TaskId.Response.Root GetListWaktuTaskId(List.TaskId.Request.Root root)
         {
+            return GetListWaktuTaskId(root, null);
+        }
+
+        public List.TaskId.Response.Root GetListWaktuTaskId(List.TaskId.Request.Root root, int? timeoutMilliseconds)
+        {
             _url += $"antrean/getlisttask";
 
-            using (var response = PopulateWebRequest(_url, Helper.WebRequestMethod.POST, Helper.WebRequestContentType.FORM, JsonConvert.SerializeObject(root), out var timeStamp).GetResponse() as HttpWebResponse)
+            var request = PopulateWebRequest(_url, Helper.WebRequestMethod.POST, Helper.WebRequestContentType.FORM, JsonConvert.SerializeObject(root), out var timeStamp, timeoutMilliseconds);
+
+            using (var response = request.GetResponse() as HttpWebResponse)
             {
                 if (response.StatusCode != HttpStatusCode.OK) throw new Exception(String.Format("Server error (HTTP {0}: {1}).", response.StatusCode, response.StatusDescription));
 
