@@ -334,6 +334,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             record.RegisteredEmail = request.Email;
             record.RegistrationDateTime = DateTime.Now;
             record.RegistrationState = TilakaRegistrationState.MenungguKyc;
+            record.ConsentVersion = config.ConsentVersion;
+            record.ConsentTimestamp = consentTimestamp;
+            record.ConsentApprovedByUserID = AppSession.UserLogin.UserID;
             repository.Save(record);
 
             LoadData();

@@ -67,11 +67,29 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             using (var scope = new esTransactionScope())
             {
+                if (record.TilakaRegistrationID <= 0)
+                    DemotePreviousLatest(record);
+
                 entity.Save();
                 scope.Complete();
             }
 
             record.TilakaRegistrationID = entity.TilakaRegistrationID ?? 0;
+        }
+
+        private static void DemotePreviousLatest(TilakaRegistrationRecord record)
+        {
+            var query = new TilakaRegistrationQuery();
+            query.Where(query.RelatedType == record.RelatedType,
+                query.RelatedID == record.RelatedID,
+                query.IsLatest == true);
+
+            var previous = new TilakaRegistrationCollection();
+            previous.Load(query);
+            if (previous.Count == 0) return;
+
+            foreach (var row in previous) row.IsLatest = false;
+            previous.Save();
         }
 
         private static TilakaRegistrationRecord Map(TilakaRegistration entity)
