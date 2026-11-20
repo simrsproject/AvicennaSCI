@@ -28,7 +28,6 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaIsLogEnabled` | `true` | Logging ke `WebServiceAPILog`. |
 | `TilakaCallbackBaseUrl` | `https://<host>` | **Tidak dipakai kode**; callback didaftarkan di portal Tilaka (lihat 0.3). |
 | `TilakaCallbackToleranceMinutes` | `5` | Toleransi `x-request-timestamp`; jam server harus sinkron (NTP). |
-| `TilakaCallbackAllowedIps` | `<ip-tilaka>` | **Ditegakkan** oleh `TilakaCallbackController.IsIpAllowed` (lihat catatan di bawah tabel). |
 | `TilakaRegistrationExpireDays` | `7` | Nilai > 7 otomatis dibatasi 7. |
 | `TilakaConsentTextFile` | `C:\Tilaka\TilakaConsent.txt` | File teks TnC, UTF-8. |
 | `TilakaConsentVersion` | `TNT-v.1.0.1` | Harus sama dengan versi TnC yang disepakati; ikut di-hash saat registrasi. |
@@ -38,13 +37,10 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaClientCertificatePath` | _(kosong)_ | Isi hanya bila Tilaka mewajibkan mTLS. |
 | `TilakaClientCertificatePassword` | _(kosong)_ | |
 
-- [ ] Ke-18 kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
-- [ ] `TilakaCallbackAllowedIps` menunjuk alamat yang benar. Perilaku: nilai kosong = izinkan semua;
-      daftar dipisah koma/titik koma; `*` hanya di akhir sebagai wildcard (mis. `10.15.37.*`).
-      **Caveat deployment:** `Request.UserHostAddress` adalah TCP peer, bukan `X-Forwarded-For` — bila
-      aplikasi di belakang reverse proxy/load balancer, daftarkan IP proxy tersebut. Alamat
-      IPv4-mapped IPv6 (mis. `::ffff:10.15.37.5`) **tidak** cocok dengan entri IPv4 (`10.15.37.5`),
-      jadi kosongkan atau sesuaikan entri bila IIS menerima koneksi dalam bentuk itu.
+- [ ] Ke-17 kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
+- [ ] **Allowlist IP ada di sisi Tilaka**, bukan di aplikasi: daftarkan IP publik server Avicenna ke
+      Tilaka agar API mereka menerima request kita. Autentikasi masuk tetap memakai HMAC
+      `x-validation-token` + channel secret. Tidak ada key `TilakaCallbackAllowedIps` di aplikasi.
 - [ ] `TilakaWebviewRedirectUrl` menunjuk ke host uji (bukan `domain-rs.example`), memakai HTTPS.
 
 ### 0.2 Folder server dan ACL
@@ -370,9 +366,5 @@ sekali lagi dengan `ConvertFrom-Json` sebelum membaca field.
   belum disediakan.
 - `Temiang.Avicenna.BusinessObject/Generated/TilakaRegistration.cs` dan kolom `Paramedic.NamaKTP`
   **disediakan oleh pemilik repo**; jangan mengedit `Generated/` secara manual.
-- `TilakaCallbackAllowedIps` **ditegakkan** oleh `TilakaCallbackController` (kosong = izinkan semua;
-  daftar koma/titik koma; `*` di akhir sebagai wildcard). Batasannya: yang diperiksa adalah TCP peer
-  (`Request.UserHostAddress`), sehingga di belakang reverse proxy IP proxy yang harus didaftarkan, dan
-  alamat IPv4-mapped IPv6 tidak cocok dengan entri IPv4.
 - Rekonsiliasi massal via `TilakaWS.asmx` belum punya penjadwalan otomatis; harus dipanggil manual
   (tombol UI atau endpoint ASMX).

@@ -29,12 +29,6 @@ namespace Temiang.Avicenna.Controllers
                     return Content("OK");
                 }
 
-                if (!IsIpAllowed(config))
-                {
-                    Log(logger, "Callback-Registration-Rejected", raw, "ip-not-allowed");
-                    return Content("OK");
-                }
-
                 string error;
                 if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
                         Request.Headers["x-request-timestamp"], raw, Request.Headers["x-validation-token"],
@@ -74,12 +68,6 @@ namespace Temiang.Avicenna.Controllers
                     return Content("OK");
                 }
 
-                if (!IsIpAllowed(config))
-                {
-                    Log(logger, "Callback-CertificateStatus-Rejected", raw, "ip-not-allowed");
-                    return Content("OK");
-                }
-
                 string error;
                 if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
                         Request.Headers["x-request-timestamp"], raw, Request.Headers["x-validation-token"],
@@ -107,37 +95,6 @@ namespace Temiang.Avicenna.Controllers
             return config != null
                    && !string.IsNullOrWhiteSpace(config.ChannelId)
                    && !string.IsNullOrWhiteSpace(config.ChannelSecret);
-        }
-
-        private bool IsIpAllowed(TilakaConfig config)
-        {
-            var allowed = config.CallbackAllowedIps;
-            if (string.IsNullOrWhiteSpace(allowed)) return true;
-
-            var caller = Request.UserHostAddress;
-            foreach (var entry in allowed.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                if (IsIpMatch(caller, entry)) return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsIpMatch(string caller, string allowed)
-        {
-            if (string.IsNullOrWhiteSpace(caller) || string.IsNullOrWhiteSpace(allowed)) return false;
-
-            caller = caller.Trim();
-            allowed = allowed.Trim();
-
-            // Wildcard hanya di akhir, mis. "10.15.37.*" untuk seluruh subnet /24.
-            if (allowed.EndsWith("*", StringComparison.Ordinal))
-            {
-                var prefix = allowed.Substring(0, allowed.Length - 1);
-                return caller.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
-            }
-
-            return string.Equals(caller, allowed, StringComparison.OrdinalIgnoreCase);
         }
 
         private string ReadRawBody()

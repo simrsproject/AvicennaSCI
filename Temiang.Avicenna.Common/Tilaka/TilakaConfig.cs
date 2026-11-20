@@ -19,7 +19,6 @@ namespace Temiang.Avicenna.Common.Tilaka
         public bool IsLogEnabled { get; set; }
         public string CallbackBaseUrl { get; set; }
         public int CallbackToleranceMinutes { get; set; }
-        public string CallbackAllowedIps { get; set; }
         public int RegistrationExpireDays { get; set; }
         public string ConsentTextFile { get; set; }
         public string ConsentVersion { get; set; }
@@ -45,7 +44,6 @@ namespace Temiang.Avicenna.Common.Tilaka
             IsLogEnabled = GetBool("TilakaIsLogEnabled", true);
             CallbackBaseUrl = GetString("TilakaCallbackBaseUrl", string.Empty).TrimEnd('/');
             CallbackToleranceMinutes = GetInt("TilakaCallbackToleranceMinutes", 5);
-            CallbackAllowedIps = GetString("TilakaCallbackAllowedIps", string.Empty);
             RegistrationExpireDays = GetInt("TilakaRegistrationExpireDays", 7);
             if (RegistrationExpireDays > 7) RegistrationExpireDays = 7;
             ConsentTextFile = GetString("TilakaConsentTextFile", string.Empty);
