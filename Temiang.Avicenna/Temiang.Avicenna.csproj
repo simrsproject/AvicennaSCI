@@ -24305,6 +24305,13 @@
     <Compile Include="Module\RADT\Tilaka\TilakaRegistrationList.aspx.designer.cs">
       <DependentUpon>TilakaRegistrationList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx.cs">
+      <DependentUpon>TilakaRegistrationDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx.designer.cs">
+      <DependentUpon>TilakaRegistrationDetail.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\Reports\OptionControl\AgeCtl.ascx.cs">
       <DependentUpon>AgeCtl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -25412,6 +25419,7 @@
     <Content Include="Module\RADT\Master\ImageTemplate\ImageTemplateList.aspx" />
     <Content Include="Module\RADT\Master\ImageTemplate\ImageTemplateSearch.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx" />
     <Content Include="SearchPopUp\StandardPopUp.aspx" />
   </ItemGroup>
   <ItemGroup>
