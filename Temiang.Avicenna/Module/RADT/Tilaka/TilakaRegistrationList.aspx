@@ -4,15 +4,6 @@
 <%@ Register TagPrefix="telerik" Namespace="Telerik.Web.UI" Assembly="Telerik.Web.UI" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <telerik:RadCodeBlock ID="RadCodeBlock1" runat="server">
-        <script type="text/javascript">
-            function openWebview(url) {
-                if (url) window.open(url, '_blank');
-                return false;
-            }
-        </script>
-    </telerik:RadCodeBlock>
-
     <table class="layout">
         <tr>
             <td class="label">Dokter</td>

@@ -18,11 +18,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.Content Content1;
 
         /// <summary>
-        /// RadCodeBlock1 control.
-        /// </summary>
-        protected global::Telerik.Web.UI.RadCodeBlock RadCodeBlock1;
-
-        /// <summary>
         /// txtParamedicName control.
         /// </summary>
         protected global::Telerik.Web.UI.RadTextBox txtParamedicName;
