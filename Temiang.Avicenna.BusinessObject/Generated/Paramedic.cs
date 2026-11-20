@@ -1,8 +1,10 @@
 /*
 ===============================================================================
-                       Persistence Layer and Business Objects  
+                       Persistence Layer and Business Objects
 ===============================================================================
-                       Date Generated       : 9/4/2023 11:12:26 AM
+                    Date Generated       : 2026-11-20 12:12:15 PM
+===============================================================================
+				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
 */
 
@@ -213,6 +215,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "IsPrintInSlip": this.str.IsPrintInSlip = (string)value; break;
                         case "Bank2": this.str.Bank2 = (string)value; break;
                         case "BankAccount2": this.str.BankAccount2 = (string)value; break;
+                        case "Foto": this.str.Foto = (string)value; break;
                         case "GuaranteeFee": this.str.GuaranteeFee = (string)value; break;
                         case "CoorporateGradeID": this.str.CoorporateGradeID = (string)value; break;
                         case "CoorporateGradeValue": this.str.CoorporateGradeValue = (string)value; break;
@@ -221,6 +224,7 @@ namespace Temiang.Avicenna.BusinessObject
                         case "Ssn": this.str.Ssn = (string)value; break;
                         case "IsPhysicianTeam": this.str.IsPhysicianTeam = (string)value; break;
                         case "ParamedicQueueCode": this.str.ParamedicQueueCode = (string)value; break;
+                        case "NamaKTP": this.str.NamaKTP = (string)value; break;
                     }
                 }
                 else
@@ -1243,6 +1247,22 @@ namespace Temiang.Avicenna.BusinessObject
                 base.SetSystemString(ParamedicMetadata.ColumnNames.ParamedicQueueCode, value);
             }
         }
+        /// <summary>
+        /// Maps to Paramedic.NamaKTP
+        /// </summary>
+        virtual public System.String NamaKTP
+        {
+            get
+            {
+                return base.GetSystemString(ParamedicMetadata.ColumnNames.NamaKTP);
+            }
+
+            set
+            {
+                base.SetSystemString(ParamedicMetadata.ColumnNames.NamaKTP, value);
+            }
+        }
+
 
         #endregion
 
@@ -1978,6 +1998,20 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.BankAccount2 = Convert.ToString(value);
                 }
             }
+            public System.String Foto
+            {
+                get
+                {
+                    System.Byte[] data = entity.Foto;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.Foto = null;
+                    else entity.Foto = Convert.FromBase64String(value);
+                }
+            }
             public System.String GuaranteeFee
             {
                 get
@@ -2090,6 +2124,21 @@ namespace Temiang.Avicenna.BusinessObject
                     else entity.ParamedicQueueCode = Convert.ToString(value);
                 }
             }
+            public System.String NamaKTP
+            {
+                get
+                {
+                    System.String data = entity.NamaKTP;
+                    return (data == null) ? String.Empty : Convert.ToString(data);
+                }
+
+                set
+                {
+                    if (value == null || value.Length == 0) entity.NamaKTP = null;
+                    else entity.NamaKTP = Convert.ToString(value);
+                }
+            }
+
             private esParamedic entity;
         }
         #endregion
@@ -2143,7 +2192,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicID, esSystemType.String);
             }
         }
-
         public esQueryItem ParamedicName
         {
             get
@@ -2151,7 +2199,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicName, esSystemType.String);
             }
         }
-
         public esQueryItem ParamedicInitial
         {
             get
@@ -2159,7 +2206,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicInitial, esSystemType.String);
             }
         }
-
         public esQueryItem DateOfBirth
         {
             get
@@ -2167,7 +2213,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.DateOfBirth, esSystemType.DateTime);
             }
         }
-
         public esQueryItem SRParamedicType
         {
             get
@@ -2175,7 +2220,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SRParamedicType, esSystemType.String);
             }
         }
-
         public esQueryItem SRParamedicStatus
         {
             get
@@ -2183,7 +2227,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SRParamedicStatus, esSystemType.String);
             }
         }
-
         public esQueryItem SRReligion
         {
             get
@@ -2191,7 +2234,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SRReligion, esSystemType.String);
             }
         }
-
         public esQueryItem SRNationality
         {
             get
@@ -2199,7 +2241,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SRNationality, esSystemType.String);
             }
         }
-
         public esQueryItem SRSpecialty
         {
             get
@@ -2207,7 +2248,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SRSpecialty, esSystemType.String);
             }
         }
-
         public esQueryItem StreetName
         {
             get
@@ -2215,7 +2255,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.StreetName, esSystemType.String);
             }
         }
-
         public esQueryItem District
         {
             get
@@ -2223,7 +2262,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.District, esSystemType.String);
             }
         }
-
         public esQueryItem City
         {
             get
@@ -2231,7 +2269,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.City, esSystemType.String);
             }
         }
-
         public esQueryItem County
         {
             get
@@ -2239,7 +2276,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.County, esSystemType.String);
             }
         }
-
         public esQueryItem State
         {
             get
@@ -2247,7 +2283,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.State, esSystemType.String);
             }
         }
-
         public esQueryItem ZipCode
         {
             get
@@ -2255,7 +2290,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ZipCode, esSystemType.String);
             }
         }
-
         public esQueryItem PhoneNo
         {
             get
@@ -2263,7 +2297,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.PhoneNo, esSystemType.String);
             }
         }
-
         public esQueryItem FaxNo
         {
             get
@@ -2271,7 +2304,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.FaxNo, esSystemType.String);
             }
         }
-
         public esQueryItem Email
         {
             get
@@ -2279,7 +2311,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.Email, esSystemType.String);
             }
         }
-
         public esQueryItem MobilePhoneNo
         {
             get
@@ -2287,7 +2318,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.MobilePhoneNo, esSystemType.String);
             }
         }
-
         public esQueryItem LicenseNo
         {
             get
@@ -2295,7 +2325,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.LicenseNo, esSystemType.String);
             }
         }
-
         public esQueryItem TaxRegistrationNo
         {
             get
@@ -2303,7 +2332,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.TaxRegistrationNo, esSystemType.String);
             }
         }
-
         public esQueryItem IsPKP
         {
             get
@@ -2311,7 +2339,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsPKP, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsAvailable
         {
             get
@@ -2319,7 +2346,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsAvailable, esSystemType.Boolean);
             }
         }
-
         public esQueryItem NotAvailableUntil
         {
             get
@@ -2327,7 +2353,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.NotAvailableUntil, esSystemType.DateTime);
             }
         }
-
         public esQueryItem IsAnesthetist
         {
             get
@@ -2335,7 +2360,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsAnesthetist, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsAudiologist
         {
             get
@@ -2343,7 +2367,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsAudiologist, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsActive
         {
             get
@@ -2351,7 +2374,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsActive, esSystemType.Boolean);
             }
         }
-
         public esQueryItem Notes
         {
             get
@@ -2359,7 +2381,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.Notes, esSystemType.String);
             }
         }
-
         public esQueryItem LastUpdateDateTime
         {
             get
@@ -2367,7 +2388,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.LastUpdateDateTime, esSystemType.DateTime);
             }
         }
-
         public esQueryItem LastUpdateByUserID
         {
             get
@@ -2375,7 +2395,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.LastUpdateByUserID, esSystemType.String);
             }
         }
-
         public esQueryItem RegistrationNo
         {
             get
@@ -2383,7 +2402,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.RegistrationNo, esSystemType.String);
             }
         }
-
         public esQueryItem LicensePeriodeStart
         {
             get
@@ -2391,7 +2409,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.LicensePeriodeStart, esSystemType.DateTime);
             }
         }
-
         public esQueryItem LicensePeriodeEnd
         {
             get
@@ -2399,7 +2416,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.LicensePeriodeEnd, esSystemType.DateTime);
             }
         }
-
         public esQueryItem IsParamedicFeeUsePercentage
         {
             get
@@ -2407,7 +2423,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsParamedicFeeUsePercentage, esSystemType.Boolean);
             }
         }
-
         public esQueryItem ParamedicFeeAmount
         {
             get
@@ -2415,7 +2430,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicFeeAmount, esSystemType.Decimal);
             }
         }
-
         public esQueryItem Bank
         {
             get
@@ -2423,7 +2437,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.Bank, esSystemType.String);
             }
         }
-
         public esQueryItem BankAccount
         {
             get
@@ -2431,7 +2444,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.BankAccount, esSystemType.String);
             }
         }
-
         public esQueryItem ParamedicFeeAmountReferral
         {
             get
@@ -2439,7 +2451,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicFeeAmountReferral, esSystemType.Decimal);
             }
         }
-
         public esQueryItem IsUsingQue
         {
             get
@@ -2447,7 +2458,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsUsingQue, esSystemType.Boolean);
             }
         }
-
         public esQueryItem SRParamedicRL1
         {
             get
@@ -2455,7 +2465,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SRParamedicRL1, esSystemType.String);
             }
         }
-
         public esQueryItem IsDeductionFeeUsePercentage
         {
             get
@@ -2463,7 +2472,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsDeductionFeeUsePercentage, esSystemType.Boolean);
             }
         }
-
         public esQueryItem DeductionFeeAmount
         {
             get
@@ -2471,7 +2479,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.DeductionFeeAmount, esSystemType.Decimal);
             }
         }
-
         public esQueryItem DeductionFeeAmountReferral
         {
             get
@@ -2479,7 +2486,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.DeductionFeeAmountReferral, esSystemType.Decimal);
             }
         }
-
         public esQueryItem ChartOfAccountIdAPParamedicFee
         {
             get
@@ -2487,7 +2493,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ChartOfAccountIdAPParamedicFee, esSystemType.Int32);
             }
         }
-
         public esQueryItem SubledgerIdAPParamedicFee
         {
             get
@@ -2495,7 +2500,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.SubledgerIdAPParamedicFee, esSystemType.Int32);
             }
         }
-
         public esQueryItem ParamedicFee
         {
             get
@@ -2503,7 +2507,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicFee, esSystemType.Boolean);
             }
         }
-
         public esQueryItem IsPrintInSlip
         {
             get
@@ -2511,7 +2514,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsPrintInSlip, esSystemType.Boolean);
             }
         }
-
         public esQueryItem Bank2
         {
             get
@@ -2519,7 +2521,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.Bank2, esSystemType.String);
             }
         }
-
         public esQueryItem BankAccount2
         {
             get
@@ -2527,7 +2528,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.BankAccount2, esSystemType.String);
             }
         }
-
         public esQueryItem Foto
         {
             get
@@ -2535,7 +2535,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.Foto, esSystemType.ByteArray);
             }
         }
-
         public esQueryItem GuaranteeFee
         {
             get
@@ -2543,7 +2542,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.GuaranteeFee, esSystemType.Decimal);
             }
         }
-
         public esQueryItem CoorporateGradeID
         {
             get
@@ -2551,7 +2549,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.CoorporateGradeID, esSystemType.Int32);
             }
         }
-
         public esQueryItem CoorporateGradeValue
         {
             get
@@ -2559,7 +2556,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.CoorporateGradeValue, esSystemType.Decimal);
             }
         }
-
         public esQueryItem BankAccountName
         {
             get
@@ -2567,7 +2563,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.BankAccountName, esSystemType.String);
             }
         }
-
         public esQueryItem BankAccountName2
         {
             get
@@ -2575,7 +2570,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.BankAccountName2, esSystemType.String);
             }
         }
-
         public esQueryItem Ssn
         {
             get
@@ -2583,7 +2577,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.Ssn, esSystemType.String);
             }
         }
-
         public esQueryItem IsPhysicianTeam
         {
             get
@@ -2591,7 +2584,6 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.IsPhysicianTeam, esSystemType.Boolean);
             }
         }
-
         public esQueryItem ParamedicQueueCode
         {
             get
@@ -2599,7 +2591,13 @@ namespace Temiang.Avicenna.BusinessObject
                 return new esQueryItem(this, ParamedicMetadata.ColumnNames.ParamedicQueueCode, esSystemType.String);
             }
         }
-
+        public esQueryItem NamaKTP
+        {
+            get
+            {
+                return new esQueryItem(this, ParamedicMetadata.ColumnNames.NamaKTP, esSystemType.String);
+            }
+        }
     }
 
     [System.Diagnostics.DebuggerDisplay("Count = {Count}")]
@@ -2776,9 +2774,9 @@ namespace Temiang.Avicenna.BusinessObject
 
             return entity;
         }
-        public Paramedic FindByPrimaryKey(String paramedicID)
+        public Paramedic FindByPrimaryKey(String standardReferenceID)
         {
-            return base.FindByPrimaryKey(paramedicID) as Paramedic;
+            return base.FindByPrimaryKey(standardReferenceID) as Paramedic;
         }
 
         #region IEnumerable< Paramedic> Members
@@ -2803,7 +2801,7 @@ namespace Temiang.Avicenna.BusinessObject
     /// <summary>
     /// Encapsulates the 'Paramedic' table
     /// </summary>
-    [System.Diagnostics.DebuggerDisplay("Paramedic ({ParamedicID})")]
+    [System.Diagnostics.DebuggerDisplay("Paramedic ({StandardReferenceID})")]
     [Serializable]
     public partial class Paramedic : esParamedic
     {
@@ -3108,15 +3106,14 @@ namespace Temiang.Avicenna.BusinessObject
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.MobilePhoneNo, 18, typeof(System.String), esSystemType.String);
             c.PropertyName = ParamedicMetadata.PropertyNames.MobilePhoneNo;
-			c.CharacterMaxLength = 100;
+            c.CharacterMaxLength = 20;
             c.HasDefault = true;
             c.Default = @"('')";
             _columns.Add(c);
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.LicenseNo, 19, typeof(System.String), esSystemType.String);
             c.PropertyName = ParamedicMetadata.PropertyNames.LicenseNo;
-			c.CharacterMaxLength = 100;
-			c.IsNullable = true;
+            c.CharacterMaxLength = 50;
             _columns.Add(c);
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.TaxRegistrationNo, 20, typeof(System.String), esSystemType.String);
@@ -3181,7 +3178,7 @@ namespace Temiang.Avicenna.BusinessObject
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.RegistrationNo, 30, typeof(System.String), esSystemType.String);
             c.PropertyName = ParamedicMetadata.PropertyNames.RegistrationNo;
-			c.CharacterMaxLength = 70;
+            c.CharacterMaxLength = 50;
             c.HasDefault = true;
             c.Default = @"('')";
             _columns.Add(c);
@@ -3204,7 +3201,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.ParamedicFeeAmount, 34, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = ParamedicMetadata.PropertyNames.ParamedicFeeAmount;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -3223,7 +3219,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.ParamedicFeeAmountReferral, 37, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = ParamedicMetadata.PropertyNames.ParamedicFeeAmountReferral;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -3246,14 +3241,12 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.DeductionFeeAmount, 41, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = ParamedicMetadata.PropertyNames.DeductionFeeAmount;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.DeductionFeeAmountReferral, 42, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = ParamedicMetadata.PropertyNames.DeductionFeeAmountReferral;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -3293,14 +3286,13 @@ namespace Temiang.Avicenna.BusinessObject
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.Foto, 49, typeof(System.Byte[]), esSystemType.ByteArray);
             c.PropertyName = ParamedicMetadata.PropertyNames.Foto;
-            c.NumericPrecision = 0;
+            c.CharacterMaxLength = 2147483647;
             c.IsNullable = true;
             _columns.Add(c);
 
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.GuaranteeFee, 50, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = ParamedicMetadata.PropertyNames.GuaranteeFee;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -3313,7 +3305,6 @@ namespace Temiang.Avicenna.BusinessObject
             c = new esColumnMetadata(ParamedicMetadata.ColumnNames.CoorporateGradeValue, 52, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = ParamedicMetadata.PropertyNames.CoorporateGradeValue;
             c.NumericPrecision = 18;
-            c.NumericScale = 2;
             c.IsNullable = true;
             _columns.Add(c);
 
@@ -3346,7 +3337,11 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-
+            c = new esColumnMetadata(ParamedicMetadata.ColumnNames.NamaKTP, 58, typeof(System.String), esSystemType.String);
+            c.PropertyName = ParamedicMetadata.PropertyNames.NamaKTP;
+            c.CharacterMaxLength = 200;
+            c.IsNullable = true;
+            _columns.Add(c);
         }
         #endregion
 
@@ -3431,6 +3426,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string Ssn = "Ssn";
             public const string IsPhysicianTeam = "IsPhysicianTeam";
             public const string ParamedicQueueCode = "ParamedicQueueCode";
+            public const string NamaKTP = "NamaKTP";
         }
         #endregion
 
@@ -3495,6 +3491,7 @@ namespace Temiang.Avicenna.BusinessObject
             public const string Ssn = "Ssn";
             public const string IsPhysicianTeam = "IsPhysicianTeam";
             public const string ParamedicQueueCode = "ParamedicQueueCode";
+            public const string NamaKTP = "NamaKTP";
         }
         #endregion
 
@@ -3596,6 +3593,7 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("Ssn", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("IsPhysicianTeam", new esTypeMap("bit", "System.Boolean"));
                 meta.AddTypeMap("ParamedicQueueCode", new esTypeMap("varchar", "System.String"));
+                meta.AddTypeMap("NamaKTP", new esTypeMap("nvarchar", "System.String"));
 
 
                 meta.Source = "Paramedic";

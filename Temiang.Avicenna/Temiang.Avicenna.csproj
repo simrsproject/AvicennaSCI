@@ -1882,6 +1882,8 @@
     <Content Include="Document\2026\11\06\03.INSERT_INTO_AppProgram_PrintLOA.sql" />
     <Content Include="Document\2026\11\06\04.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
     <Content Include="Document\2026\11\16\01.CREATE_TABLE_AdmedikaDocument.sql" />
+    <Content Include="Document\2026\11\20\01.CREATE_TABLE_TilakaRegistration.sql" />
+    <Content Include="Document\2026\11\20\02.ALTER_TABLE_Paramedic.sql" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
