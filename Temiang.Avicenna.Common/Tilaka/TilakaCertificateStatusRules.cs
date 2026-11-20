@@ -1,0 +1,14 @@
+namespace Temiang.Avicenna.Common.Tilaka
+{
+    public static class TilakaCertificateStatusRules
+    {
+        public static bool CanApply(int? current, int next)
+        {
+            if (next < TilakaConstant.CertificateStatus.None || next > TilakaConstant.CertificateStatus.Rejected) return false;
+            if (!current.HasValue || current.Value <= TilakaConstant.CertificateStatus.None) return true;
+            if (current.Value == TilakaConstant.CertificateStatus.Active
+                || current.Value == TilakaConstant.CertificateStatus.Rejected) return false;
+            return next >= current.Value;
+        }
+    }
+}

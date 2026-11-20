@@ -52,7 +52,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 checkedCount++;
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(record.TilakaName))
+                    var certificateRejected = false;
+
+                    if (!string.IsNullOrWhiteSpace(record.RegistrationRequestID))
                     {
                         var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
                         string message;
@@ -64,12 +66,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                             failed++;
                             continue;
                         }
-                        if (registration.Data != null)
-                        {
-                            record.TilakaName = registration.Data.TilakaName;
-                            record.KycStatus = registration.Data.Status;
-                            record.ManualRegistrationStatus = registration.Data.ManualRegistrationStatus;
-                        }
+                        record.ApplyUserRegistrationStatus(registration.Data);
                     }
 
                     if (!string.IsNullOrWhiteSpace(record.TilakaName))
@@ -84,11 +81,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                             failed++;
                             continue;
                         }
-                        record.CertificateStatus = certificate.Status;
+
+                        if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
+                            record.CertificateStatus = certificate.Status;
+                        else
+                            certificateRejected = true;
                     }
 
-                    record.LastErrorMessage = null;
+                    record.LastErrorMessage = certificateRejected
+                        ? "Status sertifikat dari Tilaka diabaikan karena tidak lebih maju."
+                        : null;
                     SaveProgress(repository, record);
+                    if (certificateRejected) failed++;
                 }
                 catch (Exception ex)
                 {

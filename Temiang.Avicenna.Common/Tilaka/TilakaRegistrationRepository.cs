@@ -49,8 +49,12 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (record == null) return;
 
             var entity = new TilakaRegistration();
-            if (record.TilakaRegistrationID > 0 && entity.LoadByPrimaryKey(record.TilakaRegistrationID))
+            if (record.TilakaRegistrationID > 0)
             {
+                if (!entity.LoadByPrimaryKey(record.TilakaRegistrationID))
+                    throw new InvalidOperationException(
+                        "Data pendaftaran Tilaka dengan ID " + record.TilakaRegistrationID + " tidak ditemukan.");
+
                 Map(record, entity);
             }
             else

@@ -54,11 +54,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             }
 
             record.TilakaName = name;
-            record.CertificateStatus = certificate.Status;
-            record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
+            if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
+            {
+                record.CertificateStatus = certificate.Status;
+                record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
+            }
             record.LastErrorMessage = null;
             record.LastCheckedDateTime = DateTime.Now;
-            record.LastCheckSource = TilakaConstant.LogSource.Callback;
+            record.LastCheckSource = TilakaConstant.LogSource.Manual;
             record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
             repository.Save(record);
 

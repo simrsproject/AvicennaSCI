@@ -34,7 +34,12 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             if (record.DateExpire.HasValue && record.DateExpire.Value < now) return Kedaluwarsa;
 
-            return string.IsNullOrWhiteSpace(record.RegistrationRequestID) ? UuidTerbit : MenungguKyc;
+            if (string.IsNullOrWhiteSpace(record.RegistrationRequestID)) return UuidTerbit;
+
+            // UUID sudah terbit tetapi data KYC belum dikirim: aksi berikutnya adalah Kirim Data KYC.
+            if (!record.RegistrationDateTime.HasValue) return UuidTerbit;
+
+            return MenungguKyc;
         }
     }
 }

@@ -58,7 +58,12 @@ namespace Temiang.Avicenna.Common.Tilaka
             var record = _repository.FindByRequestId(payload.RequestId);
             if (record == null) return NotApplied("request-id-unknown");
 
+            if (!payload.Success) return NotApplied("success-false");
+
             if (payload.Status < 0 || payload.Status > 4) return NotApplied("status-invalid");
+
+            if (!TilakaCertificateStatusRules.CanApply(record.CertificateStatus, payload.Status))
+                return NotApplied("status-regression");
 
             record.CertificateStatus = payload.Status;
             if (!string.IsNullOrWhiteSpace(payload.UserIdentifier) && string.IsNullOrWhiteSpace(record.TilakaName))

@@ -84,8 +84,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 imgKtp.Visible = false;
             }
 
-            chkConsent.Visible = state == TilakaRegistrationState.BelumTerdaftar;
-            btnDaftar.Visible = state == TilakaRegistrationState.BelumTerdaftar;
+            chkConsent.Visible = CanStartRegistration(state);
+            btnDaftar.Visible = CanStartRegistration(state);
             btnKirimData.Visible = state == TilakaRegistrationState.UuidTerbit;
             btnWebview.Visible = !string.IsNullOrWhiteSpace(webviewUrl)
                                  && IsWebviewState(state);
@@ -94,12 +94,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             ConfigureConsent(config);
         }
 
+        private static bool CanStartRegistration(string state)
+        {
+            return state == TilakaRegistrationState.BelumTerdaftar
+                   || state == TilakaRegistrationState.Kedaluwarsa
+                   || state == TilakaRegistrationState.KycGagal
+                   || state == TilakaRegistrationState.Ditolak;
+        }
+
         private static bool IsWebviewState(string state)
         {
             return state == TilakaRegistrationState.MenungguKyc
-                   || state == TilakaRegistrationState.KycGagal
-                   || state == TilakaRegistrationState.Kedaluwarsa
-                   || state == TilakaRegistrationState.SertifikatTerbit;
+                   || state == TilakaRegistrationState.KycGagal;
         }
 
         private void ConfigureConsent(TilakaConfig config)
@@ -134,6 +140,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         private static string BuildWebviewUrl(TilakaConfig config, TilakaRegistrationRecord record, string state)
         {
             if (record == null || string.IsNullOrWhiteSpace(record.RegistrationRequestID)) return string.Empty;
+            if (state == TilakaRegistrationState.Kedaluwarsa
+                || state == TilakaRegistrationState.Ditolak) return string.Empty;
             if (state == TilakaRegistrationState.SertifikatTerbit)
                 return TilakaUrls.ActivationWebview(config, record.RegistrationRequestID);
             return TilakaUrls.RegistrationWebview(config, record.RegistrationRequestID);
@@ -373,8 +381,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             var service = new Service();
             string message;
+            var certificateRejected = false;
 
-            if (string.IsNullOrWhiteSpace(record.TilakaName))
+            if (!string.IsNullOrWhiteSpace(record.RegistrationRequestID))
             {
                 var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
                 if (!service.IsOk(registration, out message))
@@ -383,12 +392,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     return;
                 }
 
-                if (registration.Data != null)
-                {
-                    record.TilakaName = registration.Data.TilakaName;
-                    record.KycStatus = registration.Data.Status;
-                    record.ManualRegistrationStatus = registration.Data.ManualRegistrationStatus;
-                }
+                record.ApplyUserRegistrationStatus(registration.Data);
             }
 
             if (!string.IsNullOrWhiteSpace(record.TilakaName))
@@ -400,13 +404,21 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     return;
                 }
 
-                record.CertificateStatus = certificate.Status;
-                record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
-                if (certificate.Data != null && certificate.Data.Length > 0)
+                if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
                 {
-                    record.CertificateSerialNumber = certificate.Data[0].SerialNumber;
-                    record.CertificateStartDate = ParseDate(certificate.Data[0].StartActiveDate);
-                    record.CertificateExpiryDate = ParseDate(certificate.Data[0].ExpiryDate);
+                    record.CertificateStatus = certificate.Status;
+                    record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
+                    if (certificate.Data != null && certificate.Data.Length > 0)
+                    {
+                        record.CertificateSerialNumber = certificate.Data[0].SerialNumber;
+                        record.CertificateStartDate = ParseDate(certificate.Data[0].StartActiveDate);
+                        record.CertificateExpiryDate = ParseDate(certificate.Data[0].ExpiryDate);
+                    }
+                }
+                else
+                {
+                    // Status mundur/tidak valid dari Tilaka tidak boleh menimpa status yang sudah lebih maju.
+                    certificateRejected = true;
                 }
             }
 
@@ -418,7 +430,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             var state = record.RegistrationState;
             LoadData();
-            lblMessage.Text = "Status diperbarui: " + state;
+            lblMessage.Text = certificateRejected
+                ? "Status diperbarui: " + state + ". Status sertifikat dari Tilaka diabaikan karena tidak lebih maju."
+                : "Status diperbarui: " + state;
         }
 
         private bool IsNikUsedByOther(string ssn)

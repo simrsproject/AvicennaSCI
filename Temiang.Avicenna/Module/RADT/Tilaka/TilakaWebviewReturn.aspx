@@ -1,4 +1,4 @@
-<%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterList.Master" AutoEventWireup="true"
+<%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterCustomNoMenu.Master" AutoEventWireup="true"
     CodeBehind="TilakaWebviewReturn.aspx.cs"
     Inherits="Temiang.Avicenna.Module.RADT.Tilaka.TilakaWebviewReturn" %>
 

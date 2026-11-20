@@ -42,5 +42,24 @@ namespace Temiang.Avicenna.Common.Tilaka
         public DateTime? LastCheckedDateTime { get; set; }
         public string LastCheckSource { get; set; }
         public string LastErrorMessage { get; set; }
+
+        /// <summary>
+        /// Menerapkan hasil /userregstatus secara field-by-field; nilai kosong tidak menimpa data lama.
+        /// </summary>
+        public void ApplyUserRegistrationStatus(TilakaKycData data)
+        {
+            if (data == null) return;
+
+            if (!string.IsNullOrWhiteSpace(data.TilakaName)) TilakaName = data.TilakaName;
+            if (!string.IsNullOrWhiteSpace(data.Status)) KycStatus = data.Status;
+            if (!string.IsNullOrWhiteSpace(data.ManualRegistrationStatus))
+                ManualRegistrationStatus = data.ManualRegistrationStatus;
+
+            if (!string.IsNullOrWhiteSpace(data.ReasonCode))
+            {
+                int reasonCode;
+                if (int.TryParse(data.ReasonCode, out reasonCode)) KycReasonCode = reasonCode;
+            }
+        }
     }
 }

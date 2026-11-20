@@ -45,9 +45,14 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             if (!response.Success)
             {
-                message = string.IsNullOrEmpty(response.Message)
+                var failureMessage = response.Message;
+                var certificate = response as CheckCertStatusResponse;
+                if (string.IsNullOrEmpty(failureMessage) && certificate != null && certificate.Message != null)
+                    failureMessage = certificate.Message.Info;
+
+                message = string.IsNullOrEmpty(failureMessage)
                     ? "Permintaan Tilaka gagal."
-                    : response.Message;
+                    : failureMessage;
                 return false;
             }
 
@@ -62,7 +67,20 @@ namespace Temiang.Avicenna.Common.Tilaka
             try
             {
                 var token = GetAccessToken();
-                var result = _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds);
+                TilakaTransportResult result;
+                try
+                {
+                    result = _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds);
+                }
+                catch (TilakaTransportException ex)
+                {
+                    if (ex.StatusCode != 401) throw;
+
+                    // Transport melempar untuk non-2xx: segarkan token lalu coba tepat satu kali lagi.
+                    InvalidateToken();
+                    token = GetAccessToken(true);
+                    result = _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds);
+                }
 
                 if (result.StatusCode == 401)
                 {

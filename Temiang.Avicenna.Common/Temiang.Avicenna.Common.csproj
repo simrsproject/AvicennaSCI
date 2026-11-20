@@ -307,6 +307,7 @@
     <Compile Include="Tilaka\ITilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationState.cs" />
+    <Compile Include="Tilaka\TilakaCertificateStatusRules.cs" />
     <Compile Include="Tilaka\TilakaRegistrationGuard.cs" />
     <Compile Include="Tilaka\ITilakaKtpFileStore.cs" />
     <Compile Include="Tilaka\TilakaKtpFileStore.cs" />

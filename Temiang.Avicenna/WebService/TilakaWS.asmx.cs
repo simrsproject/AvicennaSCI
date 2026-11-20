@@ -23,7 +23,6 @@ namespace Temiang.Avicenna.WebService
 
             if (max <= 0 || max > 50) max = 10;
 
-            var config = new TilakaConfig();
             var service = new Service();
             var repository = new TilakaRegistrationRepository();
             var checkedCount = 0;
@@ -37,20 +36,15 @@ namespace Temiang.Avicenna.WebService
 
                 try
                 {
-                    if (string.IsNullOrWhiteSpace(record.TilakaName))
+                    var changed = false;
+                    var failedThisRecord = false;
+                    var certificateRejected = false;
+
+                    if (!string.IsNullOrWhiteSpace(record.RegistrationRequestID))
                     {
                         var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
                         string message;
-                        if (service.IsOk(registration, out message) && registration.Data != null)
-                        {
-                            if (!string.IsNullOrWhiteSpace(registration.Data.TilakaName))
-                                record.TilakaName = registration.Data.TilakaName;
-                            if (!string.IsNullOrWhiteSpace(registration.Data.Status))
-                                record.KycStatus = registration.Data.Status;
-                            if (!string.IsNullOrWhiteSpace(registration.Data.ManualRegistrationStatus))
-                                record.ManualRegistrationStatus = registration.Data.ManualRegistrationStatus;
-                        }
-                        else
+                        if (!service.IsOk(registration, out message))
                         {
                             record.LastErrorMessage = message;
                             try
@@ -65,14 +59,24 @@ namespace Temiang.Avicenna.WebService
                             messages.Add(Truncate(record.RelatedID + ": " + message, 1000));
                             continue;
                         }
+
+                        if (ApplyUserRegistrationStatus(record, registration.Data)) changed = true;
                     }
 
                     if (!string.IsNullOrWhiteSpace(record.TilakaName))
                     {
                         var certificate = service.CheckCertificateStatus(record.TilakaName);
                         string message;
-                        if (service.IsOk(certificate, out message))
+                        if (!service.IsOk(certificate, out message))
                         {
+                            record.LastErrorMessage = message;
+                            failedThisRecord = true;
+                            failed++;
+                            messages.Add(Truncate(record.RelatedID + ": " + message, 1000));
+                        }
+                        else if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
+                        {
+                            if (record.CertificateStatus != certificate.Status) changed = true;
                             record.CertificateStatus = certificate.Status;
                             record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
                             if (certificate.Data != null && certificate.Data.Length > 0)
@@ -80,16 +84,29 @@ namespace Temiang.Avicenna.WebService
                         }
                         else
                         {
+                            // Status mundur/tidak valid tidak menimpa status yang sudah lebih maju.
+                            certificateRejected = true;
+                            failedThisRecord = true;
                             failed++;
-                            messages.Add(Truncate(record.RelatedID + ": " + message, 1000));
+                            messages.Add(Truncate(record.RelatedID +
+                                ": status sertifikat diabaikan karena tidak lebih maju.", 1000));
                         }
                     }
 
+                    if (certificateRejected)
+                        record.LastErrorMessage = "Status sertifikat dari Tilaka diabaikan karena tidak lebih maju.";
+                    else if (!failedThisRecord)
+                        record.LastErrorMessage = null;
+
+                    var previousState = record.RegistrationState;
                     record.LastCheckedDateTime = DateTime.Now;
                     record.LastCheckSource = TilakaConstant.LogSource.Reconcile;
                     record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
+                    if (!string.Equals(previousState, record.RegistrationState, StringComparison.Ordinal))
+                        changed = true;
+
                     repository.Save(record);
-                    changedCount++;
+                    if (changed) changedCount++;
                 }
                 catch (Exception ex)
                 {
@@ -114,6 +131,23 @@ namespace Temiang.Avicenna.WebService
                 failed,
                 messages
             });
+        }
+
+        private static bool ApplyUserRegistrationStatus(TilakaRegistrationRecord record, TilakaKycData data)
+        {
+            if (data == null) return false;
+
+            var previousName = record.TilakaName;
+            var previousKyc = record.KycStatus;
+            var previousManual = record.ManualRegistrationStatus;
+            var previousReason = record.KycReasonCode;
+
+            record.ApplyUserRegistrationStatus(data);
+
+            return !string.Equals(previousName, record.TilakaName, StringComparison.Ordinal)
+                   || !string.Equals(previousKyc, record.KycStatus, StringComparison.Ordinal)
+                   || !string.Equals(previousManual, record.ManualRegistrationStatus, StringComparison.Ordinal)
+                   || previousReason != record.KycReasonCode;
         }
 
         private static void StampAndSave(TilakaRegistrationRepository repository, TilakaRegistrationRecord record)

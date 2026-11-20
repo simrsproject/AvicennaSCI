@@ -15,27 +15,35 @@ namespace Temiang.Avicenna.Controllers
         [HttpPost]
         public ActionResult Registration()
         {
-            var raw = ReadRawBody();
             var config = new TilakaConfig();
             var logger = new WebServiceApiLogger(config);
-
-            if (!IsIpAllowed(config))
-            {
-                Log(logger, "Callback-Registration-Rejected", raw, "ip-not-allowed");
-                return Content("OK");
-            }
-
-            string error;
-            if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
-                    Request.Headers["x-request-timestamp"], raw, Request.Headers["x-validation-token"],
-                    config.CallbackToleranceMinutes, out error))
-            {
-                Log(logger, "Callback-Registration-Rejected", raw, error);
-                return Content("OK");
-            }
+            string raw = null;
 
             try
             {
+                raw = ReadRawBody();
+
+                if (!IsConfigured(config))
+                {
+                    Log(logger, "Callback-Registration-Rejected", raw, "not-configured");
+                    return Content("OK");
+                }
+
+                if (!IsIpAllowed(config))
+                {
+                    Log(logger, "Callback-Registration-Rejected", raw, "ip-not-allowed");
+                    return Content("OK");
+                }
+
+                string error;
+                if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
+                        Request.Headers["x-request-timestamp"], raw, Request.Headers["x-validation-token"],
+                        config.CallbackToleranceMinutes, out error))
+                {
+                    Log(logger, "Callback-Registration-Rejected", raw, error);
+                    return Content("OK");
+                }
+
                 var payload = JsonConvert.DeserializeObject<CallbackRegistrationRequest>(raw);
                 var processor = new TilakaCallbackProcessor(new TilakaRegistrationRepository());
                 var outcome = processor.ProcessRegistration(payload);
@@ -52,27 +60,35 @@ namespace Temiang.Avicenna.Controllers
         [HttpPost]
         public ActionResult CertificateStatus()
         {
-            var raw = ReadRawBody();
             var config = new TilakaConfig();
             var logger = new WebServiceApiLogger(config);
-
-            if (!IsIpAllowed(config))
-            {
-                Log(logger, "Callback-CertificateStatus-Rejected", raw, "ip-not-allowed");
-                return Content("OK");
-            }
-
-            string error;
-            if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
-                    Request.Headers["x-request-timestamp"], raw, Request.Headers["x-validation-token"],
-                    config.CallbackToleranceMinutes, out error))
-            {
-                Log(logger, "Callback-CertificateStatus-Rejected", raw, error);
-                return Content("OK");
-            }
+            string raw = null;
 
             try
             {
+                raw = ReadRawBody();
+
+                if (!IsConfigured(config))
+                {
+                    Log(logger, "Callback-CertificateStatus-Rejected", raw, "not-configured");
+                    return Content("OK");
+                }
+
+                if (!IsIpAllowed(config))
+                {
+                    Log(logger, "Callback-CertificateStatus-Rejected", raw, "ip-not-allowed");
+                    return Content("OK");
+                }
+
+                string error;
+                if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
+                        Request.Headers["x-request-timestamp"], raw, Request.Headers["x-validation-token"],
+                        config.CallbackToleranceMinutes, out error))
+                {
+                    Log(logger, "Callback-CertificateStatus-Rejected", raw, error);
+                    return Content("OK");
+                }
+
                 var payload = JsonConvert.DeserializeObject<CallbackCertificateStatusRequest>(raw);
                 var processor = new TilakaCallbackProcessor(new TilakaRegistrationRepository());
                 var outcome = processor.ProcessCertificateStatus(payload, DateTime.Now);
@@ -84,6 +100,13 @@ namespace Temiang.Avicenna.Controllers
             }
 
             return Content("OK");
+        }
+
+        private static bool IsConfigured(TilakaConfig config)
+        {
+            return config != null
+                   && !string.IsNullOrWhiteSpace(config.ChannelId)
+                   && !string.IsNullOrWhiteSpace(config.ChannelSecret);
         }
 
         private bool IsIpAllowed(TilakaConfig config)
