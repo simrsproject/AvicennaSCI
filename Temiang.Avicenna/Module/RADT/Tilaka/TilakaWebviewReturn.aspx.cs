@@ -22,7 +22,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         private void ProcessReturn()
         {
             var requestId = Request.QueryString["request-id"];
-            var tilakaName = Request.QueryString["tilaka-name"];
 
             if (string.IsNullOrWhiteSpace(requestId))
             {
@@ -39,7 +38,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             }
 
             var service = new Service();
-            var name = string.IsNullOrWhiteSpace(record.TilakaName) ? tilakaName : record.TilakaName;
+            var name = record.TilakaName;
             if (string.IsNullOrWhiteSpace(name))
             {
                 lblMessage.Text = "Nama Tilaka belum tersedia. Silakan gunakan tombol Cek Status di Avicenna.";
