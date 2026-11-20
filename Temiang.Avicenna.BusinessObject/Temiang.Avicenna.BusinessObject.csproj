@@ -1146,6 +1146,7 @@
     <Compile Include="Generated\TilakaQuickSignRequest.cs" />
     <Compile Include="Generated\TilakaQuickSignSigner.cs" />
     <Compile Include="Generated\TilakaRegistration.cs" />
+    <Compile Include="Generated\TilakaTemplateSignFile.cs" />
     <Compile Include="Generated\TransChargesItemTemplate.cs" />
     <Compile Include="Generated\TransChargesLaboratoryCritical.cs" />
     <Compile Include="Generated\TransChargesTemplate.cs" />

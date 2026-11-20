@@ -1888,6 +1888,7 @@
     <Content Include="Document\2026\11\20\04.CREATE_TABLE_TilakaCasemixFile.sql" />
     <Content Include="Document\2026\11\20\05.CREATE_TABLE_TilakaQuickSignRequest.sql" />
     <Content Include="Document\2026\11\20\06.CREATE_TABLE_TilakaQuickSignSigner.sql" />
+    <Content Include="Document\2026\11\20\07.CREATE_TABLE_TilakaTemplateSignFile.sql" />
     <Content Include="Document\Tilaka\tilaka_flow.html" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />

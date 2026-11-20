@@ -69,3 +69,8 @@ ON [dbo].[TilakaQuickSignRequest]
     [CasemixFileID] ASC
 );
 GO
+
+
+ALTER TABLE [dbo].[TilakaQuickSignRequest]
+    ADD [TemplateSignFileID] BIGINT NULL;
+GO
