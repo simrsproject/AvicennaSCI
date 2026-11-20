@@ -52,8 +52,17 @@ namespace Temiang.Avicenna.WebService
                         }
                         else
                         {
+                            record.LastErrorMessage = message;
+                            try
+                            {
+                                StampAndSave(repository, record);
+                            }
+                            catch
+                            {
+                                // Kegagalan menyimpan tidak boleh menghentikan proses batch.
+                            }
                             failed++;
-                            messages.Add(record.RelatedID + ": " + message);
+                            messages.Add(Truncate(record.RelatedID + ": " + message, 1000));
                             continue;
                         }
                     }
@@ -72,7 +81,7 @@ namespace Temiang.Avicenna.WebService
                         else
                         {
                             failed++;
-                            messages.Add(record.RelatedID + ": " + message);
+                            messages.Add(Truncate(record.RelatedID + ": " + message, 1000));
                         }
                     }
 
@@ -84,8 +93,17 @@ namespace Temiang.Avicenna.WebService
                 }
                 catch (Exception ex)
                 {
+                    record.LastErrorMessage = Truncate(ex.Message, 1000);
+                    try
+                    {
+                        StampAndSave(repository, record);
+                    }
+                    catch
+                    {
+                        // Kegagalan menyimpan tidak boleh menghentikan proses batch.
+                    }
                     failed++;
-                    messages.Add(record.RelatedID + ": " + ex.Message);
+                    messages.Add(Truncate(record.RelatedID + ": " + ex.Message, 1000));
                 }
             }
 
@@ -96,6 +114,21 @@ namespace Temiang.Avicenna.WebService
                 failed,
                 messages
             });
+        }
+
+        private static void StampAndSave(TilakaRegistrationRepository repository, TilakaRegistrationRecord record)
+        {
+            record.LastErrorMessage = Truncate(record.LastErrorMessage, 1000);
+            record.LastCheckedDateTime = DateTime.Now;
+            record.LastCheckSource = TilakaConstant.LogSource.Reconcile;
+            record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
+            repository.Save(record);
+        }
+
+        private static string Truncate(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxLength) return value;
+            return value.Substring(0, maxLength);
         }
 
         private static void ValidateAccessKey(string accessKey)

@@ -56,7 +56,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     {
                         var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
                         string message;
-                        if (!service.IsOk(registration, out message)) { failed++; continue; }
+                        if (!service.IsOk(registration, out message))
+                        {
+                            // Tetap stempel waktu agar record gagal tidak terus berada di urutan teratas.
+                            record.LastErrorMessage = message;
+                            SaveProgress(repository, record);
+                            failed++;
+                            continue;
+                        }
                         if (registration.Data != null)
                         {
                             record.TilakaName = registration.Data.TilakaName;
@@ -105,10 +112,17 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         private static void SaveProgress(TilakaRegistrationRepository repository, TilakaRegistrationRecord record)
         {
+            record.LastErrorMessage = Truncate(record.LastErrorMessage, 1000);
             record.LastCheckedDateTime = DateTime.Now;
             record.LastCheckSource = TilakaConstant.LogSource.Manual;
             record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
             repository.Save(record);
+        }
+
+        private static string Truncate(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxLength) return value;
+            return value.Substring(0, maxLength);
         }
 
         private DataTable GetList()
