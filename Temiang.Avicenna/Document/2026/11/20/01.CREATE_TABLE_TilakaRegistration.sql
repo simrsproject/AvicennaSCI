@@ -74,3 +74,10 @@ GO
 CREATE INDEX [IX_TilakaRegistration_State_Expire]
     ON [dbo].[TilakaRegistration] ([RegistrationState] ASC, [DateExpire] ASC);
 GO
+
+
+ALTER TABLE [dbo].[TilakaRegistration]
+    ADD [IsQuickSignUser]             BIT           NOT NULL CONSTRAINT [DF_TilakaRegistration_IsQuickSignUser] DEFAULT ((0)),
+        [QuickSignRegisteredDateTime] DATETIME      NULL,
+        [QuickSignLastErrorMessage]   NVARCHAR(500) NULL;
+GO

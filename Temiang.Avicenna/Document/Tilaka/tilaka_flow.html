@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tilaka E-Signature — Alur Registrasi sampai Signing</title>
+<style>
+  :root {
+    --ink: #1f2d3d; --muted: #5b6b7c; --line: #d8dee6; --bg: #f6f8fa;
+    --brand: #0b5cab; --brand-soft: #e8f1fb; --ok: #1e7e34; --warn: #a0522d; --bad: #b02a37;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", Arial, Helvetica, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.6; }
+  header { background: var(--brand); color: #fff; padding: 36px 24px; }
+  header .wrap { max-width: 1080px; margin: 0 auto; }
+  header h1 { margin: 0 0 8px; font-size: 28px; }
+  header p { margin: 0; opacity: .9; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  nav { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  nav .wrap { display: flex; flex-wrap: wrap; gap: 4px; padding-top: 8px; padding-bottom: 8px; }
+  nav a { color: var(--muted); text-decoration: none; padding: 6px 10px; border-radius: 6px; font-size: 14px; }
+  nav a:hover { background: var(--brand-soft); color: var(--brand); }
+  main { padding: 28px 0 64px; }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 24px 28px; margin-bottom: 20px; }
+  h2 { margin: 0 0 14px; font-size: 22px; color: var(--brand); }
+  h3 { margin: 24px 0 8px; font-size: 17px; }
+  h4 { margin: 18px 0 6px; font-size: 15px; }
+  p { margin: 0 0 12px; }
+  ul, ol { margin: 0 0 14px 22px; padding: 0; }
+  li { margin-bottom: 6px; }
+  code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; font-family: Consolas, "Courier New", monospace; font-size: 13px; }
+  pre { background: #0f1b2a; color: #d7e3f1; padding: 14px 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  pre code { background: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 18px; font-size: 14px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #eff4f9; font-weight: 600; }
+  tr:nth-child(even) td { background: #fafcfe; }
+  .note { border-left: 4px solid var(--brand); background: var(--brand-soft); padding: 12px 16px; border-radius: 6px; margin: 14px 0; }
+  .warn { border-left: 4px solid var(--warn); background: #fdf1e7; padding: 12px 16px; border-radius: 6px; margin: 14px 0; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .bad { color: var(--bad); font-weight: 600; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 18px; }
+  .flow .step { background: var(--brand-soft); border: 1px solid #bcd6ef; color: var(--brand); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 600; }
+  .flow .arrow { color: var(--muted); font-weight: 700; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 16px; background: #fbfdff; }
+  .card h4 { margin-top: 0; color: var(--brand); }
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 12px; font-weight: 600; }
+  .pill.ok { background: #e3f5e8; color: var(--ok); }
+  .pill.warn { background: #fdf1e7; color: var(--warn); }
+  .pill.bad { background: #fbe7e9; color: var(--bad); }
+  .pill.info { background: var(--brand-soft); color: var(--brand); }
+  footer { color: var(--muted); font-size: 13px; text-align: center; padding: 24px; }
+  @media print { nav { display: none; } body { background: #fff; } section { break-inside: avoid; border: none; padding: 0 0 18px; } header { background: #fff; color: #000; border-bottom: 2px solid #000; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Tilaka E-Signature — Alur Registrasi sampai Signing</h1>
+    <p>Panduan teknis dan operasional integrasi Tilaka di Avicenna · Fase 1 (Sign Plus) dan Fase 2 (Quick Sign)</p>
+  </div>
+</header>
+
+<nav>
+  <div class="wrap">
+    <a href="#arsitektur">Arsitektur</a>
+    <a href="#pengetahuan">Pengetahuan</a>
+    <a href="#fase1">Fase 1: Registrasi</a>
+    <a href="#fase2">Fase 2: Signing</a>
+    <a href="#status">Status &amp; Kode</a>
+    <a href="#keamanan">Keamanan</a>
+    <a href="#troubleshooting">Troubleshooting</a>
+    <a href="#golive">Go-Live</a>
+    <a href="#glosarium">Glosarium</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section id="arsitektur">
+  <h2>1. Arsitektur: dua produk, dua jaringan</h2>
+  <p>Tilaka tidak dipakai sebagai satu layanan tunggal. Ada dua komponen yang berbeda secara teknis dan operasional:</p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Sign Plus — API cloud</h4>
+      <p><code>https://sb-api.tilaka.id</code> (sandbox)<br /><code>https://api.tilaka.id</code> (production)</p>
+      <ul>
+        <li>Registrasi &amp; aktivasi sertifikat dokter.</li>
+        <li>OAuth2 client credentials + <strong>mTLS</strong> (bila diwajibkan).</li>
+        <li>Webview registrasi, aktivasi, ubah MFA, ubah tampilan TTD.</li>
+        <li>Callback Registration (hasil KYC) dan Certificate Status.</li>
+        <li>Server Avicenna harus dapat diakses dari internet untuk callback.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Quick Sign — <code>tilaka-lite</code> on-prem</h4>
+      <p><code>https://&lt;host-rs&gt;:8088</code></p>
+      <ul>
+        <li>Upload PDF, request sign, cek status, unduh hasil.</li>
+        <li>Berjalan di Docker: <code>tilaka-lite</code> + MinIO + MariaDB.</li>
+        <li>Autentikasi sistem: client id/secret + IP whitelist.</li>
+        <li>Tanda tangan dilakukan setelah user punya auth session.</li>
+        <li>Tidak memerlukan akses internet untuk signing (kecuali auth user).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Alur besar</h3>
+  <div class="flow">
+    <span class="step">Dokter terdaftar</span><span class="arrow">→</span>
+    <span class="step">Sertifikat aktif</span><span class="arrow">→</span>
+    <span class="step">File Casemix</span><span class="arrow">→</span>
+    <span class="step">Quick Sign user</span><span class="arrow">→</span>
+    <span class="step">Template TTD</span><span class="arrow">→</span>
+    <span class="step">Request sign</span><span class="arrow">→</span>
+    <span class="step">Auth webview</span><span class="arrow">→</span>
+    <span class="step">Callback / polling</span><span class="arrow">→</span>
+    <span class="step">PDF bertanda tangan</span>
+  </div>
+
+  <div class="note">
+    <strong>Poin penting:</strong> Quick Sign hanya bisa dipakai dokter yang sudah memiliki sertifikat <em>Aktif</em> (status 3) dan sudah didaftarkan sebagai Quick Sign user. Jadi Fase 2 selalu bergantung pada Fase 1.
+  </div>
+</section>
+
+<section id="pengetahuan">
+  <h2>2. Pengetahuan dan prasyarat yang diperlukan</h2>
+
+  <h3>2.1 Infrastruktur</h3>
+  <table>
+    <tr><th>Kebutuhan</th><th>Keterangan</th></tr>
+    <tr><td>VM <code>tilaka-lite</code> (full package)</td><td>8 core, RAM 16 GB, disk 200 GB (minimal 50 GB untuk uji), Debian 12 / Ubuntu 22.04. Estimasi hingga 23 TPS.</td></tr>
+    <tr><td>VM <code>tilaka-lite</code> saja</td><td>4 core, RAM 8 GB, disk 30 GB, bila RS sudah punya object storage (S3) dan database sendiri. Estimasi hingga 10 TPS.</td></tr>
+    <tr><td>Docker</td><td>Docker Engine/Desktop + Compose untuk menjalankan <code>tilaka-lite</code>, MinIO, MariaDB.</td></tr>
+    <tr><td>Jaringan</td><td>Server Avicenna ↔ <code>tilaka-lite</code> pada port yang disepakati; server Avicenna harus dapat diakses internet untuk callback Sign Plus.</td></tr>
+    <tr><td>Waktu</td><td>NTP aktif di server Avicenna dan <code>tilaka-lite</code>; HMAC callback memakai timestamp.</td></tr>
+    <tr><td>Penyimpanan</td><td><code>C:\Tilaka\</code> (TnC read-only), <code>C:\Tilaka\KTP</code> (write), <code>C:\Tilaka\Signed</code> (write), dan lokasi file Casemix yang sudah ada (dibaca saja). Semuanya masuk kebijakan backup.</td></tr>
+  </table>
+
+  <h3>2.2 Kredensial dan pendaftaran ke Tilaka</h3>
+  <ul>
+    <li><strong>Channel ID</strong> dan <strong>channel secret</strong> untuk Sign Plus dan Quick Sign.</li>
+    <li><strong>Sertifikat mTLS</strong> (bila diwajibkan) beserta password, dipasang di server Avicenna.</li>
+    <li><strong>IP publik server Avicenna</strong> didaftarkan ke Tilaka — allowlist ada di sisi Tilaka, bukan di aplikasi.</li>
+    <li><strong>URL callback</strong> yang didaftarkan: <code>https://&lt;host&gt;/TilakaCallback/Registration</code> dan <code>https://&lt;host&gt;/TilakaCallback/CertificateStatus</code>.</li>
+    <li><strong>URL redirect</strong> webview: <code>https://&lt;host&gt;/TilakaWebview/Return</code>.</li>
+    <li><strong>Teks dan versi TnC</strong> final dari legal RS; disimpan di <code>C:\Tilaka\TilakaConsent.txt</code> dan <code>TilakaConsentVersion</code>.</li>
+  </ul>
+
+  <h3>2.3 Pengetahuan teknis minimum tim</h3>
+  <table>
+    <tr><th>Topik</th><th>Yang harus dipahami</th></tr>
+    <tr><td>OAuth2</td><td><code>POST /auth</code> dengan <code>grant_type=client_credentials</code>; access token 300 detik; cache dan refresh sebelum kedaluwarsa.</td></tr>
+    <tr><td>HMAC</td><td><code>hash_consent</code> = HMAC-SHA256(secret, channelId + consentText + version + timestamp); <code>x-validation-token</code> = HMAC-SHA256(secret, clientId + timestamp + rawBody).</td></tr>
+    <tr><td>Base64</td><td>Foto KTP dan gambar tanda tangan dikirim sebagai data URI/base64; ukuran mempengaruhi request.</td></tr>
+    <tr><td>KYC</td><td>OTP email, liveness, Dukcapil, manual form; hasil S/F/E/B/D dan <code>manual_registration_status</code>.</td></tr>
+    <tr><td>Sertifikat</td><td>Status 0–4, masa berlaku, aktivasi, revoke, re-enroll.</td></tr>
+    <tr><td>Signing</td><td>Auth session 30 hari, <code>template_no</code>, <code>sequence</code>, koordinat, <code>qr_option</code>, kuota, presigned URL.</td></tr>
+    <tr><td>Privasi</td><td>NIK, email, foto KTP, dan dokumen medis adalah data sensitif (UU PDP); masking log dan kontrol akses wajib.</td></tr>
+  </table>
+</section>
+
+<section id="fase1">
+  <h2>3. Fase 1 — Registrasi dan aktivasi sertifikat dokter</h2>
+  <p>Fase ini sudah diimplementasikan. Hasil akhirnya: dokter memiliki <code>tilaka_name</code> dan sertifikat berstatus <strong>Aktif</strong>.</p>
+
+  <h3>3.1 Persiapan data dokter</h3>
+  <ol>
+    <li><code>Paramedic.NamaKTP</code> terisi sesuai KTP (bukan nama bergelar).</li>
+    <li><code>Paramedic.Ssn</code> berisi NIK tepat 16 digit dan tidak dipakai dokter lain.</li>
+    <li><code>Paramedic.Email</code> terisi dan aktif (dipakai OTP).</li>
+    <li>Admin mengunggah foto KTP di halaman Tilaka; file disimpan di <code>C:\Tilaka\KTP\yyyy\MM\dd\</code>.</li>
+  </ol>
+
+  <h3>3.2 Langkah registrasi</h3>
+  <div class="flow">
+    <span class="step">Validasi data</span><span class="arrow">→</span>
+    <span class="step">Generate UUID</span><span class="arrow">→</span>
+    <span class="step">Kirim data KYC</span><span class="arrow">→</span>
+    <span class="step">Webview registrasi</span><span class="arrow">→</span>
+    <span class="step">Callback KYC</span><span class="arrow">→</span>
+    <span class="step">Sertifikat terbit</span><span class="arrow">→</span>
+    <span class="step">Webview aktivasi</span><span class="arrow">→</span>
+    <span class="step">Aktif</span>
+  </div>
+
+  <table>
+    <tr><th>Langkah</th><th>Endpoint</th><th>Data penting</th><th>Hasil di Avicenna</th></tr>
+    <tr><td>1. Generate UUID</td><td><code>POST /generateUUID</code></td><td>Company: <code>?name=&amp;email=</code></td><td><code>RegistrationRequestID</code>, <code>DateExpire</code> (maks 7 hari), status <code>UuidTerbit</code></td></tr>
+    <tr><td>2. Kirim data KYC</td><td><code>POST /registerForKycCheck</code></td><td><code>registration_id</code>, <code>email</code>, <code>name</code>, <code>nik</code>, <code>photo_ktp</code>, <code>date_expire</code>, <code>is_approved</code>, <code>consent_text</code>, <code>version</code>, <code>hash_consent</code>, <code>consent_timestamp</code></td><td>Snapshot <code>RegisteredName/NIK/Email</code>, consent, status <code>MenungguKyc</code></td></tr>
+    <tr><td>3. Webview registrasi</td><td><code>GET /personal-webview/guide?request_id=...&amp;redirect_url=...</code></td><td>User menyelesaikan OTP, liveness, Tilaka Name, password</td><td>Status tetap <code>MenungguKyc</code></td></tr>
+    <tr><td>4. Callback KYC</td><td><code>POST /TilakaCallback/Registration</code></td><td><code>RegisterID</code>, <code>data.status</code> S/F/E/B/D, <code>reason_code</code>, <code>manual_registration_status</code>, <code>tilaka_name</code></td><td><code>KycStatus</code>, <code>KycReasonCode</code>, <code>ManualRegistrationStatus</code>, <code>TilakaName</code></td></tr>
+    <tr><td>5. Callback sertifikat</td><td><code>POST /TilakaCallback/CertificateStatus</code></td><td><code>request_id</code>, <code>status</code> 1–4, <code>user_identifier</code></td><td><code>CertificateStatus</code>; status 2 = siap aktivasi</td></tr>
+    <tr><td>6. Webview aktivasi</td><td><code>GET /personal-webview/link-account?request_id=...&amp;setting=1&amp;channel_id=...&amp;redirect_url=...</code></td><td>Login Tilaka Name, setujui sertifikat, atur TTD &amp; MFA</td><td>Status <code>SertifikatTerbit</code> → <code>Aktif</code></td></tr>
+    <tr><td>7. Return page</td><td><code>GET /TilakaWebview/Return?request-id=...</code></td><td>Hanya memakai <code>TilakaName</code> tersimpan</td><td>Verifikasi <code>/checkcertstatus</code>, status disegarkan</td></tr>
+    <tr><td>8. Cek Status / rekonsiliasi</td><td><code>POST /userregstatus</code>, <code>POST /checkcertstatus</code>, <code>TilakaWS.ReconcilePending</code></td><td><code>register_id</code> / <code>user_identifier</code></td><td>Fallback bila callback tidak masuk</td></tr>
+  </table>
+
+  <div class="warn">
+    <strong>Jebakan yang sering terjadi:</strong>
+    <ul>
+      <li>Membuat UUID baru saat request lama masih hidup → Tilaka menolak “NIK sedang dalam proses pendaftaran/verifikasi”. Gunakan <em>Lanjutkan</em>.</li>
+      <li>Nama di <code>ParamedicName</code> memuat gelar sehingga tidak cocok dengan Dukcapil. Gunakan <code>NamaKTP</code>.</li>
+      <li>Foto KTP terlalu besar → <code>413 Request Entity Too Large</code>. Kompres sebelum kirim.</li>
+      <li>Jam server tidak sinkron → HMAC callback ditolak.</li>
+    </ul>
+  </div>
+
+  <h3>3.3 Status yang akan terlihat</h3>
+  <table>
+    <tr><th>Status internal</th><th>Arti</th><th>Tindakan admin</th></tr>
+    <tr><td><code>BelumTerdaftar</code></td><td>Belum ada pendaftaran</td><td>Daftar</td></tr>
+    <tr><td><code>UuidTerbit</code></td><td>UUID ada, data KYC belum dikirim</td><td>Kirim Data KYC</td></tr>
+    <tr><td><code>MenungguKyc</code></td><td>Data terkirim, user belum menyelesaikan webview</td><td>Buka Webview Registrasi</td></tr>
+    <tr><td><code>KycGagal</code></td><td>Liveness/Dukcapil gagal; manual form belum final</td><td>Buka Webview (lanjut manual) / Cek Status</td></tr>
+    <tr><td><code>MenungguVerifikasi</code></td><td>Manual registration V atau sertifikat status 1</td><td>Cek Status</td></tr>
+    <tr><td><code>SertifikatTerbit</code></td><td>Sertifikat terbit, perlu approval user</td><td>Buka Webview Aktivasi</td></tr>
+    <tr><td><code>Aktif</code></td><td>Sertifikat aktif</td><td>Lanjut Fase 2</td></tr>
+    <tr><td><code>Ditolak</code></td><td>Ditolak final verifikator/validator</td><td>Daftar ulang setelah perbaikan data</td></tr>
+    <tr><td><code>Kedaluwarsa</code></td><td><code>DateExpire</code> lewat</td><td>Daftar ulang</td></tr>
+  </table>
+</section>
+
+<section id="fase2">
+  <h2>4. Fase 2 — Quick Sign (tanda tangan dokumen)</h2>
+
+  <h3>4.1 Data file Casemix (read-only)</h3>
+  <p>Data dokumen yang akan ditandatangani <strong>sudah tersedia</strong> di tabel <code>TilakaCasemixFile</code>. Modul ini tidak melakukan input, unggah, edit, atau hapus — hanya menampilkan dan memproses.</p>
+  <ol>
+    <li>Modul membaca baris <code>TilakaCasemixFile</code> dan menampilkan <strong>RegistrationNo, ParamedicID, FileName, FilePath</strong>.</li>
+    <li>File fisik dibaca dari <code>FilePath</code> saat request signing; isinya harus PDF (Quick Sign tidak menerima format lain).</li>
+    <li>Kolom <strong>Action</strong> berisi tombol <strong>Process Signature</strong> yang hanya tampil untuk baris yang <em>belum diproses</em>.</li>
+    <li>Menekan tombol menjalankan request sign dengan signer = dokter `ParamedicID`, posisi tanda tangan 1/1/1/1/1, lalu menampilkan status per signer dan tautan auth webview.</li>
+    <li>Baris yang sudah diproses menampilkan status request terbaru; tombol Process Signature tidak ditampilkan lagi.</li>
+  </ol>
+  <div class="note">Status file diturunkan dari request terbaru: <em>Belum diproses</em>, <em>Requested</em>, <em>InProgress</em>, <em>Completed</em>, <em>Failed</em>. Tidak ada kolom status terpisah di <code>TilakaCasemixFile</code>.</div>
+  <div class="note">Satu file boleh diajukan lebih dari sekali (mis. signing gagal atau perlu koreksi). Status file diturunkan dari request terbaru: <em>Belum diajukan</em>, <em>Requested</em>, <em>InProgress</em>, <em>Completed</em>, <em>Failed</em>.</div>
+
+  <h3>4.2 Onboarding Quick Sign user</h3>
+  <p>Syarat: sertifikat dokter <strong>Aktif</strong> dan <code>TilakaName</code> terisi.</p>
+  <pre><code>POST {TilakaLiteBaseUrl}/addquicksignusers
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: application/json
+
+{
+  "users": [
+    { "email": "dokter@rs.example" }
+  ]
+}</code></pre>
+  <p>Respons berisi status per email. Error yang mungkin: <em>User does not exist</em>, <em>User is already registered for Quicksign</em>, <em>User does not have active certificate</em>, <em>Interval tidak valid, sertifikat user akan expired pada ...</em>.</p>
+
+  <h3>4.3 Template tanda tangan</h3>
+  <p>Setiap signer membutuhkan template yang terdaftar. Satu user boleh punya lebih dari satu template.</p>
+  <pre><code>POST {TilakaLiteBaseUrl}/quicksign-addtemplates
+Authorization: Bearer &lt;access_token&gt;
+
+{
+  "templates": [
+    {
+      "file_name": "Template TTD Dokter",
+      "template_number": "TTD-DR-01",
+      "template_file": "&lt;base64 PDF&gt;",
+      "assigned_users": [
+        { "user_identifier": "dokter001", "email": "dokter@rs.example" }
+      ]
+    }
+  ]
+}</code></pre>
+  <p>Batas 5 template/user per panggilan. Menambah template baru <strong>membatalkan auth session</strong> user; user harus aktivasi ulang.</p>
+
+  <h3>4.4 Membuat request tanda tangan</h3>
+  <div class="flow">
+    <span class="step">File Casemix</span><span class="arrow">→</span>
+    <span class="step">Pilih signer</span><span class="arrow">→</span>
+    <span class="step">Atur posisi</span><span class="arrow">→</span>
+    <span class="step">Upload ke Tilaka</span><span class="arrow">→</span>
+    <span class="step">Request sign</span><span class="arrow">→</span>
+    <span class="step">Auth webview</span><span class="arrow">→</span>
+    <span class="step">Signing</span><span class="arrow">→</span>
+    <span class="step">Unduh</span>
+  </div>
+
+  <h4>Upload file Casemix ke tilaka-lite</h4>
+  <p>Aplikasi membaca file dari <code>TilakaCasemixFile.FilePath</code>, lalu mengirimkannya ke Tilaka. Nama file lokal tidak dipakai untuk request signing.</p>
+  <pre><code>POST {TilakaLiteBaseUrl}/api/v1/upload
+Authorization: Bearer &lt;access_token&gt;
+Content-Type: multipart/form-data
+
+file = &lt;dokumen.pdf&gt;
+
+Response: { "success": true, "message": "File uploaded successfully",
+            "filename": "b95d459d34cb4836977d_Test Document.pdf" }</code></pre>
+  <p><strong>Simpan <code>filename</code> persis.</strong> Nama file lokal tidak boleh dipakai untuk request sign.</p>
+
+  <h4>Request sign</h4>
+  <pre><code>POST {TilakaLiteBaseUrl}/api/v1/requestquicksign
+Authorization: Bearer &lt;access_token&gt;
+
+{
+  "request_id": "AVC-20261120-0001",
+  "signatures": [
+    {
+      "user_identifier": "dokter001",
+      "email": "dokter@rs.example",
+      "signature_image": "&lt;base64 jpeg/png&gt;",
+      "sequence": 1
+    }
+  ],
+  "list_pdf": [
+    {
+      "filename": "b95d459d34cb4836977d_Test Document.pdf",
+      "template_no": "TTD-DR-01",
+      "signatures": [
+        {
+          "user_identifier": "dokter001",
+          "width": 1,
+          "height": 1,
+          "coordinate_x": 1,
+          "coordinate_y": 1,
+          "page_number": 1,
+          "reason": "Menyetujui isi dokumen",
+          "location": "Jakarta",
+          "qr_option": "QRCOMBINE"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+  <ul>
+    <li><code>request_id</code> unik global, maks 50 karakter.</li>
+    <li><code>sequence</code> wajib untuk lebih dari satu signer.</li>
+    <li><code>qr_option</code>: <code>QRONLY</code> atau <code>QRCOMBINE</code> (opsional).</li>
+    <li><code>signature_image</code> dapat diisi per signer dan per tanda tangan.</li>
+    <li>Posisi tanda tangan saat ini memakai nilai tetap <code>page_number=1</code>, <code>coordinate_x=1</code>, <code>coordinate_y=1</code>, <code>width=1</code>, <code>height=1</code>.</li>
+  </ul>
+
+  <h4>Respons auth</h4>
+  <pre><code>{
+  "success": true,
+  "message": "request quicksign success",
+  "auth_response": [
+    {
+      "url": "https://.../personal-webview/signing/authhash/pinform?...",
+      "user_identifier": "dokter001",
+      "status": false,
+      "error_message": null,
+      "token_key": "..."
+    }
+  ],
+  "failed_doc_name": null
+}</code></pre>
+  <p><code>status=false</code> berarti signer belum punya auth session aktif: buka <code>url</code> di browser, login Tilaka + OTP/FR. Setelah sukses, auth session berlaku 30 hari.</p>
+
+  <h4>Cek status</h4>
+  <pre><code>POST {TilakaLiteBaseUrl}/api/v1/checksignstatus
+{ "request_id": "AVC-20261120-0001" }
+
+Response:
+{
+  "success": true,
+  "message": "DONE",
+  "status": [
+    { "sequence": 1, "status": "DONE", "user_identifier": "dokter001",
+      "num_signatures": 1, "num_signatures_done": 1 }
+  ],
+  "request_id": "AVC-20261120-0001",
+  "list_pdf": [
+    { "filename": "...", "error": false, "presigned_url": "https://..." }
+  ]
+}</code></pre>
+  <p>Status per signer: <code>UNAUTHORIZED</code>, <code>PROCESS</code>, <code>DONE</code>, <code>FAILED</code>, <code>DENIED</code>.</p>
+
+  <h4>Callback signing</h4>
+  <pre><code>POST {Avicenna}/TilakaCallback/Signing
+
+{
+  "success": true,
+  "message": "DONE",
+  "request_id": "AVC-20261120-0001",
+  "user_info": {
+    "sequence": 1, "status": "DONE", "user_identifier": "dokter001",
+    "num_signatures": 1, "num_signatures_done": 1
+  },
+  "sign_info": [
+    { "filename": "...", "status": "DONE", "presigned_url": "https://..." }
+  ]
+}</code></pre>
+  <p>Callback dikirim <strong>per signer</strong>. Aplikasi harus idempoten dan tidak menurunkan status yang sudah <code>DONE</code>.</p>
+
+  <h4>Unduh hasil</h4>
+  <ul>
+    <li>Gunakan <code>presigned_url</code> dari callback/status. URL berlaku terbatas (default 86400 detik).</li>
+    <li>Bila kedaluwarsa: <code>GET {TilakaLiteBaseUrl}/getpresignurl?filename=&lt;filename&gt;</code>.</li>
+    <li>Simpan salinan ke <code>C:\Tilaka\Signed\&lt;request_id&gt;\&lt;filename&gt;</code> dan catat path relatifnya.</li>
+    <li>Unduh ke user lewat handler ber-<code>ProgramID</code>, bukan URL publik langsung.</li>
+  </ul>
+
+  <h3>4.5 Monitoring auth session</h3>
+  <pre><code>GET {TilakaLiteBaseUrl}/quicksign-authsessions?email=&amp;auth_status=active&amp;page_number=1&amp;limit=25
+Authorization: Bearer &lt;access_token&gt;</code></pre>
+  <p><code>auth_status</code>: <code>active</code>, <code>expired</code>, <code>not_activated</code>. Dipakai untuk melihat siapa yang perlu aktivasi ulang sebelum signing.</p>
+
+  <h3>4.6 Kuota dan batasan</h3>
+  <ul>
+    <li>Aktivasi auth session memotong kuota sebanyak jumlah template user.</li>
+    <li>Menambah template baru memotong kuota dan membatalkan auth session.</li>
+    <li>Setiap tanda tangan pada dokumen memotong kuota sesuai jumlah signature.</li>
+    <li>Satu request dapat berisi beberapa signer dan beberapa halaman.</li>
+  </ul>
+</section>
+
+<section id="status">
+  <h2>5. Matriks status dan kode</h2>
+
+  <h3>5.1 KYC (<code>data.status</code>)</h3>
+  <table>
+    <tr><th>Kode</th><th>Arti</th><th>Tindakan</th></tr>
+    <tr><td><code>S</code></td><td>Sukses KYC</td><td>Tunggu sertifikat</td></tr>
+    <tr><td><code>F</code></td><td>Gagal Dukcapil</td><td>Manual form / perbaiki data</td></tr>
+    <tr><td><code>E</code></td><td>Error Dukcapil</td><td>Coba lagi selama belum kedaluwarsa</td></tr>
+    <tr><td><code>B</code></td><td>Masih verifikasi</td><td>Tunggu</td></tr>
+    <tr><td><code>D</code></td><td>Sedang mengisi formulir</td><td>Lanjutkan webview</td></tr>
+  </table>
+
+  <h3>5.2 <code>reason_code</code></h3>
+  <table>
+    <tr><th>Kode</th><th>Arti</th></tr>
+    <tr><td>0</td><td>Sukses KYC</td></tr>
+    <tr><td>1</td><td>Gagal Dukcapil</td></tr>
+    <tr><td>2</td><td>Liveness gagal</td></tr>
+    <tr><td>3</td><td>Register ID kedaluwarsa</td></tr>
+  </table>
+
+  <h3>5.3 Sertifikat</h3>
+  <table>
+    <tr><th>Status</th><th>Arti</th><th>Tindakan</th></tr>
+    <tr><td>0</td><td>Tidak ada sertifikat / sudah revoke / expired</td><td>Daftar atau re-enroll</td></tr>
+    <tr><td>1</td><td>Dalam proses verifikator/validator</td><td>Tunggu</td></tr>
+    <tr><td>2</td><td>Terbit, perlu approval user</td><td>Webview aktivasi</td></tr>
+    <tr><td>3</td><td>Aktif</td><td>Siap signing</td></tr>
+    <tr><td>4</td><td>Ditolak final</td><td>Perbaiki data, daftar ulang</td></tr>
+  </table>
+
+  <h3>5.4 Signing per signer</h3>
+  <table>
+    <tr><th>Status</th><th>Arti</th><th>Tindakan</th></tr>
+    <tr><td><code>UNAUTHORIZED</code></td><td>Request berhasil, auth session belum ada</td><td>Buka auth URL</td></tr>
+    <tr><td><code>PROCESS</code></td><td>Sedang ditandatangani</td><td>Tunggu / cek status</td></tr>
+    <tr><td><code>DONE</code></td><td>Selesai</td><td>Unduh hasil</td></tr>
+    <tr><td><code>FAILED</code></td><td>Gagal saat proses</td><td>Cek error, ajukan ulang</td></tr>
+    <tr><td><code>DENIED</code></td><td>Gagal MFA 5x</td><td>User mencoba lagi</td></tr>
+    <tr><td><code>IDLE</code></td><td>Error jaringan/proxy/token</td><td>Cek koneksi, ulangi</td></tr>
+  </table>
+</section>
+
+<section id="keamanan">
+  <h2>6. Keamanan dan operasional</h2>
+  <table>
+    <tr><th>Area</th><th>Aturan</th></tr>
+    <tr><td>Callback</td><td>Verifikasi <code>x-validation-token</code> dengan raw body; timestamp dalam toleransi; selalu balas 200.</td></tr>
+    <tr><td>Rahasia</td><td>Channel secret dan password sertifikat hanya di <code>Web.config</code> server; tidak masuk source control/log.</td></tr>
+    <tr><td>Masking log</td><td>NIK (4 digit terakhir), email (huruf pertama + domain), base64, token.</td></tr>
+    <tr><td>Foto KTP</td><td>Disimpan di luar web root; disajikan lewat handler ber-<code>ProgramID</code>.</td></tr>
+    <tr><td>Dokumen bertanda tangan</td><td>Disimpan di <code>C:\Tilaka\Signed</code>; file Casemix dibaca dari lokasi yang sudah ada; keduanya disajikan lewat handler ber-<code>ProgramID</code>.</td></tr>
+    <tr><td>Backup</td><td><code>C:\Tilaka</code> + database + <code>tilaka-lite</code> (MinIO/MariaDB).</td></tr>
+    <tr><td>Retensi</td><td>Tentukan berapa lama log API, file KTP, dan salinan PDF disimpan; hapus sesuai kebijakan.</td></tr>
+    <tr><td>NTP</td><td>Wajib; selisih jam membuat HMAC dan timestamp ditolak.</td></tr>
+  </table>
+</section>
+
+<section id="troubleshooting">
+  <h2>7. Troubleshooting</h2>
+  <table>
+    <tr><th>Gejala</th><th>Penyebab umum</th><th>Solusi</th></tr>
+    <tr><td><code>name dan email harus dikirimkan</code></td><td>Channel Company tetapi <code>/generateUUID</code> tanpa parameter</td><td>Pastikan <code>TilakaChannelType=Company</code> dan kirim name+email</td></tr>
+    <tr><td><code>NIK sedang dalam proses pendaftaran/verifikasi</code></td><td>Masih ada request aktif</td><td>Gunakan Lanjutkan, jangan generate UUID baru</td></tr>
+    <tr><td>Callback ditolak <code>invalid-signature</code></td><td>Body diubah sebelum hash / secret salah</td><td>Hash raw body; cocokkan channel secret</td></tr>
+    <tr><td>Callback ditolak <code>timestamp-out-of-range</code></td><td>Jam server tidak sinkron</td><td>Aktifkan NTP; cek timezone</td></tr>
+    <tr><td><code>413 Request Entity Too Large</code></td><td>Foto KTP/base64 terlalu besar</td><td>Kompres; naikkan batas request server</td></tr>
+    <tr><td>Signer <code>UNAUTHORIZED</code> terus</td><td>Auth webview belum diselesaikan</td><td>Buka ulang URL auth; cek email OTP</td></tr>
+    <tr><td><code>User is not registered as QuickSign user</code></td><td>Belum onboarding</td><td>Panggil <code>/addquicksignusers</code></td></tr>
+    <tr><td><code>Invalid Base64 for template file</code></td><td>Template bukan PDF</td><td>Gunakan PDF asli, base64 tanpa header data URI</td></tr>
+    <tr><td>Presigned URL 403/expired</td><td>URL kedaluwarsa</td><td>Panggil <code>/getpresignurl</code></td></tr>
+    <tr><td>Status signing mundur</td><td>Callback/polling datang tidak berurutan</td><td>Terapkan aturan status final (DONE tidak bisa turun)</td></tr>
+  </table>
+</section>
+
+<section id="golive">
+  <h2>8. Checklist go-live</h2>
+  <h3>Fase 1</h3>
+  <ul>
+    <li>SQL <code>TilakaRegistration</code> + kolom <code>Paramedic.NamaKTP</code> dijalankan; stored procedure diperbarui.</li>
+    <li>Key <code>Tilaka*</code> terisi; folder <code>C:\Tilaka</code> + ACL siap.</li>
+    <li>URL callback dan IP publik didaftarkan ke Tilaka.</li>
+    <li>Menu <code>01.23.01</code> aktif untuk user group.</li>
+    <li>Satu dokter uji menyelesaikan registrasi sampai <strong>Aktif</strong>.</li>
+    <li>Callback valid dan negatif (signature salah) teruji.</li>
+  </ul>
+  <h3>Fase 2</h3>
+  <ul>
+    <li>Data <code>TilakaCasemixFile</code> sudah tersedia dan dapat dibaca; kolom RegistrationNo/ParamedicID/FileName/FilePath terisi.</li>
+    <li><code>tilaka-lite</code> berjalan; MinIO dan MariaDB sehat; versi sesuai dukungan Tilaka.</li>
+    <li>Key <code>TilakaLite*</code> terisi; folder <code>C:\Tilaka\Signed</code> siap.</li>
+    <li>Dokter uji terdaftar sebagai Quick Sign user dan punya template.</li>
+    <li>Request sign satu signer berhasil sampai <code>DONE</code>.</li>
+    <li>Callback signing dan polling sama-sama teruji; status tidak mundur.</li>
+    <li>Salinan PDF tersimpan lokal dan dapat diunduh lewat handler.</li>
+    <li>Auth interval tampil benar (active/expired/not_activated).</li>
+    <li>Uji negatif: user tanpa sertifikat aktif, template belum ada, MFA gagal, URL kedaluwarsa.</li>
+  </ul>
+</section>
+
+<section id="glosarium">
+  <h2>9. Glosarium</h2>
+  <table>
+    <tr><th>Istilah</th><th>Arti</th></tr>
+    <tr><td>PSrE</td><td>Penyelenggara Sertifikasi Elektronik (Tilaka).</td></tr>
+    <tr><td>KYC</td><td>Know Your Customer: verifikasi identitas via Dukcapil dan liveness.</td></tr>
+    <tr><td>Dukcapil</td><td>Direktorat Jenderal Kependudukan dan Pencatatan Sipil; sumber data NIK.</td></tr>
+    <tr><td>Tilaka Name</td><td>Nama pengguna yang dibuat saat registrasi, dipakai untuk login dan signing.</td></tr>
+    <tr><td>mTLS</td><td>Mutual TLS: autentikasi dua arah dengan sertifikat klien.</td></tr>
+    <tr><td>HMAC</td><td>Hash berbasis kunci untuk membuktikan integritas dan keaslian payload.</td></tr>
+    <tr><td>Auth session</td><td>Sesi autentikasi Quick Sign setelah user menyelesaikan MFA; berlaku 30 hari.</td></tr>
+    <tr><td>Template</td><td>Contoh tanda tangan (gambar/gaya) yang terdaftar per user, diacu dengan <code>template_no</code>.</td></tr>
+    <tr><td>Presigned URL</td><td>URL sementara untuk mengunduh dokumen hasil dari object storage.</td></tr>
+    <tr><td><code>tilaka-lite</code></td><td>Layanan Quick Sign on-prem yang dijalankan dengan Docker.</td></tr>
+  </table>
+</section>
+
+</main>
+
+<footer>
+  Dokumen internal Avicenna · Tilaka E-Signature · diperbarui 20 November 2026
+</footer>
+
+</body>
+</html>

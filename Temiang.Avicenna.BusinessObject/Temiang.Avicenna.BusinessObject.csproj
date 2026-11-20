@@ -1142,6 +1142,9 @@
     <Compile Include="Generated\System\AppProgramEsign.cs" />
     <Compile Include="Generated\TERMonthly.cs" />
     <Compile Include="Generated\TERMonthlyItem.cs" />
+    <Compile Include="Generated\TilakaCasemixFile.cs" />
+    <Compile Include="Generated\TilakaQuickSignRequest.cs" />
+    <Compile Include="Generated\TilakaQuickSignSigner.cs" />
     <Compile Include="Generated\TilakaRegistration.cs" />
     <Compile Include="Generated\TransChargesItemTemplate.cs" />
     <Compile Include="Generated\TransChargesLaboratoryCritical.cs" />
