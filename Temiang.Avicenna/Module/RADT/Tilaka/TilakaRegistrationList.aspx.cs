@@ -47,7 +47,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var checkedCount = 0;
             var failed = 0;
 
-            foreach (var record in repository.FindPending(20))
+            foreach (var record in repository.FindPending(5))
             {
                 checkedCount++;
                 try
@@ -69,24 +69,46 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     {
                         var certificate = service.CheckCertificateStatus(record.TilakaName);
                         string message;
-                        if (!service.IsOk(certificate, out message)) { failed++; continue; }
+                        if (!service.IsOk(certificate, out message))
+                        {
+                            // Simpan hasil registrasi yang sudah didapat sebelum keluar.
+                            record.LastErrorMessage = message;
+                            SaveProgress(repository, record);
+                            failed++;
+                            continue;
+                        }
                         record.CertificateStatus = certificate.Status;
                     }
 
-                    record.LastCheckedDateTime = DateTime.Now;
-                    record.LastCheckSource = TilakaConstant.LogSource.Manual;
-                    record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
-                    repository.Save(record);
+                    record.LastErrorMessage = null;
+                    SaveProgress(repository, record);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    record.LastErrorMessage = ex.Message;
+                    try
+                    {
+                        SaveProgress(repository, record);
+                    }
+                    catch
+                    {
+                        // Kegagalan menyimpan tidak boleh menghentikan proses batch.
+                    }
                     failed++;
                 }
             }
 
-            lblMessage.Text = string.Format("{0} diperiksa, {1} gagal. Refresh grid untuk melihat hasil.", checkedCount, failed);
+            lblMessage.Text = string.Format("{0} diperiksa (maksimal 5 per klik), {1} gagal. Grid sudah diperbarui.", checkedCount, failed);
             Session.Remove(SessionNameForList);
             grdList.Rebind();
+        }
+
+        private static void SaveProgress(TilakaRegistrationRepository repository, TilakaRegistrationRecord record)
+        {
+            record.LastCheckedDateTime = DateTime.Now;
+            record.LastCheckSource = TilakaConstant.LogSource.Manual;
+            record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
+            repository.Save(record);
         }
 
         private DataTable GetList()
