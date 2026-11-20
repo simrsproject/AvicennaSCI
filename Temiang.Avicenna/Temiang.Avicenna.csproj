@@ -5302,6 +5302,7 @@
     <Content Include="WebService\Siranap.asmx" />
     <Content Include="WebService\Sisrute.asmx" />
     <Content Include="WebService\SystemService.asmx" />
+    <Content Include="WebService\TilakaWS.asmx" />
     <Content Include="Images\Asset\Odontogram\TeethFront.jpg" />
     <Content Include="Images\Asset\Odontogram\TeethRear.jpg" />
     <Content Include="Images\Asset\Patient\ManVector.png" />
@@ -22899,6 +22900,10 @@
     </Compile>
     <Compile Include="WebService\SystemService.asmx.cs">
       <DependentUpon>SystemService.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebService\TilakaWS.asmx.cs">
+      <DependentUpon>TilakaWS.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebService\V0\AppointmentNRegistrationDataService.cs">
