@@ -43,6 +43,11 @@ namespace Temiang.Avicenna.Common.Tilaka
         public string LastCheckSource { get; set; }
         public string LastErrorMessage { get; set; }
 
+        public bool IsQuickSignUser { get; set; }
+        public DateTime? QuickSignRegisteredDateTime { get; set; }
+        public string QuickSignLastErrorMessage { get; set; }
+        public string LastUpdateByUserID { get; set; }
+
         /// <summary>
         /// Menerapkan hasil /userregstatus secara field-by-field; nilai kosong tidak menimpa data lama.
         /// </summary>

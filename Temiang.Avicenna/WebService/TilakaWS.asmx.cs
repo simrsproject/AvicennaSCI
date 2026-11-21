@@ -133,6 +133,177 @@ namespace Temiang.Avicenna.WebService
             });
         }
 
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public string ReconcileSigning(string accessKey, int max)
+        {
+            ValidateAccessKey(accessKey);
+
+            if (max <= 0 || max > 50) max = 10;
+
+            var config = new TilakaConfig();
+            var messages = new List<string>();
+            var checkedCount = 0;
+            var changedCount = 0;
+            var failed = 0;
+
+            if (!config.IsQuickSignConfigured)
+            {
+                messages.Add("Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).");
+                return JsonConvert.SerializeObject(new { @checked = 0, changed = 0, failed = 1, messages });
+            }
+
+            var service = TilakaQuickSignServiceFactory.Create(config);
+            var repository = new TilakaQuickSignRepository();
+
+            ITilakaSignedFileDownloader downloader = null;
+            if (!string.IsNullOrWhiteSpace(config.QuickSignSignedFolder))
+                downloader = new TilakaSignedFileDownloader(config.QuickSignSignedFolder, service);
+
+            foreach (var record in repository.FindPending(max))
+            {
+                checkedCount++;
+
+                try
+                {
+                    var status = service.CheckSignStatus(record.RequestID);
+                    string message;
+                    if (!service.IsOk(status, out message))
+                    {
+                        failed++;
+                        messages.Add(Truncate(record.RequestID + ": " + message, 1000));
+                        continue;
+                    }
+
+                    var signers = repository.LoadSigners(record.QuickSignRequestID);
+                    var changed = ApplySigningStatus(record, signers, status);
+
+                    var state = TilakaQuickSignState.Evaluate(record, signers);
+                    if (state == TilakaQuickSignConstant.RequestStatus.Completed)
+                    {
+                        if (downloader != null && string.IsNullOrWhiteSpace(record.SignedFilePath))
+                        {
+                            var url = FirstSignedUrl(signers);
+                            if (!string.IsNullOrWhiteSpace(url))
+                            {
+                                try
+                                {
+                                    record.SignedFilePath = downloader.Download(record.RequestID,
+                                        record.FileName, url);
+                                }
+                                catch (Exception ex)
+                                {
+                                    record.ErrorMessage = Truncate(
+                                        "Gagal mengunduh dokumen bertanda tangan: " + ex.Message, 1000);
+                                }
+                            }
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(record.SignedFilePath))
+                        {
+                            record.Status = TilakaQuickSignConstant.RequestStatus.Completed;
+                            record.IsActive = false;
+                            record.CompletedDateTime = DateTime.Now;
+                            changed = true;
+                        }
+                        else
+                        {
+                            record.Status = TilakaQuickSignConstant.RequestStatus.InProgress;
+                            record.IsActive = true;
+                        }
+                    }
+                    else if (state == TilakaQuickSignConstant.RequestStatus.Failed)
+                    {
+                        record.Status = TilakaQuickSignConstant.RequestStatus.Failed;
+                        record.IsActive = false;
+                        record.CompletedDateTime = DateTime.Now;
+                        changed = true;
+                    }
+                    else
+                    {
+                        record.Status = TilakaQuickSignConstant.RequestStatus.InProgress;
+                        record.IsActive = true;
+                    }
+
+                    record.LastUpdateByUserID = "TILAKA-RECONCILE";
+                    repository.Save(record, signers);
+                    if (changed) changedCount++;
+                }
+                catch (Exception ex)
+                {
+                    failed++;
+                    messages.Add(Truncate(record.RequestID + ": " + ex.Message, 1000));
+                }
+            }
+
+            return JsonConvert.SerializeObject(new
+            {
+                @checked = checkedCount,
+                changed = changedCount,
+                failed,
+                messages
+            });
+        }
+
+        private static bool ApplySigningStatus(TilakaQuickSignRecord record,
+            IList<TilakaQuickSignSignerRecord> signers, QuickSignStatusResponse status)
+        {
+            var changed = false;
+
+            if (status.Status != null)
+            {
+                foreach (var item in status.Status)
+                {
+                    foreach (var signer in signers)
+                    {
+                        if (signer.Sequence != item.Sequence
+                            && !string.Equals(signer.UserIdentifier, item.UserIdentifier,
+                                StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        if (!TilakaQuickSignState.CanApplySignerStatus(signer.Status, item.Status)) continue;
+
+                        if (!string.Equals(signer.Status, item.Status, StringComparison.Ordinal)) changed = true;
+                        signer.Status = item.Status;
+                        signer.NumSignatures = item.NumSignatures ?? signer.NumSignatures;
+                        signer.NumSignaturesDone = item.NumSignaturesDone ?? signer.NumSignaturesDone;
+                        signer.LastCheckedDateTime = DateTime.Now;
+                        signer.LastUpdateByUserID = "TILAKA-RECONCILE";
+                    }
+                }
+            }
+
+            if (status.ListPdf != null)
+            {
+                var url = string.Empty;
+                foreach (var pdf in status.ListPdf)
+                {
+                    if (string.IsNullOrWhiteSpace(pdf.PresignedUrl)) continue;
+                    url = pdf.PresignedUrl;
+                }
+
+                if (!string.IsNullOrWhiteSpace(url))
+                {
+                    foreach (var signer in signers) signer.SignedUrl = url;
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(record.ErrorMessage))
+            {
+                record.ErrorMessage = null;
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        private static string FirstSignedUrl(IList<TilakaQuickSignSignerRecord> signers)
+        {
+            foreach (var signer in signers)
+                if (!string.IsNullOrWhiteSpace(signer.SignedUrl)) return signer.SignedUrl;
+            return null;
+        }
+
         private static bool ApplyUserRegistrationStatus(TilakaRegistrationRecord record, TilakaKycData data)
         {
             if (data == null) return false;

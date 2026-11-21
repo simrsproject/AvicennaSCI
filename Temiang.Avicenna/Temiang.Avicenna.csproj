@@ -1889,6 +1889,7 @@
     <Content Include="Document\2026\11\20\05.CREATE_TABLE_TilakaQuickSignRequest.sql" />
     <Content Include="Document\2026\11\20\06.CREATE_TABLE_TilakaQuickSignSigner.sql" />
     <Content Include="Document\2026\11\20\07.CREATE_TABLE_TilakaTemplateSignFile.sql" />
+    <Content Include="Document\2026\11\20\08.INSERT_INTO_AppProgram_TilakaQuickSign.sql" />
     <Content Include="Document\Tilaka\tilaka_flow.html" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
@@ -24331,6 +24332,54 @@
     <Compile Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx.cs">
       <DependentUpon>TilakaKtpImageHandler.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaCasemixFileList.aspx.cs">
+      <DependentUpon>TilakaCasemixFileList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaCasemixFileList.aspx.designer.cs">
+      <DependentUpon>TilakaCasemixFileList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaSigningList.aspx.cs">
+      <DependentUpon>TilakaSigningList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaSigningList.aspx.designer.cs">
+      <DependentUpon>TilakaSigningList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaSigningDetail.aspx.cs">
+      <DependentUpon>TilakaSigningDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaSigningDetail.aspx.designer.cs">
+      <DependentUpon>TilakaSigningDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaQuickSignUserList.aspx.cs">
+      <DependentUpon>TilakaQuickSignUserList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaQuickSignUserList.aspx.designer.cs">
+      <DependentUpon>TilakaQuickSignUserList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaTemplateSignFileList.aspx.cs">
+      <DependentUpon>TilakaTemplateSignFileList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaTemplateSignFileList.aspx.designer.cs">
+      <DependentUpon>TilakaTemplateSignFileList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaAuthIntervalList.aspx.cs">
+      <DependentUpon>TilakaAuthIntervalList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaAuthIntervalList.aspx.designer.cs">
+      <DependentUpon>TilakaAuthIntervalList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaCasemixFileHandler.ashx.cs">
+      <DependentUpon>TilakaCasemixFileHandler.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaSignedFileHandler.ashx.cs">
+      <DependentUpon>TilakaSignedFileHandler.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Module\Reports\OptionControl\AgeCtl.ascx.cs">
       <DependentUpon>AgeCtl.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -25440,6 +25489,14 @@
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx" />
+    <Content Include="Module\RADT\Tilaka\TilakaCasemixFileList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaSigningList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaSigningDetail.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaQuickSignUserList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaTemplateSignFileList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaAuthIntervalList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaCasemixFileHandler.ashx" />
+    <Content Include="Module\RADT\Tilaka\TilakaSignedFileHandler.ashx" />
     <Content Include="SearchPopUp\StandardPopUp.aspx" />
   </ItemGroup>
   <ItemGroup>

@@ -53,6 +53,17 @@ namespace Temiang.Avicenna.Tests.Tilaka
             {
                 return new TilakaTransportResult { StatusCode = 200, Body = CertificateJson };
             }
+
+            public TilakaTransportResult Get(string url, string bearerToken, int timeoutSeconds)
+            {
+                return new TilakaTransportResult { StatusCode = 200, Body = "{}" };
+            }
+
+            public TilakaTransportResult PostMultipart(string url, string formName, string fileName,
+                byte[] content, string contentType, string bearerToken, int timeoutSeconds)
+            {
+                return new TilakaTransportResult { StatusCode = 200, Body = "{}" };
+            }
         }
 
         private static TilakaRegistrationRecord Record()

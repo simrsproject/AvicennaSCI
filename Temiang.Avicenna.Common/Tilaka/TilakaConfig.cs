@@ -28,6 +28,20 @@ namespace Temiang.Avicenna.Common.Tilaka
         public string ClientCertificatePath { get; set; }
         public string ClientCertificatePassword { get; set; }
 
+        public string LiteBaseUrl { get; set; }
+        public string LiteAuthPath { get; set; }
+        public int LiteTimeoutSeconds { get; set; }
+        public bool LiteIsLogEnabled { get; set; }
+        public bool QuickSignAllowUnsignedCallback { get; set; }
+        public string QuickSignSignedFolder { get; set; }
+        public string TemplateSignFolder { get; set; }
+        public string QuickSignDefaultTemplateNo { get; set; }
+
+        public bool IsQuickSignConfigured
+        {
+            get { return !string.IsNullOrWhiteSpace(LiteBaseUrl); }
+        }
+
         public bool IsCompanyChannel
         {
             get { return string.Equals(ChannelType, "Company", StringComparison.OrdinalIgnoreCase); }
@@ -53,6 +67,15 @@ namespace Temiang.Avicenna.Common.Tilaka
             WebviewRedirectUrl = GetString("TilakaWebviewRedirectUrl", string.Empty);
             ClientCertificatePath = GetString("TilakaClientCertificatePath", string.Empty);
             ClientCertificatePassword = GetString("TilakaClientCertificatePassword", string.Empty);
+
+            LiteBaseUrl = GetString("TilakaLiteBaseUrl", string.Empty).TrimEnd('/');
+            LiteAuthPath = GetString("TilakaLiteAuthPath", "/auth");
+            LiteTimeoutSeconds = GetInt("TilakaLiteTimeoutSeconds", 120);
+            LiteIsLogEnabled = GetBool("TilakaLiteIsLogEnabled", true);
+            QuickSignAllowUnsignedCallback = GetBool("TilakaQuickSignAllowUnsignedCallback", false);
+            QuickSignSignedFolder = GetString("TilakaQuickSignSignedFolder", string.Empty);
+            TemplateSignFolder = GetString("TilakaUploadTemplateSignFilePath", string.Empty);
+            QuickSignDefaultTemplateNo = GetString("TilakaQuickSignDefaultTemplateNo", string.Empty);
         }
 
         public string ReadConsentText()

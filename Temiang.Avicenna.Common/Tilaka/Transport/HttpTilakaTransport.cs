@@ -31,9 +31,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         public TilakaTransportResult PostJson(string url, string jsonBody, string bearerToken, int timeoutSeconds)
         {
             var request = CreateRequest(url, "POST", "application/json", timeoutSeconds);
-            if (!string.IsNullOrWhiteSpace(bearerToken))
-                request.Headers[HttpRequestHeader.Authorization] = "Bearer " + bearerToken;
-
+            AddBearer(request, bearerToken);
             return Send(request, Encoding.UTF8.GetBytes(jsonBody ?? string.Empty));
         }
 
@@ -41,6 +39,44 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             var request = CreateRequest(url, "POST", "application/x-www-form-urlencoded", timeoutSeconds);
             return Send(request, Encoding.UTF8.GetBytes(BuildFormBody(form)));
+        }
+
+        public TilakaTransportResult Get(string url, string bearerToken, int timeoutSeconds)
+        {
+            var request = CreateRequest(url, "GET", null, timeoutSeconds);
+            AddBearer(request, bearerToken);
+            return Send(request, null);
+        }
+
+        public TilakaTransportResult PostMultipart(string url, string formName, string fileName,
+            byte[] content, string contentType, string bearerToken, int timeoutSeconds)
+        {
+            var boundary = CreateBoundary();
+            var body = BuildMultipartBody(boundary, formName, fileName, content, contentType);
+            var request = CreateRequest(url, "POST", "multipart/form-data; boundary=" + boundary, timeoutSeconds);
+            AddBearer(request, bearerToken);
+            return Send(request, body);
+        }
+
+        public static string CreateBoundary()
+        {
+            return "----TilakaBoundary" + Guid.NewGuid().ToString("N");
+        }
+
+        public static byte[] BuildMultipartBody(string boundary, string formName, string fileName,
+            byte[] content, string contentType)
+        {
+            using (var stream = new MemoryStream())
+            {
+                Write(stream, "--" + boundary + "\r\n");
+                Write(stream, "Content-Disposition: form-data; name=\"" + Sanitize(formName) +
+                              "\"; filename=\"" + Sanitize(fileName) + "\"\r\n");
+                Write(stream, "Content-Type: " + SanitizeContentType(contentType) + "\r\n\r\n");
+                var bytes = content ?? new byte[0];
+                stream.Write(bytes, 0, bytes.Length);
+                Write(stream, "\r\n--" + boundary + "--\r\n");
+                return stream.ToArray();
+            }
         }
 
         public static string BuildFormBody(IDictionary<string, string> form)
@@ -59,11 +95,17 @@ namespace Temiang.Avicenna.Common.Tilaka
             return builder.ToString();
         }
 
+        private static void AddBearer(HttpWebRequest request, string bearerToken)
+        {
+            if (!string.IsNullOrWhiteSpace(bearerToken))
+                request.Headers[HttpRequestHeader.Authorization] = "Bearer " + bearerToken;
+        }
+
         private HttpWebRequest CreateRequest(string url, string method, string contentType, int timeoutSeconds)
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
-            request.ContentType = contentType;
+            if (!string.IsNullOrWhiteSpace(contentType)) request.ContentType = contentType;
             request.Accept = "application/json";
             request.AllowAutoRedirect = false;
             request.KeepAlive = false;
@@ -77,10 +119,14 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             try
             {
-                request.ContentLength = body.Length;
-                if (body.Length > 0)
+                if (request.Method != "GET")
                 {
-                    using (var stream = request.GetRequestStream()) stream.Write(body, 0, body.Length);
+                    var bytes = body ?? new byte[0];
+                    request.ContentLength = bytes.Length;
+                    if (bytes.Length > 0)
+                    {
+                        using (var stream = request.GetRequestStream()) stream.Write(bytes, 0, bytes.Length);
+                    }
                 }
 
                 using (var response = (HttpWebResponse)request.GetResponse())
@@ -123,6 +169,26 @@ namespace Temiang.Avicenna.Common.Tilaka
                 if (stream == null) return null;
                 using (var reader = new StreamReader(stream, Encoding.UTF8)) return reader.ReadToEnd();
             }
+        }
+
+        private static string Sanitize(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return "file";
+            var builder = new StringBuilder(value.Length);
+            foreach (var ch in value)
+                builder.Append(ch < 32 || ch == 127 || ch == '"' ? '_' : ch);
+            return builder.ToString();
+        }
+
+        private static string SanitizeContentType(string contentType)
+        {
+            return string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : Sanitize(contentType);
+        }
+
+        private static void Write(Stream stream, string value)
+        {
+            var bytes = Encoding.UTF8.GetBytes(value);
+            stream.Write(bytes, 0, bytes.Length);
         }
     }
 }

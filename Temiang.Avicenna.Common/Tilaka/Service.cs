@@ -62,6 +62,32 @@ namespace Temiang.Avicenna.Common.Tilaka
         public TResponse Execute<TResponse>(string operation, string url, string jsonBody)
             where TResponse : TilakaResponse, new()
         {
+            return ExecuteCore<TResponse>(operation, jsonBody,
+                token => _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds));
+        }
+
+        public TResponse ExecuteGet<TResponse>(string operation, string url)
+            where TResponse : TilakaResponse, new()
+        {
+            return ExecuteCore<TResponse>(operation, null,
+                token => _transport.Get(url, token, _config.TimeoutSeconds));
+        }
+
+        public TResponse ExecuteMultipart<TResponse>(string operation, string url, string formName,
+            string fileName, byte[] content, string contentType)
+            where TResponse : TilakaResponse, new()
+        {
+            var logBody = string.Format("[multipart file={0}, bytes={1}]", fileName,
+                content == null ? 0 : content.Length);
+            return ExecuteCore<TResponse>(operation, logBody,
+                token => _transport.PostMultipart(url, formName, fileName, content, contentType,
+                    token, _config.TimeoutSeconds));
+        }
+
+        private TResponse ExecuteCore<TResponse>(string operation, string logBody,
+            Func<string, TilakaTransportResult> send)
+            where TResponse : TilakaResponse, new()
+        {
             var stopwatch = Stopwatch.StartNew();
 
             try
@@ -70,7 +96,7 @@ namespace Temiang.Avicenna.Common.Tilaka
                 TilakaTransportResult result;
                 try
                 {
-                    result = _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds);
+                    result = send(token);
                 }
                 catch (TilakaTransportException ex)
                 {
@@ -79,19 +105,19 @@ namespace Temiang.Avicenna.Common.Tilaka
                     // Transport melempar untuk non-2xx: segarkan token lalu coba tepat satu kali lagi.
                     InvalidateToken();
                     token = GetAccessToken(true);
-                    result = _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds);
+                    result = send(token);
                 }
 
                 if (result.StatusCode == 401)
                 {
                     InvalidateToken();
                     token = GetAccessToken(true);
-                    result = _transport.PostJson(url, jsonBody, token, _config.TimeoutSeconds);
+                    result = send(token);
                 }
 
                 stopwatch.Stop();
                 var response = TilakaResponseParser.Parse<TResponse>(result.Body, result.StatusCode);
-                WriteLog(operation, jsonBody, result.Body, stopwatch.ElapsedMilliseconds);
+                WriteLog(operation, logBody, result.Body, stopwatch.ElapsedMilliseconds);
                 return response;
             }
             catch (TilakaTransportException ex)
@@ -102,13 +128,13 @@ namespace Temiang.Avicenna.Common.Tilaka
                     : TilakaResponseParser.Parse<TResponse>(ex.ResponseBody, ex.StatusCode);
 
                 if (string.IsNullOrEmpty(failed.TechnicalError)) failed.TechnicalError = ex.Message;
-                WriteLog(operation, jsonBody, ex.ResponseBody, stopwatch.ElapsedMilliseconds);
+                WriteLog(operation, logBody, ex.ResponseBody, stopwatch.ElapsedMilliseconds);
                 return failed;
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                WriteLog(operation, jsonBody, null, stopwatch.ElapsedMilliseconds);
+                WriteLog(operation, logBody, null, stopwatch.ElapsedMilliseconds);
                 return new TResponse { TechnicalError = ex.Message };
             }
         }

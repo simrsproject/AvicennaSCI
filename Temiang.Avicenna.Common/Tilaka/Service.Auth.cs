@@ -21,9 +21,14 @@ namespace Temiang.Avicenna.Common.Tilaka
             lock (TokenSync) TokenCache.Clear();
         }
 
+        private static string BuildTokenKey(TilakaConfig config)
+        {
+            return (config.BaseUrl ?? string.Empty) + "|" + (config.ChannelId ?? string.Empty);
+        }
+
         public string GetAccessToken(bool forceRefresh = false)
         {
-            var key = _config.ChannelId ?? string.Empty;
+            var key = BuildTokenKey(_config);
 
             lock (TokenSync)
             {
@@ -67,7 +72,7 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         private void InvalidateToken()
         {
-            lock (TokenSync) TokenCache.Remove(_config.ChannelId ?? string.Empty);
+            lock (TokenSync) TokenCache.Remove(BuildTokenKey(_config));
         }
     }
 }

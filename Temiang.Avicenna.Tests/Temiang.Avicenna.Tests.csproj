@@ -105,6 +105,11 @@
     <Compile Include="Tilaka\TilakaServiceTests.cs" />
     <Compile Include="Tilaka\TilakaRegistrationStateTests.cs" />
     <Compile Include="Tilaka\TilakaWebviewReturnHandlerTests.cs" />
+    <Compile Include="Tilaka\TilakaQuickSignStateTests.cs" />
+    <Compile Include="Tilaka\TilakaQuickSignParserTests.cs" />
+    <Compile Include="Tilaka\TilakaQuickSignTransportTests.cs" />
+    <Compile Include="Tilaka\TilakaQuickSignRequestServiceTests.cs" />
+    <Compile Include="Tilaka\TilakaQuickSignCallbackTests.cs" />
     <Compile Include="Tilaka\TilakaCertificateStatusRulesTests.cs" />
     <Compile Include="Tilaka\TilakaRegistrationGuardTests.cs" />
     <Compile Include="Tilaka\TilakaKtpFileStoreTests.cs" />

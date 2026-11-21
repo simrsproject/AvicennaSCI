@@ -66,8 +66,11 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
 
             entity.LastUpdateDateTime = DateTime.Now;
-            if (!string.IsNullOrWhiteSpace(record.ConsentApprovedByUserID))
-                entity.LastUpdateByUserID = record.ConsentApprovedByUserID;
+            var updater = !string.IsNullOrWhiteSpace(record.LastUpdateByUserID)
+                ? record.LastUpdateByUserID
+                : record.ConsentApprovedByUserID;
+            if (!string.IsNullOrWhiteSpace(updater))
+                entity.LastUpdateByUserID = updater;
 
             using (var scope = new esTransactionScope())
             {
@@ -79,6 +82,19 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
 
             record.TilakaRegistrationID = entity.TilakaRegistrationID ?? 0;
+        }
+
+        public void UpdateQuickSignUser(string relatedType, string relatedId, bool isRegistered,
+            DateTime? registeredDateTime, string errorMessage, string userID)
+        {
+            var record = FindLatest(relatedType, relatedId);
+            if (record == null) return;
+
+            record.IsQuickSignUser = isRegistered;
+            record.QuickSignRegisteredDateTime = registeredDateTime;
+            record.QuickSignLastErrorMessage = errorMessage;
+            record.LastUpdateByUserID = userID;
+            Save(record);
         }
 
         private static void DemotePreviousLatest(TilakaRegistrationRecord record)
@@ -130,7 +146,10 @@ namespace Temiang.Avicenna.Common.Tilaka
                 KtpUploadedDateTime = entity.KtpUploadedDateTime,
                 LastCheckedDateTime = entity.LastCheckedDateTime,
                 LastCheckSource = entity.LastCheckSource,
-                LastErrorMessage = entity.LastErrorMessage
+                LastErrorMessage = entity.LastErrorMessage,
+                IsQuickSignUser = entity.IsQuickSignUser ?? false,
+                QuickSignRegisteredDateTime = entity.QuickSignRegisteredDateTime,
+                QuickSignLastErrorMessage = entity.QuickSignLastErrorMessage
             };
         }
 
@@ -166,6 +185,9 @@ namespace Temiang.Avicenna.Common.Tilaka
             entity.LastCheckedDateTime = record.LastCheckedDateTime;
             entity.LastCheckSource = record.LastCheckSource;
             entity.LastErrorMessage = record.LastErrorMessage;
+            entity.IsQuickSignUser = record.IsQuickSignUser;
+            entity.QuickSignRegisteredDateTime = record.QuickSignRegisteredDateTime;
+            entity.QuickSignLastErrorMessage = record.QuickSignLastErrorMessage;
         }
     }
 }

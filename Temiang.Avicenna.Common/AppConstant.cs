@@ -1181,6 +1181,11 @@ namespace Temiang.Avicenna.Common
 
             // Tilaka
             public const string TilakaRegistration = "01.23.01";
+            public const string TilakaCasemixFile = "01.23.02";
+            public const string TilakaSigning = "01.23.03";
+            public const string TilakaQuickSignUser = "01.23.04";
+            public const string TilakaTemplateSignFile = "01.23.05";
+            public const string TilakaAuthInterval = "01.23.06";
         }
 
         public class Report

@@ -90,6 +90,62 @@ namespace Temiang.Avicenna.Controllers
             return Content("OK");
         }
 
+        [HttpPost]
+        public ActionResult Signing()
+        {
+            var config = new TilakaConfig();
+            var logger = new WebServiceApiLogger(config);
+            string raw = null;
+
+            try
+            {
+                raw = ReadRawBody();
+
+                if (!IsConfigured(config))
+                {
+                    Log(logger, "Callback-Signing-Rejected", raw, "not-configured");
+                    return Content("OK");
+                }
+
+                var token = Request.Headers["x-validation-token"];
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    string error;
+                    if (!TilakaSignature.VerifyCallback(config.ChannelId, config.ChannelSecret,
+                            Request.Headers["x-request-timestamp"], raw, token,
+                            config.CallbackToleranceMinutes, out error))
+                    {
+                        Log(logger, "Callback-Signing-Rejected", raw, error);
+                        return Content("OK");
+                    }
+                }
+                else if (!config.QuickSignAllowUnsignedCallback)
+                {
+                    Log(logger, "Callback-Signing-Rejected", raw, "callback-unsigned");
+                    return Content("OK");
+                }
+
+                ITilakaSignedFileDownloader downloader = null;
+                if (!string.IsNullOrWhiteSpace(config.QuickSignSignedFolder))
+                {
+                    downloader = new TilakaSignedFileDownloader(
+                        config.QuickSignSignedFolder, TilakaQuickSignServiceFactory.Create(config));
+                }
+
+                var payload = JsonConvert.DeserializeObject<CallbackSigningRequest>(raw);
+                var processor = new TilakaQuickSignCallbackProcessor(
+                    new TilakaQuickSignRepository(), downloader);
+                var outcome = processor.Process(payload);
+                Log(logger, "Callback-Signing", raw, outcome.Applied ? "applied" : outcome.Reason);
+            }
+            catch (Exception ex)
+            {
+                Log(logger, "Callback-Signing-Error", raw, ex.Message);
+            }
+
+            return Content("OK");
+        }
+
         private static bool IsConfigured(TilakaConfig config)
         {
             return config != null
