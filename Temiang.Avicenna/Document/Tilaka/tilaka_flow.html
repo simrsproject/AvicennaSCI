@@ -148,9 +148,24 @@
     <li><strong>Sertifikat mTLS</strong> (bila diwajibkan) beserta password, dipasang di server Avicenna.</li>
     <li><strong>IP publik server Avicenna</strong> didaftarkan ke Tilaka — allowlist ada di sisi Tilaka, bukan di aplikasi.</li>
     <li><strong>URL callback</strong> yang didaftarkan: <code>https://&lt;host&gt;/TilakaCallback/Registration</code> dan <code>https://&lt;host&gt;/TilakaCallback/CertificateStatus</code>.</li>
+    <li><strong>Callback signing</strong>: <code>https://&lt;host&gt;/TilakaCallback/Signing</code> — berasal dari
+        <code>tilaka-lite</code> di jaringan RS, tidak memerlukan akses publik.</li>
     <li><strong>URL redirect</strong> webview: <code>https://&lt;host&gt;/TilakaWebview/Return</code>.</li>
     <li><strong>Teks dan versi TnC</strong> final dari legal RS; disimpan di <code>C:\Tilaka\TilakaConsent.txt</code> dan <code>TilakaConsentVersion</code>.</li>
   </ul>
+
+  <h4>Konfigurasi Quick Sign (<code>Web.config</code>)</h4>
+  <table>
+    <tr><th>Key</th><th>Nilai</th><th>Catatan</th></tr>
+    <tr><td><code>TilakaLiteBaseUrl</code></td><td><code>https://&lt;host-rs&gt;:8088</code></td><td>Kosong = Quick Sign nonaktif</td></tr>
+    <tr><td><code>TilakaLiteAuthPath</code></td><td><code>/auth</code></td><td></td></tr>
+    <tr><td><code>TilakaLiteTimeoutSeconds</code></td><td><code>120</code></td><td></td></tr>
+    <tr><td><code>TilakaLiteIsLogEnabled</code></td><td><code>true</code></td><td>Log ke <code>WebServiceAPILog</code> dengan tag <code>TILAKA</code></td></tr>
+    <tr><td><code>TilakaQuickSignAllowUnsignedCallback</code></td><td><code>false</code></td><td>Bila <code>false</code>, callback tanpa token ditolak</td></tr>
+    <tr><td><code>TilakaQuickSignSignedFolder</code></td><td><code>C:\Tilaka\Signed</code></td><td>Write untuk app pool</td></tr>
+    <tr><td><code>TilakaUploadTemplateSignFilePath</code></td><td><code>C:\Tilaka\TemplateSign</code></td><td>Write untuk app pool</td></tr>
+    <tr><td><code>TilakaQuickSignDefaultTemplateNo</code></td><td>_(kosong)_</td><td>Fallback bila dokter tidak punya template default</td></tr>
+  </table>
 
   <h3>2.3 Pengetahuan teknis minimum tim</h3>
   <table>
@@ -306,14 +321,32 @@
 </section>
 
 <section id="fase2">
-  <h2>4. Fase 2 — Quick Sign (tanda tangan dokumen)</h2>
+  <h2>4. Fase 2 - Quick Sign (tanda tangan dokumen)</h2>
+
+  <div class="note">
+    <strong>Status implementasi:</strong> Fase 2 sudah tersedia di Avicenna (service, repository, callback,
+    halaman, dan rekonsiliasi). Verifikasi ke <code>tilaka-lite</code> belum dilakukan. Selama
+    <code>TilakaLiteBaseUrl</code> kosong, halaman Quick Sign menampilkan pesan konfigurasi dan tidak
+    memanggil API.
+  </div>
+
+  <h3>4.0 Menu dan halaman Quick Sign</h3>
+  <table>
+    <tr><th>Menu</th><th>ProgramID</th><th>Halaman</th></tr>
+    <tr><td>File Casemix</td><td><code>01.23.02</code></td><td><code>TilakaCasemixFileList.aspx</code></td></tr>
+    <tr><td>Tanda Tangan (Quick Sign)</td><td><code>01.23.03</code></td><td><code>TilakaSigningList.aspx</code>, <code>TilakaSigningDetail.aspx</code></td></tr>
+    <tr><td>Quick Sign User</td><td><code>01.23.04</code></td><td><code>TilakaQuickSignUserList.aspx</code></td></tr>
+    <tr><td>Template Tanda Tangan</td><td><code>01.23.05</code></td><td><code>TilakaTemplateSignFileList.aspx</code></td></tr>
+    <tr><td>Auth Interval</td><td><code>01.23.06</code></td><td><code>TilakaAuthIntervalList.aspx</code></td></tr>
+  </table>
 
   <h3>4.1 Data file Casemix (read-only)</h3>
   <p>Data dokumen yang akan ditandatangani <strong>sudah tersedia</strong> di tabel <code>TilakaCasemixFile</code>. Modul ini tidak melakukan input, unggah, edit, atau hapus — hanya menampilkan dan memproses.</p>
   <ol>
     <li>Modul membaca baris <code>TilakaCasemixFile</code> dan menampilkan <strong>RegistrationNo, ParamedicID, FileName, FilePath</strong>.</li>
     <li>File fisik dibaca dari <code>FilePath</code> saat request signing; isinya harus PDF (Quick Sign tidak menerima format lain).</li>
-    <li>Kolom <strong>Action</strong> berisi tombol <strong>Process Signature</strong> yang hanya tampil untuk baris yang <em>belum diproses</em>.</li>
+    <li>Kolom <strong>Action</strong> berisi tombol <strong>Process Signature</strong> yang hanya tampil bila
+        belum ada request, atau request terakhir <code>Failed</code>/<code>DENIED</code>.</li>
     <li>Menekan tombol menjalankan request sign dengan signer = dokter <code>ParamedicID</code>, posisi tanda tangan 1/1/1/1/1, lalu menampilkan status per signer dan tautan auth webview.</li>
     <li>Baris yang sudah diproses menampilkan status request terbaru; tombol Process Signature tidak ditampilkan lagi.</li>
   </ol>
@@ -368,8 +401,7 @@ Authorization: Bearer &lt;access_token&gt;
   <h3>4.4 Membuat request tanda tangan</h3>
   <div class="flow">
     <span class="step">File Casemix</span><span class="arrow">→</span>
-    <span class="step">Pilih signer</span><span class="arrow">→</span>
-    <span class="step">Atur posisi</span><span class="arrow">→</span>
+    <span class="step">Process Signature (DPJP)</span><span class="arrow">→</span>
     <span class="step">Upload ke Tilaka</span><span class="arrow">→</span>
     <span class="step">Request sign</span><span class="arrow">→</span>
     <span class="step">Auth webview</span><span class="arrow">→</span>
@@ -394,7 +426,7 @@ Response: { "success": true, "message": "File uploaded successfully",
 Authorization: Bearer &lt;access_token&gt;
 
 {
-  "request_id": "AVC-20261120-0001",
+  "request_id": "8f14e45fceea167a5a36dedd4bea2543",
   "signatures": [
     {
       "user_identifier": "dokter001",
@@ -450,7 +482,7 @@ Authorization: Bearer &lt;access_token&gt;
 
   <h4>Cek status</h4>
   <pre><code>POST {TilakaLiteBaseUrl}/api/v1/checksignstatus
-{ "request_id": "AVC-20261120-0001" }
+{ "request_id": "8f14e45fceea167a5a36dedd4bea2543" }
 
 Response:
 {
@@ -460,7 +492,7 @@ Response:
     { "sequence": 1, "status": "DONE", "user_identifier": "dokter001",
       "num_signatures": 1, "num_signatures_done": 1 }
   ],
-  "request_id": "AVC-20261120-0001",
+  "request_id": "8f14e45fceea167a5a36dedd4bea2543",
   "list_pdf": [
     { "filename": "...", "error": false, "presigned_url": "https://..." }
   ]
@@ -473,7 +505,7 @@ Response:
 {
   "success": true,
   "message": "DONE",
-  "request_id": "AVC-20261120-0001",
+  "request_id": "8f14e45fceea167a5a36dedd4bea2543",
   "user_info": {
     "sequence": 1, "status": "DONE", "user_identifier": "dokter001",
     "num_signatures": 1, "num_signatures_done": 1
@@ -483,6 +515,12 @@ Response:
   ]
 }</code></pre>
   <p>Callback dikirim <strong>per signer</strong>. Aplikasi harus idempoten dan tidak menurunkan status yang sudah <code>DONE</code>.</p>
+  <p><strong>Autentikasi callback:</strong> bila header <code>x-validation-token</code> dikirim, nilainya diverifikasi
+  dengan HMAC (client id + timestamp + raw body). Bila header tidak ada, callback hanya diproses jika
+  <code>TilakaQuickSignAllowUnsignedCallback=true</code>; selain itu dicatat sebagai
+  <code>callback-unsigned</code> dan diabaikan. Semua callback tetap dibalas HTTP 200.</p>
+  <p>Status request: <code>Requested</code> → <code>InProgress</code> → <code>Completed</code> / <code>Failed</code>.
+  Hanya satu request aktif per file Casemix (filtered unique index pada <code>IsActive = 1</code>).</p>
 
   <h4>Unduh hasil</h4>
   <ul>
@@ -504,6 +542,65 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
     <li>Setiap tanda tangan pada dokumen memotong kuota sesuai jumlah signature.</li>
     <li>Satu request dapat berisi beberapa signer dan beberapa halaman.</li>
   </ul>
+
+  <h3>4.7 Panduan langkah demi langkah (operator)</h3>
+
+  <h4>A. Onboarding Quick Sign user</h4>
+  <ol>
+    <li>Buka <strong>Tilaka E-Signature → Quick Sign User</strong> (<code>01.23.04</code>).</li>
+    <li>Filter status <strong>Belum terdaftar</strong>; tombol <strong>Daftarkan Quick Sign</strong> hanya
+        muncul untuk dokter dengan sertifikat <code>Aktif</code>.</li>
+    <li>Klik tombol. Sistem memanggil <code>/addquicksignusers</code>.</li>
+    <li>Status berubah menjadi <strong>Terdaftar</strong> dan tanggal terisi. Bila email sudah terdaftar,
+        aplikasi tetap menandai terdaftar (idempoten).</li>
+  </ol>
+
+  <h4>B. Template tanda tangan</h4>
+  <ol start="5">
+    <li>Buka <strong>Template Tanda Tangan</strong> (<code>01.23.05</code>).</li>
+    <li>Isi ID dokter, pilih PDF, klik <strong>Upload</strong>. Nomor template terbentuk otomatis
+        <code>TTD-{ParamedicID}-01</code>; file tersimpan di <code>C:\Tilaka\TemplateSign\</code>.</li>
+    <li>Template pertama otomatis menjadi default.</li>
+    <li>Klik <strong>Daftarkan</strong> untuk memanggil <code>/quicksign-addtemplates</code>.
+        Setelah sukses, <code>IsRegistered = 1</code>.</li>
+    <li>Perhatikan peringatan: auth session dokter batal dan kuota berkurang.</li>
+  </ol>
+
+  <h4>C. Process Signature</h4>
+  <ol start="10">
+    <li>Buka <strong>File Casemix</strong> (<code>01.23.02</code>).</li>
+    <li>Pada baris yang belum diproses, klik <strong>Process Signature</strong>.</li>
+    <li>Sistem memakai DPJP (<code>ParamedicID</code>), template default, dan posisi 1/1/1/1/1.
+        Bila salah satu prasyarat tidak terpenuhi, pesan kesalahan ditampilkan dan tidak ada panggilan API.</li>
+    <li>Setelah berhasil, halaman status signing terbuka.</li>
+  </ol>
+
+  <h4>D. Auth webview dan signing</h4>
+  <ol start="14">
+    <li>Pada status <code>UNAUTHORIZED</code>, klik <strong>Buka Auth</strong> untuk signer tersebut.</li>
+    <li>Login Tilaka + OTP/FR. Setelah selesai, kembali ke halaman status Avicenna.</li>
+    <li>Klik <strong>Cek Status</strong>; status signer berubah <code>PROCESS</code> → <code>DONE</code>
+        dan request menjadi <code>Completed</code>.</li>
+  </ol>
+
+  <h4>E. Unduh hasil</h4>
+  <ol start="17">
+    <li>Tombol <strong>Unduh PDF</strong> muncul setelah salinan lokal tersimpan.</li>
+    <li>File berada di <code>C:\Tilaka\Signed\{RequestID}\</code> dan disajikan lewat handler
+        ber-<code>ProgramID</code>.</li>
+  </ol>
+
+  <h4>F. Auth interval</h4>
+  <ol start="19">
+    <li>Buka <strong>Auth Interval</strong> (<code>01.23.06</code>).</li>
+    <li>Isi email/status lalu klik <strong>Refresh</strong>.</li>
+    <li>Status yang tampil: <code>active</code>, <code>expired</code>, <code>not_activated</code>.</li>
+  </ol>
+
+  <div class="warn">
+    <strong>Bila tombol tidak muncul:</strong> periksa sertifikat dokter (<code>Aktif</code>), status Quick Sign
+    user, template default yang sudah terdaftar, dan <code>AppUser.SignatureImage</code>.
+  </div>
 </section>
 
 <section id="status">
@@ -579,6 +676,12 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
     <tr><td><code>Invalid Base64 for template file</code></td><td>Template bukan PDF</td><td>Gunakan PDF asli, base64 tanpa header data URI</td></tr>
     <tr><td>Presigned URL 403/expired</td><td>URL kedaluwarsa</td><td>Panggil <code>/getpresignurl</code></td></tr>
     <tr><td>Status signing mundur</td><td>Callback/polling datang tidak berurutan</td><td>Terapkan aturan status final (DONE tidak bisa turun)</td></tr>
+    <tr><td>“Quick Sign belum dikonfigurasi”</td><td><code>TilakaLiteBaseUrl</code> kosong</td><td>Isi URL <code>tilaka-lite</code> di <code>Web.config</code></td></tr>
+    <tr><td>Tombol Daftarkan Quick Sign tidak muncul</td><td>Sertifikat belum <code>Aktif</code> atau sudah terdaftar</td><td>Aktifkan sertifikat / cek status Quick Sign</td></tr>
+    <tr><td>Template tidak bisa didaftarkan</td><td>Dokter belum Quick Sign user atau <code>TilakaName</code> kosong</td><td>Selesaikan onboarding Quick Sign lebih dulu</td></tr>
+    <tr><td>Process Signature ditolak</td><td>Tidak ada template default terdaftar atau <code>SignatureImage</code> kosong</td><td>Daftarkan template default; isi gambar tanda tangan dokter</td></tr>
+    <tr><td>Callback signing ditolak <code>callback-unsigned</code></td><td>Header <code>x-validation-token</code> tidak ada</td><td>Set <code>TilakaQuickSignAllowUnsignedCallback=true</code> atau pastikan token dikirim</td></tr>
+    <tr><td>Dua request aktif untuk file yang sama</td><td>Filtered unique index menolak</td><td>Tunggu request pertama final; retry setelah <code>Failed</code></td></tr>
   </table>
 </section>
 
@@ -595,6 +698,10 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
   </ul>
   <h3>Fase 2</h3>
   <ul>
+    <li>SQL <code>07.CREATE_TABLE_TilakaTemplateSignFile.sql</code> dan <code>08.INSERT_INTO_AppProgram_TilakaQuickSign.sql</code> dijalankan.</li>
+    <li>Kolom <code>TilakaQuickSignRequest.TemplateSignFileID</code> ada di database.</li>
+    <li>Menu <code>01.23.02</code>–<code>01.23.06</code> aktif untuk user group.</li>
+    <li>Folder <code>C:\Tilaka\TemplateSign</code> dan <code>C:\Tilaka\Signed</code> dibuat + ACL.</li>
     <li>Data <code>TilakaCasemixFile</code> sudah tersedia dan dapat dibaca; kolom RegistrationNo/ParamedicID/FileName/FilePath terisi.</li>
     <li><code>tilaka-lite</code> berjalan; MinIO dan MariaDB sehat; versi sesuai dukungan Tilaka.</li>
     <li>Key <code>TilakaLite*</code> terisi; folder <code>C:\Tilaka\Signed</code> siap.</li>
@@ -627,7 +734,7 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
 </main>
 
 <footer>
-  Dokumen internal Avicenna · Tilaka E-Signature · diperbarui 20 November 2026
+  Dokumen internal Avicenna · Tilaka E-Signature · diperbarui 21 November 2026
 </footer>
 
 </body>
