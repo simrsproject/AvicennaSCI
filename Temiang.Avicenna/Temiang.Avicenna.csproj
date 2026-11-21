@@ -1891,6 +1891,7 @@
     <Content Include="Document\2026\11\20\07.CREATE_TABLE_TilakaTemplateSignFile.sql" />
     <Content Include="Document\2026\11\20\08.INSERT_INTO_AppProgram_TilakaQuickSign.sql" />
     <Content Include="Document\Tilaka\tilaka_flow.html" />
+    <Content Include="Document\Tilaka\QuickSign-Checklist.md" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />

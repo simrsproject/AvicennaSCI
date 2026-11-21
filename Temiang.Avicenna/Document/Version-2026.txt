@@ -1,4 +1,11 @@
-﻿---[20-11-2026 - Tilaka]---
+﻿---[21-11-2026 - Tilaka Quick Sign]---
+1. Integrasi Tilaka Quick Sign (tanda tangan elektronik dokumen)
+   - Script: 04-08 di Document/2026/11/20/
+   - Menu: 01.23.02 File Casemix, 01.23.03 Tanda Tangan, 01.23.04 Quick Sign User,
+     01.23.05 Template, 01.23.06 Auth Interval
+   - Web.config: key TilakaLite*, TilakaQuickSign*, TilakaUploadTemplateSignFilePath
+   - Folder server: C:\Tilaka\TemplateSign (write) dan C:\Tilaka\Signed (write)
+---[20-11-2026 - Tilaka]---
 1. Integrasi Tilaka Sign Plus: registrasi & aktivasi sertifikat dokter
    - Script ada di Document/2026/11/20/
    - Menu: 01.23 (Tilaka E-Signature), 01.23.01 (Monitoring & Registrasi)
