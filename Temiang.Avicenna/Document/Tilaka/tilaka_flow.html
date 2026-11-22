@@ -76,6 +76,7 @@
     <a href="#troubleshooting">Troubleshooting</a>
     <a href="#golive">Go-Live</a>
     <a href="#glosarium">Glosarium</a>
+    <a href="#konfirmasi-tilaka">Konfirmasi Tilaka</a>
   </div>
 </nav>
 
@@ -731,10 +732,122 @@ Authorization: Bearer &lt;access_token&gt;</code></pre>
   </table>
 </section>
 
+<section id="konfirmasi-tilaka">
+  <h2>10. Checklist konfirmasi ke Tim Tilaka</h2>
+  <p>Daftar ini perlu dipastikan sebelum go-live. Item bertanda <span class="pill bad">Blocking</span>
+  menghentikan proses bila belum tersedia.</p>
+
+  <div class="note">
+    <strong>Legenda sumber:</strong>
+    <code>SP</code> = <em>PRD-10-002-Tilaka Sign Plus (Register &amp; Aktivasi Regular) v8.0</em>;
+    <code>RE</code> = <em>(4.) PRD-10-002-API Personal (Re-enroll Regular) v2.0</em>;
+    <code>QS</code> = <em>(3.) PRD-10-002-Quick Sign v2.0</em>;
+    <code>AI</code> = <em>PRD-QS-001 API Get List Auth Interval</em>.
+    <span class="muted">Komersial</span> berarti tidak diatur di PRD dan perlu konfirmasi bisnis/operasional.
+    Nomor halaman mengacu pada halaman file PDF, bukan nomor halaman cetak.
+  </div>
+
+  <h3>10.1 Channel dan kredensial</h3>
+  <table>
+    <tr><th>Item</th><th>Yang perlu dipastikan</th><th>Dampak</th><th>Sumber</th></tr>
+    <tr><td>Jenis channel</td><td>Personal atau Company</td><td><span class="pill bad">Blocking</span> — menentukan parameter <code>/generateUUID</code></td><td><code>SP</code> hlm. 14–16</td></tr>
+    <tr><td>Channel ID + secret Sign Plus</td><td>Sandbox dan production</td><td><span class="pill bad">Blocking</span></td><td><code>SP</code> hlm. 11; <code>QS</code> hlm. 9–10</td></tr>
+    <tr><td>Channel ID + secret Quick Sign</td><td>Sama dengan Sign Plus atau terpisah</td><td><span class="pill bad">Blocking Fase 2</span></td><td><code>QS</code> hlm. 9–10</td></tr>
+    <tr><td>mTLS</td><td>Wajib/tidak; file sertifikat + password; atau diterminasi proxy</td><td><span class="pill bad">Blocking</span> bila wajib</td><td><code>SP</code> hlm. 10–11; <code>RE</code> hlm. 8</td></tr>
+    <tr><td>IP whitelist</td><td>IP publik server Avicenna; IP server untuk <code>tilaka-lite</code></td><td><span class="pill bad">Blocking</span></td><td><code>SP</code> hlm. 10–11; <code>QS</code> hlm. 9</td></tr>
+    <tr><td>Environment</td><td>Apakah sandbox dan production memakai channel berbeda</td><td>Konfigurasi</td><td><span class="muted">Komersial</span></td></tr>
+  </table>
+
+  <h3>10.2 Callback</h3>
+  <table>
+    <tr><th>Item</th><th>Yang perlu dipastikan</th><th>Sumber</th></tr>
+    <tr><td>URL</td><td><code>/TilakaCallback/Registration</code>, <code>/TilakaCallback/CertificateStatus</code>, <code>/TilakaCallback/Signing</code></td><td><code>SP</code> hlm. 10, 34, 44; <code>QS</code> hlm. 28</td></tr>
+    <tr><td>Metode &amp; respons</td><td>POST JSON; cukup balas HTTP 200</td><td><code>SP</code> hlm. 35, 47; <code>QS</code> hlm. 30</td></tr>
+    <tr><td>HTTPS/TLS</td><td>Wajib HTTPS? Versi TLS minimum?</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>IP asal</td><td>Daftar IP Tilaka (cloud) dan <code>tilaka-lite</code></td><td><code>SP</code> hlm. 10; <code>QS</code> hlm. 28</td></tr>
+    <tr><td>Token</td><td>Apakah <code>x-validation-token</code> selalu dikirim, termasuk Quick Sign</td><td><code>SP</code> hlm. 12–13; <code>QS</code> hlm. 28</td></tr>
+    <tr><td>Retry &amp; timeout</td><td>Jumlah retry, interval, dan batas waktu respons</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>Urutan</td><td>Certificate Status bisa datang sebelum Registration?</td><td><code>SP</code> hlm. 34–36, 44–49</td></tr>
+    <tr><td>Tipe data</td><td><code>status</code> int/string; <code>message</code> string/objek</td><td><code>SP</code> hlm. 34–36, 68–73</td></tr>
+  </table>
+
+  <h3>10.3 Registrasi dan aktivasi</h3>
+  <table>
+    <tr><th>Item</th><th>Yang perlu dipastikan</th><th>Sumber</th></tr>
+    <tr><td><code>date_expire</code></td><td>Maksimal 7 hari; format <code>yyyy-MM-dd HH:mm</code>; zona waktu</td><td><code>SP</code> hlm. 19–22</td></tr>
+    <tr><td>Consent</td><td>Teks lengkap wajib atau ringkasan + URL; batas 20 karakter <code>version</code>; rumus hash</td><td><code>SP</code> hlm. 20–22</td></tr>
+    <tr><td>NIK</td><td>Wajib 16 digit; aturan bila nama KTP berbeda dengan Dukcapil</td><td><code>SP</code> hlm. 18–22</td></tr>
+    <tr><td>Email OTP</td><td>Domain pengirim, whitelist, masa berlaku</td><td><code>SP</code> hlm. 28</td></tr>
+    <tr><td>Redirect webview</td><td>Apakah Tilaka menambahkan <code>request-id</code>/<code>tilaka-name</code>; nama parameter persis</td><td><code>SP</code> hlm. 27, 38, 81</td></tr>
+    <tr><td>Masa berlaku sertifikat</td><td>Durasi; kapan perlu re-enroll</td><td><code>SP</code> hlm. 68–79; <code>RE</code> hlm. 7</td></tr>
+    <tr><td>Auto-approve</td><td>Konfirmasi 9 hari</td><td><code>SP</code> hlm. 35, 39</td></tr>
+    <tr><td>Revoke</td><td>Daftar alasan; notifikasi ke kami</td><td><code>SP</code> hlm. 63–67</td></tr>
+    <tr><td><code>checkcertstatus</code></td><td>Bentuk <code>message</code> dan tipe <code>status</code></td><td><code>SP</code> hlm. 68–73</td></tr>
+    <tr><td><code>generateUUID</code></td><td>Apakah POST dengan body <code>{}</code> diterima</td><td><code>SP</code> hlm. 13–16</td></tr>
+    <tr><td>Path auth</td><td><code>/auth</code> atau <code>/auth/token</code></td><td><code>SP</code> hlm. 11; <code>RE</code> hlm. 8</td></tr>
+    <tr><td>Re-enroll</td><td>Kapan diizinkan; status sertifikat yang memblokir</td><td><code>RE</code> hlm. 7–13, 20–24; <code>SP</code> hlm. 74–79</td></tr>
+  </table>
+
+  <h3>10.4 Quick Sign (<code>tilaka-lite</code>)</h3>
+  <table>
+    <tr><th>Item</th><th>Yang perlu dipastikan</th><th>Sumber</th></tr>
+    <tr><td>Instalasi</td><td>Siapa install Docker/<code>tilaka-lite</code>; versi image; lisensi; akses VM</td><td><code>QS</code> hlm. 7; <span class="muted">Komersial</span></td></tr>
+    <tr><td>Jaringan</td><td>Base URL, port, domain, sertifikat TLS</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>Kredensial</td><td>Client id/secret; apakah <code>/auth</code> sama dengan cloud</td><td><code>QS</code> hlm. 9–10</td></tr>
+    <tr><td>Kuota</td><td>Penghitungan, reset, biaya, batas TPS</td><td><code>QS</code> hlm. 13; <span class="muted">Komersial</span></td></tr>
+    <tr><td><strong>Isi <code>template_file</code></strong></td><td>PDF bebas, wajib berisi gambar TTD, atau ada template resmi Tilaka</td><td><code>QS</code> hlm. 43–49</td></tr>
+    <tr><td>Template per user</td><td>Boleh dipakai banyak dokter atau satu per dokter</td><td><code>QS</code> hlm. 13, 43–49</td></tr>
+    <tr><td><code>template_number</code></td><td>Batas panjang/karakter; unik per user/global</td><td><code>QS</code> hlm. 43–49</td></tr>
+    <tr><td>Batas file</td><td>Ukuran PDF, jumlah halaman, signature per request, signer</td><td><code>QS</code> hlm. 11–16</td></tr>
+    <tr><td>Posisi TTD</td><td>Origin koordinat, satuan, apakah <code>width=1</code>/<code>height=1</code> diperbolehkan</td><td><code>QS</code> hlm. 15–16</td></tr>
+    <tr><td><code>signature_image</code></td><td>Format, ukuran, apakah harus sama dengan template</td><td><code>QS</code> hlm. 15–16</td></tr>
+    <tr><td><code>qr_option</code></td><td>Perilaku <code>QRONLY</code>/<code>QRCOMBINE</code></td><td><code>QS</code> hlm. 16</td></tr>
+    <tr><td>Auth session</td><td>30 hari; satu session per user; apa yang membatalkan</td><td><code>QS</code> hlm. 13</td></tr>
+    <tr><td>Callback Quick Sign</td><td><code>sign_info</code> selalu ada? token dikirim? retry?</td><td><code>QS</code> hlm. 28–31</td></tr>
+    <tr><td>Presigned URL</td><td>Masa berlaku; perpanjangan; host</td><td><code>QS</code> hlm. 37–38</td></tr>
+    <tr><td>Multi-signer</td><td><code>template_no</code> untuk semua signer atau per signer</td><td><code>QS</code> hlm. 13–16</td></tr>
+    <tr><td>Sandbox</td><td>Tersedia atau harus on-prem; akun/NIK uji</td><td><span class="muted">Komersial</span></td></tr>
+  </table>
+
+  <h3>10.5 Legal, privasi, dan operasional</h3>
+  <table>
+    <tr><th>Item</th><th>Yang perlu dipastikan</th><th>Sumber</th></tr>
+    <tr><td>PKS/DPA</td><td>Peran controller/processor; lokasi data</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>Retensi</td><td>KTP, selfie, dokumen, dan log</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>CPS/PSrE</td><td>Kebijakan sertifikat dan teks persetujuan resmi</td><td><code>SP</code> hlm. 8; <span class="muted">Komersial</span></td></tr>
+    <tr><td>Audit</td><td>Akses serial number dan riwayat penerbitan/revoke</td><td><code>SP</code> hlm. 68–73</td></tr>
+    <tr><td>Insiden</td><td>Prosedur notifikasi kebocoran/penyalahgunaan</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>Dukungan</td><td>Kanal eskalasi, jam dukungan, kontak teknis, SLA</td><td><span class="muted">Komersial</span></td></tr>
+    <tr><td>Rate limit</td><td>Batas request untuk cloud dan lite</td><td><code>QS</code> hlm. 7; <span class="muted">Komersial</span></td></tr>
+    <tr><td>Versi API</td><td>Kebijakan perubahan/deprecation</td><td><span class="muted">Komersial</span></td></tr>
+  </table>
+
+  <h3>10.6 Asumsi implementasi yang perlu dikonfirmasi</h3>
+  <ol>
+    <li><code>POST /auth</code> memakai <code>application/x-www-form-urlencoded</code>. <span class="muted">(<code>SP</code> hlm. 11)</span></li>
+    <li><code>checkcertstatus</code> mengembalikan <code>message</code> objek dan <code>status</code> int/string. <span class="muted">(<code>SP</code> hlm. 68–73)</span></li>
+    <li>Callback Registration memakai key <code>RegisterID</code> (huruf besar). <span class="muted">(<code>SP</code> hlm. 44–47)</span></li>
+    <li><code>requestquicksign</code> menerima <code>signature_image</code> base64 tanpa prefix <code>data:</code>. <span class="muted">(<code>QS</code> hlm. 15–16)</span></li>
+    <li>Upload Quick Sign memakai field name <code>file</code>. <span class="muted">(<code>QS</code> hlm. 11–12)</span></li>
+    <li>Posisi <code>1/1/1/1/1</code> diterima. <span class="muted">(<code>QS</code> hlm. 15–16)</span></li>
+    <li>Satu signer (DPJP) per request. <span class="muted">(<code>QS</code> hlm. 13–16)</span></li>
+    <li>Pola <code>TTD-{ParamedicID}-{XX}</code> diterima. <span class="muted">(<code>QS</code> hlm. 43–49)</span></li>
+    <li>Callback signing boleh tanpa <code>x-validation-token</code> bila flag diaktifkan. <span class="muted">(<code>QS</code> hlm. 28; <code>SP</code> hlm. 12–13)</span></li>
+    <li><code>tilaka-lite</code> memakai channel/secret yang sama dengan cloud. <span class="muted">(<code>QS</code> hlm. 9–10)</span></li>
+  </ol>
+
+  <h3>10.7 Prioritas</h3>
+  <ul>
+    <li><span class="pill bad">Blocking Fase 1</span> jenis channel, channel id/secret, mTLS, IP whitelist, URL callback, TnC, path auth, format <code>checkcertstatus</code>.</li>
+    <li><span class="pill warn">Blocking Fase 2</span> instalasi <code>tilaka-lite</code>, kredensial Quick Sign, isi template, batas file, posisi TTD, callback signing.</li>
+    <li><span class="pill info">Bisa menyusul</span> SLA, retensi, audit, rate limit, kebijakan versi API.</li>
+  </ul>
+</section>
+
 </main>
 
 <footer>
-  Dokumen internal Avicenna · Tilaka E-Signature · diperbarui 21 November 2026
+  Dokumen internal Avicenna · Tilaka E-Signature · diperbarui 22 November 2026
 </footer>
 
 </body>
