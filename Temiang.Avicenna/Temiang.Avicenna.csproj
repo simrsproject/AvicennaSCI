@@ -1885,10 +1885,12 @@
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
+    <Content Include="Document\Admedika\CustomerHost_ProviderBridging - INPATIENT.pdf" />
     <Content Include="Document\Admedika\CustomerHost_ProviderBridging - OUTPATIENT.pdf" />
     <Content Include="Document\Admedika\DAILY_MONITORING.pdf" />
     <Content Include="Document\Admedika\EDOCS_UPLOAD v.Rustlang.pdf" />
     <Content Include="Document\Admedika\INVOICE_TRACKING.pdf" />
+    <Content Include="Document\Admedika\PRE_REGISTER_EBILL.pdf" />
     <Content Include="Document\Admedika\RE_PRINT_OUT.pdf" />
     <None Include="Document\Bpjs Face Scan\Readme.md" />
     <Content Include="Document\2026\05\13\AntrianRSI\001-CREATE-TABLE-AutoNumberSemantic.sql" />

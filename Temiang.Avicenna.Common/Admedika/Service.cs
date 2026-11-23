@@ -491,6 +491,333 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public PreRegisterEbillEnquiryResponse PreRegisterEbillEnquiry(string payorCode, string coverage,
+            string dateFrom, string dateTo)
+        {
+            var response = new PreRegisterEbillEnquiryResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            if (!ValidatePreRegisterEbillPeriod(response, ref payorCode, ref coverage, ref dateFrom, ref dateTo))
+                return response;
+
+            return Send<PreRegisterEbillEnquiryResponse>(
+                AdmedikaConstant.ServiceID.PreRegisterEbillEnquiry,
+                new PreRegisterEbillEnquiryTxnData
+                {
+                    Request = new PreRegisterEbillEnquiryRequest
+                    {
+                        PreRegisterEbillEnquiry = new PreRegisterEbillEnquiryPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            PayorCode = payorCode,
+                            Coverage = coverage,
+                            DateFrom = dateFrom,
+                            DateTo = dateTo
+                        }
+                    }
+                });
+        }
+
+        public PreRegisterEbillResponse PreRegisterEbill(PreRegisterEbillPayload request,
+            AdmedikaFile[] files)
+        {
+            var response = new PreRegisterEbillResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            if (request == null)
+            {
+                SetValidationError(response, "preRegisterEbill cannot be empty.");
+                return response;
+            }
+
+            var payorCode = request.PayorCode;
+            var coverage = request.Coverage;
+            var dateFrom = request.DateFrom;
+            var dateTo = request.DateTo;
+
+            if (!ValidatePreRegisterEbillPeriod(response, ref payorCode, ref coverage, ref dateFrom, ref dateTo))
+                return response;
+
+            request.PayorCode = payorCode;
+            request.Coverage = coverage;
+            request.DateFrom = dateFrom;
+            request.DateTo = dateTo;
+
+            request.InvoiceNo = Normalize(request.InvoiceNo);
+            request.InvoiceDate = Normalize(request.InvoiceDate);
+            request.PreparedBy = Normalize(request.PreparedBy);
+            request.TotAmountDue = Normalize(request.TotAmountDue);
+
+            if (string.IsNullOrEmpty(request.InvoiceNo))
+                return ValidationFailed(response, "invoiceNo cannot be empty.");
+            if (!IsValidDdMmYyyy(request.InvoiceDate))
+                return ValidationFailed(response, "invoiceDate must use DDMMYYYY format.", "1829");
+            if (string.IsNullOrEmpty(request.PreparedBy))
+                return ValidationFailed(response, "preparedBy cannot be empty.");
+            if (request.PreparedBy.Length > 25)
+                return ValidationFailed(response, "preparedBy cannot exceed 25 characters.", "1997");
+            if (string.IsNullOrEmpty(request.TotAmountDue))
+                return ValidationFailed(response, "totAmountDue cannot be empty.");
+
+            var selectedClaims = request.SelectedClaims ?? new PreRegisterEbillSelectedClaim[0];
+            if (selectedClaims.Length == 0)
+                return ValidationFailed(response, "selectedClaims cannot be empty.");
+
+            for (var i = 0; i < selectedClaims.Length; i++)
+            {
+                if (selectedClaims[i] == null)
+                    return ValidationFailed(response, "selectedClaims cannot contain empty item.");
+
+                selectedClaims[i].ClID = Normalize(selectedClaims[i].ClID);
+                if (string.IsNullOrEmpty(selectedClaims[i].ClID))
+                    return ValidationFailed(response, "selectedClaims clID cannot be empty.");
+            }
+
+            request.SelectedClaims = selectedClaims;
+            request.TotSelectedClaims = selectedClaims.Length.ToString(CultureInfo.InvariantCulture);
+            request.TerminalID = _config.TerminalID;
+
+            return SendMultipart<PreRegisterEbillResponse>(
+                AdmedikaConstant.ServiceID.PreRegisterEbill,
+                new PreRegisterEbillTxnData
+                {
+                    Request = new PreRegisterEbillRequest
+                    {
+                        PreRegisterEbill = request
+                    }
+                },
+                files);
+        }
+
+        public FinalBillResponse FinalBill(FinalBillPayload bill)
+        {
+            var response = new FinalBillResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            if (bill == null)
+                return ValidationFailed(response, "finalBill cannot be empty.");
+
+            bill.CardNo = Normalize(bill.CardNo);
+            bill.FinalFlag = NormalizeFlag(bill.FinalFlag);
+            bill.DateAdmission = Normalize(bill.DateAdmission);
+            bill.DateDischarge = Normalize(bill.DateDischarge);
+            bill.InvoiceNo = Normalize(bill.InvoiceNo);
+            bill.InvoiceDate = Normalize(bill.InvoiceDate);
+            bill.PreparedBy = Normalize(bill.PreparedBy);
+            bill.Remarks = Normalize(bill.Remarks);
+            bill.AccidentFlag = NormalizeFlag(bill.AccidentFlag);
+            bill.SurgicalFlag = NormalizeFlag(bill.SurgicalFlag);
+            bill.TotAmountDue = Normalize(bill.TotAmountDue);
+
+            if (string.IsNullOrEmpty(bill.CardNo))
+                return ValidationFailed(response, "cardNo cannot be empty.");
+            if (bill.CardNo.Length != 16 || !ContainsDigitsOnly(bill.CardNo))
+                return ValidationFailed(response, "cardNo must contain exactly 16 digits.", "1997");
+            if (bill.FinalFlag != "Y" && bill.FinalFlag != "N")
+                return ValidationFailed(response, "finalFlag must be Y or N.", "1997");
+            if (!IsValidDdMmYyyyTime(bill.DateAdmission))
+                return ValidationFailed(response, "dateAdmission must use DDMMYYYY HH24MISS format.", "1814");
+
+            if (bill.FinalFlag == "Y")
+            {
+                if (!IsValidDdMmYyyyTime(bill.DateDischarge))
+                    return ValidationFailed(response,
+                        "dateDischarge is required in DDMMYYYY HH24MISS format when finalFlag is Y.", "1815");
+            }
+            else if (!string.IsNullOrEmpty(bill.DateDischarge) && !IsValidDdMmYyyyTime(bill.DateDischarge))
+            {
+                return ValidationFailed(response, "dateDischarge must use DDMMYYYY HH24MISS format.", "1815");
+            }
+
+            if (!string.IsNullOrEmpty(bill.InvoiceDate) && !IsValidDdMmYyyy(bill.InvoiceDate))
+                return ValidationFailed(response, "invoiceDate must use DDMMYYYY format.", "1829");
+            if (string.IsNullOrEmpty(bill.PreparedBy))
+                return ValidationFailed(response, "preparedBy cannot be empty.");
+            if (bill.PreparedBy.Length > 25)
+                return ValidationFailed(response, "preparedBy cannot exceed 25 characters.", "1997");
+            if (!string.IsNullOrEmpty(bill.Remarks) && bill.Remarks.Length > 500)
+                return ValidationFailed(response, "remarks cannot exceed 500 characters.", "1997");
+            if (string.IsNullOrEmpty(bill.TotAmountDue))
+                return ValidationFailed(response, "totAmountDue cannot be empty.");
+            if (!IsOptionalFlagValid(bill.AccidentFlag))
+                return ValidationFailed(response, "accidentFlag must be Y or N.", "1997");
+            if (!IsOptionalFlagValid(bill.SurgicalFlag))
+                return ValidationFailed(response, "surgicalFlag must be Y or N.", "1997");
+
+            if (bill.ItemizedBill == null || bill.ItemizedBill.Length == 0)
+                return ValidationFailed(response, "itemizedBill cannot be empty.");
+
+            var totItems = 0;
+
+            foreach (var group in bill.ItemizedBill)
+            {
+                if (group == null)
+                    return ValidationFailed(response, "itemizedBill cannot contain empty group.");
+
+                group.GroupCode = Normalize(group.GroupCode);
+                group.GroupName = Normalize(group.GroupName);
+
+                if (string.IsNullOrEmpty(group.GroupCode))
+                    return ValidationFailed(response, "groupCode cannot be empty.");
+                if (string.IsNullOrEmpty(group.GroupName))
+                    return ValidationFailed(response, "groupName cannot be empty.");
+                if (group.ItemList == null || group.ItemList.Length == 0)
+                    return ValidationFailed(response, "itemList cannot be empty for group " + group.GroupCode + ".");
+
+                foreach (var item in group.ItemList)
+                {
+                    if (item == null)
+                        return ValidationFailed(response, "itemList cannot contain empty item.");
+
+                    item.Code = Normalize(item.Code);
+                    item.Name = Normalize(item.Name);
+                    item.DateIssue = Normalize(item.DateIssue);
+                    item.Qty = Normalize(item.Qty);
+                    item.TotPrice = Normalize(item.TotPrice);
+                    item.Discount = Normalize(item.Discount);
+                    item.NonMedicalFlag = NormalizeFlag(item.NonMedicalFlag);
+                    item.BenID = Normalize(item.BenID);
+                    item.Remarks = Normalize(item.Remarks);
+
+                    if (string.IsNullOrEmpty(item.Code))
+                        return ValidationFailed(response, "item code cannot be empty.");
+                    if (string.IsNullOrEmpty(item.Name))
+                        return ValidationFailed(response, "item name cannot be empty.");
+                    if (string.IsNullOrEmpty(item.Qty))
+                        return ValidationFailed(response, "item qty cannot be empty.");
+                    if (string.IsNullOrEmpty(item.TotPrice))
+                        return ValidationFailed(response, "item totPrice cannot be empty.");
+                    if (!IsOptionalFlagValid(item.NonMedicalFlag))
+                        return ValidationFailed(response, "item nonMedicalFlag must be Y or N.", "1997");
+                    if (!string.IsNullOrEmpty(item.Remarks) && item.Remarks.Length > 500)
+                        return ValidationFailed(response, "item remarks cannot exceed 500 characters.", "1997");
+
+                    totItems++;
+                }
+            }
+
+            bill.TerminalID = _config.TerminalID;
+            bill.TotItems = totItems.ToString(CultureInfo.InvariantCulture);
+
+            return Send<FinalBillResponse>(
+                AdmedikaConstant.ServiceID.FinalBill,
+                new FinalBillTxnData
+                {
+                    Request = new FinalBillRequest
+                    {
+                        FinalBill = bill
+                    }
+                });
+        }
+
+        public DischargeIpResponse DischargeIp(string cardNo, string clID)
+        {
+            var response = new DischargeIpResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            if (!ValidateCardAndClaim(response, ref cardNo, ref clID)) return response;
+
+            return Send<DischargeIpResponse>(
+                AdmedikaConstant.ServiceID.DischargeIp,
+                new DischargeIpTxnData
+                {
+                    Request = new DischargeIpRequest
+                    {
+                        Discharge = new DischargeIpPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            ClID = clID
+                        }
+                    }
+                });
+        }
+
+        public PreAssessmentStatusResponse PreAssessmentStatus(string cardNo, string clID)
+        {
+            var response = new PreAssessmentStatusResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            if (!ValidateCardAndClaim(response, ref cardNo, ref clID)) return response;
+
+            return Send<PreAssessmentStatusResponse>(
+                AdmedikaConstant.ServiceID.PreAssessmentStatus,
+                new PreAssessmentStatusTxnData
+                {
+                    Request = new PreAssessmentStatusRequest
+                    {
+                        PreAssessmentStatus = new PreAssessmentStatusPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            CardNo = cardNo,
+                            ClID = clID
+                        }
+                    }
+                });
+        }
+
+        private bool ValidateCardAndClaim(AdmedikaResponse response, ref string cardNo, ref string clID)
+        {
+            cardNo = Normalize(cardNo);
+            clID = Normalize(clID);
+
+            if (string.IsNullOrEmpty(cardNo))
+                return SetValidationError(response, "cardNo cannot be empty.");
+            if (cardNo.Length != 16 || !ContainsDigitsOnly(cardNo))
+                return SetValidationError(response, "cardNo must contain exactly 16 digits.", "1997");
+            if (string.IsNullOrEmpty(clID))
+                return SetValidationError(response, "clID cannot be empty.");
+
+            return true;
+        }
+
+        private static bool ValidatePreRegisterEbillPeriod(AdmedikaResponse response,
+            ref string payorCode, ref string coverage, ref string dateFrom, ref string dateTo)
+        {
+            payorCode = Normalize(payorCode);
+            coverage = NormalizeFlag(coverage);
+            dateFrom = Normalize(dateFrom);
+            dateTo = Normalize(dateTo);
+
+            if (string.IsNullOrEmpty(payorCode))
+                return SetValidationError(response, "payorCode cannot be empty.");
+            if (coverage != "RJ" && coverage != "RI")
+                return SetValidationError(response, "coverage must be RJ or RI.", "1997");
+            if (!IsValidDdMmYyyy(dateFrom))
+                return SetValidationError(response, "dateFrom must use DDMMYYYY format.", "1829");
+            if (!IsValidDdMmYyyy(dateTo))
+                return SetValidationError(response, "dateTo must use DDMMYYYY format.", "1829");
+
+            return true;
+        }
+
+        private static bool IsValidDdMmYyyy(string value)
+        {
+            DateTime parsed;
+            return !string.IsNullOrEmpty(value) &&
+                   DateTime.TryParseExact(value, "ddMMyyyy", CultureInfo.InvariantCulture,
+                       DateTimeStyles.None, out parsed);
+        }
+
+        private static bool IsValidDdMmYyyyTime(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return false;
+
+            DateTime parsed;
+            return DateTime.TryParseExact(value, "ddMMyyyy HHmmss", CultureInfo.InvariantCulture,
+                       DateTimeStyles.None, out parsed)
+                   || DateTime.TryParseExact(value, "ddMMyyyy", CultureInfo.InvariantCulture,
+                       DateTimeStyles.None, out parsed);
+        }
+
+        private static TResponse ValidationFailed<TResponse>(TResponse response, string message,
+            string errorCode = "1999")
+            where TResponse : AdmedikaResponse
+        {
+            SetValidationError(response, message, errorCode);
+            return response;
+        }
+
         private bool RequireDocType(string docType, AdmedikaResponse response, out string normalized)
         {
             normalized = docType == null ? null : docType.Trim();

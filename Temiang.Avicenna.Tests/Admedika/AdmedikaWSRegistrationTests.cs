@@ -25,8 +25,9 @@ namespace Temiang.Avicenna.Tests.Admedika
                 new[]
                 {
                     "CancelOpenClaimsTxn", "CheckIcdExclusion", "CheckMemberClaimTxnStatus", "DailyMonitoring",
-                    "DischargeOp", "EdocsUpload", "Eligibility", "GetEntitlement", "GetMemberEnrolledPlanTc",
-                    "HelloWorld", "InvoiceTracking", "RePrintOut"
+                    "DischargeIp", "DischargeOp", "EdocsUpload", "Eligibility", "FinalBill",
+                    "GetEntitlement", "GetMemberEnrolledPlanTc", "HelloWorld", "InvoiceTracking",
+                    "PreAssessmentStatus", "PreRegisterEbill", "PreRegisterEbillEnquiry", "RePrintOut"
                 },
                 methods);
         }
@@ -42,7 +43,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                 .Select(attribute => attribute.Description)
                 .ToArray();
 
-            Assert.AreEqual(12, descriptions.Length);
+            Assert.AreEqual(17, descriptions.Length);
             Assert.IsTrue(descriptions.All(d => !string.IsNullOrWhiteSpace(d)),
                 "Setiap WebMethod harus memiliki Description.");
             Assert.IsTrue(descriptions.All(d => d.Contains(". from source : ")),
@@ -51,7 +52,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                 "Setiap Description harus memuat ringkasan field request.");
             Assert.IsTrue(descriptions.All(d => d.EndsWith(".pdf")),
                 "Setiap Description harus diakhiri nama file PDF.");
-            Assert.AreEqual(12, descriptions.Distinct().Count(),
+            Assert.AreEqual(17, descriptions.Distinct().Count(),
                 "Description antar WebMethod harus unik.");
 
             var service = typeof(Temiang.Avicenna.WebService.AdmedikaWS)
@@ -70,7 +71,7 @@ namespace Temiang.Avicenna.Tests.Admedika
                 .Where(m => m.GetCustomAttributes(typeof(WebMethodAttribute), true).Length > 0)
                 .ToArray();
 
-            Assert.AreEqual(12, methods.Length);
+            Assert.AreEqual(17, methods.Length);
 
             foreach (var method in methods)
             {

@@ -163,6 +163,64 @@ namespace Temiang.Avicenna.WebService
         }
 
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [WebMethod(Description = @"Menampilkan daftar klaim yang siap di pre-register E-Bill berdasarkan payor dan periode. "
+            + @"Request: payorCode (R, simpan saat eligibility); coverage (R, RJ/RI); "
+            + @"dateFrom (R, ddmmyyyy); dateTo (R, ddmmyyyy). "
+            + @"terminalID diisi otomatis dari konfigurasi. "
+            + @"from source : PRE_REGISTER_EBILL.pdf")]
+        public PreRegisterEbillEnquiryResponse PreRegisterEbillEnquiry(string payorCode, string coverage,
+            string dateFrom, string dateTo)
+        {
+            return _service.PreRegisterEbillEnquiry(payorCode, coverage, dateFrom, dateTo);
+        }
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [WebMethod(Description = @"Mengirim klaim terpilih untuk pre-register E-Bill beserta dokumen pendukung (multipart: data + files). "
+            + @"Request: payorCode (R); coverage (R, RJ/RI); dateFrom (R, ddmmyyyy); dateTo (R, ddmmyyyy); "
+            + @"invoiceNo (R); invoiceDate (R, ddmmyyyy); preparedBy (R, maks 25); totAmountDue (R); "
+            + @"selectedClaims (R): clID; files (O, satu atau lebih file). "
+            + @"terminalID dan totSelectedClaims diisi otomatis. "
+            + @"from source : PRE_REGISTER_EBILL.pdf")]
+        public PreRegisterEbillResponse PreRegisterEbill(PreRegisterEbillPayload request,
+            AdmedikaFile[] files)
+        {
+            return _service.PreRegisterEbill(request, files);
+        }
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [WebMethod(Description = @"Mengirim interim/final bill rawat inap beserta rincian biaya untuk assessment. "
+            + @"Request: cardNo (R, 16 digit); finalFlag (R, Y=final/N=interim); "
+            + @"dateAdmission (R, ddmmyyyy hhmmss); dateDischarge (R jika finalFlag=Y); preparedBy (R); "
+            + @"totAmountDue (R); itemizedBill (R): groupCode, groupName, "
+            + @"itemList[code, name, dateIssue, qty, totPrice, discount, nonMedicalFlag, benID, remarks]; "
+            + @"field klinis opsional. terminalID dan totItems diisi otomatis. "
+            + @"from source : CustomerHost_ProviderBridging - INPATIENT.pdf")]
+        public FinalBillResponse FinalBill(FinalBillPayload bill)
+        {
+            return _service.FinalBill(bill);
+        }
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [WebMethod(Description = @"Memproses discharge rawat inap dan mengambil hasil assessment (LOC). "
+            + @"Request: cardNo (R, 16 digit); clID (R). "
+            + @"terminalID diisi otomatis dari konfigurasi. "
+            + @"from source : CustomerHost_ProviderBridging - INPATIENT.pdf")]
+        public DischargeIpResponse DischargeIp(string cardNo, string clID)
+        {
+            return _service.DischargeIp(cardNo, clID);
+        }
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [WebMethod(Description = @"Memeriksa status pre-assessment rawat inap dan sisa entitlement pasien. "
+            + @"Request: cardNo (R, 16 digit); clID (R). "
+            + @"terminalID diisi otomatis dari konfigurasi. "
+            + @"from source : CustomerHost_ProviderBridging - INPATIENT.pdf")]
+        public PreAssessmentStatusResponse PreAssessmentStatus(string cardNo, string clID)
+        {
+            return _service.PreAssessmentStatus(cardNo, clID);
+        }
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         [WebMethod(Description = @"Mengunggah dokumen pendukung klaim (multipart: data + files). "
             + @"Request: cardNo (R); clID (claims ID); docType (R, lihat AdmedikaDocType); remarks (O); "
             + @"patientName (O); userBy (O, maks 8 karakter); files (R, satu atau lebih file). "

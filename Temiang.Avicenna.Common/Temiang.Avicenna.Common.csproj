@@ -250,6 +250,14 @@
     <Compile Include="Admedika\Transport\AdmedikaFile.cs" />
     <Compile Include="Admedika\Request\DailyMonitoringRequest.cs" />
     <Compile Include="Admedika\Response\DailyMonitoringResponse.cs" />
+    <Compile Include="Admedika\Request\PreRegisterEbillRequest.cs" />
+    <Compile Include="Admedika\Response\PreRegisterEbillResponse.cs" />
+    <Compile Include="Admedika\Request\FinalBillRequest.cs" />
+    <Compile Include="Admedika\Response\FinalBillResponse.cs" />
+    <Compile Include="Admedika\Request\DischargeIpRequest.cs" />
+    <Compile Include="Admedika\Response\DischargeIpResponse.cs" />
+    <Compile Include="Admedika\Request\PreAssessmentStatusRequest.cs" />
+    <Compile Include="Admedika\Response\PreAssessmentStatusResponse.cs" />
     <Compile Include="Admedika\Request\CancelOpenClaimsTxnRequest.cs" />
     <Compile Include="Admedika\Response\CancelOpenClaimsTxnResponse.cs" />
     <Compile Include="Admedika\Request\CheckMemberClaimTxnStatusRequest.cs" />

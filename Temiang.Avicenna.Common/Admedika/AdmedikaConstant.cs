@@ -16,6 +16,11 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string EdocsUpload = "EDOCS_UPLOAD";
             public const string InvoiceTracking = "INVOICE_TRACKING";
             public const string RePrintOut = "RE_PRINT_OUT";
+            public const string PreRegisterEbillEnquiry = "PRE_REGISTER_EBILL_ENQUIRY";
+            public const string PreRegisterEbill = "PRE_REGISTER_EBILL";
+            public const string FinalBill = "FINAL_BILL";
+            public const string DischargeIp = "DISCHARGE_IP";
+            public const string PreAssessmentStatus = "PRE_ASSESSMENT_STATUS";
         }
 
         public static class CoverageID
