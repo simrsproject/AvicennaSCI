@@ -79,6 +79,7 @@ namespace Temiang.Avicenna.Common.Admedika
             public const string DCM011F = "011-F"; // Usage : DCM - Pemeriksaan Penunjang RADIOLOGI
             public const string DCM011G = "011-G"; // Usage : DCM - Pemeriksaan Fisik (Abdomen, Tumor/kelainan kulit: regio, ukuran ?)
             public const string DCM011H = "011-H"; // Usage : DCM - Pemeriksaan Penunjang Laboratorium & PATOLOGI ANATOMI
+            public const string DCM011I = "011-I"; // Usage : DCM - Berat Badan *Wajib untuk Anak/Bayi
             public const string DCM012A = "012-A"; // Usage : DCM - Diagnosa Primer
             public const string DCM012B = "012-B"; // Usage : DCM - Diagnosa Sekunder
             public const string DCM012C = "012-C"; // Usage : DCM - Diagnosa Ketiga

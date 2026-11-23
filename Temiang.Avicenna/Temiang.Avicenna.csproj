@@ -1888,6 +1888,7 @@
     <Content Include="Document\Admedika\CustomerHost_ProviderBridging - INPATIENT.pdf" />
     <Content Include="Document\Admedika\CustomerHost_ProviderBridging - OUTPATIENT.pdf" />
     <Content Include="Document\Admedika\DAILY_MONITORING.pdf" />
+    <Content Include="Document\Admedika\DAILY_MONITORING Ver 1.1.pdf" />
     <Content Include="Document\Admedika\EDOCS_UPLOAD v.Rustlang.pdf" />
     <Content Include="Document\Admedika\INVOICE_TRACKING.pdf" />
     <Content Include="Document\Admedika\PRE_REGISTER_EBILL.pdf" />
