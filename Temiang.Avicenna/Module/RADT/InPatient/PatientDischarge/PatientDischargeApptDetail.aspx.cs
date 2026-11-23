@@ -816,7 +816,8 @@ namespace Temiang.Avicenna.Module.RADT.InPatient
                 {
                     Request = new ControlLetter.Insert.Request.TRequest
                     {
-                        NoSEP = registration.BpjsSepNo,
+                        NoSEP = InpatientControlPlan.ResolveControlSep(registration,
+                            GetControlCardNo(registration), unit.BridgingID, item.ControlPlanDateTime),
                         KodeDokter = physician.BridgingID,
                         PoliKontrol = unit.BridgingID,
                         TglRencanaKontrol = item.ControlPlanDateTime.ToString("yyyy-MM-dd"),
