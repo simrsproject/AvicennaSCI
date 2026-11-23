@@ -1882,6 +1882,8 @@
     <Content Include="Document\2026\11\06\03.INSERT_INTO_AppProgram_PrintLOA.sql" />
     <Content Include="Document\2026\11\06\04.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
     <Content Include="Document\2026\11\16\01.CREATE_TABLE_AdmedikaDocument.sql" />
+    <Content Include="Document\2026\11\16\AdmedikaLOC\01.PrintLOC.sql" />
+    <Content Include="Document\2026\11\16\AdmedikaLOC\02.DischargeRequestJson.sql" />
     <Content Include="Document\2026\11\23\01.CREATE_TABLE_AdmedikaDailyMonitoring.sql" />
     <Content Include="Document\2026\11\23\02.INSERT_INTO_AppProgram_Admedika_DailyMonitoring.sql" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
@@ -1895,6 +1897,9 @@
     <Content Include="Document\Admedika\INVOICE_TRACKING.pdf" />
     <Content Include="Document\Admedika\PRE_REGISTER_EBILL.pdf" />
     <Content Include="Document\Admedika\RE_PRINT_OUT.pdf" />
+    <Content Include="Document\2026\11\16\AdmedikaLOC\BillingCharges\PrintLOC_Admedika.trdx" />
+    <Content Include="Document\2026\11\16\AdmedikaLOC\DischargeRequestJson.md" />
+    <Content Include="Document\2026\11\16\AdmedikaLOC\README.md" />
     <None Include="Document\Bpjs Face Scan\Readme.md" />
     <Content Include="Document\2026\05\13\AntrianRSI\001-CREATE-TABLE-AutoNumberSemantic.sql" />
     <Content Include="Document\2026\05\13\AntrianRSI\002-CREATE-TABLE-VisitQueue.sql" />
