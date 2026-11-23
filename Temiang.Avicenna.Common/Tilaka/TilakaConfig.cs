@@ -17,7 +17,6 @@ namespace Temiang.Avicenna.Common.Tilaka
         public string ChannelType { get; set; }
         public int TimeoutSeconds { get; set; }
         public bool IsLogEnabled { get; set; }
-        public string CallbackBaseUrl { get; set; }
         public int CallbackToleranceMinutes { get; set; }
         public int RegistrationExpireDays { get; set; }
         public string ConsentTextFile { get; set; }
@@ -56,7 +55,6 @@ namespace Temiang.Avicenna.Common.Tilaka
             ChannelType = GetString("TilakaChannelType", "Personal");
             TimeoutSeconds = GetInt("TilakaTimeoutSeconds", 60);
             IsLogEnabled = GetBool("TilakaIsLogEnabled", true);
-            CallbackBaseUrl = GetString("TilakaCallbackBaseUrl", string.Empty).TrimEnd('/');
             CallbackToleranceMinutes = GetInt("TilakaCallbackToleranceMinutes", 5);
             RegistrationExpireDays = GetInt("TilakaRegistrationExpireDays", 7);
             if (RegistrationExpireDays > 7) RegistrationExpireDays = 7;

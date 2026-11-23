@@ -15,7 +15,7 @@ langkah dijalankan oleh operator di server uji.
 
 ## 0. Prasyarat
 
-### 0.1 Kunci konfigurasi `Web.config` (appSettings, 18 kunci)
+### 0.1 Kunci konfigurasi `Web.config` (appSettings, 16 kunci)
 
 | Kunci | Nilai untuk uji | Catatan |
 |---|---|---|
@@ -26,7 +26,6 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaChannelType` | `Company` | Harus sesuai tipe channel yang terdaftar di Tilaka. |
 | `TilakaTimeoutSeconds` | `60` | |
 | `TilakaIsLogEnabled` | `true` | Logging ke `WebServiceAPILog`. |
-| `TilakaCallbackBaseUrl` | `https://<host>` | **Tidak dipakai kode**; callback didaftarkan di portal Tilaka (lihat 0.3). |
 | `TilakaCallbackToleranceMinutes` | `5` | Toleransi `x-request-timestamp`; jam server harus sinkron (NTP). |
 | `TilakaRegistrationExpireDays` | `7` | Nilai > 7 otomatis dibatasi 7. |
 | `TilakaConsentTextFile` | `C:\Tilaka\TilakaConsent.txt` | File teks TnC, UTF-8. |
@@ -37,7 +36,7 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaClientCertificatePath` | _(kosong)_ | Isi hanya bila Tilaka mewajibkan mTLS. |
 | `TilakaClientCertificatePassword` | _(kosong)_ | |
 
-- [ ] Ke-17 kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
+- [ ] Ke-16 kunci di atas terisi dan `TilakaChannelId`/`TilakaChannelSecret` adalah milik channel sandbox.
 - [ ] **Allowlist IP ada di sisi Tilaka**, bukan di aplikasi: daftarkan IP publik server Avicenna ke
       Tilaka agar API mereka menerima request kita. Autentikasi masuk tetap memakai HMAC
       `x-validation-token` + channel secret. Tidak ada key `TilakaCallbackAllowedIps` di aplikasi.
