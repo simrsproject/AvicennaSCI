@@ -84,6 +84,7 @@
     <Compile Include="Admedika\AdmedikaConfigTests.cs" />
     <Compile Include="Admedika\AdmedikaCoverageValidationTests.cs" />
     <Compile Include="Admedika\AdmedikaDailyMonitoringTests.cs" />
+    <Compile Include="Admedika\AdmedikaDailyMonitoringCategoryTests.cs" />
     <Compile Include="Admedika\AdmedikaDischargeIpTests.cs" />
     <Compile Include="Admedika\AdmedikaFinalBillTests.cs" />
     <Compile Include="Admedika\AdmedikaPreAssessmentStatusTests.cs" />

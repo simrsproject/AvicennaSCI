@@ -1882,6 +1882,8 @@
     <Content Include="Document\2026\11\06\03.INSERT_INTO_AppProgram_PrintLOA.sql" />
     <Content Include="Document\2026\11\06\04.ALTER_TABLE_AdmedikaClaimTransaction.sql" />
     <Content Include="Document\2026\11\16\01.CREATE_TABLE_AdmedikaDocument.sql" />
+    <Content Include="Document\2026\11\23\01.CREATE_TABLE_AdmedikaDailyMonitoring.sql" />
+    <Content Include="Document\2026\11\23\02.INSERT_INTO_AppProgram_Admedika_DailyMonitoring.sql" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />
     <Content Include="Document\Admedika\CHECK_ICD_EXCLUSION.pdf" />
     <Content Include="Document\Admedika\CHECK_MEMBER_CLAIM_TXN_STATUS-and-GET_MEMBER_ENROLLED_PLAN_TC.pdf" />
@@ -3002,6 +3004,8 @@
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaEligibilityDetail.aspx" />
     <Content Include="Module\RADT\Admedika\Eligibility\AdmedikaPatientDialogList.aspx" />
     <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsList.aspx" />
+    <Content Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringList.aspx" />
+    <Content Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringDetail.aspx" />
     <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsDetail.aspx" />
     <Content Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsUploadDialog.aspx" />
     <Content Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx" />
@@ -15910,6 +15914,22 @@
       <DependentUpon>AdmedikaEdocsUploadDialog.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\Admedika\Edocs\AdmedikaEdocsHelper.cs" />
+    <Compile Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringList.aspx.cs">
+      <DependentUpon>AdmedikaDailyMonitoringList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringList.aspx.designer.cs">
+      <DependentUpon>AdmedikaDailyMonitoringList.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringDetail.aspx.cs">
+      <DependentUpon>AdmedikaDailyMonitoringDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringDetail.aspx.designer.cs">
+      <DependentUpon>AdmedikaDailyMonitoringDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringCategory.cs" />
+    <Compile Include="Module\RADT\Admedika\DailyMonitoring\AdmedikaDailyMonitoringHelper.cs" />
     <Compile Include="Module\RADT\Bpjs\Antrol\Dashboard.aspx.cs">
       <DependentUpon>Dashboard.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
