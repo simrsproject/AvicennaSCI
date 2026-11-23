@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alur Integrasi AdMedika — Rawat Inap</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #5f6b7a;
+    --line: #e3e7ec;
+    --accent: #0f766e;
+    --accent-soft: #e6f4f1;
+    --warn: #b45309;
+    --warn-soft: #fdf3e3;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+    --info: #1d4ed8;
+    --info-soft: #e8eefc;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141a;
+      --card: #161c24;
+      --text: #e6edf3;
+      --muted: #9aa7b5;
+      --line: #26303b;
+      --accent: #2dd4bf;
+      --accent-soft: #12312d;
+      --warn: #fbbf24;
+      --warn-soft: #33270e;
+      --danger: #f87171;
+      --danger-soft: #331414;
+      --info: #93c5fd;
+      --info-soft: #14213d;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.65 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 28px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 12px 0 8px; }
+  .subtitle { color: var(--muted); margin: 0; max-width: 760px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  h2 { font-size: 20px; margin: 0 0 6px; }
+  h3 { font-size: 16px; margin: 22px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { color: var(--muted); margin-top: 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1px 6px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+  .b-required { color: var(--danger); background: var(--danger-soft); }
+  .b-optional { color: var(--info); background: var(--info-soft); }
+  .b-conditional { color: var(--warn); background: var(--warn-soft); }
+  .b-none { color: var(--muted); background: var(--bg); }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    margin: 16px 0 4px;
+  }
+  .node {
+    flex: 1 1 150px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--bg);
+    min-width: 140px;
+  }
+  .node strong { display: block; font-size: 13px; }
+  .node span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .node.key { border-color: var(--accent); background: var(--accent-soft); }
+  .node.key strong { color: var(--accent); }
+  .arrow {
+    align-self: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+  }
+  @media (max-width: 620px) {
+    .arrow { display: none; }
+    .node { flex-basis: 100%; }
+  }
+
+  .steps { list-style: none; padding: 0; margin: 16px 0 0; counter-reset: step; }
+  .steps > li {
+    position: relative;
+    padding: 0 0 22px 44px;
+    margin: 0;
+    border-left: 2px solid var(--line);
+    margin-left: 15px;
+  }
+  .steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .steps > li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+  }
+  .steps h3 { margin: 2px 0 4px; font-size: 15px; }
+  .steps p { margin: 4px 0; color: var(--muted); }
+  .steps .out { font-size: 13px; color: var(--text); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  .center { text-align: center; }
+  .nowrap { white-space: nowrap; }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .note p { margin: 4px 0; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .terminal {
+    background: #0b1220;
+    color: #d7e2ee;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 12px 0;
+  }
+  .terminal .c { color: #7dd3fc; }
+  .terminal .g { color: #86efac; }
+  .terminal .r { color: #fca5a5; }
+  .terminal .m { color: #94a3b8; }
+  .terminal .k { color: #93c5fd; }
+  .terminal .s { color: #86efac; }
+  .terminal .n { color: #fcd34d; }
+  .json-cap {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    color: var(--accent);
+    margin: 14px 0 -4px;
+  }
+  .json-cap.fail { color: var(--danger); }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 28px; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    section { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Dokumentasi Integrasi</span>
+    <h1>Alur AdMedika — Rawat Inap</h1>
+    <p class="subtitle">
+      Urutan pemanggilan endpoint rawat inap: pembukaan klaim, monitoring harian,
+      interim/final bill, assessment, sampai discharge dan pencetakan LOC.
+    </p>
+    <p class="meta">Sumber: <em>CustomerHost_ProviderBridging - INPATIENT.pdf</em>,
+      <em>DAILY_MONITORING.pdf</em>, <em>EDOCS_UPLOAD v.Rustlang.pdf</em>,
+      <em>RE_PRINT_OUT.pdf</em>, <em>CANCEL_OPEN_CLAIMS_TXN.pdf</em>.</p>
+  </header>
+
+  <section>
+    <h2>1. Konsep: klaim rawat inap</h2>
+    <p class="lead">Satu episode rawat inap = satu klaim yang dimonitor harian sampai final bill dan discharge.</p>
+
+    <div class="flow">
+      <div class="node key">
+        <strong>ELIGIBILITY</strong>
+        <span>membuka klaim · covID 01/HNS · status 08</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node">
+        <strong>DAILY_MONITORING</strong>
+        <span>form harian selama rawat inap</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node">
+        <strong>FINAL_BILL</strong>
+        <span>interim (N) / final (Y) · status 34</span>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node key">
+        <strong>DISCHARGE_IP</strong>
+        <span>assessment · LOC · status 40</span>
+      </div>
+    </div>
+
+    <p>
+      Klaim rawat inap tetap <strong>terbuka</strong> selama sudah dibuka lewat <code>Eligibility</code>
+      dan belum ditutup lewat <code>DischargeIp</code>. AdMedika hanya mengizinkan satu klaim
+      terbuka per member untuk coverage yang sama.
+    </p>
+
+    <h3>Status klaim yang perlu dikenal</h3>
+    <table>
+      <thead>
+        <tr><th class="nowrap">clStatus</th><th>Arti</th><th>Terbuka?</th><th>Implikasi</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>08</code></td><td>Eligibility approved</td><td><span class="badge b-required">Ya</span></td><td>Klaim dibuka, rawat inap berjalan</td></tr>
+        <tr><td><code>21</code></td><td>Admission approved</td><td><span class="badge b-required">Ya</span></td><td>Admission disetujui</td></tr>
+        <tr><td><code>34</code></td><td>Pre-discharge / final bill received</td><td><span class="badge b-conditional">Ya</span></td><td>Final bill sudah diterima, menunggu assessment</td></tr>
+        <tr><td><code>36</code></td><td>Final document completed</td><td><span class="badge b-conditional">Ya</span></td><td>Dokumen final lengkap</td></tr>
+        <tr><td><code>38</code></td><td>Assessed claims</td><td><span class="badge b-conditional">Ya</span></td><td>Sudah dinilai, menunggu discharge</td></tr>
+        <tr><td><code>39</code></td><td>Claims on hold</td><td><span class="badge b-conditional">Ya</span></td><td>Perlu tindak lanjut</td></tr>
+        <tr><td><code>40</code></td><td>Valid claim</td><td><span class="badge b-none">Tidak</span></td><td>Sudah ditutup; boleh eligibility baru</td></tr>
+        <tr><td><code>41</code></td><td>Incomplete documents</td><td><span class="badge b-conditional">Dalam proses</span></td><td>Lengkapi dokumen</td></tr>
+        <tr><td><code>47</code></td><td>Final document - incomplete</td><td><span class="badge b-conditional">Dalam proses</span></td><td>Lengkapi dokumen final</td></tr>
+        <tr><td><code>22</code></td><td>Claims rejected</td><td><span class="badge b-none">Tidak</span></td><td>Ditolak</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note warn">
+      <p><strong>Jika membuat eligibility saat masih ada klaim terbuka:</strong>
+        AdMedika menolak dengan <code>1998</code>
+        (<em>Have a pending inpatient claims … Please proceed with discharge transaction!</em>).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Urutan pemanggilan rawat inap</h2>
+    <p class="lead">Eligibility dan DischargeIp wajib; sisanya berkala atau sesuai kebutuhan.</p>
+
+    <div class="flow">
+      <div class="node"><strong>1. Cek status</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>2. Eligibility</strong><span>wajib · covID 01</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>3. Daily monitoring</strong><span>berkala</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>4. Pre-assessment</strong><span>opsional</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>5. Final bill</strong><span>interim/final</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>6. Discharge</strong><span>wajib</span></div>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <h3>CheckMemberClaimTxnStatus <span class="badge b-optional">Opsional</span></h3>
+        <p>Mendeteksi klaim rawat inap yang masih terbuka sebelum membuat klaim baru.</p>
+        <p class="out">Butuh <code>cardNo</code>; <code>clID</code> boleh kosong untuk klaim terbaru.</p>
+      </li>
+      <li>
+        <h3>Eligibility <span class="badge b-required">Wajib</span></h3>
+        <p>Membuka klaim rawat inap dengan coverage <code>01</code>/<code>HNS</code>.</p>
+        <p class="out">Menghasilkan <code>clID</code>, entitlement, dan <code>printOut</code> LOA.</p>
+      </li>
+      <li>
+        <h3>DailyMonitoring <span class="badge b-conditional">Berkala</span></h3>
+        <p>Mengirim form monitoring harian (DCM001A – DCM017A) selama pasien dirawat.</p>
+        <p class="out">Butuh klaim rawat inap terbuka; tanpa itu ditolak <code>1844</code>.</p>
+      </li>
+      <li>
+        <h3>PreAssessmentStatus <span class="badge b-optional">Opsional</span></h3>
+        <p>Cek apakah entitlement menutup interim bill atau ada selisih yang harus dibayar pasien.</p>
+        <p class="out">Menampilkan <code>form_f_link</code>, total incurred/approved, dan entitlement.</p>
+      </li>
+      <li>
+        <h3>FinalBill <span class="badge b-required">Wajib</span></h3>
+        <p>Mengirim rincian biaya. <code>finalFlag=N</code> untuk interim, <code>Y</code> saat pasien siap pulang.</p>
+        <p class="out">Setiap pengiriman menimpa item pada hari yang sama; final bill menghasilkan status <code>34</code>.</p>
+      </li>
+      <li>
+        <h3>EdocsUpload <span class="badge b-conditional">Sesuai kebutuhan</span></h3>
+        <p>Mengunggah dokumen pendukung (resume medis, hasil lab, billing, dll.).</p>
+        <p class="out">Butuh <code>clID</code> dan <code>docType</code> yang valid.</p>
+      </li>
+      <li>
+        <h3>DischargeIp <span class="badge b-required">Wajib</span></h3>
+        <p>Memproses discharge rawat inap dan mengambil hasil assessment (LOC).</p>
+        <p class="out">LOC biasanya terbit dalam ±45 menit; selama assessment berjalan gateway menjawab <code>1842</code>.</p>
+      </li>
+      <li>
+        <h3>RePrintOut <span class="badge b-optional">Opsional</span></h3>
+        <p>Mencetak ulang dokumen: <code>E</code> = LOA, <code>D</code> = LOC, <code>X</code> = LOR.</p>
+      </li>
+    </ol>
+
+    <div class="note">
+      <p><strong>Urutan minimal:</strong>
+        <code>Eligibility</code> → <code>DailyMonitoring</code> (berkala) →
+        <code>FinalBill (Y)</code> → <code>DischargeIp</code>.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>3. Contoh pemanggilan dari kode aplikasi</h2>
+    <p class="lead">
+      Memakai kelas <code>Service</code> langsung. Pemeriksaan hasil memakai
+      <code>srv.IsOk(...)</code> yang memeriksa <code>TechnicalError</code> lalu
+      <code>IsSuccess</code> dan merangkum error menjadi <code>[kode] deskripsi</code>.
+    </p>
+
+    <pre class="terminal"><span class="m">// menggunakan Temiang.Avicenna.Common.Admedika</span>
+using Temiang.Avicenna.Common.Admedika;
+
+var srv = new Temiang.Avicenna.Common.Admedika.Service();
+string message;</pre>
+
+    <h3>3.1 Eligibility rawat inap</h3>
+    <pre class="terminal">var result = srv.Eligibility(
+    cardNo: "8000991200072646",
+    covID: "01",                    <span class="m">// 01 = HNS / rawat inap</span>
+    diagnosisCodeList: "J06",
+    providerTransID: "RI-20261123-001",
+    nationalID: null,
+    familyCardID: null,
+    physicianName: "dr. Nama Dokter",
+    accidentFlag: "N",
+    surgicalFlag: "N",
+    roomType: "VIP1",
+    roomPrice: "500000",
+    remarks: "Registrasi rawat inap");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1998 bila masih ada klaim terbuka</span>
+    return;
+}
+
+var clID = result.ClID;          <span class="m">// simpan untuk seluruh alur</span>
+var loa = result.PrintOut;       <span class="m">// LOA rawat inap</span></pre>
+
+    <h3>3.2 DailyMonitoring</h3>
+    <pre class="terminal">var dmForms = new[]
+{
+    new DailyMonitoringForm
+    {
+        Code = "DCM010A",                    <span class="m">// Anamnesa Medis</span>
+        Name = "Anamnesa Medis",
+        Input = "Demam sejak 3 hari, batuk, sesak ringan",
+        Date = "23112026"
+    },
+    new DailyMonitoringForm
+    {
+        Code = "DCM012A",                    <span class="m">// Diagnosa Primer</span>
+        Name = "Diagnosa Primer",
+        Input = "J06 - Acute upper respiratory infections",
+        Date = "23112026"
+    }
+};
+
+var result = srv.DailyMonitoring(
+    "8000991200072646",
+    "RI-20261123-001",
+    clID,
+    "user01",
+    dmForms);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1844 bila belum ada monitoring / klaim tidak sesuai</span>
+    return;
+}
+
+ShowInfo(result.ClStatus + " - " + result.ClDesc);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"Successful"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"dailyMonitoringResponse"</span>: {
+        <span class="k">"dailyMonitoring"</span>: {
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"providerTransID"</span>: <span class="s">"RI-20261123-001"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"HNS"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"21"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"ADMISSION APPROVED"</span>,
+          <span class="k">"ok"</span>: <span class="s">"Y"</span>,
+          <span class="k">"msg"</span>: <span class="s">"Daily monitoring submitted"</span>,
+          <span class="k">"dmForms"</span>: [
+            { <span class="k">"code"</span>: <span class="s">"DCM010A"</span>, <span class="k">"status"</span>: <span class="s">"Success"</span> },
+            { <span class="k">"code"</span>: <span class="s">"DCM012A"</span>, <span class="k">"status"</span>: <span class="s">"Success"</span> }
+          ]
+        }
+      }
+    },
+    <span class="k">"txnResponseDateTime"</span>: <span class="s">"20261123101500"</span>
+  }
+}</pre>
+
+    <h3>3.3 PreAssessmentStatus</h3>
+    <pre class="terminal">var result = srv.PreAssessmentStatus("8000991200072646", clID);
+
+if (!srv.IsOk(result, out message))
+{
+    <span class="m">// 1995 = klaim sudah valid; lanjutkan ke DISCHARGE_IP</span>
+    ShowError(message);
+    return;
+}
+
+var approved = result.TotAmtApproved;
+var excess = result.TotAmtNotApproved;
+var link = result.FormFLink;     <span class="m">// Form-F (temporary)</span></pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"preAssessmentStatusResponse"</span>: {
+        <span class="k">"preAssessmentStatus"</span>: {
+          <span class="k">"statusText"</span>: <span class="s">"This claim is still being assessed [7 minutes ago] Please wait for a while."</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"HNS"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"38"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"ASSESSED CLAIMS"</span>,
+          <span class="k">"form_f_link"</span>: <span class="s">"https://webclaim.admedika.com/letter/l_formf_temporary.php?RefID=..."</span>,
+          <span class="k">"totAmtIncurred"</span>: <span class="s">"57721261"</span>,
+          <span class="k">"totAmtApproved"</span>: <span class="s">"40000000"</span>,
+          <span class="k">"totAmtNotApproved"</span>: <span class="s">"17721261"</span>,
+          <span class="k">"entitlement"</span>: [
+            { <span class="k">"benID"</span>: <span class="s">"02"</span>, <span class="k">"amtIncurred"</span>: <span class="s">"1980000"</span>, <span class="k">"amtApproved"</span>: <span class="s">"1980000"</span>, <span class="k">"amtNotApproved"</span>: <span class="s">"0"</span> }
+          ]
+        }
+      }
+    }
+  }
+}</pre>
+
+    <h3>3.4 FinalBill — interim (N)</h3>
+    <pre class="terminal">var bill = new FinalBillPayload
+{
+    CardNo = "8000991200072646",
+    FinalFlag = "N",                         <span class="m">// interim bill</span>
+    DiagnosisCodeList = "J06, A02.9",
+    ProviderTransID = "RI-20261123-001",
+    ClID = clID,
+    DateAdmission = "23112026 103455",       <span class="m">// DDMMYYYY HH24MISS</span>
+    PreparedBy = "user01",
+    TotAmountDue = "8739000",
+    ItemizedBill = new[]
+    {
+        new FinalBillGroup
+        {
+            GroupCode = "99999",
+            GroupName = "Administration",
+            ItemList = new[]
+            {
+                new FinalBillItem { Code = "99999999", Name = "Materai", Qty = "1",
+                    TotPrice = "6000", NonMedicalFlag = "Y" }
+            }
+        }
+    }
+};
+
+var result = srv.FinalBill(bill);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1810, 1814, 1815, 1830, dst.</span>
+    return;
+}
+
+ShowInfo(result.ClStatus + " - " + result.ClDesc);</pre>
+
+    <h3>3.5 FinalBill — final (Y)</h3>
+    <pre class="terminal">bill.FinalFlag = "Y";
+bill.DateDischarge = "23112026 180000";     <span class="m">// wajib saat final</span>
+bill.InvoiceNo = "INV-RI-20261123-001";
+bill.InvoiceDate = "23112026";
+bill.TotAmountDue = "17300000";
+
+var result = srv.FinalBill(bill);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);
+    return;
+}
+
+<span class="m">// status berubah menjadi 34 = PRE-DISCHARGE | FINAL BILL RECEIVED</span>
+ShowInfo(result.ClStatus + " - " + result.ClDesc);</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"finalBillResponse"</span>: {
+        <span class="k">"finalBill"</span>: {
+          <span class="k">"statusText"</span>: <span class="s">"Thank you for submitting your Final Bill Statement. The HCM Team will complete this process as soon as possible."</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"Juan Tamad"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"PayorName"</span>: <span class="s">"JAMINAN KESEHATAN"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"HNS"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"34"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"PRE-DISCHARGE | FINAL BILL RECEIVED"</span>
+        }
+      }
+    }
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — total item tidak cocok (1810)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"statusMsg"</span>: <span class="s">"error on txnData"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"finalBillResponse"</span>: {
+        <span class="k">"finalBill"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1810</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Not match! [totItems: 11] is not equal to itemizedBill ..."</span>
+        }
+      }
+    }
+  }
+}</pre>
+
+    <h3>3.6 DischargeIp</h3>
+    <pre class="terminal">var result = srv.DischargeIp("8000991200072646", clID);
+
+if (!srv.IsOk(result, out message))
+{
+    <span class="m">// 1842 = assessment masih berjalan, tunggu lalu ulangi</span>
+    <span class="m">// 1843 = final bill belum ada</span>
+    ShowError(message);
+    return;
+}
+
+var status = result.ClStatus;          <span class="m">// 40 saat valid</span>
+var approved = result.TotAmtApproved;
+var loc = result.FormFLink;            <span class="m">// Form-F (LOC)</span></pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"dischargeResponse"</span>: {
+        <span class="k">"discharge"</span>: {
+          <span class="k">"statusText"</span>: <span class="s">"Claim successfully processed."</span>,
+          <span class="k">"cardNo"</span>: <span class="s">"8000991200072646"</span>,
+          <span class="k">"patientName"</span>: <span class="s">"ADM TEST SATU"</span>,
+          <span class="k">"clID"</span>: <span class="s">"28651305"</span>,
+          <span class="k">"covCode"</span>: <span class="s">"HNS"</span>,
+          <span class="k">"clStatus"</span>: <span class="s">"40"</span>,
+          <span class="k">"clDesc"</span>: <span class="s">"VALID CLAIM"</span>,
+          <span class="k">"dateAdmission"</span>: <span class="s">"Nov-23-2026"</span>,
+          <span class="k">"dateDischarge"</span>: <span class="s">"Nov-23-2026"</span>,
+          <span class="k">"payorCode"</span>: <span class="s">"ADMEDKA"</span>,
+          <span class="k">"payorName"</span>: <span class="s">"Jaminan Kesehatan"</span>,
+          <span class="k">"form_f_link"</span>: <span class="s">"https://webclaim.admedika.com/letter/l_formf.php?RefID=..."</span>,
+          <span class="k">"totAmtIncurred"</span>: <span class="s">"17300000"</span>,
+          <span class="k">"totAmtApproved"</span>: <span class="s">"12400000"</span>,
+          <span class="k">"totAmtNotApproved"</span>: <span class="s">"4900000"</span>,
+          <span class="k">"entitlement"</span>: [
+            { <span class="k">"benID"</span>: <span class="s">"02"</span>, <span class="k">"shortName"</span>: <span class="s">"BIAYA KAMAR"</span>,
+              <span class="k">"amtIncurred"</span>: <span class="s">"5900000"</span>, <span class="k">"amtApproved"</span>: <span class="s">"1000000"</span>,
+              <span class="k">"amtNotApproved"</span>: <span class="s">"4900000"</span> }
+          ]
+        }
+      }
+    }
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — assessment masih berjalan (1842)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"dischargeRequestResponse"</span>: {
+        <span class="k">"dischargeRequest"</span>: {
+          <span class="k">"errorCode"</span>: <span class="s">"1842"</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"FYI: This claim is still being assessed [5 minutes ago] Please wait for a while."</span>
+        }
+      }
+    }
+  }
+}</pre>
+
+    <h3>3.7 EdocsUpload dan RePrintOut</h3>
+    <pre class="terminal"><span class="m">// dokumen pendukung rawat inap</span>
+var files = new[]
+{
+    new AdmedikaFile
+    {
+        FileName = "resume-medis.pdf",
+        ContentType = "application/pdf",
+        Content = File.ReadAllBytes(@"C:\dokumen\resume-medis.pdf")
+    }
+};
+
+var upload = srv.EdocsUpload(
+    "8000991200072646", clID, "RESUMEMEDIS",
+    "Resume medis rawat inap", "ADM TEST SATU", "user01", files);
+
+<span class="m">// cetak ulang LOC</span>
+var reprint = srv.RePrintOut(clID, "D");   <span class="m">// E=LOA, D=LOC, X=LOR</span></pre>
+  </section>
+
+  <section>
+    <h2>4. Cabang dan penanganan kondisi</h2>
+    <div class="grid2">
+      <div>
+        <h3>Klaim terbuka yang salah</h3>
+        <div class="terminal">CheckMemberClaimTxnStatus   <span class="c">→ clStatus 08/21</span>
+CancelOpenClaimsTxn         <span class="m">remarks: alasan</span>
+Eligibility                 <span class="g">→ clID baru</span></div>
+      </div>
+      <div>
+        <h3>Assessment belum selesai</h3>
+        <div class="terminal">FinalBill (Y)               <span class="g">→ status 34</span>
+DischargeIp                 <span class="r">→ 1842 (tunggu)</span>
+DischargeIp (ulangi)        <span class="g">→ status 40 + LOC</span></div>
+      </div>
+    </div>
+
+    <div class="note warn">
+      <p><strong>1842</strong> bukan kegagalan permanen. Tunggu proses assessment AdMedika
+        (biasanya beberapa menit hingga ±45 menit), lalu panggil <code>DischargeIp</code> lagi.</p>
+    </div>
+
+    <div class="note danger">
+      <p><strong>1995</strong> dari <code>PreAssessmentStatus</code> berarti klaim sudah valid —
+        gunakan <code>DischargeIp</code>, bukan pre-assessment.</p>
+    </div>
+
+    <table>
+      <thead><tr><th class="nowrap">Kode</th><th>Arti</th><th>Muncul saat</th></tr></thead>
+      <tbody>
+        <tr><td><code>1998</code></td><td>Rejected</td><td>Masih ada klaim terbuka; eligibility ditolak</td></tr>
+        <tr><td><code>1840</code></td><td>Not found</td><td>Tidak ada klaim terbuka / data tidak ditemukan</td></tr>
+        <tr><td><code>1842</code></td><td>Assessment in progress</td><td><code>DischargeIp</code> dipanggil sebelum assessment selesai</td></tr>
+        <tr><td><code>1843</code></td><td>No final bill</td><td><code>DischargeIp</code> tanpa final bill</td></tr>
+        <tr><td><code>1844</code></td><td>No daily monitoring</td><td>Belum ada form monitoring yang valid</td></tr>
+        <tr><td><code>1810</code></td><td>Not match</td><td>Jumlah item/total bill tidak cocok</td></tr>
+        <tr><td><code>1814</code>/<code>1815</code></td><td>Tanggal tidak valid</td><td>Format admission/discharge salah</td></tr>
+        <tr><td><code>1995</code></td><td>Invalid</td><td>Klaim sudah valid; gunakan <code>DischargeIp</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>5. Referensi endpoint rawat inap</h2>
+    <table>
+      <thead>
+        <tr><th>Endpoint</th><th>terminalID</th><th>Prasyarat</th><th>Kegunaan</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>CheckMemberClaimTxnStatus</code></td><td>Ya</td><td>Tidak ada</td><td>Deteksi klaim terbuka</td></tr>
+        <tr><td><code>CancelOpenClaimsTxn</code></td><td>Ya</td><td>Klaim terbuka</td><td>Batalkan klaim salah</td></tr>
+        <tr><td><code>Eligibility</code></td><td>Ya</td><td>Tidak boleh ada klaim terbuka</td><td>Buka klaim rawat inap</td></tr>
+        <tr><td><code>DailyMonitoring</code></td><td>Ya</td><td>Klaim rawat inap terbuka</td><td>Form monitoring harian</td></tr>
+        <tr><td><code>PreAssessmentStatus</code></td><td>Ya</td><td>Klaim terbuka</td><td>Cek entitlement interim bill</td></tr>
+        <tr><td><code>FinalBill</code></td><td>Ya</td><td>Klaim terbuka</td><td>Kirim interim/final bill</td></tr>
+        <tr><td><code>DischargeIp</code></td><td>Ya</td><td>Final bill (Y)</td><td>Assessment + LOC</td></tr>
+        <tr><td><code>EdocsUpload</code></td><td>Tidak</td><td><code>clID</code> valid</td><td>Unggah dokumen</td></tr>
+        <tr><td><code>RePrintOut</code></td><td>Tidak</td><td><code>clID</code> valid</td><td>Cetak ulang LOA/LOC/LOR</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>6. Membaca respons</h2>
+    <p>Semua respons bisnis AdMedika dikembalikan sebagai <strong>HTTP 200</strong>.</p>
+    <table>
+      <thead><tr><th>Urutan</th><th>Field</th><th>Arti</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>TechnicalError</code></td><td>Gagal teknis: timeout, TLS, body bukan JSON</td></tr>
+        <tr><td>2</td><td><code>IsSuccess</code></td><td><code>statusCode</code> bernilai nol</td></tr>
+        <tr><td>3</td><td><code>ErrorCode</code>, <code>ErrorDesc</code></td><td>Kegagalan bisnis dari <code>txnData</code></td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <p>Parser mengambil payload pertama di dalam wrapper; nama wrapper bisa berbeda antarversi
+        gateway (mis. <code>dischargeResponse</code> atau <code>dischargeRequestResponse</code>).
+        Penentuan sukses tetap memakai <code>IsSuccess</code>, bukan nama wrapper atau HTTP status.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>7. Contoh urutan yang sudah diverifikasi</h2>
+    <div class="terminal"><span class="m"># rawat inap baru, tidak ada klaim terbuka</span>
+CheckMemberClaimTxnStatus   <span class="g">→ 1840, tidak ada klaim</span>
+Eligibility (covID 01)      <span class="g">→ clID baru, status 08</span>
+DailyMonitoring             <span class="g">→ form harian tersimpan</span>
+FinalBill (N)               <span class="g">→ interim bill</span>
+PreAssessmentStatus         <span class="g">→ entitlement interim</span>
+FinalBill (Y)               <span class="g">→ status 34</span>
+DischargeIp                 <span class="g">→ status 40, LOC</span>
+RePrintOut (D)              <span class="g">→ printOut LOC</span></div>
+
+    <div class="terminal"><span class="m"># assessment belum selesai</span>
+FinalBill (Y)               <span class="g">→ status 34</span>
+DischargeIp                 <span class="r">→ 1842, tunggu</span>
+DischargeIp (ulangi)        <span class="g">→ status 40, LOC</span></div>
+  </section>
+
+  <section>
+    <h2>8. Catatan operasional</h2>
+    <ul>
+      <li>Satu member hanya boleh punya satu klaim terbuka per coverage. Selesaikan atau batalkan sebelum membuat yang baru.</li>
+      <li>Simpan <code>clID</code> dari <code>Eligibility</code>; dipakai untuk monitoring, upload, final bill, discharge, dan reprint.</li>
+      <li><code>terminalID</code> berasal dari konfigurasi, bukan parameter pemanggil.</li>
+      <li><code>FinalBill</code> yang dikirim ulang pada hari yang sama akan menimpa item sebelumnya; pastikan data lengkap.</li>
+      <li><code>finalFlag=Y</code> wajib disertai <code>dateDischarge</code> dan itemized final bill yang lengkap.</li>
+      <li>Nominal dan <code>printOut</code> diteruskan apa adanya; jangan memformat ulang sebelum menyimpan.</li>
+      <li><code>DailyMonitoring</code> hanya untuk rawat inap; pada klaim rawat jalan akan ditolak.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Avicenna × Gateway@AdMedika — dokumen internal. Diperbarui 23 November 2026.
+  </footer>
+</div>
+</body>
+</html>

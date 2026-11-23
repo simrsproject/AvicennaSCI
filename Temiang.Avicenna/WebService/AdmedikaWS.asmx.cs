@@ -244,6 +244,16 @@ namespace Temiang.Avicenna.WebService
         }
 
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        [WebMethod(Description = @"Mengambil rincian klaim per invoice (Invoice Tracking Details). "
+            + @"Request: payorCode (R, dari hasil INVOICE_TRACKING); invoiceNo (R, nomor invoice lengkap). "
+            + @"terminalID diisi otomatis dari konfigurasi. "
+            + @"from source : INVOICE_TRACKING.pdf")]
+        public InvoiceTrackingDetailsResponse InvoiceTrackingDetails(string payorCode, string invoiceNo)
+        {
+            return _service.InvoiceTrackingDetails(payorCode, invoiceNo);
+        }
+
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         [WebMethod(Description = @"Mencetak ulang LOA/LOC/LOR berdasarkan clID dan tipe cetak. "
             + @"Request: clID (R, claims ID); rePrintType (R, E=LOA/D=LOC/X=LOR). "
             + @"from source : RE_PRINT_OUT.pdf")]

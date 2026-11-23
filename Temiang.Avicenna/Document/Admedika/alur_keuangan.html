@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alur Integrasi AdMedika — Keuangan</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2933;
+    --muted: #5f6b7a;
+    --line: #e3e7ec;
+    --accent: #0f766e;
+    --accent-soft: #e6f4f1;
+    --warn: #b45309;
+    --warn-soft: #fdf3e3;
+    --danger: #b91c1c;
+    --danger-soft: #fdecec;
+    --info: #1d4ed8;
+    --info-soft: #e8eefc;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f141a;
+      --card: #161c24;
+      --text: #e6edf3;
+      --muted: #9aa7b5;
+      --line: #26303b;
+      --accent: #2dd4bf;
+      --accent-soft: #12312d;
+      --warn: #fbbf24;
+      --warn-soft: #33270e;
+      --danger: #f87171;
+      --danger-soft: #331414;
+      --info: #93c5fd;
+      --info-soft: #14213d;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 16px 64px;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.65 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  header { margin-bottom: 28px; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  h1 { font-size: 30px; line-height: 1.25; margin: 12px 0 8px; }
+  .subtitle { color: var(--muted); margin: 0; max-width: 760px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  h2 { font-size: 20px; margin: 0 0 6px; }
+  h3 { font-size: 16px; margin: 22px 0 8px; }
+  p { margin: 8px 0; }
+  .lead { color: var(--muted); margin-top: 0; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  code {
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 1px 6px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+  .b-required { color: var(--danger); background: var(--danger-soft); }
+  .b-optional { color: var(--info); background: var(--info-soft); }
+  .b-conditional { color: var(--warn); background: var(--warn-soft); }
+  .b-none { color: var(--muted); background: var(--bg); }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 8px;
+    margin: 16px 0 4px;
+  }
+  .node {
+    flex: 1 1 150px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--bg);
+    min-width: 140px;
+  }
+  .node strong { display: block; font-size: 13px; }
+  .node span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .node.key { border-color: var(--accent); background: var(--accent-soft); }
+  .node.key strong { color: var(--accent); }
+  .arrow {
+    align-self: center;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+  }
+  @media (max-width: 620px) {
+    .arrow { display: none; }
+    .node { flex-basis: 100%; }
+  }
+
+  .steps { list-style: none; padding: 0; margin: 16px 0 0; counter-reset: step; }
+  .steps > li {
+    position: relative;
+    padding: 0 0 22px 44px;
+    margin: 0;
+    border-left: 2px solid var(--line);
+    margin-left: 15px;
+  }
+  .steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .steps > li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: -16px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+  }
+  .steps h3 { margin: 2px 0 4px; font-size: 15px; }
+  .steps p { margin: 4px 0; color: var(--muted); }
+  .steps .out { font-size: 13px; color: var(--text); }
+
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  .center { text-align: center; }
+  .nowrap { white-space: nowrap; }
+
+  .note {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .note.warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .note.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .note p { margin: 4px 0; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .terminal {
+    background: #0b1220;
+    color: #d7e2ee;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: Consolas, "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow-x: auto;
+    white-space: pre;
+    margin: 12px 0;
+  }
+  .terminal .c { color: #7dd3fc; }
+  .terminal .g { color: #86efac; }
+  .terminal .r { color: #fca5a5; }
+  .terminal .m { color: #94a3b8; }
+  .terminal .k { color: #93c5fd; }
+  .terminal .s { color: #86efac; }
+  .terminal .n { color: #fcd34d; }
+  .json-cap {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .03em;
+    color: var(--accent);
+    margin: 14px 0 -4px;
+  }
+  .json-cap.fail { color: var(--danger); }
+
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 28px; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    section { box-shadow: none; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="eyebrow">Dokumentasi Integrasi</span>
+    <h1>Alur AdMedika — Keuangan</h1>
+    <p class="subtitle">
+      Proses pre-register E-Bill (enquiry sampai pengiriman dokumen) serta pelacakan
+      invoice dan rincian klaim per invoice.
+    </p>
+    <p class="meta">Sumber: <em>PRE_REGISTER_EBILL.pdf</em>, <em>INVOICE_TRACKING.pdf</em>.</p>
+  </header>
+
+  <section>
+    <h2>1. Konsep</h2>
+    <p class="lead">Dua alur terpisah: pre-register E-Bill dan pelacakan invoice.</p>
+
+    <div class="flow">
+      <div class="node key"><strong>PRE_REGISTER_EBILL_ENQUIRY</strong><span>daftar klaim siap E-Bill</span></div>
+      <div class="arrow">→</div>
+      <div class="node key"><strong>PRE_REGISTER_EBILL</strong><span>kirim klaim + dokumen · surat jalan</span></div>
+    </div>
+    <div class="flow">
+      <div class="node"><strong>INVOICE_TRACKING</strong><span>cari invoice · ringkasan klaim</span></div>
+      <div class="arrow">→</div>
+      <div class="node"><strong>INVOICE_TRACKING_DETAILS</strong><span>rincian klaim per invoice</span></div>
+    </div>
+
+    <p>
+      <code>PRE_REGISTER_EBILL_ENQUIRY</code> menampilkan klaim yang sudah siap diajukan
+      sebagai E-Bill untuk payor dan periode tertentu. Klaim terpilih kemudian dikirim
+      lewat <code>PRE_REGISTER_EBILL</code> bersama dokumen pendukung (multipart).
+      Hasilnya berupa tautan surat jalan.
+    </p>
+    <p>
+      <code>INVOICE_TRACKING</code> dipakai untuk memantau invoice yang sudah terbentuk,
+      sedangkan <code>INVOICE_TRACKING_DETAILS</code> menampilkan klaim-klaim di dalam
+      satu invoice beserta nominal dan statusnya.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Alur pre-register E-Bill</h2>
+    <ol class="steps">
+      <li>
+        <h3>PreRegisterEbillEnquiry <span class="badge b-required">Wajib</span></h3>
+        <p>Mengambil daftar klaim berdasarkan <code>payorCode</code>, coverage, dan periode.</p>
+        <p class="out">Butuh <code>payorCode</code> (simpan saat eligibility), <code>coverage</code>
+          (<code>RJ</code>/<code>RI</code>), <code>dateFrom</code>, <code>dateTo</code> (DDMMYYYY).</p>
+      </li>
+      <li>
+        <h3>Pilih klaim</h3>
+        <p>Tentukan klaim yang akan diajukan; kumpulkan <code>clID</code> dan total tagihan.</p>
+        <p class="out">Jumlah klaim terpilih (<code>totSelectedClaims</code>) dihitung otomatis oleh service.</p>
+      </li>
+      <li>
+        <h3>PreRegisterEbill <span class="badge b-required">Wajib</span></h3>
+        <p>Mengirim klaim terpilih beserta dokumen (receipt dan dokumen terkait) sebagai multipart.</p>
+        <p class="out">Butuh <code>invoiceNo</code>, <code>invoiceDate</code>, <code>preparedBy</code>,
+          <code>totAmountDue</code>, dan daftar <code>selectedClaims</code>. <code>files</code> boleh kosong.</p>
+      </li>
+      <li>
+        <h3>Simpan hasil</h3>
+        <p>Respons berisi <code>surat_jalan_link</code> dan status per klaim.</p>
+        <p class="out">Tampilkan tautan surat jalan dan catat status tiap <code>clID</code>.</p>
+      </li>
+    </ol>
+
+    <h3>Field request Pre-Register E-Bill</h3>
+    <table>
+      <thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td><code>terminalID</code></td><td>Otomatis</td><td>Diambil dari konfigurasi</td></tr>
+        <tr><td><code>payorCode</code></td><td><span class="badge b-required">R</span></td><td>Payor code; simpan saat eligibility</td></tr>
+        <tr><td><code>coverage</code></td><td><span class="badge b-required">R</span></td><td><code>RJ</code> rawat jalan atau <code>RI</code> rawat inap</td></tr>
+        <tr><td><code>dateFrom</code>, <code>dateTo</code></td><td><span class="badge b-required">R</span></td><td>DDMMYYYY</td></tr>
+        <tr><td><code>invoiceNo</code></td><td><span class="badge b-required">R</span></td><td>Nomor invoice rumah sakit</td></tr>
+        <tr><td><code>invoiceDate</code></td><td><span class="badge b-required">R</span></td><td>DDMMYYYY</td></tr>
+        <tr><td><code>preparedBy</code></td><td><span class="badge b-required">R</span></td><td>User penyusun, maks 25 karakter</td></tr>
+        <tr><td><code>totAmountDue</code></td><td><span class="badge b-required">R</span></td><td>Total tagihan</td></tr>
+        <tr><td><code>selectedClaims[]</code></td><td><span class="badge b-required">R</span></td><td>Daftar <code>clID</code>; <code>totSelectedClaims</code> diisi otomatis</td></tr>
+        <tr><td><code>files</code></td><td><span class="badge b-optional">O</span></td><td>Dokumen pendukung, boleh kosong</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>3. Contoh pemanggilan pre-register E-Bill</h2>
+
+    <h3>3.1 PreRegisterEbillEnquiry</h3>
+    <pre class="terminal">var result = srv.PreRegisterEbillEnquiry(
+    "ADMEDKA",       <span class="m">// payorCode</span>
+    "RJ",            <span class="m">// coverage: RJ / RI</span>
+    "01102026",      <span class="m">// dateFrom</span>
+    "08102026");     <span class="m">// dateTo</span>
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila payor/kode tidak ditemukan</span>
+    return;
+}
+
+foreach (var claim in result.ClaimsList)
+{
+    <span class="m">// claim.ClID, claim.PatientName, claim.InvoiceNo</span>
+    <span class="m">// claim.TotAmtIncurred, claim.TotAmtApproved, claim.ClStatus</span>
+}</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"preRegisterEbillEnquiryResponse"</span>: {
+        <span class="k">"preRegisterEbillEnquiry"</span>: {
+          <span class="k">"payorCode"</span>: <span class="s">"ADMEDKA"</span>,
+          <span class="k">"payorName"</span>: <span class="s">"JAMINAN KESEHATAN"</span>,
+          <span class="k">"coverage"</span>: <span class="s">"RJ"</span>,
+          <span class="k">"dateFrom"</span>: <span class="s">"01102026"</span>,
+          <span class="k">"dateTo"</span>: <span class="s">"08102026"</span>,
+          <span class="k">"tot_claims"</span>: <span class="n">2</span>,
+          <span class="k">"claimsList"</span>: [
+            {
+              <span class="k">"clID"</span>: <span class="s">"xx650092"</span>,
+              <span class="k">"patientName"</span>: <span class="s">"TESTDENTAL SEMBILAN"</span>,
+              <span class="k">"icdCode"</span>: <span class="s">"K02.1"</span>,
+              <span class="k">"totAmtIncurred"</span>: <span class="s">"90000.00"</span>,
+              <span class="k">"totAmtApproved"</span>: <span class="s">"90000.00"</span>,
+              <span class="k">"covCode"</span>: <span class="s">"DENTAL"</span>,
+              <span class="k">"clStatus"</span>: <span class="s">"40"</span>,
+              <span class="k">"clDesc"</span>: <span class="s">"VALID CLAIM"</span>
+            }
+          ]
+        }
+      }
+    }
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — payor tidak ditemukan (1840)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"preRegisterEbillEnquiryResponse"</span>: {
+        <span class="k">"preRegisterEbillEnquiry"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1840</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Not found! [payorCode] [ADMEDXXX]"</span>
+        }
+      }
+    }
+  }
+}</pre>
+
+    <h3>3.2 PreRegisterEbill (multipart)</h3>
+    <pre class="terminal"><span class="m">// perlu: using System.IO;</span>
+var files = new[]
+{
+    new AdmedikaFile
+    {
+        FileName = "receipt.pdf",
+        ContentType = "application/pdf",
+        Content = File.ReadAllBytes(@"C:\dokumen\receipt.pdf")
+    }
+};
+
+var request = new PreRegisterEbillPayload
+{
+    PayorCode = "ADMEDKA",
+    Coverage = "RJ",
+    DateFrom = "01102026",
+    DateTo = "08102026",
+    InvoiceNo = "INV-20261002-001",
+    InvoiceDate = "02102026",
+    PreparedBy = "user01",
+    TotAmountDue = "100000",
+    SelectedClaims = new[]
+    {
+        new PreRegisterEbillSelectedClaim { ClID = "xx650092" },
+        new PreRegisterEbillSelectedClaim { ClID = "xx650087" }
+    }
+};
+
+var result = srv.PreRegisterEbill(request, files);
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1810 bila jumlah klaim tidak cocok</span>
+    return;
+}
+
+OpenUrl(result.SuratJalanLink);   <span class="m">// surat jalan pre-regist</span>
+foreach (var claim in result.SelectedClaims)
+{
+    <span class="m">// claim.ClID, claim.Status</span>
+}</pre>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"preRegisterEbillResponse"</span>: {
+        <span class="k">"preRegisterEbill"</span>: {
+          <span class="k">"surat_jalan_link"</span>: <span class="s">"https://mobile.admedika.co.id/edc/letters/surat_jalan_pre_regist.php?xcode=..."</span>,
+          <span class="k">"selectedClaims"</span>: [
+            { <span class="k">"clID"</span>: <span class="s">"28XXXX"</span>, <span class="k">"status"</span>: <span class="s">"Success"</span> },
+            { <span class="k">"clID"</span>: <span class="s">"2865XXX"</span>, <span class="k">"status"</span>: <span class="s">"Success"</span> }
+          ]
+        }
+      }
+    }
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — jumlah klaim tidak cocok (1810)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"preRegisterEbillResponse"</span>: {
+        <span class="k">"preRegisterEbill"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1810</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Not match! [totSelectedClaims: 1] is not equal to selectedClaims [count(): 2]"</span>
+        }
+      }
+    }
+  }
+}</pre>
+  </section>
+
+  <section>
+    <h2>4. Invoice Tracking</h2>
+    <p class="lead">Mencari invoice dan menampilkan ringkasan klaim di dalamnya.</p>
+
+    <pre class="terminal"><span class="m">// invoice spesifik: isi invoiceNo lengkap, dateName null</span>
+var result = srv.InvoiceTracking("INV-20261002-001", null, null, null);
+
+<span class="m">// pencarian per rentang tanggal</span>
+var byDate = srv.InvoiceTracking("TES", "RECEIVED_DATE", "01032026", "04032026");
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila invoice tidak ditemukan</span>
+    return;
+}
+
+foreach (var inv in result.InvoiceTracking)
+{
+    <span class="m">// inv.InvoiceNo, inv.PayorName, inv.TotClaims</span>
+    <span class="m">// inv.TotAmtIncurred, inv.TotAmtPaid, inv.ReceivedDate</span>
+    <span class="m">// inv.RegisterDate, inv.SubmissionDate, inv.AdmedNo, inv.PaymentDate</span>
+}</pre>
+
+    <table>
+      <thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td><code>terminalID</code></td><td>Otomatis</td><td>Diambil dari konfigurasi</td></tr>
+        <tr><td><code>invoiceNo</code></td><td><span class="badge b-required">R</span></td><td>Nomor invoice; untuk pencarian spesifik gunakan nomor lengkap</td></tr>
+        <tr><td><code>dateName</code></td><td><span class="badge b-optional">O</span></td><td><code>RECEIVED_DATE</code> (default) atau <code>REGISTER_DATE</code></td></tr>
+        <tr><td><code>dateFrom</code>, <code>dateTo</code></td><td><span class="badge b-optional">O</span></td><td>DDMMYYYY</td></tr>
+      </tbody>
+    </table>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"invoiceTrackingResponse"</span>: {
+        <span class="k">"invoiceTracking"</span>: [
+          {
+            <span class="k">"payorName"</span>: <span class="s">"ADMEDIKA"</span>,
+            <span class="k">"payorCode"</span>: <span class="s">"PT ADMINISTRASI MEDIKA"</span>,
+            <span class="k">"invoiceNo"</span>: <span class="s">"TES KLAIM 2"</span>,
+            <span class="k">"totClaims"</span>: <span class="s">"1"</span>,
+            <span class="k">"totAmtIncurred"</span>: <span class="s">"1800000"</span>,
+            <span class="k">"totAmtPaid"</span>: <span class="s">"0"</span>,
+            <span class="k">"receivedDate"</span>: <span class="s">"Mar-04-2026"</span>,
+            <span class="k">"registerDate"</span>: <span class="s">""</span>,
+            <span class="k">"submissionDate"</span>: <span class="s">""</span>,
+            <span class="k">"admedNo"</span>: <span class="s">""</span>,
+            <span class="k">"paymentDate"</span>: <span class="s">""</span>
+          }
+        ]
+      }
+    }
+  }
+}</pre>
+  </section>
+
+  <section>
+    <h2>5. Invoice Tracking Details</h2>
+    <p class="lead">Menampilkan klaim-klaim di dalam satu invoice, lengkap dengan nominal dan status.</p>
+
+    <pre class="terminal">var result = srv.InvoiceTrackingDetails(
+    "ADMEDKA",          <span class="m">// payorCode dari INVOICE_TRACKING</span>
+    "Arie245");         <span class="m">// invoiceNo lengkap</span>
+
+if (!srv.IsOk(result, out message))
+{
+    ShowError(message);   <span class="m">// 1840 bila invoice/payor tidak ditemukan</span>
+    return;
+}
+
+foreach (var detail in result.Details)
+{
+    <span class="m">// detail.ClaimsID, detail.PatientName, detail.ProvName</span>
+    <span class="m">// detail.CovCode, detail.AdmissionDate, detail.DischargeDate</span>
+    <span class="m">// detail.AmtIncurred, detail.AmtApproved, detail.AmtToPay</span>
+    <span class="m">// detail.AmtPaidToProvider, detail.IcdCode, detail.ClStatus, detail.Remarks</span>
+}</pre>
+
+    <table>
+      <thead><tr><th>Field</th><th>Wajib</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td><code>terminalID</code></td><td>Otomatis</td><td>Diambil dari konfigurasi</td></tr>
+        <tr><td><code>payorCode</code></td><td><span class="badge b-required">R</span></td><td>Payor code dari hasil <code>INVOICE_TRACKING</code></td></tr>
+        <tr><td><code>invoiceNo</code></td><td><span class="badge b-required">R</span></td><td>Nomor invoice lengkap</td></tr>
+      </tbody>
+    </table>
+
+    <p class="json-cap">Respons sukses (JSON)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"00"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"invoiceTrackingDetailsResponse"</span>: {
+        <span class="k">"invoiceTrackingDetails"</span>: {
+          <span class="k">"payorCode"</span>: <span class="s">"ADMEDKA"</span>,
+          <span class="k">"invoiceNo"</span>: <span class="s">"Arie245"</span>,
+          <span class="k">"details"</span>: [
+            {
+              <span class="k">"claimsID"</span>: <span class="s">"XXXX1"</span>,
+              <span class="k">"patientName"</span>: <span class="s">"Test Name1"</span>,
+              <span class="k">"provCode"</span>: <span class="s">"XXXX"</span>,
+              <span class="k">"provName"</span>: <span class="s">"ADMEDIKA MEDICAL CENTRE"</span>,
+              <span class="k">"covCode"</span>: <span class="s">"GP"</span>,
+              <span class="k">"admissionDate"</span>: <span class="s">"Jan-14-2026"</span>,
+              <span class="k">"dischargeDate"</span>: <span class="s">"Jan-14-2026"</span>,
+              <span class="k">"amtIncurred"</span>: <span class="s">"2000"</span>,
+              <span class="k">"amtApproved"</span>: <span class="s">"2000"</span>,
+              <span class="k">"amtToPay"</span>: <span class="s">"0"</span>,
+              <span class="k">"amtPaidToProvider"</span>: <span class="s">"0"</span>,
+              <span class="k">"icdCode"</span>: <span class="s">"R23.2"</span>,
+              <span class="k">"clStatus"</span>: <span class="s">"40"</span>,
+              <span class="k">"remarks"</span>: <span class="s">""</span>
+            }
+          ]
+        }
+      }
+    }
+  }
+}</pre>
+
+    <p class="json-cap fail">Respons gagal — invoice tidak ditemukan (1840)</p>
+    <pre class="terminal">{
+  <span class="k">"output"</span>: {
+    <span class="k">"statusCode"</span>: <span class="s">"910"</span>,
+    <span class="k">"txnData"</span>: {
+      <span class="k">"invoiceTrackingDetailsResponse"</span>: {
+        <span class="k">"invoiceTrackingDetails"</span>: {
+          <span class="k">"errorCode"</span>: <span class="n">1840</span>,
+          <span class="k">"errorDesc"</span>: <span class="s">"Not found! [invoiceNo: XXXXXXX] for this [payorCode: XXXXXXXX]."</span>
+        }
+      }
+    }
+  }
+}</pre>
+  </section>
+
+  <section>
+    <h2>6. Kode respons yang sering muncul</h2>
+    <table>
+      <thead><tr><th class="nowrap">Kode</th><th>Arti</th><th>Muncul saat</th></tr></thead>
+      <tbody>
+        <tr><td><code>1840</code></td><td>Not found</td><td>Payor, invoice, atau klaim tidak ditemukan</td></tr>
+        <tr><td><code>1810</code></td><td>Not match</td><td>Jumlah/komposisi data tidak cocok (mis. total klaim)</td></tr>
+        <tr><td><code>1813</code></td><td>Terminal not found</td><td>Terminal ID tidak terdaftar pada payor</td></tr>
+        <tr><td><code>1829</code></td><td>Tanggal tidak valid</td><td>Format tanggal bukan DDMMYYYY</td></tr>
+        <tr><td><code>1999</code></td><td>Cannot be empty</td><td>Field wajib kosong (payorCode/invoiceNo)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <p>Semua respons bisnis tetap <strong>HTTP 200</strong>. Periksa
+        <code>TechnicalError</code> → <code>IsSuccess</code> → <code>ErrorCode/ErrorDesc</code>,
+        bukan HTTP status.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>7. Contoh urutan terverifikasi</h2>
+    <div class="terminal"><span class="m"># pre-register E-Bill rawat jalan</span>
+PreRegisterEbillEnquiry      <span class="g">→ daftar klaim siap E-Bill</span>
+PreRegisterEbill (multipart) <span class="g">→ surat_jalan_link + status klaim</span>
+
+<span class="m"># pelacakan invoice</span>
+InvoiceTracking              <span class="g">→ daftar invoice + total</span>
+InvoiceTrackingDetails       <span class="g">→ rincian klaim per invoice</span></div>
+  </section>
+
+  <section>
+    <h2>8. Catatan operasional</h2>
+    <ul>
+      <li><code>payorCode</code> disimpan saat eligibility; dipakai untuk enquiry, pre-register, dan detail invoice.</li>
+      <li><code>totSelectedClaims</code> dan <code>totItems</code> dihitung otomatis oleh service; jangan diisi manual.</li>
+      <li>Untuk pencarian invoice spesifik, isi <code>invoiceNo</code> lengkap dan biarkan <code>dateName</code> kosong.</li>
+      <li>Dokumen E-Bill dikirim sebagai multipart: field <code>data</code> (JSON) dan <code>files</code>.</li>
+      <li>Nominal dari gateway diteruskan apa adanya; jangan memformat ulang sebelum menyimpan.</li>
+      <li>Simpan <code>surat_jalan_link</code> dan status per <code>clID</code> untuk audit.</li>
+    </ul>
+  </section>
+
+  <footer>
+    Avicenna × Gateway@AdMedika — dokumen internal. Diperbarui 23 November 2026.
+  </footer>
+</div>
+</body>
+</html>

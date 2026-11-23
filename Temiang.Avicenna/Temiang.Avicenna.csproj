@@ -1957,6 +1957,8 @@
     <Content Include="Document\2026\09\01\01. PPRA Non PPAB Approval Parameter and Flag.sql" />
     <Content Include="Document\2026\10\02\01.CR-EMR-Correction-MDS-Attachment.sql" />
     <Content Include="Document\2026\10\29\1.CREATE_View_Vw_GuarantorAdmedika.sql" />
+    <Content Include="Document\Admedika\alur_inpatient.html" />
+    <Content Include="Document\Admedika\alur_keuangan.html" />
     <Content Include="Document\Admedika\alur_outpatient.html" />
     <Content Include="Document\Bpjs Face Scan\frista-helper.bat" />
     <Content Include="Document\Bpjs Face Scan\run_frista.bat" />

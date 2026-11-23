@@ -245,6 +245,8 @@
     <Compile Include="Admedika\Response\RePrintOutResponse.cs" />
     <Compile Include="Admedika\Request\InvoiceTrackingRequest.cs" />
     <Compile Include="Admedika\Response\InvoiceTrackingResponse.cs" />
+    <Compile Include="Admedika\Request\InvoiceTrackingDetailsRequest.cs" />
+    <Compile Include="Admedika\Response\InvoiceTrackingDetailsResponse.cs" />
     <Compile Include="Admedika\Request\EdocsUploadRequest.cs" />
     <Compile Include="Admedika\Response\EdocsUploadResponse.cs" />
     <Compile Include="Admedika\Transport\AdmedikaFile.cs" />

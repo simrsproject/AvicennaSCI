@@ -895,6 +895,35 @@ namespace Temiang.Avicenna.Common.Admedika
                 });
         }
 
+        public InvoiceTrackingDetailsResponse InvoiceTrackingDetails(string payorCode, string invoiceNo)
+        {
+            var response = new InvoiceTrackingDetailsResponse();
+            if (!RequireTerminalId(response)) return response;
+
+            payorCode = Normalize(payorCode);
+            invoiceNo = Normalize(invoiceNo);
+
+            if (string.IsNullOrEmpty(payorCode))
+                return ValidationFailed(response, "payorCode cannot be empty.");
+            if (string.IsNullOrEmpty(invoiceNo))
+                return ValidationFailed(response, "invoiceNo cannot be empty.");
+
+            return Send<InvoiceTrackingDetailsResponse>(
+                AdmedikaConstant.ServiceID.InvoiceTrackingDetails,
+                new InvoiceTrackingDetailsTxnData
+                {
+                    Request = new InvoiceTrackingDetailsRequest
+                    {
+                        InvoiceTrackingDetails = new InvoiceTrackingDetailsPayload
+                        {
+                            TerminalID = _config.TerminalID,
+                            PayorCode = payorCode,
+                            InvoiceNo = invoiceNo
+                        }
+                    }
+                });
+        }
+
         public RePrintOutResponse RePrintOut(string clID, string rePrintType)
         {
             return Send<RePrintOutResponse>(
