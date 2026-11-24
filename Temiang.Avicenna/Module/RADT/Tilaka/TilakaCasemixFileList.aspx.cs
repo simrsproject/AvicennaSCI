@@ -17,7 +17,17 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             UrlPageDetail = "TilakaSigningDetail.aspx";
         }
 
-        protected void btnSearch_OnClick(object sender, EventArgs e)
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuAdd.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuView.Visible = false;
+        }
+
+        protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             Session.Remove(SessionNameForList);
             grdList.Rebind();
@@ -96,13 +106,22 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var query = new TilakaCasemixFileQuery("a");
             var paramedic = new ParamedicQuery("b");
             query.LeftJoin(paramedic).On(query.ParamedicID == paramedic.ParamedicID);
-            query.Select(query, paramedic.IsUsingESignature);
+            query.Select(query,
+                paramedic.ParamedicName,
+                paramedic.IsUsingESignature);
             query.Where(query.IsVoid == false);
 
             if (!string.IsNullOrWhiteSpace(txtRegistrationNo.Text))
                 query.Where(query.RegistrationNo.Like("%" + txtRegistrationNo.Text.Trim() + "%"));
-            if (!string.IsNullOrWhiteSpace(txtParamedicID.Text))
-                query.Where(query.ParamedicID == txtParamedicID.Text.Trim());
+
+            var doctorKeyword = txtParamedicID.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(doctorKeyword))
+            {
+                var keyword = "%" + doctorKeyword + "%";
+                query.Where(query.Or(
+                    query.ParamedicID.Like(keyword),
+                    paramedic.ParamedicName.Like(keyword)));
+            }
 
             query.es.Top = AppSession.Parameter.MaxResultRecord;
             query.OrderBy(query.CasemixFileID.Descending);

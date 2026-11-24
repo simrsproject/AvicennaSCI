@@ -2,24 +2,73 @@
     CodeBehind="TilakaCasemixFileList.aspx.cs"
     Inherits="Temiang.Avicenna.Module.RADT.Tilaka.TilakaCasemixFileList" %>
 <%@ Register TagPrefix="telerik" Namespace="Telerik.Web.UI" Assembly="Telerik.Web.UI" %>
+<%@ Register TagPrefix="cc" Namespace="Temiang.Avicenna.CustomControl" Assembly="Temiang.Avicenna" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <table class="layout">
-        <tr>
-            <td class="label">Registration No</td>
-            <td><telerik:RadTextBox ID="txtRegistrationNo" runat="server" Width="200px" /></td>
-            <td class="label">Dokter</td>
-            <td><telerik:RadTextBox ID="txtParamedicID" runat="server" Width="150px" /></td>
-            <td><asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="btnSearch_OnClick" /></td>
-        </tr>
-    </table>
+    <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
+        <AjaxSettings>
+            <telerik:AjaxSetting AjaxControlID="btnFilterRegistrationNo">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterParamedic">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="grdList">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+        </AjaxSettings>
+    </telerik:RadAjaxManagerProxy>
+
+    <cc:CollapsePanel ID="CollapsePanel1" runat="server" Title="Search Filter">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="50%" style="vertical-align: top">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">Registration No</td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtRegistrationNo" runat="server" Width="300px" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterRegistrationNo" runat="server"
+                                    ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%" style="vertical-align: top">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">Dokter (ID/Nama)</td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtParamedicID" runat="server" Width="300px" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterParamedic" runat="server"
+                                    ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </cc:CollapsePanel>
 
     <telerik:RadGrid ID="grdList" runat="server" AllowPaging="True" PageSize="20"
         OnNeedDataSource="grdList_NeedDataSource" OnItemCommand="grdList_ItemCommand">
         <MasterTableView DataKeyNames="CasemixFileID" ClientDataKeyNames="CasemixFileID" AutoGenerateColumns="false">
             <Columns>
                 <telerik:GridBoundColumn DataField="RegistrationNo" HeaderText="Registration No" UniqueName="RegistrationNo" />
-                <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="Dokter" UniqueName="ParamedicID" />
+                <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ID Dokter" UniqueName="ParamedicID" />
+                <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Nama Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="FileName" HeaderText="File Name" UniqueName="FileName" />
                 <telerik:GridBoundColumn DataField="FilePath" HeaderText="File Path" UniqueName="FilePath" />
                 <telerik:GridBoundColumn DataField="RequestStatus" HeaderText="Status" UniqueName="RequestStatus" />

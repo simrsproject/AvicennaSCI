@@ -37,7 +37,7 @@
                 <td width="50%" style="vertical-align: top">
                     <table width="100%">
                         <tr>
-                            <td class="label">Dokter</td>
+                            <td class="label">Dokter (ID/Nama)</td>
                             <td class="entry">
                                 <telerik:RadTextBox ID="txtParamedicName" runat="server" Width="300px" />
                             </td>

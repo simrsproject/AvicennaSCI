@@ -183,8 +183,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             query.Where(query.Or(
                 query.IsUsingESignature == true,
                 tilaka.TilakaRegistrationID.IsNotNull()));
-            if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
-                query.Where(query.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
+            var doctorKeyword = txtParamedicName.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(doctorKeyword))
+            {
+                var keyword = "%" + doctorKeyword + "%";
+                query.Where(query.Or(
+                    query.ParamedicID.Like(keyword),
+                    query.ParamedicName.Like(keyword)));
+            }
 
             var table = query.LoadDataTable();
             table.Columns.Add("StatusText", typeof(string));
