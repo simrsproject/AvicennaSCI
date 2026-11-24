@@ -53,6 +53,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             long id;
             if (!long.TryParse(Convert.ToString(e.CommandArgument), out id)) return;
 
+            lblMessage.Text = string.Empty;
+
             var result = ProcessSignature(id);
             if (result.IsSuccess && result.Record != null)
             {
@@ -61,7 +63,19 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 return;
             }
 
-            lblMessage.Text = result.Message;
+            if (result.IsSuccess)
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Green;
+                lblMessage.Text = "Request signature berhasil dibuat.";
+            }
+            else
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = string.IsNullOrWhiteSpace(result.Message)
+                    ? "Gagal memproses tanda tangan."
+                    : result.Message;
+            }
+
             Session.Remove(SessionNameForList);
             grdList.Rebind();
         }

@@ -20,6 +20,7 @@
             <telerik:AjaxSetting AjaxControlID="grdList">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="lblMessage" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
         </AjaxSettings>
@@ -62,6 +63,8 @@
         </table>
     </cc:CollapsePanel>
 
+    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+
     <telerik:RadGrid ID="grdList" runat="server" AllowPaging="True" PageSize="20"
         OnNeedDataSource="grdList_NeedDataSource" OnItemCommand="grdList_ItemCommand">
         <MasterTableView DataKeyNames="CasemixFileID" ClientDataKeyNames="CasemixFileID" AutoGenerateColumns="false">
@@ -77,6 +80,7 @@
                         <asp:LinkButton ID="btnProcess" runat="server" Text="Process Signature"
                             CommandName="process" CommandArgument='<%# Eval("CasemixFileID") %>'
                             Enabled='<%# Eval("CanProcess") %>'
+                            OnClientClick="return confirm('Proses tanda tangan untuk file ini? Pastikan dokter dan template sudah benar.');"
                             ToolTip='<%# Convert.ToBoolean(Eval("CanProcess")) ? "" : "Dokter tidak menggunakan tanda tangan elektronik atau request masih berjalan." %>' />
                         <asp:LinkButton ID="btnStatus" runat="server" Text="Status"
                             CommandName="status" CommandArgument='<%# Eval("RequestID") %>'
@@ -86,6 +90,4 @@
             </Columns>
         </MasterTableView>
     </telerik:RadGrid>
-
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>
