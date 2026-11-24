@@ -76,9 +76,9 @@
                 <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="Email" HeaderText="Email" UniqueName="Email" />
                 <telerik:GridBoundColumn DataField="TilakaName" HeaderText="Tilaka Name" UniqueName="TilakaName" />
-                <telerik:GridBoundColumn DataField="CertificateStatus" HeaderText="Sertifikat" UniqueName="CertificateStatus" />
+                <telerik:GridBoundColumn DataField="CertificateStatus" HeaderText="Sertifikat Status" UniqueName="CertificateStatus" />
                 <telerik:GridBoundColumn DataField="QuickSignStatus" HeaderText="Quick Sign" UniqueName="QuickSignStatus" />
-                <telerik:GridBoundColumn DataField="QuickSignRegisteredDateTime" HeaderText="Terdaftar"
+                <telerik:GridBoundColumn DataField="QuickSignRegisteredDateTime" HeaderText="Register Time"
                     DataFormatString="{0:dd-MM-yyyy HH:mm}" UniqueName="QuickSignRegisteredDateTime" />
                 <telerik:GridBoundColumn DataField="QuickSignLastErrorMessage" HeaderText="Error" UniqueName="QuickSignLastErrorMessage" />
                 <telerik:GridTemplateColumn HeaderText="Action" UniqueName="Action">

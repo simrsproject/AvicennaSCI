@@ -9,7 +9,7 @@ INSERT INTO AppProgram (
     IsUsingReportHeader, IsDirectPrintEnable, IsListLoadRecordOnInit, IsListLoadRecordIfFiltered, IsProgramRedirected,
     ApplicationID, ZplCommandTemplate, IsProgramExportAble, IsProgramCrossUnitAble, IsProgramPowerUserAble, SRProgramCategory
 ) VALUES (
-    '01.23.02', '01.23', 'File Casemix', '01', 2, 2, '',
+    '01.23.02', '01.23', 'Casemix Files for Signature (Quick Sign)', '01', 2, 4, '',
     0, 1, 0, 'PRG',
     1, 1, 1, 1,
     0, 0, 0, 0,
@@ -31,7 +31,7 @@ INSERT INTO AppProgram (
     IsUsingReportHeader, IsDirectPrintEnable, IsListLoadRecordOnInit, IsListLoadRecordIfFiltered, IsProgramRedirected,
     ApplicationID, ZplCommandTemplate, IsProgramExportAble, IsProgramCrossUnitAble, IsProgramPowerUserAble, SRProgramCategory
 ) VALUES (
-    '01.23.03', '01.23', 'Tanda Tangan (Quick Sign)', '01', 2, 3, '',
+    '01.23.03', '01.23', 'Quick Sign Request Tracking', '01', 2, 5, '',
     0, 1, 0, 'PRG',
     1, 1, 1, 1,
     0, 0, 0, 0,
@@ -53,7 +53,7 @@ INSERT INTO AppProgram (
     IsUsingReportHeader, IsDirectPrintEnable, IsListLoadRecordOnInit, IsListLoadRecordIfFiltered, IsProgramRedirected,
     ApplicationID, ZplCommandTemplate, IsProgramExportAble, IsProgramCrossUnitAble, IsProgramPowerUserAble, SRProgramCategory
 ) VALUES (
-    '01.23.04', '01.23', 'Quick Sign User', '01', 2, 4, '',
+    '01.23.04', '01.23', 'Registrasi Quick Sign User', '01', 2, 2, '',
     0, 1, 0, 'PRG',
     0, 1, 0, 1,
     0, 0, 0, 0,
@@ -75,7 +75,7 @@ INSERT INTO AppProgram (
     IsUsingReportHeader, IsDirectPrintEnable, IsListLoadRecordOnInit, IsListLoadRecordIfFiltered, IsProgramRedirected,
     ApplicationID, ZplCommandTemplate, IsProgramExportAble, IsProgramCrossUnitAble, IsProgramPowerUserAble, SRProgramCategory
 ) VALUES (
-    '01.23.05', '01.23', 'Template Tanda Tangan', '01', 2, 5, '',
+    '01.23.05', '01.23', 'Template Tanda Tangan', '01', 2, 3, '',
     0, 1, 0, 'PRG',
     1, 1, 1, 1,
     0, 0, 0, 0,
