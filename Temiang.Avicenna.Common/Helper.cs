@@ -1319,7 +1319,10 @@ namespace Temiang.Avicenna.Common
         {
             try
             {
-                return AppSession.UserLogin.UserHostName;
+                if (HttpContext.Current != null && HttpContext.Current.Session != null)
+                    return AppSession.UserLogin.UserHostName;
+
+                return string.IsNullOrWhiteSpace(Common.Helper.ClientIP()) ? string.Empty : Common.Helper.ClientIP();
             }
             catch
             {

@@ -5495,6 +5495,7 @@
     <Compile Include="Bridging\Antrol\SisaAntrean.cs" />
     <Compile Include="Bridging\Antrol\StatusAntrean.cs" />
     <Compile Include="Bridging\AuthenticationMiddleware.cs" />
+    <Compile Include="Bridging\AntrolTaskQueueProcessor.cs" />
     <Compile Include="Bridging\Controllers\AntrolController.cs" />
     <Compile Include="Bridging\Controllers\EisDinkesController.cs" />
     <Compile Include="Bridging\Controllers\JakiHelfaController.cs" />

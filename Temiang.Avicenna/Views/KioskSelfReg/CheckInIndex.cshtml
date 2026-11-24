@@ -67,6 +67,11 @@
             url: BaseURL + "/antrol/selfcheckin/postselfcheckIn",
             data: rpSTR,
             success: function (data) {
+                CoreButtonLoadingOff($(btn));
+                if (!data || !data.metadata) {
+                    ShowError('Respons check-in kosong. Periksa status registrasi sebelum mencoba kembali.');
+                    return;
+                }
                 console.log(data);
                 if (data.metadata.Code == "200") {
                     //console.log(data.Response);
@@ -80,7 +85,7 @@
                     }, 2000);
                     ResetValue();
                 } else {
-                    ShowError(data.metadata.message);
+                    ShowError(data.metadata.Message || data.metadata.message || 'Proses check-in belum berhasil.');
                 }
                 CoreButtonLoadingOff($(btn));
             },
@@ -91,6 +96,9 @@
                 } catch {
                     ShowError(xhr.responseText);
                 }
+            },
+            complete: function () {
+                CoreButtonLoadingOff($(btn));
             },
             dataType: 'json'
         });

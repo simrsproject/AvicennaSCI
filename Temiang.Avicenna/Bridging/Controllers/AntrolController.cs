@@ -4526,7 +4526,12 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 {
                     svc = new Common.BPJS.VClaim.v11.Service();
                     var srkresponse = svc.GetRencanaKontrolByNoPeserta(appt.AppointmentDate?.Date.ToString("MM"), appt.AppointmentDate?.Date.ToString("yyyy"), string.IsNullOrWhiteSpace(appt.GuarantorCardNo) ? pasien.GuarantorCardNo : appt.GuarantorCardNo, Common.BPJS.VClaim.Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
-                    var srk = srkresponse.Response.List.Where(r => r.TglRencanaKontrol == appt.AppointmentDate?.ToString("yyyy-MM-dd")).SingleOrDefault();
+                    var candidates = srkresponse?.Response?.List?.Where(r => r != null &&
+                        r.TglRencanaKontrol == appt.AppointmentDate?.ToString("yyyy-MM-dd")).ToList();
+                    if (candidates != null && candidates.Count > 1)
+                        candidates = candidates.Where(r => !string.IsNullOrWhiteSpace(appt.ReferenceNumber) &&
+                            string.Equals(r.NoSuratKontrol?.Trim(), appt.ReferenceNumber.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+                    var srk = candidates?.Count == 1 ? candidates[0] : null;
                     if (srk == null)
                     {
                         log.Response = JsonConvert.SerializeObject(new
@@ -4863,7 +4868,12 @@ namespace Temiang.Avicenna.Bridging.Controllers
                 svc = new Common.BPJS.VClaim.v11.Service();
                 var srkresponse = svc.GetRencanaKontrolByNoPeserta(appt.AppointmentDate?.Date.ToString("MM"), appt.AppointmentDate?.Date.ToString("yyyy"), string.IsNullOrWhiteSpace(appt.GuarantorCardNo) ? pasien.GuarantorCardNo : appt.GuarantorCardNo,
                     Common.BPJS.VClaim.Enum.FilterRencanaKontrol.TanggalRencanaKontrol);
-                var srk = srkresponse.Response.List.Where(r => r.TglRencanaKontrol == appt.AppointmentDate?.ToString("yyyy-MM-dd")).SingleOrDefault();
+                var candidates = srkresponse?.Response?.List?.Where(r => r != null &&
+                    r.TglRencanaKontrol == appt.AppointmentDate?.ToString("yyyy-MM-dd")).ToList();
+                if (candidates != null && candidates.Count > 1)
+                    candidates = candidates.Where(r => !string.IsNullOrWhiteSpace(appt.ReferenceNumber) &&
+                        string.Equals(r.NoSuratKontrol?.Trim(), appt.ReferenceNumber.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+                var srk = candidates?.Count == 1 ? candidates[0] : null;
                 if (srk == null)
                 {
                     log.Response = JsonConvert.SerializeObject(new
@@ -6289,6 +6299,9 @@ namespace Temiang.Avicenna.Bridging.Controllers
 
                 var regno = reg.RegistrationNo;
 
+                bool queueAntrol = string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolTaskQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(AppSession.Parameter.HealthcareID, "RSI", StringComparison.OrdinalIgnoreCase)
+                    && Helper.IsBpjsAntrolIntegration && !(reg.IsNewPatient ?? false);
                 using (var trans = new esTransactionScope())
                 {
                     appt.Save();
@@ -6313,9 +6326,27 @@ namespace Temiang.Avicenna.Bridging.Controllers
                     if (TransChargesItemsDTConsumption.Count > 0) TransChargesItemsDTConsumption.Save();
                     if (CostCalculations.Count > 0) CostCalculations.Save();
 
+                    if (queueAntrol)
+                    {
+                        var args = new esParameters();
+                        args.Add("Booking", appt.AppointmentNo, esParameterDirection.Input, DbType.String, 50);
+                        args.Add("Started", checkInStartedAt.ToUnixTimeMilliseconds(), esParameterDirection.Input, DbType.Int64, 0);
+                        args.Add("Finished", DateTimeOffset.Now.ToUnixTimeMilliseconds(), esParameterDirection.Input, DbType.Int64, 0);
+                        new Temiang.Dal.Core.esUtility().ExecuteNonQuery("dbo", "BpjsAntrolEnqueueCheckIn", args);
+                    }
                     trans.Complete();
                 }
 
+                if (queueAntrol)
+                {
+                    try { 
+                        AntrolTaskQueueProcessor.Run(appt.AppointmentNo); 
+                    }
+                    catch (Exception)
+                    {
+                        System.Diagnostics.Trace.TraceError("Antrol pending task requires scheduled recovery");
+                    }
+                }
                 // =============================
                 // GENERATE VISIT QUEUE UNTUK CHECK IN MANDIRI
                 // =============================
@@ -6423,7 +6454,7 @@ namespace Temiang.Avicenna.Bridging.Controllers
                         });
                     }
 
-                    if (!isEnable || CanSendRsiSelfCheckInTask3(appt.AppointmentNo, checkInStartedAt))
+                    if (!queueAntrol && (!isEnable || CanSendRsiSelfCheckInTask3(appt.AppointmentNo, checkInStartedAt)))
                         SendSelfCheckInTask(appt.AppointmentNo, 3, DateTimeOffset.Now);
                 }
 
@@ -6521,6 +6552,21 @@ namespace Temiang.Avicenna.Bridging.Controllers
             });
         }
 
+        [System.Web.Http.HttpPost]
+        [System.Web.Http.Route("antrol/taskqueue/process")]
+        public HttpResponseMessage ProcessAntrolTaskQueue()
+        {
+            var key = System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolTaskQueueJobKey"];
+            System.Collections.Generic.IEnumerable<string> values;
+            if (string.IsNullOrWhiteSpace(key) || !Request.Headers.TryGetValues("x-antrol-job-key", out values)
+                || !values.SequenceEqual(new[] { key }))
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
+            if (!string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolTaskQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(AppSession.Parameter.HealthcareID, "RSI", StringComparison.OrdinalIgnoreCase)
+                || !Helper.IsBpjsAntrolIntegration)
+                return Request.CreateResponse(HttpStatusCode.Conflict);
+            return Request.CreateResponse(HttpStatusCode.OK, new { processed = AntrolTaskQueueProcessor.Run() });
+        }
         private bool CanSendRsiSelfCheckInTask3(string bookingNo, DateTimeOffset checkInStartedAt)
         {
             var request = new Common.BPJS.Antrian.List.TaskId.Request.Root { Kodebooking = bookingNo };

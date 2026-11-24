@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -57,7 +57,7 @@ namespace Temiang.Avicenna.BusinessObject.Common
                     {
                         try
                         {
-                            entity.SetColumn("CreatedByUserID", HttpContext.Current.Session["_UserLogin"] != null ? ((UserLogin)HttpContext.Current.Session["_UserLogin"]).UserID : "WEBSERVICE");
+                            entity.SetColumn("CreatedByUserID", HttpContext.Current?.Session?["_UserLogin"] is UserLogin ? ((UserLogin)HttpContext.Current.Session["_UserLogin"]).UserID : "WEBSERVICE");
                         }
                         catch (Exception)
                         {
@@ -69,7 +69,7 @@ namespace Temiang.Avicenna.BusinessObject.Common
                     {
                         try
                         {
-                            entity.SetColumn("CreateByUserID", HttpContext.Current.Session["_UserLogin"] != null ? ((UserLogin)HttpContext.Current.Session["_UserLogin"]).UserID : "WEBSERVICE");
+                            entity.SetColumn("CreateByUserID", HttpContext.Current?.Session?["_UserLogin"] is UserLogin ? ((UserLogin)HttpContext.Current.Session["_UserLogin"]).UserID : "WEBSERVICE");
                         }
                         catch (Exception)
                         {
@@ -101,7 +101,7 @@ namespace Temiang.Avicenna.BusinessObject.Common
                         try
                         {
                             entity.SetColumn("LastUpdateByUserID",
-                                ((UserLogin)HttpContext.Current.Session["_UserLogin"]).UserID != null
+                                (HttpContext.Current?.Session?["_UserLogin"] as UserLogin)?.UserID != null
                                     ? ((UserLogin)HttpContext.Current.Session["_UserLogin"]).UserID
                                     : "WEBSERVICE");
                         }
