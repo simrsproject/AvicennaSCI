@@ -39,6 +39,16 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             ToolBarMenuSearch.Enabled = false;
         }
 
+        protected override void OnMenuMoveNextClick(ValidateArgs args)
+        {
+            Response.Redirect("TilakaTemplateSignFileList.aspx");
+        }
+
+        protected override void OnMenuMovePrevClick(ValidateArgs args)
+        {
+            Response.Redirect("TilakaTemplateSignFileList.aspx");
+        }
+
         protected override void OnDataModeChanged(AppEnum.DataMode oldVal, AppEnum.DataMode newVal)
         {
             base.OnDataModeChanged(oldVal, newVal);
