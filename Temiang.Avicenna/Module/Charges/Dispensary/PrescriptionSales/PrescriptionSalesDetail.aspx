@@ -375,7 +375,7 @@
                oWnd.setUrl("openApolDetail.aspx?itemid=" + itemid + "&itemiid=" + itemiid + "&rno=" + regNo.get_value() + "&pno=" + prescNo.get_value());
 
                oWnd.set_title('Apol Detail Info');
-               oWnd.set_width(900);
+               oWnd.set_width(1000);
                oWnd.set_height(300);
                oWnd.show();
            }
@@ -1450,6 +1450,8 @@
                                     <img src="../../../../Images/infoblue16.png" border="0" alt="Show Location" title="Show Balance All Location" /></a>
                                 <%--<a href="javascript:void(0);" onclick="javascript:openPrevBuyDialog('<%# DataBinder.Eval(Container.DataItem, "ItemID")%>')">
                                     <img src="../../../../Images/infoblue16.png" border="0" alt="Show Prev Buy" title="Show Prev Buy" /></a>--%>
+                                <a href="javascript:void(0);" onclick="javascript:openApolDetail('<%# DataBinder.Eval(Container.DataItem, "ItemID")%>')">
+                                    <img src="../../../../Images/BPJS.png" border="0" alt="Apol Detail Item" title="Apol Detail Item" /></a>
                                 <br />
                                 <i>Intervention :</i><asp:Label ID="lblIntervention" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "ItemInterventionName") %>' /><br />
                                 <i>Notes :</i><asp:Label ID="lblNotes" runat="server" Text='<%# DataBinder.Eval(Container.DataItem, "Notes") %>' />

@@ -1533,6 +1533,130 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                             cm.Query.Where(cm.Query.SRConsumeMethod == it.SRConsumeMethod);
                             if (cm.Query.Load()) signa2 = cm.IterationQty ?? 0;
 
+                            decimal permintaanApol = it.PrescriptionQty.ToDecimal();
+
+                            if (it.IsCompound == true)
+                            {
+                                string itemIdApol = string.IsNullOrWhiteSpace(it.ItemInterventionID)
+                                    ? it.ItemID
+                                    : it.ItemInterventionID;
+
+                                var itemApol = new ItemProductMedic();
+
+                                if (!itemApol.LoadByPrimaryKey(itemIdApol))
+                                {
+                                    throw new InvalidOperationException(
+                                        "Data obat untuk perhitungan APOL tidak ditemukan: " + itemIdApol);
+                                }
+
+                                // Baca angka biasa maupun pecahan:
+                                // 3/4, 1/2, 7.5/30, 87.5/200, 10, dst.
+                                string dosageText = Convert.ToString(it.DosageQty).Trim();
+                                string[] dosageParts = dosageText.Split('/');
+
+                                decimal pembilang = 0m;
+                                decimal penyebut = 1m;
+
+                                var numberStyle =
+                                    System.Globalization.NumberStyles.AllowDecimalPoint |
+                                    System.Globalization.NumberStyles.AllowLeadingSign;
+
+                                var culture = System.Globalization.CultureInfo.InvariantCulture;
+
+                                bool validDosage =
+                                    dosageParts.Length >= 1 &&
+                                    dosageParts.Length <= 2 &&
+                                    decimal.TryParse(
+                                        dosageParts[0].Trim().Replace(',', '.'),
+                                        numberStyle,
+                                        culture,
+                                        out pembilang);
+
+                                if (dosageParts.Length == 2)
+                                {
+                                    decimal parsedPenyebut;
+
+                                    bool validPenyebut = decimal.TryParse(
+                                        dosageParts[1].Trim().Replace(',', '.'),
+                                        numberStyle,
+                                        culture,
+                                        out parsedPenyebut);
+
+                                    validDosage = validDosage && validPenyebut;
+
+                                    if (validPenyebut)
+                                        penyebut = parsedPenyebut;
+                                }
+
+                                if (!validDosage || pembilang <= 0m || penyebut <= 0m)
+                                {
+                                    throw new InvalidOperationException(
+                                        "Dosis racikan APOL tidak valid: " + dosageText);
+                                }
+
+                                decimal dosing = pembilang / penyebut;
+                                decimal sediaanApol = itemApol.Dosage ?? 0m;
+
+                                string unitDosis = Convert.ToString(it.SRDosageUnit).Trim();
+                                string unitItem = Convert.ToString(itemApol.SRItemUnit).Trim();
+                                string unitKandungan = Convert.ToString(itemApol.SRDosageUnit).Trim();
+
+                                if (sediaanApol <= 0m ||
+                                    string.IsNullOrWhiteSpace(unitDosis) ||
+                                    string.IsNullOrWhiteSpace(unitItem) ||
+                                    string.IsNullOrWhiteSpace(unitKandungan))
+                                {
+                                    throw new InvalidOperationException(
+                                        "Sediaan atau satuan obat belum lengkap untuk APOL: " + itemIdApol);
+                                }
+
+                                if (string.Equals(unitDosis, unitItem, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // Contoh: 1/2 TAB × 0.5 = 0.25
+                                    permintaanApol = dosing * sediaanApol;
+                                }
+                                else if (string.Equals(unitDosis, unitKandungan, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    // Contoh: input 150 MG, kandungan MG
+                                    permintaanApol = dosing;
+                                }
+                                else
+                                {
+                                    // Konversi satuan dosis alternatif.
+                                    var dosageDetails = new ItemProductDosageDetailCollection();
+
+                                    dosageDetails.Query.Where(
+                                        dosageDetails.Query.ItemID == itemApol.ItemID);
+
+                                    dosageDetails.LoadAll();
+
+                                    var dosageDetail = dosageDetails.SingleOrDefault(
+                                        d => string.Equals(
+                                            d.SRDosageUnit,
+                                            unitDosis,
+                                            StringComparison.OrdinalIgnoreCase));
+
+                                    decimal dosageKonversi = dosageDetail == null
+                                        ? 0m
+                                        : Convert.ToDecimal(dosageDetail.Dosage);
+
+                                    if (dosageKonversi <= 0m)
+                                    {
+                                        throw new InvalidOperationException(
+                                            "Konversi satuan dosis APOL tidak tersedia: " + itemIdApol);
+                                    }
+
+                                    // Dosis alternatif -> jumlah unit obat -> satuan kandungan.
+                                    permintaanApol = (dosing / dosageKonversi) * sediaanApol;
+                                }
+
+                                // Pertahankan 4 angka di belakang koma.
+                                permintaanApol = Math.Round(
+                                    permintaanApol,
+                                    4,
+                                    MidpointRounding.AwayFromZero);
+                            }
+
                             var det = new BpjsApolDetail
                             {
                                 PrescriptionNo = tp.PrescriptionNo,
@@ -1542,9 +1666,9 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                                 KDOBT = kdobt,
                                 NMOBAT = nmobat,
                                 SIGNA1OBT = signa2,
-                                SIGNA2OBT = it.DosageQty.ToInt(),
-                                PERMINTAAN = it.PrescriptionQty.ToInt(), // penting utk racikan
-                                JMLOBT = it.TakenQty.ToInt(),
+                                SIGNA2OBT = it.ConsumeQty.ToDecimal(),
+                                PERMINTAAN = permintaanApol, // penting utk racikan
+                                JMLOBT = it.TakenQty.ToDecimal(),
                                 JHO = it.DaysOfUsage,
                                 CATKHSOBT = it.Notes,
                                 METADATACODE = "ORDER",
@@ -1740,13 +1864,21 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                 var reg = new Registration();
                 reg.LoadByPrimaryKey(RegistrationNo);
 
+
+                #region APOL
+
                 if (Helper.IsApotekOnlineIntegration && reg.GuarantorID == AppSession.Parameter.GuarantorAskesID[0] && !string.IsNullOrWhiteSpace(reg.BpjsSepNo))
                 {
-                    var bpjsapol = new BpjsApol();
-                    bpjsapol.Query.Where(bpjsapol.Query.RegistrationNo == RegistrationNo, bpjsapol.Query.PrescriptionNo == header.PrescriptionNo);
-                    if (!bpjsapol.Query.Load())
+                    using (var transs = new esTransactionScope())
                     {
-                        using (var transs = new esTransactionScope())
+                        var bpjsapol = new BpjsApol();
+
+                        bpjsapol.Query.Where(
+                            bpjsapol.Query.RegistrationNo == RegistrationNo,
+                            bpjsapol.Query.PrescriptionNo == header.PrescriptionNo
+                        );
+
+                        if (!bpjsapol.Query.Load())
                         {
                             bpjsapol.AddNew();
 
@@ -1759,93 +1891,240 @@ namespace Temiang.Avicenna.Module.RADT.Emr
                             bpjsapol.TGLRSP = header.PrescriptionDate;
                             bpjsapol.METADATACODE = "ORDER";
                             bpjsapol.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                            bpjsapol.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+                            bpjsapol.LastUpdateDateTime =
+                                (new DateTime()).NowAtSqlServer();
+
                             bpjsapol.Save();
+                        }
 
-                            var apolId = bpjsapol.ID;
+                        var apolId = bpjsapol.ID;
 
-                            // Insert data tpi ke bad
-                            foreach (var it in TransPrescriptionItems)
+                        foreach (var it in TransPrescriptionItems)
+                        {
+                            string jnsrobt;
+
+                            if (it.IsCompound == true)
                             {
-                                // jns robit racikan: "R.{NN}" -> R.01
-                                var seqStr = (Convert.ToString(it.SequenceNo) ?? "").Trim();
-                                var m = System.Text.RegularExpressions.Regex.Match(seqStr, @"\d{1,2}(?!.*\d)");
-                                string jnsrobt;
-                                if (it.IsCompound == true)
-                                {
-                                    var seq = Convert.ToString(it.SequenceNo) ?? "";
-                                    var lastDigit = seq.Reverse().FirstOrDefault(char.IsDigit);
-                                    jnsrobt = (lastDigit != default(char)) ? ("R.0" + lastDigit) : "R.01"; // fallback aman
-                                }
-                                else
-                                {
-                                    jnsrobt = "N";
-                                }
+                                var seq = Convert.ToString(it.SequenceNo) ?? "";
+                                var lastDigit = seq.Reverse().FirstOrDefault(char.IsDigit);
 
-                                string kdobt = null, nmobat = null;
-                                var map = new ItemBridging();
-                                map.Query.Where(
-                                    map.Query.ItemID == (string.IsNullOrWhiteSpace(it.ItemInterventionID) ? it.ItemID : it.ItemInterventionID),
-                                    map.Query.SRBridgingType == AppEnum.BridgingType.APOTEKONLINE.ToString()
-                                );
-                                if (map.Query.Load()) { kdobt = map.BridgingID; nmobat = map.BridgingName; }
-
-                                int signa2 = 0;
-                                var cm = new ConsumeMethod();
-                                cm.Query.Where(cm.Query.SRConsumeMethod == it.SRConsumeMethod);
-                                if (cm.Query.Load()) signa2 = cm.IterationQty ?? 0;
-
-                                //var det = new BpjsApolDetail
-                                //{
-                                //    PrescriptionNo = header.PrescriptionNo,
-                                //    SequenceNo = it.SequenceNo,
-                                //    BpjsApolID = apolId,
-                                //    JNSROBT = jnsrobt,
-                                //    KDOBT = kdobt,
-                                //    NMOBAT = nmobat,
-                                //    SIGNA1OBT = it.DosageQty.ToInt(),
-                                //    SIGNA2OBT = signa2,
-                                //    PERMINTAAN = it.PrescriptionQty.ToInt(), // penting utk racikan
-                                //    JMLOBT = it.TakenQty.ToInt(),
-                                //    JHO = it.DaysOfUsage,
-                                //    CATKHSOBT = it.Notes,
-                                //    METADATACODE = "ORDER",
-                                //    LastUpdateByUserID = AppSession.UserLogin.UserID,
-                                //    LastUpdateDateTime = (new DateTime()).NowAtSqlServer()
-                                //};
-
-                                //det.Save();
-
-                                var det = new BpjsApolDetail();
-                                det.AddNew();
-
-                                det.PrescriptionNo = header.PrescriptionNo;
-                                det.SequenceNo = it.SequenceNo;
-                                det.BpjsApolID = apolId;
-                                det.JNSROBT = jnsrobt;
-                                det.KDOBT = kdobt;
-                                det.NMOBAT = nmobat;
-                                det.SIGNA1OBT = signa2;
-                                det.SIGNA2OBT = it.DosageQty.ToInt();
-
-                                if (it.IsCompound == true)
-                                    det.PERMINTAAN = it.PrescriptionQty.ToInt();
-
-                                det.JMLOBT = it.TakenQty.ToInt();
-                                det.JHO = it.DaysOfUsage;
-                                det.CATKHSOBT = it.Notes;
-                                det.METADATACODE = "ORDER";
-                                det.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                                det.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
-
-                                det.Save();
+                                jnsrobt = lastDigit != default(char)
+                                    ? "R.0" + lastDigit
+                                    : "R.01";
+                            }
+                            else
+                            {
+                                jnsrobt = "N";
                             }
 
-                            transs.Complete();
+                            string itemIdApol =
+                                string.IsNullOrWhiteSpace(it.ItemInterventionID)
+                                    ? it.ItemID
+                                    : it.ItemInterventionID;
+
+                            string kdobt = null;
+                            string nmobat = null;
+
+                            var map = new ItemBridging();
+
+                            map.Query.Where(
+                                map.Query.ItemID == itemIdApol,
+                                map.Query.SRBridgingType ==
+                                    AppEnum.BridgingType.APOTEKONLINE.ToString()
+                            );
+
+                            if (map.Query.Load())
+                            {
+                                kdobt = map.BridgingID;
+                                nmobat = map.BridgingName;
+                            }
+
+                            int signa2 = 0;
+
+                            var cm = new ConsumeMethod();
+
+                            cm.Query.Where(
+                                cm.Query.SRConsumeMethod == it.SRConsumeMethod
+                            );
+
+                            if (cm.Query.Load())
+                            {
+                                signa2 = cm.IterationQty ?? 0;
+                            }
+
+                            decimal? permintaanApol = null;
+
+                            if (it.IsCompound == true)
+                            {
+                                var itemApol = new ItemProductMedic();
+
+                                if (!itemApol.LoadByPrimaryKey(itemIdApol))
+                                {
+                                    throw new InvalidOperationException(
+                                        "Data obat untuk perhitungan APOL tidak ditemukan: " +
+                                        itemIdApol);
+                                }
+
+                                string dosageText =
+                                    Convert.ToString(it.DosageQty).Trim();
+
+                                string[] dosageParts = dosageText.Split('/');
+
+                                decimal pembilang = 0m;
+                                decimal penyebut = 1m;
+
+                                var numberStyle =
+                                    System.Globalization.NumberStyles.AllowDecimalPoint |
+                                    System.Globalization.NumberStyles.AllowLeadingSign;
+
+                                var culture =
+                                    System.Globalization.CultureInfo.InvariantCulture;
+
+                                bool validDosage =
+                                    dosageParts.Length >= 1 &&
+                                    dosageParts.Length <= 2 &&
+                                    decimal.TryParse(
+                                        dosageParts[0].Trim().Replace(',', '.'),
+                                        numberStyle,
+                                        culture,
+                                        out pembilang);
+
+                                if (dosageParts.Length == 2)
+                                {
+                                    decimal parsedPenyebut;
+
+                                    bool validPenyebut = decimal.TryParse(
+                                        dosageParts[1].Trim().Replace(',', '.'),
+                                        numberStyle,
+                                        culture,
+                                        out parsedPenyebut);
+
+                                    validDosage = validDosage && validPenyebut;
+
+                                    if (validPenyebut)
+                                    {
+                                        penyebut = parsedPenyebut;
+                                    }
+                                }
+
+                                if (!validDosage ||
+                                    pembilang <= 0m ||
+                                    penyebut <= 0m)
+                                {
+                                    throw new InvalidOperationException(
+                                        "Dosis racikan APOL tidak valid: " +
+                                        dosageText);
+                                }
+
+                                decimal dosing = pembilang / penyebut;
+                                decimal sediaanApol = itemApol.Dosage ?? 0m;
+
+                                string unitDosis =
+                                    Convert.ToString(it.SRDosageUnit).Trim();
+
+                                string unitItem =
+                                    Convert.ToString(itemApol.SRItemUnit).Trim();
+
+                                string unitKandungan =
+                                    Convert.ToString(itemApol.SRDosageUnit).Trim();
+
+                                if (sediaanApol <= 0m ||
+                                    string.IsNullOrWhiteSpace(unitDosis) ||
+                                    string.IsNullOrWhiteSpace(unitItem) ||
+                                    string.IsNullOrWhiteSpace(unitKandungan))
+                                {
+                                    throw new InvalidOperationException(
+                                        "Sediaan atau satuan obat APOL belum lengkap: " +
+                                        itemIdApol);
+                                }
+
+                                decimal hasilPermintaan;
+
+                                if (string.Equals(
+                                    unitDosis,
+                                    unitItem,
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    hasilPermintaan = dosing * sediaanApol;
+                                }
+
+                                else if (string.Equals(
+                                    unitDosis,
+                                    unitKandungan,
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    hasilPermintaan = dosing;
+                                }
+
+                                else
+                                {
+                                    var dosageDetails =
+                                        new ItemProductDosageDetailCollection();
+
+                                    dosageDetails.Query.Where(
+                                        dosageDetails.Query.ItemID == itemApol.ItemID
+                                    );
+
+                                    dosageDetails.LoadAll();
+
+                                    var dosageDetail =
+                                        dosageDetails.SingleOrDefault(
+                                            d => string.Equals(
+                                                d.SRDosageUnit,
+                                                unitDosis,
+                                                StringComparison.OrdinalIgnoreCase)
+                                        );
+
+                                    decimal dosageKonversi = dosageDetail == null ? 0m : Convert.ToDecimal(dosageDetail.Dosage);
+
+                                    if (dosageKonversi <= 0m)
+                                    {
+                                        throw new InvalidOperationException("Konversi satuan dosis APOL tidak tersedia: " + itemIdApol);
+                                    }
+
+                                    hasilPermintaan = (dosing / dosageKonversi) * sediaanApol;
+                                }
+
+                                permintaanApol = Math.Round(hasilPermintaan, 4, MidpointRounding.AwayFromZero);
+                            }
+
+                            var det = new BpjsApolDetail();
+
+                            det.Query.Where(
+                                det.Query.BpjsApolID == apolId,
+                                det.Query.PrescriptionNo == header.PrescriptionNo,
+                                det.Query.SequenceNo == it.SequenceNo
+                            );
+
+                            if (!det.Query.Load())
+                            {
+                                det.AddNew();
+                            }
+
+                            det.BpjsApolID = apolId;
+                            det.PrescriptionNo = header.PrescriptionNo;
+                            det.SequenceNo = it.SequenceNo;
+                            det.JNSROBT = jnsrobt;
+                            det.KDOBT = kdobt;
+                            det.NMOBAT = nmobat;
+                            det.SIGNA1OBT = signa2;
+                            det.SIGNA2OBT = it.ConsumeQty.ToDecimal();
+                            det.PERMINTAAN = permintaanApol;
+                            det.JMLOBT = it.TakenQty.ToDecimal();
+                            det.JHO = it.DaysOfUsage;
+                            det.CATKHSOBT = it.Notes;
+                            det.METADATACODE = "ORDER";
+                            det.LastUpdateByUserID = AppSession.UserLogin.UserID;
+                            det.LastUpdateDateTime = (new DateTime()).NowAtSqlServer();
+
+                            det.Save();
                         }
+
+                        transs.Complete();
                     }
                 }
 
+                #endregion
 
                 TransPrescriptionItems.Save();
                 trans.Complete();

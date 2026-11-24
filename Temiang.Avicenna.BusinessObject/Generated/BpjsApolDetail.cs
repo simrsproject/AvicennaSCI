@@ -207,18 +207,18 @@ namespace Temiang.Avicenna.BusinessObject
                             break;
                         case "SIGNA2OBT":
 
-                            if (value == null || value is System.Int32)
-                                this.SIGNA2OBT = (System.Int32?)value;
+                            if (value == null || value is System.Decimal)
+                                this.SIGNA2OBT = (System.Decimal?)value;
                             break;
                         case "PERMINTAAN":
 
-                            if (value == null || value is System.Int32)
-                                this.PERMINTAAN = (System.Int32?)value;
+                            if (value == null || value is System.Decimal)
+                                this.PERMINTAAN = (System.Decimal?)value;
                             break;
                         case "JMLOBT":
 
                             if (value == null || value is System.Decimal)
-                                this.JMLOBT = (System.Int32?)value;
+                                this.JMLOBT = (System.Decimal?)value;
                             break;
                         case "JHO":
 
@@ -414,31 +414,31 @@ namespace Temiang.Avicenna.BusinessObject
         /// <summary>
         /// Maps to BpjsApolDetail.SIGNA2OBT
         /// </summary>
-        virtual public System.Int32? SIGNA2OBT
+        virtual public System.Decimal? SIGNA2OBT
         {
             get
             {
-                return base.GetSystemInt32(BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT);
+                return base.GetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT);
             }
 
             set
             {
-                base.SetSystemInt32(BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT, value);
+                base.SetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT, value);
             }
         }
         /// <summary>
         /// Maps to BpjsApolDetail.PERMINTAAN
         /// </summary>
-        virtual public System.Int32? PERMINTAAN
+        virtual public System.Decimal? PERMINTAAN
         {
             get
             {
-                return base.GetSystemInt32(BpjsApolDetailMetadata.ColumnNames.PERMINTAAN);
+                return base.GetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.PERMINTAAN);
             }
 
             set
             {
-                base.SetSystemInt32(BpjsApolDetailMetadata.ColumnNames.PERMINTAAN, value);
+                base.SetSystemDecimal(BpjsApolDetailMetadata.ColumnNames.PERMINTAAN, value);
             }
         }
         /// <summary>
@@ -753,28 +753,28 @@ namespace Temiang.Avicenna.BusinessObject
             {
                 get
                 {
-                    System.Int32? data = entity.SIGNA2OBT;
+                    System.Decimal? data = entity.SIGNA2OBT;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
                     if (value == null || value.Length == 0) entity.SIGNA2OBT = null;
-                    else entity.SIGNA2OBT = Convert.ToInt32(value);
+                    else entity.SIGNA2OBT = Convert.ToDecimal(value);
                 }
             }
             public System.String PERMINTAAN
             {
                 get
                 {
-                    System.Int32? data = entity.PERMINTAAN;
+                    System.Decimal? data = entity.PERMINTAAN;
                     return (data == null) ? String.Empty : Convert.ToString(data);
                 }
 
                 set
                 {
                     if (value == null || value.Length == 0) entity.PERMINTAAN = null;
-                    else entity.PERMINTAAN = Convert.ToInt32(value);
+                    else entity.PERMINTAAN = Convert.ToDecimal(value);
                 }
             }
             public System.String JMLOBT
@@ -1013,7 +1013,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             get
             {
-                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT, esSystemType.Int32);
+                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT, esSystemType.Decimal);
             }
         }
 
@@ -1021,7 +1021,7 @@ namespace Temiang.Avicenna.BusinessObject
         {
             get
             {
-                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.PERMINTAAN, esSystemType.Int32);
+                return new esQueryItem(this, BpjsApolDetailMetadata.ColumnNames.PERMINTAAN, esSystemType.Decimal);
             }
         }
 
@@ -1529,13 +1529,13 @@ namespace Temiang.Avicenna.BusinessObject
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT, 11, typeof(System.Int32), esSystemType.Int32);
+            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.SIGNA2OBT, 11, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = BpjsApolDetailMetadata.PropertyNames.SIGNA2OBT;
             c.NumericPrecision = 10;
             c.IsNullable = true;
             _columns.Add(c);
 
-            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.PERMINTAAN, 12, typeof(System.Int32), esSystemType.Int32);
+            c = new esColumnMetadata(BpjsApolDetailMetadata.ColumnNames.PERMINTAAN, 12, typeof(System.Decimal), esSystemType.Decimal);
             c.PropertyName = BpjsApolDetailMetadata.PropertyNames.PERMINTAAN;
             c.NumericPrecision = 10;
             c.IsNullable = true;
@@ -1710,9 +1710,9 @@ namespace Temiang.Avicenna.BusinessObject
                 meta.AddTypeMap("KDOBT", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("NMOBAT", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("SIGNA1OBT", new esTypeMap("int", "System.Int32"));
-                meta.AddTypeMap("SIGNA2OBT", new esTypeMap("int", "System.Int32"));
-                meta.AddTypeMap("PERMINTAAN", new esTypeMap("int", "System.Int32"));
-                meta.AddTypeMap("JMLOBT", new esTypeMap("int", "System.Decimal"));
+                meta.AddTypeMap("SIGNA2OBT", new esTypeMap("decimal", "System.Decimal"));
+                meta.AddTypeMap("PERMINTAAN", new esTypeMap("decimal", "System.Int32"));
+                meta.AddTypeMap("JMLOBT", new esTypeMap("decimal", "System.Decimal"));
                 meta.AddTypeMap("JHO", new esTypeMap("decimal", "System.Decimal"));
                 meta.AddTypeMap("CATKHSOBT", new esTypeMap("varchar", "System.String"));
                 meta.AddTypeMap("METADATACODE", new esTypeMap("varchar", "System.String"));
