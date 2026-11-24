@@ -286,7 +286,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         {
             args.IsCancel = true;
             args.MessageText = message;
-            lblMessage.Text = message;
+            lblMessage.Text = string.Empty;
             ShowInformationHeader(message);
         }
 
