@@ -32,6 +32,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             uplKtp.Enabled = true;
         }
 
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuAdd.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+            ToolBarMenuDelete.Visible = false;
+            ToolBarMenuMovePrev.Visible = false;
+            ToolBarMenuMoveNext.Visible = false;
+            ToolBarMenuSearch.Visible = false;
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (IsPostBack) return;
