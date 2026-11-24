@@ -83,5 +83,6 @@
     </div>
     <br />
     <br />
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+    <asp:Label ID="lblMessage" runat="server" EnableViewState="false"
+        Font-Bold="true" ForeColor="Green" />
 </asp:Content>

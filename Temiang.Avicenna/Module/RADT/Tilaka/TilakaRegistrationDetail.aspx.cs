@@ -57,7 +57,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (string.IsNullOrWhiteSpace(ParamedicID))
             {
                 HideActions();
-                lblMessage.Text = "Dokter tidak ditemukan.";
+                ShowWarning("Dokter tidak ditemukan.");
                 return;
             }
 
@@ -65,7 +65,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!paramedic.LoadByPrimaryKey(ParamedicID))
             {
                 HideActions();
-                lblMessage.Text = "Dokter tidak ditemukan.";
+                ShowWarning("Dokter tidak ditemukan.");
                 return;
             }
 
@@ -108,7 +108,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             ConfigureConsent(config);
 
             if (!isUsingESignature)
-                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
+                ShowWarning("Dokter ini tidak menggunakan tanda tangan elektronik.");
         }
 
         private static bool CanStartRegistration(string state)
@@ -134,13 +134,31 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             if (string.IsNullOrWhiteSpace(consentText))
             {
-                lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
+                ShowWarning("File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile);
                 if (btnDaftar.Visible)
                 {
                     chkConsent.Enabled = false;
                     btnDaftar.Enabled = false;
                 }
             }
+        }
+
+        private void ShowWarning(string message)
+        {
+            lblMessage.Text = string.Empty;
+            ShowInformationHeader(message);
+        }
+
+        private void ShowSuccess(string message)
+        {
+            HideInformationHeader();
+            lblMessage.Text = message;
+        }
+
+        private void ClearMessages()
+        {
+            lblMessage.Text = string.Empty;
+            HideInformationHeader();
         }
 
         private void HideActions()
@@ -166,17 +184,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         protected void btnDaftar_OnClick(object sender, EventArgs e)
         {
+            ClearMessages();
             try
             {
                 RegisterRegistration();
             }
             catch (InvalidOperationException ex)
             {
-                lblMessage.Text = ex.Message;
+                ShowWarning(ex.Message);
             }
             catch (Exception)
             {
-                lblMessage.Text = "Gagal memproses pendaftaran Tilaka. Silakan coba lagi atau hubungi administrator.";
+                ShowWarning("Gagal memproses pendaftaran Tilaka. Silakan coba lagi atau hubungi administrator.");
             }
         }
 
@@ -185,20 +204,20 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var paramedic = new Paramedic();
             if (!paramedic.LoadByPrimaryKey(ParamedicID))
             {
-                lblMessage.Text = "Dokter tidak ditemukan.";
+                ShowWarning("Dokter tidak ditemukan.");
                 return;
             }
 
             if (paramedic.IsUsingESignature != true)
             {
-                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
+                ShowWarning("Dokter ini tidak menggunakan tanda tangan elektronik.");
                 return;
             }
 
             var config = new TilakaConfig();
             if (string.IsNullOrWhiteSpace(config.ReadConsentText()))
             {
-                lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
+                ShowWarning("File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile);
                 return;
             }
 
@@ -224,7 +243,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var guard = TilakaRegistrationGuard.Check(input, latest, DateTime.Now);
             if (!guard.CanRegister)
             {
-                lblMessage.Text = guard.Message;
+                ShowWarning(guard.Message);
                 return;
             }
 
@@ -250,9 +269,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             string message;
             if (!service.IsOk(uuid, out message) || uuid.Data == null || uuid.Data.Length == 0)
             {
-                lblMessage.Text = string.IsNullOrWhiteSpace(message)
+                ShowWarning(string.IsNullOrWhiteSpace(message)
                     ? "Gagal mendapatkan UUID Tilaka."
-                    : message;
+                    : message);
                 return;
             }
 
@@ -277,22 +296,23 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             repository.Save(record);
 
             LoadData();
-            lblMessage.Text = "UUID Tilaka berhasil dibuat. Lanjutkan dengan Kirim Data KYC.";
+            ShowSuccess("UUID Tilaka berhasil dibuat. Lanjutkan dengan Kirim Data KYC.");
         }
 
         protected void btnKirimData_OnClick(object sender, EventArgs e)
         {
+            ClearMessages();
             try
             {
                 SendKycData();
             }
             catch (InvalidOperationException ex)
             {
-                lblMessage.Text = ex.Message;
+                ShowWarning(ex.Message);
             }
             catch (Exception)
             {
-                lblMessage.Text = "Gagal mengirim data KYC Tilaka. Silakan coba lagi atau hubungi administrator.";
+                ShowWarning("Gagal mengirim data KYC Tilaka. Silakan coba lagi atau hubungi administrator.");
             }
         }
 
@@ -301,13 +321,13 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var paramedic = new Paramedic();
             if (!paramedic.LoadByPrimaryKey(ParamedicID))
             {
-                lblMessage.Text = "Dokter tidak ditemukan.";
+                ShowWarning("Dokter tidak ditemukan.");
                 return;
             }
 
             if (paramedic.IsUsingESignature != true)
             {
-                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
+                ShowWarning("Dokter ini tidak menggunakan tanda tangan elektronik.");
                 return;
             }
 
@@ -316,14 +336,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var record = repository.FindLatest(TilakaConstant.RelatedType.Paramedic, ParamedicID);
             if (record == null)
             {
-                lblMessage.Text = "Data pendaftaran Tilaka tidak ditemukan.";
+                ShowWarning("Data pendaftaran Tilaka tidak ditemukan.");
                 return;
             }
 
             var consentText = config.ReadConsentText();
             if (string.IsNullOrWhiteSpace(consentText))
             {
-                lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
+                ShowWarning("File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile);
                 return;
             }
 
@@ -331,7 +351,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var ktpBytes = store.Load(record.KtpFilePath);
             if (ktpBytes == null)
             {
-                lblMessage.Text = "Foto KTP belum tersedia.";
+                ShowWarning("Foto KTP belum tersedia.");
                 return;
             }
 
@@ -360,9 +380,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             string message;
             if (!service.IsOk(response, out message))
             {
-                lblMessage.Text = string.IsNullOrWhiteSpace(message)
+                ShowWarning(string.IsNullOrWhiteSpace(message)
                     ? "Permintaan KYC Tilaka gagal."
-                    : message;
+                    : message);
                 return;
             }
 
@@ -377,18 +397,19 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             repository.Save(record);
 
             LoadData();
-            lblMessage.Text = "Data KYC terkirim. Silakan buka webview registrasi.";
+            ShowSuccess("Data KYC terkirim. Silakan buka webview registrasi.");
         }
 
         protected void btnCekStatus_OnClick(object sender, EventArgs e)
         {
+            ClearMessages();
             try
             {
                 CheckStatus();
             }
             catch (Exception)
             {
-                lblMessage.Text = "Gagal memeriksa status Tilaka. Silakan coba lagi atau hubungi administrator.";
+                ShowWarning("Gagal memeriksa status Tilaka. Silakan coba lagi atau hubungi administrator.");
             }
         }
 
@@ -396,7 +417,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         {
             if (string.IsNullOrWhiteSpace(ParamedicID))
             {
-                lblMessage.Text = "Dokter tidak ditemukan.";
+                ShowWarning("Dokter tidak ditemukan.");
                 return;
             }
 
@@ -404,7 +425,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var record = repository.FindLatest(TilakaConstant.RelatedType.Paramedic, ParamedicID);
             if (record == null)
             {
-                lblMessage.Text = "Data pendaftaran Tilaka tidak ditemukan.";
+                ShowWarning("Data pendaftaran Tilaka tidak ditemukan.");
                 return;
             }
 
@@ -417,7 +438,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
                 if (!service.IsOk(registration, out message))
                 {
-                    lblMessage.Text = message;
+                    ShowWarning(message);
                     return;
                 }
 
@@ -429,7 +450,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 var certificate = service.CheckCertificateStatus(record.TilakaName);
                 if (!service.IsOk(certificate, out message))
                 {
-                    lblMessage.Text = message;
+                    ShowWarning(message);
                     return;
                 }
 
@@ -459,9 +480,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             var state = record.RegistrationState;
             LoadData();
-            lblMessage.Text = certificateRejected
-                ? "Status diperbarui: " + state + ". Status sertifikat dari Tilaka diabaikan karena tidak lebih maju."
-                : "Status diperbarui: " + state;
+            if (certificateRejected)
+                ShowWarning("Status diperbarui: " + state +
+                            ". Status sertifikat dari Tilaka diabaikan karena tidak lebih maju.");
+            else
+                ShowSuccess("Status diperbarui: " + state);
         }
 
         private bool IsNikUsedByOther(string ssn)
