@@ -24371,6 +24371,16 @@
     <Compile Include="Module\RADT\Tilaka\TilakaTemplateSignFileList.aspx.designer.cs">
       <DependentUpon>TilakaTemplateSignFileList.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaTemplateSignFileDetail.aspx.cs">
+      <DependentUpon>TilakaTemplateSignFileDetail.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaTemplateSignFileDetail.aspx.designer.cs">
+      <DependentUpon>TilakaTemplateSignFileDetail.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaTemplateSignFileHandler.ashx.cs">
+      <DependentUpon>TilakaTemplateSignFileHandler.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\Tilaka\TilakaAuthIntervalList.aspx.cs">
       <DependentUpon>TilakaAuthIntervalList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -25499,6 +25509,8 @@
     <Content Include="Module\RADT\Tilaka\TilakaSigningDetail.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaQuickSignUserList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaTemplateSignFileList.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaTemplateSignFileDetail.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaTemplateSignFileHandler.ashx" />
     <Content Include="Module\RADT\Tilaka\TilakaAuthIntervalList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaCasemixFileHandler.ashx" />
     <Content Include="Module\RADT\Tilaka\TilakaSignedFileHandler.ashx" />

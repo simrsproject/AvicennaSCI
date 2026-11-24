@@ -375,11 +375,13 @@ Content-Type: application/json
 
   <p>Di Avicenna, template dikelola lewat tabel <code>TilakaTemplateSignFile</code>:</p>
   <ul>
-    <li>Admin mengunggah PDF template untuk dokter tertentu.</li>
+    <li>Admin membuat template dari toolbar <strong>New</strong> di halaman Template; dokter dipilih dari dropdown yang hanya berisi <code>IsUsingESignature = 1</code>.</li>
     <li><code>TemplateNo</code> dibuat otomatis dengan pola <code>TTD-{ParamedicID}-{XX}</code>, mis. <code>TTD-DR001-01</code>.</li>
     <li>File disimpan di <code>C:\Tilaka\TemplateSign\{ParamedicID}\{TemplateNo}_{yyyyMMddHHmmss}.pdf</code>.</li>
-    <li>Template pertama untuk dokter menjadi <code>IsDefault = 1</code>; Process Signature memakai default tersebut.</li>
-    <li>Setelah terdaftar di Tilaka, <code>IsRegistered = 1</code> dan <code>RegisteredDateTime</code> diisi.</li>
+    <li>Template baru memiliki <strong>Is Default</strong> tercentang; default lama otomatis menjadi non-default.</li>
+    <li><strong>Edit</strong> hanya mengubah <strong>Is Default</strong> dan <strong>Is Active</strong>; dokter dan file tidak dapat diubah.</li>
+    <li><strong>Register</strong> dilakukan dari list, bukan dari detail, dan memanggil <code>quicksign-addtemplates</code>. Setelah berhasil, <code>IsRegistered = 1</code> dan <code>RegisteredDateTime</code> diisi.</li>
+    <li><strong>Is Active = 0</strong> hanya menonaktifkan template secara lokal; template tetap ada di Tilaka.</li>
   </ul>
 
   <pre><code>POST {TilakaLiteBaseUrl}/quicksign-addtemplates

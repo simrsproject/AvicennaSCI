@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Data;
 using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -16,10 +14,25 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             base.OnInit(e);
             ProgramID = AppConstant.Program.TilakaTemplateSignFile;
             UrlPageSearch = "TilakaTemplateSignFileList.aspx";
-            UrlPageDetail = "TilakaTemplateSignFileList.aspx";
+            UrlPageDetail = "TilakaTemplateSignFileDetail.aspx";
         }
 
-        protected void btnSearch_OnClick(object sender, EventArgs e)
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuExport.Visible = false;
+            ToolBarMenuImport.Visible = false;
+            ToolBarMenuHome.Visible = false;
+            ToolBarMenuQuickSearch.Visible = false;
+            ToolBarMenuList.Visible = false;
+            ToolBarMenuRejournal.Visible = false;
+            ToolBarMenuRebalance.Visible = false;
+            ToolBarMenuBPJSSearch.Visible = false;
+        }
+
+        protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             Session.Remove(SessionNameForList);
             grdList.Rebind();
@@ -30,82 +43,32 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             grdList.DataSource = GetList();
         }
 
-        protected void btnUpload_OnClick(object sender, EventArgs e)
+        public override void OnMenuViewClick(GridDataItem[] dataItems)
         {
-            if (uplTemplate.UploadedFiles.Count == 0)
-            {
-                lblMessage.Text = "Pilih file PDF template terlebih dahulu.";
-                return;
-            }
+            if (dataItems == null || dataItems.Length == 0) return;
 
-            var paramedicID = (txtParamedicID.Text ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(paramedicID))
-            {
-                lblMessage.Text = "Isi ID dokter terlebih dahulu.";
-                return;
-            }
+            RedirectToDetail(Convert.ToString(dataItems[0].GetDataKeyValue("TemplateSignFileID")), "view");
+        }
 
-            var paramedic = new Paramedic();
-            if (!paramedic.LoadByPrimaryKey(paramedicID))
-            {
-                lblMessage.Text = "Dokter tidak ditemukan.";
-                return;
-            }
+        public override void OnMenuEditClick(GridDataItem[] dataItems)
+        {
+            if (dataItems == null || dataItems.Length == 0) return;
 
-            if (paramedic.IsUsingESignature != true)
-            {
-                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
-                return;
-            }
+            RedirectToDetail(Convert.ToString(dataItems[0].GetDataKeyValue("TemplateSignFileID")), "edit");
+        }
 
-            var config = new TilakaConfig();
-            try
-            {
-                var store = new TilakaTemplateSignFileStore(config.TemplateSignFolder);
-                var repository = new TilakaTemplateSignFileRepository();
-                var existing = repository.FindByParamedic(paramedicID);
-                var next = NextSequence(existing);
-                var templateNo = "TTD-" + paramedicID.ToUpperInvariant() + "-" + next.ToString("00");
+        private static void RedirectToDetail(string id, string mode)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return;
 
-                var file = uplTemplate.UploadedFiles[0];
-                byte[] content;
-                using (var stream = new MemoryStream())
-                {
-                    file.InputStream.CopyTo(stream);
-                    content = stream.ToArray();
-                }
-
-                var relative = store.Save(paramedicID, templateNo, content, file.ContentType, DateTime.Now);
-                var hasDefault = existing.Any(x => x.IsDefault);
-
-                repository.Save(new TilakaTemplateSignFileRecord
-                {
-                    ParamedicID = paramedicID,
-                    TemplateNo = templateNo,
-                    FileName = file.GetName(),
-                    FilePath = relative,
-                    ContentType = file.ContentType,
-                    FileSize = content.Length,
-                    IsDefault = !hasDefault,
-                    IsActive = true,
-                    IsRegistered = false,
-                    CreatedDateTime = DateTime.Now,
-                    CreatedByUserID = AppSession.UserLogin.UserID
-                });
-
-                lblMessage.Text = "Template " + templateNo + " tersimpan. Lanjutkan dengan Daftarkan.";
-            }
-            catch (Exception ex)
-            {
-                lblMessage.Text = ex.Message;
-            }
-
-            Session.Remove(SessionNameForList);
-            grdList.Rebind();
+            System.Web.HttpContext.Current.Response.Redirect(
+                "TilakaTemplateSignFileDetail.aspx?md=" + mode + "&id=" + System.Web.HttpUtility.UrlEncode(id));
         }
 
         protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
         {
+            if (e.CommandName != "register") return;
+
             long id;
             if (!long.TryParse(Convert.ToString(e.CommandArgument), out id)) return;
 
@@ -113,31 +76,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var record = repository.FindByID(id);
             if (record == null) return;
 
-            if (e.CommandName == "default")
-            {
-                foreach (var item in repository.FindByParamedic(record.ParamedicID))
-                {
-                    if (item.TemplateSignFileID == id) continue;
-                    item.IsDefault = false;
-                    item.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                    repository.Save(item);
-                }
-
-                record.IsDefault = true;
-                record.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                repository.Save(record);
-            }
-            else if (e.CommandName == "deactivate")
-            {
-                record.IsActive = false;
-                record.IsDefault = false;
-                record.LastUpdateByUserID = AppSession.UserLogin.UserID;
-                repository.Save(record);
-            }
-            else if (e.CommandName == "register")
-            {
-                RegisterTemplate(record, repository);
-            }
+            RegisterTemplate(record, repository);
 
             Session.Remove(SessionNameForList);
             grdList.Rebind();
@@ -232,35 +171,40 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             }
         }
 
-        private System.Data.DataTable GetList()
+        private DataTable GetList()
         {
             object cached = Session[SessionNameForList];
-            if (cached != null) return (System.Data.DataTable)cached;
+            if (cached != null) return (DataTable)cached;
 
-            var query = new TilakaTemplateSignFileQuery();
-            if (!string.IsNullOrWhiteSpace(txtParamedicID.Text))
-                query.Where(query.ParamedicID == txtParamedicID.Text.Trim());
+            var query = new TilakaTemplateSignFileQuery("a");
+            var paramedic = new ParamedicQuery("b");
+            query.LeftJoin(paramedic).On(query.ParamedicID == paramedic.ParamedicID);
+            query.Select(query, paramedic.ParamedicName);
+
+            var keywordText = txtParamedic.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(keywordText))
+            {
+                var keyword = "%" + keywordText + "%";
+                query.Where(query.Or(
+                    query.ParamedicID.Like(keyword),
+                    paramedic.ParamedicName.Like(keyword)));
+            }
 
             query.es.Top = AppSession.Parameter.MaxResultRecord;
             query.OrderBy(query.ParamedicID.Ascending, query.TemplateNo.Ascending);
 
             var table = query.LoadDataTable();
-            Session[SessionNameForList] = table;
-            return table;
-        }
+            table.Columns.Add("CanRegister", typeof(bool));
 
-        private static int NextSequence(IList<TilakaTemplateSignFileRecord> existing)
-        {
-            var max = 0;
-            foreach (var item in existing)
+            foreach (DataRow row in table.Rows)
             {
-                if (string.IsNullOrWhiteSpace(item.TemplateNo)) continue;
-                var parts = item.TemplateNo.Split('-');
-                int value;
-                if (int.TryParse(parts[parts.Length - 1], out value) && value > max) max = value;
+                var isActive = row["IsActive"] != DBNull.Value && Convert.ToBoolean(row["IsActive"]);
+                var isRegistered = row["IsRegistered"] != DBNull.Value && Convert.ToBoolean(row["IsRegistered"]);
+                row["CanRegister"] = TilakaTemplateSignFileRules.CanRegister(isActive, isRegistered);
             }
 
-            return max + 1;
+            Session[SessionNameForList] = table;
+            return table;
         }
     }
 }

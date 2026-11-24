@@ -324,6 +324,7 @@
     <Compile Include="Tilaka\TilakaCasemixFileRepository.cs" />
     <Compile Include="Tilaka\TilakaCasemixFileReader.cs" />
     <Compile Include="Tilaka\TilakaTemplateSignFileRepository.cs" />
+    <Compile Include="Tilaka\TilakaTemplateSignFileRules.cs" />
     <Compile Include="Tilaka\TilakaTemplateSignFileStore.cs" />
     <Compile Include="Tilaka\TilakaUserProfileProvider.cs" />
     <Compile Include="Tilaka\TilakaQuickSignRequestService.cs" />

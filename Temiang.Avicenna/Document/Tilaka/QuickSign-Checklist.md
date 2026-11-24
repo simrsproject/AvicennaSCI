@@ -26,11 +26,15 @@ langkah di bawah belum bisa dijalankan.
 
 ## 3. Template
 
-- [ ] Buka **Template Tanda Tangan** (`01.23.05`).
-- [ ] Isi ID dokter, unggah PDF, klik **Upload**.
+- [ ] Buka **Template Tanda Tangan** (`01.23.05`); list memakai filter Dokter (ID/Nama).
+- [ ] Klik **New**; pilih dokter (`IsUsingESignature = 1`) dan unggah PDF.
 - [ ] `TemplateNo` terbentuk `TTD-{ParamedicID}-01`; file ada di `C:\Tilaka\TemplateSign\{ParamedicID}\`.
-- [ ] Klik **Daftarkan** → `quicksign-addtemplates`; `IsRegistered = 1`, `RegisteredDateTime` terisi.
-- [ ] Template pertama otomatis `IsDefault = 1`; template berikutnya tidak menimpa default.
+- [ ] **Is Default** tercentang; jika sudah ada default lama, default tersebut otomatis menjadi non-default.
+- [ ] **Is Active** tercentang secara default.
+- [ ] Klik **Register** di list → `quicksign-addtemplates`; `IsRegistered = 1`, `RegisteredDateTime` terisi.
+- [ ] Edit hanya dapat mengubah **Is Default** dan **Is Active**; dokter/file tidak bisa diubah.
+- [ ] Download PDF dari halaman detail berfungsi.
+- [ ] Nonaktifkan template hanya mengubah data lokal; template tetap ada di Tilaka.
 - [ ] Peringatan “auth session batal” tampil sebelum pendaftaran.
 
 ## 4. Process Signature
