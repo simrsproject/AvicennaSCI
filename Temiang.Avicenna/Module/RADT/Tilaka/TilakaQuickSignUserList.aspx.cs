@@ -17,7 +17,25 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             UrlPageDetail = "TilakaQuickSignUserList.aspx";
         }
 
-        protected void btnSearch_OnClick(object sender, EventArgs e)
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuView.Visible = false;
+            ToolBarMenuAdd.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+            ToolBarMenuExport.Visible = false;
+            ToolBarMenuImport.Visible = false;
+            ToolBarMenuHome.Visible = false;
+            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuQuickSearch.Visible = false;
+            ToolBarMenuList.Visible = false;
+            ToolBarMenuRejournal.Visible = false;
+            ToolBarMenuRebalance.Visible = false;
+            ToolBarMenuBPJSSearch.Visible = false;
+        }
+
+        protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             Session.Remove(SessionNameForList);
             grdList.Rebind();
