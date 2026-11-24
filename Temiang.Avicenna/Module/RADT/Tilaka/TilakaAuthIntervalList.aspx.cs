@@ -16,14 +16,39 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             UrlPageDetail = "TilakaAuthIntervalList.aspx";
         }
 
-        protected void btnSearch_OnClick(object sender, EventArgs e)
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuView.Visible = false;
+            ToolBarMenuAdd.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+            ToolBarMenuExport.Visible = false;
+            ToolBarMenuImport.Visible = false;
+            ToolBarMenuHome.Visible = false;
+            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuQuickSearch.Visible = false;
+            ToolBarMenuList.Visible = false;
+            ToolBarMenuRejournal.Visible = false;
+            ToolBarMenuRebalance.Visible = false;
+            ToolBarMenuBPJSSearch.Visible = false;
+        }
+
+        protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             LoadFromService();
         }
 
         protected void grdList_NeedDataSource(object source, GridNeedDataSourceEventArgs e)
         {
-            grdList.DataSource = Session[SessionNameForList] as DataTable;
+            var table = Session[SessionNameForList] as DataTable;
+            if (table == null)
+            {
+                table = BuildTable(null);
+                Session[SessionNameForList] = table;
+            }
+
+            grdList.DataSource = table;
         }
 
         private void LoadFromService()
@@ -54,7 +79,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 grdList.DataBind();
 
                 lblMessage.Text = table.Rows.Count == 0
-                    ? "Tidak ada data auth interval."
+                    ? string.Empty
                     : "Total: " + (response.Pagination == null ? table.Rows.Count : response.Pagination.TotalElements);
             }
             catch (Exception ex)
@@ -75,7 +100,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             table.Columns.Add("AuthStatus", typeof(string));
             table.Columns.Add("TemplateNumbers", typeof(string));
 
-            if (response.Data == null) return table;
+            if (response == null || response.Data == null) return table;
 
             foreach (var item in response.Data)
             {
