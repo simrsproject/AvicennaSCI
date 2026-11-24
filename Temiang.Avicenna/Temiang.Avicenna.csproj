@@ -24333,6 +24333,9 @@
     <Compile Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx.cs">
       <DependentUpon>TilakaKtpImageHandler.ashx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaConsentHandler.ashx.cs">
+      <DependentUpon>TilakaConsentHandler.ashx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\Tilaka\TilakaCasemixFileList.aspx.cs">
       <DependentUpon>TilakaCasemixFileList.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -25490,6 +25493,7 @@
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx" />
+    <Content Include="Module\RADT\Tilaka\TilakaConsentHandler.ashx" />
     <Content Include="Module\RADT\Tilaka\TilakaCasemixFileList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaSigningList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaSigningDetail.aspx" />

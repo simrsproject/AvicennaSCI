@@ -129,6 +129,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         private void ConfigureConsent(TilakaConfig config)
         {
             var consentText = config.ReadConsentText();
+            btnReadConsent.Visible = chkConsent.Visible
+                                     && !string.IsNullOrWhiteSpace(consentText);
+
             if (string.IsNullOrWhiteSpace(consentText))
             {
                 lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
@@ -138,16 +141,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     btnDaftar.Enabled = false;
                 }
             }
-
-            var isWebPath = !string.IsNullOrWhiteSpace(config.ConsentTextFile)
-                            && config.ConsentTextFile.StartsWith("~/", StringComparison.Ordinal);
-            lnkConsent.Visible = isWebPath;
-            if (isWebPath) lnkConsent.NavigateUrl = ResolveUrl(config.ConsentTextFile);
         }
 
         private void HideActions()
         {
             chkConsent.Visible = false;
+            btnReadConsent.Visible = false;
             uplKtp.Visible = false;
             btnDaftar.Visible = false;
             btnKirimData.Visible = false;

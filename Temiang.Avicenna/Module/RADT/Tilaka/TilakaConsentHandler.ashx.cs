@@ -1,0 +1,51 @@
+using System.Text;
+using System.Web;
+using Temiang.Avicenna.Common.Tilaka;
+
+namespace Temiang.Avicenna.Module.RADT.Tilaka
+{
+    public class TilakaConsentHandler : IHttpHandler
+    {
+        public void ProcessRequest(HttpContext context)
+        {
+            context.Response.ContentType = "text/html";
+            context.Response.ContentEncoding = Encoding.UTF8;
+            context.Response.Cache.SetCacheability(HttpCacheability.NoCache);
+
+            var config = new TilakaConfig();
+            var consentText = config.ReadConsentText();
+
+            context.Response.Write("<!DOCTYPE html>");
+            context.Response.Write("<html><head><meta charset=\"utf-8\" />");
+            context.Response.Write("<title>Persetujuan Tilaka</title>");
+            context.Response.Write("<style>");
+            context.Response.Write("body{font-family:'Segoe UI',Arial,sans-serif;color:#1f2d3d;");
+            context.Response.Write("background:#f5f6f8;margin:0;padding:20px;}");
+            context.Response.Write("pre{white-space:pre-wrap;word-wrap:break-word;font-family:inherit;");
+            context.Response.Write("font-size:14px;line-height:1.6;background:#fff;padding:20px;");
+            context.Response.Write("border:1px solid #d8dee6;border-radius:8px;margin:0;}");
+            context.Response.Write(".warn{background:#fdf1e7;border-left:4px solid #a0522d;");
+            context.Response.Write("padding:12px 16px;border-radius:6px;}");
+            context.Response.Write("</style></head><body>");
+
+            if (string.IsNullOrWhiteSpace(consentText))
+            {
+                context.Response.Write("<div class=\"warn\">Isi persetujuan Tilaka belum tersedia. ");
+                context.Response.Write("Hubungi administrator untuk memeriksa konfigurasi TnC.</div>");
+            }
+            else
+            {
+                context.Response.Write("<pre>");
+                context.Response.Write(HttpUtility.HtmlEncode(consentText));
+                context.Response.Write("</pre>");
+            }
+
+            context.Response.Write("</body></html>");
+        }
+
+        public bool IsReusable
+        {
+            get { return false; }
+        }
+    }
+}

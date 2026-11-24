@@ -11,8 +11,19 @@
                 if (url) window.open(url, '_blank');
                 return false;
             }
+
+            function openConsent() {
+                var oWnd = $find("<%= winConsent.ClientID %>");
+                if (oWnd) oWnd.show();
+                return false;
+            }
         </script>
     </telerik:RadCodeBlock>
+
+    <telerik:RadWindow ID="winConsent" runat="server" Animation="None"
+        Behavior="Close,Move,Resize" Width="800px" Height="600px"
+        Modal="true" VisibleStatusbar="False" Title="Persetujuan Tilaka"
+        NavigateUrl="TilakaConsentHandler.ashx" />
 
     <asp:HiddenField ID="hfWebviewUrl" runat="server" />
     <asp:HiddenField ID="hfParamedicID" runat="server" />
@@ -55,16 +66,20 @@
             <td class="entry">
                 <asp:CheckBox ID="chkConsent" runat="server"
                     Text="Dokter telah membaca dan menyetujui TnC Tilaka." />
-                <asp:HyperLink ID="lnkConsent" runat="server" Target="_blank" Text="Lihat TnC" />
+                &nbsp;
+                <asp:Button ID="btnReadConsent" runat="server" Text="Baca Persetujuan"
+                    OnClientClick="return openConsent();" CausesValidation="false" />
             </td>
         </tr>
     </table>
 
     <br />
-    <asp:Button ID="btnDaftar" runat="server" Text="Daftar" OnClick="btnDaftar_OnClick" />
-    <asp:Button ID="btnKirimData" runat="server" Text="Kirim Data KYC" OnClick="btnKirimData_OnClick" />
-    <asp:Button ID="btnWebview" runat="server" Text="Buka Webview" OnClientClick="return openWebview();" />
-    <asp:Button ID="btnCekStatus" runat="server" Text="Cek Status" OnClick="btnCekStatus_OnClick" />
+    <div style="margin-left: 10px;">
+        <asp:Button ID="btnDaftar" runat="server" Text="Daftar" OnClick="btnDaftar_OnClick" />
+        <asp:Button ID="btnKirimData" runat="server" Text="Kirim Data KYC" OnClick="btnKirimData_OnClick" />
+        <asp:Button ID="btnWebview" runat="server" Text="Buka Webview" OnClientClick="return openWebview();" />
+        <asp:Button ID="btnCekStatus" runat="server" Text="Cek Status" OnClick="btnCekStatus_OnClick" />
+    </div>
     <br />
     <br />
     <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />

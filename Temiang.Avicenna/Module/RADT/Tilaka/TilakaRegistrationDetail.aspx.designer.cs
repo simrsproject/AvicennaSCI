@@ -33,6 +33,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.HiddenField hfParamedicID;
 
         /// <summary>
+        /// winConsent control.
+        /// </summary>
+        protected global::Telerik.Web.UI.RadWindow winConsent;
+
+        /// <summary>
         /// lblParamedicName control.
         /// </summary>
         protected global::System.Web.UI.WebControls.Label lblParamedicName;
@@ -78,9 +83,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.CheckBox chkConsent;
 
         /// <summary>
-        /// lnkConsent control.
+        /// btnReadConsent control.
         /// </summary>
-        protected global::System.Web.UI.WebControls.HyperLink lnkConsent;
+        protected global::System.Web.UI.WebControls.Button btnReadConsent;
 
         /// <summary>
         /// btnDaftar control.
