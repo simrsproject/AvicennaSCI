@@ -74,6 +74,7 @@
                 <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Nama Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="FileName" HeaderText="File Name" UniqueName="FileName" />
                 <telerik:GridBoundColumn DataField="FilePath" HeaderText="File Path" UniqueName="FilePath" />
+                <telerik:GridBoundColumn DataField="DownloadPath" HeaderText="Download Path" UniqueName="DownloadPath" />
                 <telerik:GridBoundColumn DataField="RequestStatus" HeaderText="Status" UniqueName="RequestStatus" />
                 <telerik:GridTemplateColumn HeaderText="Action" UniqueName="Action">
                     <ItemTemplate>
