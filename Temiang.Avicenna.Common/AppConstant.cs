@@ -50,6 +50,7 @@ namespace Temiang.Avicenna.Common
             public const string SelfServiceRegistration = "01.01.11";
             public const string Appointment = "01.06";
             public const string AppointmentStatus = "01.06.01";
+            public const string AppointmentCancel = "01.06.02";
             public const string CloseAppointment = "01.07";
             public const string HealthScreeningAppointment = "01.17.05";
             public const string HealthScreeningCloseAppointment = "01.17.06";

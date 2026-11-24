@@ -3210,6 +3210,7 @@
     <Content Include="Module\RADT\MedicalRecord\UpdateMrnPatient\UpdateMrnPatientList.aspx" />
     <Content Include="Module\RADT\MedicationStatus\MedicationScheduleEntry.aspx" />
     <Content Include="Module\RADT\MedicationStatus\MedicationStatusPatientSign.aspx" />
+    <Content Include="Module\RADT\OutPatient\AppointmentCancel\AppointmentCancelList.aspx" />
     <Content Include="Module\RADT\OutPatient\DetailOpRegistrationAndDischarge\DetailOpRegistrationAndDischargeApptItemDetail.ascx" />
     <Content Include="Module\RADT\PatientResearch\PatientResearchDetail.aspx" />
     <Content Include="Module\RADT\PatientResearch\PatientResearchItemDetail.ascx" />
@@ -19968,6 +19969,13 @@
     </Compile>
     <Compile Include="Module\RADT\MedicationStatus\MedicationStatusPatientSign.aspx.designer.cs">
       <DependentUpon>MedicationStatusPatientSign.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Module\RADT\OutPatient\AppointmentCancel\AppointmentCancelList.aspx.cs">
+      <DependentUpon>AppointmentCancelList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\OutPatient\AppointmentCancel\AppointmentCancelList.aspx.designer.cs">
+      <DependentUpon>AppointmentCancelList.aspx</DependentUpon>
     </Compile>
     <Compile Include="Module\RADT\OutPatient\AppointmentStatus\AppointmentStatusList.aspx.cs">
       <DependentUpon>AppointmentStatusList.aspx</DependentUpon>
