@@ -85,7 +85,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         /// <summary>
         /// btnReadConsent control.
         /// </summary>
-        protected global::System.Web.UI.WebControls.Button btnReadConsent;
+        protected global::System.Web.UI.WebControls.LinkButton btnReadConsent;
 
         /// <summary>
         /// btnDaftar control.

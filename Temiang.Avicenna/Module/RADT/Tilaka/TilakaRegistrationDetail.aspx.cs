@@ -36,12 +36,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         {
             base.OnLoadComplete(e);
 
-            ToolBarMenuAdd.Visible = false;
-            ToolBarMenuEdit.Visible = false;
-            ToolBarMenuDelete.Visible = false;
-            ToolBarMenuMovePrev.Visible = false;
-            ToolBarMenuMoveNext.Visible = false;
-            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuAdd.Enabled = false;
+            ToolBarMenuEdit.Enabled = false;
+            ToolBarMenuDelete.Enabled = false;
+            ToolBarMenuMovePrev.Enabled = false;
+            ToolBarMenuMoveNext.Enabled = false;
+            ToolBarMenuSearch.Enabled = false;
         }
 
         protected void Page_Load(object sender, EventArgs e)

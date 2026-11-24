@@ -67,8 +67,9 @@
                 <asp:CheckBox ID="chkConsent" runat="server"
                     Text="Dokter telah membaca dan menyetujui TnC Tilaka." />
                 &nbsp;
-                <asp:Button ID="btnReadConsent" runat="server" Text="Baca Persetujuan"
-                    OnClientClick="return openConsent();" CausesValidation="false" />
+                <asp:LinkButton ID="btnReadConsent" runat="server" Text="Baca Persetujuan"
+                    OnClientClick="return openConsent();" CausesValidation="false"
+                    Style="text-decoration: underline; color: #0b5cab; cursor: pointer;" />
             </td>
         </tr>
     </table>
