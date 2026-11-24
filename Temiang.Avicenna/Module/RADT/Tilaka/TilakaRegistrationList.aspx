@@ -2,29 +2,91 @@
     CodeBehind="TilakaRegistrationList.aspx.cs"
     Inherits="Temiang.Avicenna.Module.RADT.Tilaka.TilakaRegistrationList" %>
 <%@ Register TagPrefix="telerik" Namespace="Telerik.Web.UI" Assembly="Telerik.Web.UI" %>
+<%@ Register TagPrefix="cc" Namespace="Temiang.Avicenna.CustomControl" Assembly="Temiang.Avicenna" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <table class="layout">
+    <telerik:RadAjaxManagerProxy ID="RadAjaxManagerProxy1" runat="server">
+        <AjaxSettings>
+            <telerik:AjaxSetting AjaxControlID="btnFilterParamedic">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterState">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnReconcile">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="lblMessage" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="grdList">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
+        </AjaxSettings>
+    </telerik:RadAjaxManagerProxy>
+
+    <cc:CollapsePanel ID="CollapsePanel1" runat="server" Title="Search Filter">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="50%" style="vertical-align: top">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">Dokter</td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtParamedicName" runat="server" Width="300px" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterParamedic" runat="server"
+                                    ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%" style="vertical-align: top">
+                    <table width="100%">
+                        <tr>
+                            <td class="label">Status</td>
+                            <td class="entry">
+                                <telerik:RadComboBox ID="cboState" runat="server" Width="300px" AllowCustomText="false">
+                                    <Items>
+                                        <telerik:RadComboBoxItem Text="(Semua)" Value="" />
+                                        <telerik:RadComboBoxItem Text="Belum terdaftar" Value="BelumTerdaftar" />
+                                        <telerik:RadComboBoxItem Text="Menunggu KYC" Value="MenungguKyc" />
+                                        <telerik:RadComboBoxItem Text="KYC gagal" Value="KycGagal" />
+                                        <telerik:RadComboBoxItem Text="Menunggu verifikasi" Value="MenungguVerifikasi" />
+                                        <telerik:RadComboBoxItem Text="Sertifikat terbit" Value="SertifikatTerbit" />
+                                        <telerik:RadComboBoxItem Text="Aktif" Value="Aktif" />
+                                        <telerik:RadComboBoxItem Text="Ditolak" Value="Ditolak" />
+                                        <telerik:RadComboBoxItem Text="Kedaluwarsa" Value="Kedaluwarsa" />
+                                    </Items>
+                                </telerik:RadComboBox>
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterState" runat="server"
+                                    ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </cc:CollapsePanel>
+
+    <table width="100%" cellpadding="0" cellspacing="10">
         <tr>
-            <td class="label">Dokter</td>
-            <td><telerik:RadTextBox ID="txtParamedicName" runat="server" Width="250px" /></td>
-            <td class="label">Status</td>
-            <td>
-                <telerik:RadComboBox ID="cboState" runat="server" Width="200px" AllowCustomText="false">
-                    <Items>
-                        <telerik:RadComboBoxItem Text="(Semua)" Value="" />
-                        <telerik:RadComboBoxItem Text="Belum terdaftar" Value="BelumTerdaftar" />
-                        <telerik:RadComboBoxItem Text="Menunggu KYC" Value="MenungguKyc" />
-                        <telerik:RadComboBoxItem Text="KYC gagal" Value="KycGagal" />
-                        <telerik:RadComboBoxItem Text="Menunggu verifikasi" Value="MenungguVerifikasi" />
-                        <telerik:RadComboBoxItem Text="Sertifikat terbit" Value="SertifikatTerbit" />
-                        <telerik:RadComboBoxItem Text="Aktif" Value="Aktif" />
-                        <telerik:RadComboBoxItem Text="Ditolak" Value="Ditolak" />
-                        <telerik:RadComboBoxItem Text="Kedaluwarsa" Value="Kedaluwarsa" />
-                    </Items>
-                </telerik:RadComboBox>
+            <td style="padding: 4px 0 6px 0;">
+                <asp:Button ID="btnReconcile" runat="server" Text="Cek Status Massal"
+                    OnClick="btnReconcile_OnClick" />
+                <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
             </td>
-            <td><asp:Button ID="btnSearch" runat="server" Text="Search" OnClick="btnSearch_OnClick" /></td>
         </tr>
     </table>
 
@@ -48,7 +110,4 @@
             </Columns>
         </MasterTableView>
     </telerik:RadGrid>
-
-    <asp:Button ID="btnReconcile" runat="server" Text="Cek Status Massal" OnClick="btnReconcile_OnClick" />
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>

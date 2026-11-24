@@ -18,6 +18,16 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.Content Content1;
 
         /// <summary>
+        /// RadAjaxManagerProxy1 control.
+        /// </summary>
+        protected global::Telerik.Web.UI.RadAjaxManagerProxy RadAjaxManagerProxy1;
+
+        /// <summary>
+        /// CollapsePanel1 control.
+        /// </summary>
+        protected global::Temiang.Avicenna.CustomControl.CollapsePanel CollapsePanel1;
+
+        /// <summary>
         /// txtParamedicName control.
         /// </summary>
         protected global::Telerik.Web.UI.RadTextBox txtParamedicName;
@@ -28,9 +38,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::Telerik.Web.UI.RadComboBox cboState;
 
         /// <summary>
-        /// btnSearch control.
+        /// btnFilterParamedic control.
         /// </summary>
-        protected global::System.Web.UI.WebControls.Button btnSearch;
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterParamedic;
+
+        /// <summary>
+        /// btnFilterState control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterState;
 
         /// <summary>
         /// grdList control.

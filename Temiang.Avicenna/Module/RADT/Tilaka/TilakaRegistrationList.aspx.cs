@@ -15,14 +15,23 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             ProgramID = AppConstant.Program.TilakaRegistration;
             UrlPageSearch = "TilakaRegistrationList.aspx";
             UrlPageDetail = "TilakaRegistrationDetail.aspx";
-            ToolBarMenuQuickSearch.Visible = true;
+        }
+
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuQuickSearch.Visible = false;
+            ToolBarMenuSearch.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+            ToolBarMenuAdd.Visible = false;
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
         }
 
-        protected void btnSearch_OnClick(object sender, EventArgs e)
+        protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             Session.Remove(SessionNameForList);
             grdList.Rebind();
@@ -36,8 +45,22 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
         {
             if (e.CommandName != "detail") return;
-            var id = Convert.ToString(e.CommandArgument);
-            Response.Redirect(string.Format("TilakaRegistrationDetail.aspx?md=view&id={0}", id));
+            RedirectToDetail(Convert.ToString(e.CommandArgument));
+        }
+
+        public override void OnMenuViewClick(GridDataItem[] dataItems)
+        {
+            if (dataItems == null || dataItems.Length == 0) return;
+
+            RedirectToDetail(Convert.ToString(dataItems[0].GetDataKeyValue("ParamedicID")));
+        }
+
+        private void RedirectToDetail(string paramedicId)
+        {
+            if (string.IsNullOrWhiteSpace(paramedicId)) return;
+
+            Response.Redirect("TilakaRegistrationDetail.aspx?md=view&id=" +
+                              Server.UrlEncode(paramedicId));
         }
 
         protected void btnReconcile_OnClick(object sender, EventArgs e)
@@ -162,8 +185,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 tilaka.TilakaRegistrationID.IsNotNull()));
             if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
                 query.Where(query.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
-
-            query.es.Top = AppSession.Parameter.MaxResultRecord;
 
             var table = query.LoadDataTable();
             table.Columns.Add("StatusText", typeof(string));
