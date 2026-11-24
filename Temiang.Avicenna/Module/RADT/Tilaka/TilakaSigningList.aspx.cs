@@ -17,7 +17,16 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             UrlPageDetail = "TilakaSigningDetail.aspx";
         }
 
-        protected void btnSearch_OnClick(object sender, EventArgs e)
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuAdd.Visible = false;
+            ToolBarMenuEdit.Visible = false;
+            ToolBarMenuSearch.Visible = false;
+        }
+
+        protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
             Session.Remove(SessionNameForList);
             grdList.Rebind();
@@ -31,8 +40,21 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
         {
             if (e.CommandName != "detail") return;
-            Response.Redirect("TilakaSigningDetail.aspx?id=" +
-                              Server.UrlEncode(Convert.ToString(e.CommandArgument)));
+            RedirectToDetail(Convert.ToString(e.CommandArgument));
+        }
+
+        public override void OnMenuViewClick(GridDataItem[] dataItems)
+        {
+            if (dataItems == null || dataItems.Length == 0) return;
+
+            RedirectToDetail(Convert.ToString(dataItems[0].GetDataKeyValue("RequestID")));
+        }
+
+        private void RedirectToDetail(string requestId)
+        {
+            if (string.IsNullOrWhiteSpace(requestId)) return;
+
+            Response.Redirect("TilakaSigningDetail.aspx?id=" + Server.UrlEncode(requestId));
         }
 
         private DataTable GetList()

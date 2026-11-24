@@ -23,6 +23,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             UrlPageSearch = "TilakaSigningList.aspx";
         }
 
+        protected override void OnLoadComplete(EventArgs e)
+        {
+            base.OnLoadComplete(e);
+
+            ToolBarMenuAdd.Enabled = false;
+            ToolBarMenuEdit.Enabled = false;
+            ToolBarMenuDelete.Enabled = false;
+            ToolBarMenuMovePrev.Enabled = false;
+            ToolBarMenuMoveNext.Enabled = false;
+            ToolBarMenuSearch.Enabled = false;
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
