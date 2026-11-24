@@ -134,7 +134,7 @@ namespace Temiang.Avicenna.Controllers
 
                 var payload = JsonConvert.DeserializeObject<CallbackSigningRequest>(raw);
                 var processor = new TilakaQuickSignCallbackProcessor(
-                    new TilakaQuickSignRepository(), downloader);
+                    new TilakaQuickSignRepository(), downloader, new TilakaCasemixFileRepository());
                 var outcome = processor.Process(payload);
                 Log(logger, "Callback-Signing", raw, outcome.Applied ? "applied" : outcome.Reason);
             }

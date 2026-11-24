@@ -195,6 +195,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 var downloader = new TilakaSignedFileDownloader(
                     config.QuickSignSignedFolder, TilakaQuickSignServiceFactory.Create(config));
                 record.SignedFilePath = downloader.Download(record.RequestID, record.FileName, url);
+
+                if (record.CasemixFileID.HasValue)
+                {
+                    new TilakaCasemixFileRepository().UpdateDownloadPath(
+                        record.CasemixFileID.Value,
+                        record.QuickSignRequestID,
+                        record.SignedFilePath);
+                }
             }
             catch (Exception ex)
             {

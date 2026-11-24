@@ -46,7 +46,30 @@ namespace Temiang.Avicenna.Tests.Tilaka
             {
                 Calls++;
                 if (ShouldFail) throw new InvalidOperationException("expired");
-                return requestId + "/" + fileName;
+                return "2026/11/" + requestId + "/" + fileName;
+            }
+        }
+
+        private class FakeCasemixRepository : ITilakaCasemixFileRepository
+        {
+            public string DownloadPath;
+            public long RequestID;
+            public int Calls;
+
+            public TilakaCasemixFileRecord FindByID(long casemixFileID) { return null; }
+
+            public IList<TilakaCasemixFileRecord> FindAll()
+            {
+                return new List<TilakaCasemixFileRecord>();
+            }
+
+            public void UpdateLink(long casemixFileID, long quickSignRequestID, DateTime processedDateTime) { }
+
+            public void UpdateDownloadPath(long casemixFileID, long quickSignRequestID, string downloadPath)
+            {
+                Calls++;
+                RequestID = quickSignRequestID;
+                DownloadPath = downloadPath;
             }
         }
 
@@ -57,6 +80,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 Record = new TilakaQuickSignRecord
                 {
                     QuickSignRequestID = 1,
+                    CasemixFileID = 10,
                     RequestID = "req-1",
                     FileName = "doc.pdf",
                     Status = TilakaQuickSignConstant.RequestStatus.Requested,
@@ -107,7 +131,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
         {
             var repository = Repository();
             var downloader = new FakeDownloader();
-            var processor = new TilakaQuickSignCallbackProcessor(repository, downloader);
+            var casemix = new FakeCasemixRepository();
+            var processor = new TilakaQuickSignCallbackProcessor(repository, downloader, casemix);
 
             var outcome = processor.Process(DonePayload());
 
@@ -115,7 +140,9 @@ namespace Temiang.Avicenna.Tests.Tilaka
             Assert.AreEqual(1, downloader.Calls);
             Assert.AreEqual(TilakaQuickSignConstant.RequestStatus.Completed, repository.Record.Status);
             Assert.IsFalse(repository.Record.IsActive);
-            Assert.AreEqual("req-1/doc.pdf", repository.Record.SignedFilePath);
+            Assert.AreEqual("2026/11/req-1/doc.pdf", repository.Record.SignedFilePath);
+            Assert.AreEqual("2026/11/req-1/doc.pdf", casemix.DownloadPath);
+            Assert.AreEqual(1, casemix.RequestID);
         }
 
         [TestMethod]
@@ -123,13 +150,15 @@ namespace Temiang.Avicenna.Tests.Tilaka
         {
             var repository = Repository();
             var downloader = new FakeDownloader { ShouldFail = true };
-            var processor = new TilakaQuickSignCallbackProcessor(repository, downloader);
+            var casemix = new FakeCasemixRepository();
+            var processor = new TilakaQuickSignCallbackProcessor(repository, downloader, casemix);
 
             processor.Process(DonePayload());
 
             Assert.AreEqual(TilakaQuickSignConstant.RequestStatus.InProgress, repository.Record.Status);
             Assert.IsTrue(repository.Record.IsActive);
             StringAssert.Contains(repository.Record.ErrorMessage, "Gagal mengunduh");
+            Assert.AreEqual(0, casemix.Calls);
         }
 
         [TestMethod]
@@ -138,7 +167,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
             var repository = Repository();
             repository.Record.Status = TilakaQuickSignConstant.RequestStatus.Completed;
             repository.Signers[0].Status = TilakaQuickSignConstant.SignerStatus.Done;
-            var processor = new TilakaQuickSignCallbackProcessor(repository, new FakeDownloader());
+            var processor = new TilakaQuickSignCallbackProcessor(
+                repository, new FakeDownloader(), new FakeCasemixRepository());
 
             var outcome = processor.Process(DonePayload());
 
@@ -150,7 +180,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
         public void UnknownRequest_IsNotApplied()
         {
             var repository = Repository();
-            var processor = new TilakaQuickSignCallbackProcessor(repository, new FakeDownloader());
+            var processor = new TilakaQuickSignCallbackProcessor(
+                repository, new FakeDownloader(), new FakeCasemixRepository());
             var payload = DonePayload();
             payload.RequestId = "unknown";
 

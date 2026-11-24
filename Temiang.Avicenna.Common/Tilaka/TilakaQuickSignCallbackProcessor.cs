@@ -6,12 +6,15 @@ namespace Temiang.Avicenna.Common.Tilaka
     {
         private readonly ITilakaQuickSignRepository _repository;
         private readonly ITilakaSignedFileDownloader _downloader;
+        private readonly ITilakaCasemixFileRepository _casemixRepository;
 
         public TilakaQuickSignCallbackProcessor(ITilakaQuickSignRepository repository,
-            ITilakaSignedFileDownloader downloader)
+            ITilakaSignedFileDownloader downloader,
+            ITilakaCasemixFileRepository casemixRepository)
         {
             _repository = repository;
             _downloader = downloader;
+            _casemixRepository = casemixRepository;
         }
 
         public TilakaCallbackOutcome Process(CallbackSigningRequest payload)
@@ -122,6 +125,14 @@ namespace Temiang.Avicenna.Common.Tilaka
             try
             {
                 record.SignedFilePath = _downloader.Download(record.RequestID, record.FileName, presignedUrl);
+
+                if (record.CasemixFileID.HasValue && _casemixRepository != null)
+                {
+                    _casemixRepository.UpdateDownloadPath(
+                        record.CasemixFileID.Value,
+                        record.QuickSignRequestID,
+                        record.SignedFilePath);
+                }
             }
             catch (Exception ex)
             {

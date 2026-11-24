@@ -15,6 +15,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         public bool IsVoid { get; set; }
         public long? LastQuickSignRequestID { get; set; }
         public DateTime? LastProcessedDateTime { get; set; }
+        public string DownloadPath { get; set; }
     }
 
     public interface ITilakaCasemixFileRepository
@@ -22,6 +23,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         TilakaCasemixFileRecord FindByID(long casemixFileID);
         IList<TilakaCasemixFileRecord> FindAll();
         void UpdateLink(long casemixFileID, long quickSignRequestID, DateTime processedDateTime);
+        void UpdateDownloadPath(long casemixFileID, long quickSignRequestID, string downloadPath);
     }
 
     public class TilakaCasemixFileRepository : ITilakaCasemixFileRepository
@@ -60,6 +62,28 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
         }
 
+        public void UpdateDownloadPath(long casemixFileID, long quickSignRequestID, string downloadPath)
+        {
+            if (string.IsNullOrWhiteSpace(downloadPath)) return;
+
+            var entity = new TilakaCasemixFile();
+            if (!entity.LoadByPrimaryKey(casemixFileID)) return;
+
+            // Jangan biarkan callback request lama menimpa path request terbaru.
+            if (!TilakaSignedFileRules.ShouldUpdateDownloadPath(
+                    entity.DownloadPath, entity.LastQuickSignRequestID, quickSignRequestID))
+                return;
+
+            entity.DownloadPath = downloadPath;
+            entity.LastUpdateDateTime = DateTime.Now;
+
+            using (var scope = new esTransactionScope())
+            {
+                entity.Save();
+                scope.Complete();
+            }
+        }
+
         private static TilakaCasemixFileRecord Map(TilakaCasemixFile entity)
         {
             return new TilakaCasemixFileRecord
@@ -71,7 +95,8 @@ namespace Temiang.Avicenna.Common.Tilaka
                 FilePath = entity.FilePath,
                 IsVoid = entity.IsVoid ?? false,
                 LastQuickSignRequestID = entity.LastQuickSignRequestID,
-                LastProcessedDateTime = entity.LastProcessedDateTime
+                LastProcessedDateTime = entity.LastProcessedDateTime,
+                DownloadPath = entity.DownloadPath
             };
         }
     }

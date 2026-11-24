@@ -29,9 +29,8 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (string.IsNullOrWhiteSpace(presignedUrl))
                 throw new InvalidOperationException("Presigned URL kosong.");
 
-            var safeRequest = SafeName(requestId);
-            var safeFile = SafeName(fileName);
-            var relative = safeRequest + "/" + safeFile;
+            var relative = TilakaSignedFileRules.BuildRelativePath(
+                requestId, fileName, DateTime.Now);
             var fullPath = ResolveFullPath(relative);
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
@@ -79,12 +78,5 @@ namespace Temiang.Avicenna.Common.Tilaka
             return fullPath;
         }
 
-        private static string SafeName(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return "UNKNOWN";
-            foreach (var ch in Path.GetInvalidFileNameChars()) value = value.Replace(ch, '_');
-            value = value.Replace("..", "_").Trim().Trim('.');
-            return string.IsNullOrWhiteSpace(value) ? "UNKNOWN" : value;
-        }
     }
 }
