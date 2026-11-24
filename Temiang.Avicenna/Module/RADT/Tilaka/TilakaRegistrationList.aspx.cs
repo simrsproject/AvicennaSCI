@@ -157,6 +157,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 tilaka.LastCheckedDateTime);
 
             query.Where(query.IsActive == true);
+            query.Where(query.Or(
+                query.IsUsingESignature == true,
+                tilaka.TilakaRegistrationID.IsNotNull()));
             if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
                 query.Where(query.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
 

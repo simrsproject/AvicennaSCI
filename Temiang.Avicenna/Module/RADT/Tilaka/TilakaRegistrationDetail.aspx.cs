@@ -62,6 +62,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             lblSsn.Text = paramedic.Ssn;
             lblEmail.Text = paramedic.Email;
 
+            var isUsingESignature = paramedic.IsUsingESignature == true;
             var config = new TilakaConfig();
             var repository = new TilakaRegistrationRepository();
             var record = repository.FindLatest(TilakaConstant.RelatedType.Paramedic, ParamedicID);
@@ -84,14 +85,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 imgKtp.Visible = false;
             }
 
-            chkConsent.Visible = CanStartRegistration(state);
-            btnDaftar.Visible = CanStartRegistration(state);
-            btnKirimData.Visible = state == TilakaRegistrationState.UuidTerbit;
-            btnWebview.Visible = !string.IsNullOrWhiteSpace(webviewUrl)
+            chkConsent.Visible = isUsingESignature && CanStartRegistration(state);
+            btnDaftar.Visible = isUsingESignature && CanStartRegistration(state);
+            btnKirimData.Visible = isUsingESignature && state == TilakaRegistrationState.UuidTerbit;
+            btnWebview.Visible = isUsingESignature
+                                 && !string.IsNullOrWhiteSpace(webviewUrl)
                                  && IsWebviewState(state);
             btnCekStatus.Visible = record != null && state != TilakaRegistrationState.BelumTerdaftar;
 
             ConfigureConsent(config);
+
+            if (!isUsingESignature)
+                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
         }
 
         private static bool CanStartRegistration(string state)
@@ -170,6 +175,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!paramedic.LoadByPrimaryKey(ParamedicID))
             {
                 lblMessage.Text = "Dokter tidak ditemukan.";
+                return;
+            }
+
+            if (paramedic.IsUsingESignature != true)
+            {
+                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
                 return;
             }
 
@@ -280,6 +291,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!paramedic.LoadByPrimaryKey(ParamedicID))
             {
                 lblMessage.Text = "Dokter tidak ditemukan.";
+                return;
+            }
+
+            if (paramedic.IsUsingESignature != true)
+            {
+                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
                 return;
             }
 

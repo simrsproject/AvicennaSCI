@@ -93,7 +93,10 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             object cached = Session[SessionNameForList];
             if (cached != null) return (DataTable)cached;
 
-            var query = new TilakaCasemixFileQuery();
+            var query = new TilakaCasemixFileQuery("a");
+            var paramedic = new ParamedicQuery("b");
+            query.LeftJoin(paramedic).On(query.ParamedicID == paramedic.ParamedicID);
+            query.Select(query, paramedic.IsUsingESignature);
             query.Where(query.IsVoid == false);
 
             if (!string.IsNullOrWhiteSpace(txtRegistrationNo.Text))
@@ -111,6 +114,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             foreach (DataRow row in table.Rows)
             {
+                var isUsingESignature = row["IsUsingESignature"] != DBNull.Value
+                                        && Convert.ToBoolean(row["IsUsingESignature"]);
+
                 var requestQuery = new TilakaQuickSignRequestQuery();
                 requestQuery.Where(requestQuery.CasemixFileID == Convert.ToInt64(row["CasemixFileID"]));
                 requestQuery.es.Top = 1;
@@ -122,13 +128,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     var status = request.Status;
                     row["RequestID"] = request.RequestID;
                     row["RequestStatus"] = status;
-                    row["CanProcess"] = status == TilakaQuickSignConstant.RequestStatus.Failed;
+                    row["CanProcess"] = isUsingESignature
+                                        && status == TilakaQuickSignConstant.RequestStatus.Failed;
                 }
                 else
                 {
                     row["RequestID"] = DBNull.Value;
                     row["RequestStatus"] = "Belum diproses";
-                    row["CanProcess"] = true;
+                    row["CanProcess"] = isUsingESignature;
                 }
             }
 

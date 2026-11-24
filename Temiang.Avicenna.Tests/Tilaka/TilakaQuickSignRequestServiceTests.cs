@@ -13,6 +13,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
             public string UploadResponse = "{\"success\":true,\"message\":\"ok\",\"filename\":\"uploaded.pdf\"}";
             public string RequestResponse = "{\"success\":true,\"message\":\"ok\",\"auth_response\":[{\"url\":\"http://auth\",\"user_identifier\":\"dr001\",\"status\":false,\"token_key\":\"tk\"}],\"failed_doc_name\":null}";
             public bool FailRequestSign;
+            public int UploadCalls;
 
             public TilakaTransportResult PostForm(string url, IDictionary<string, string> form, int timeoutSeconds)
             {
@@ -47,6 +48,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
             public TilakaTransportResult PostMultipart(string url, string formName, string fileName,
                 byte[] content, string contentType, string bearerToken, int timeoutSeconds)
             {
+                UploadCalls++;
                 return new TilakaTransportResult { StatusCode = 200, Body = UploadResponse };
             }
         }
@@ -143,9 +145,11 @@ namespace Temiang.Avicenna.Tests.Tilaka
         {
             public string Signature = "AAAA";
             public string Email = "dr001@rs.example";
+            public bool UsingESignature = true;
 
             public string GetEmail(string paramedicID) { return Email; }
             public string GetSignatureImageBase64(string paramedicID) { return Signature; }
+            public bool IsUsingESignature(string paramedicID) { return UsingESignature; }
         }
 
         private class FakeReader : ITilakaCasemixFileReader
@@ -272,6 +276,25 @@ namespace Temiang.Avicenna.Tests.Tilaka
 
             Assert.IsFalse(result.IsSuccess);
             StringAssert.Contains(result.Message, "tanda tangan");
+        }
+
+        [TestMethod]
+        public void Submit_DoctorNotUsingESignature_FailsBeforeUpload()
+        {
+            FakeCasemixRepository casemix;
+            FakeTemplateRepository template;
+            FakeRegistrationRepository registration;
+            FakeProfile profile;
+            var repository = Repository(out casemix, out template, out registration, out profile);
+            profile.UsingESignature = false;
+            var transport = new FakeTransport();
+            var service = CreateService(transport, repository, casemix, template, registration, profile);
+
+            var result = service.Submit(1, null, null, null, null, "tester");
+
+            Assert.IsFalse(result.IsSuccess);
+            StringAssert.Contains(result.Message, "tanda tangan elektronik");
+            Assert.AreEqual(0, transport.UploadCalls);
         }
 
         [TestMethod]

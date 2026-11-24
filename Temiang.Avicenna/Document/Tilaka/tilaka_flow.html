@@ -187,6 +187,7 @@
 
   <h3>3.1 Persiapan data dokter</h3>
   <ol>
+    <li><code>Paramedic.IsUsingESignature = 1</code> (diisi melalui database). Hanya dokter dengan flag ini yang muncul di daftar registrasi dan Quick Sign. Riwayat registrasi dokter yang flag-nya dimatikan tetap tampil untuk audit.</li>
     <li><code>Paramedic.NamaKTP</code> terisi sesuai KTP (bukan nama bergelar).</li>
     <li><code>Paramedic.Ssn</code> berisi NIK tepat 16 digit dan tidak dipakai dokter lain.</li>
     <li><code>Paramedic.Email</code> terisi dan aktif (dipakai OTP).</li>
@@ -346,15 +347,17 @@
   <ol>
     <li>Modul membaca baris <code>TilakaCasemixFile</code> dan menampilkan <strong>RegistrationNo, ParamedicID, FileName, FilePath</strong>.</li>
     <li>File fisik dibaca dari <code>FilePath</code> saat request signing; isinya harus PDF (Quick Sign tidak menerima format lain).</li>
-    <li>Kolom <strong>Action</strong> berisi tombol <strong>Process Signature</strong> yang hanya tampil bila
-        belum ada request, atau request terakhir <code>Failed</code>/<code>DENIED</code>.</li>
+    <li>Kolom <strong>Action</strong> berisi tombol <strong>Process Signature</strong>. Tombol tetap tampil
+        tetapi <em>disabled</em> bila dokter <code>Paramedic.IsUsingESignature</code> bukan <code>1</code>,
+        atau bila request terakhir masih berjalan/sudah selesai. Tombol aktif bila belum ada request
+        atau request terakhir <code>Failed</code>.</li>
     <li>Menekan tombol menjalankan request sign dengan signer = dokter <code>ParamedicID</code>, posisi tanda tangan 1/1/1/1/1, lalu menampilkan status per signer dan tautan auth webview.</li>
-    <li>Baris yang sudah diproses menampilkan status request terbaru; tombol Process Signature tidak ditampilkan lagi.</li>
+    <li>Baris yang sudah diproses menampilkan status request terbaru; tombol Process Signature kembali disabled.</li>
   </ol>
   <div class="note">Satu file boleh diajukan lebih dari sekali (mis. signing gagal atau perlu koreksi). Status file diturunkan dari request terbaru: <em>Belum diproses</em>, <em>Requested</em>, <em>InProgress</em>, <em>Completed</em>, <em>Failed</em>. Tidak ada kolom status terpisah di <code>TilakaCasemixFile</code>.</div>
 
   <h3>4.2 Onboarding Quick Sign user</h3>
-  <p>Syarat: sertifikat dokter <strong>Aktif</strong> dan <code>TilakaName</code> terisi.</p>
+  <p>Syarat: <code>Paramedic.IsUsingESignature = 1</code>, sertifikat dokter <strong>Aktif</strong>, dan <code>TilakaName</code> terisi.</p>
   <pre><code>POST {TilakaLiteBaseUrl}/addquicksignusers
 Authorization: Bearer &lt;access_token&gt;
 Content-Type: application/json

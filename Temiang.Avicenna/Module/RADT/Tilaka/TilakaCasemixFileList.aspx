@@ -27,7 +27,8 @@
                     <ItemTemplate>
                         <asp:LinkButton ID="btnProcess" runat="server" Text="Process Signature"
                             CommandName="process" CommandArgument='<%# Eval("CasemixFileID") %>'
-                            Visible='<%# Eval("CanProcess") %>' />
+                            Enabled='<%# Eval("CanProcess") %>'
+                            ToolTip='<%# Convert.ToBoolean(Eval("CanProcess")) ? "" : "Dokter tidak menggunakan tanda tangan elektronik atau request masih berjalan." %>' />
                         <asp:LinkButton ID="btnStatus" runat="server" Text="Status"
                             CommandName="status" CommandArgument='<%# Eval("RequestID") %>'
                             Visible='<%# !string.IsNullOrEmpty(Convert.ToString(Eval("RequestID"))) %>' />

@@ -12,12 +12,14 @@ langkah di bawah belum bisa dijalankan.
 - [ ] Folder `C:\Tilaka\TemplateSign` dan `C:\Tilaka\Signed` dibuat; app pool punya Modify.
 - [ ] SQL `07.CREATE_TABLE_TilakaTemplateSignFile.sql` dan `08.INSERT_INTO_AppProgram_TilakaQuickSign.sql` sudah dijalankan.
 - [ ] Kolom `TilakaQuickSignRequest.TemplateSignFileID` ada di database.
-- [ ] Doctor uji: sertifikat `Aktif`, `TilakaName` terisi, `AppUser.SignatureImage` tidak kosong.
+- [ ] Doctor uji: `Paramedic.IsUsingESignature = 1`, sertifikat `Aktif`, `TilakaName` terisi, `AppUser.SignatureImage` tidak kosong.
 - [ ] Data `TilakaCasemixFile` uji sudah tersedia (diisi di luar modul).
+- [ ] Ada satu dokter uji dengan `IsUsingESignature = 0` untuk memverifikasi tombol Process Signature disabled dan penolakan backend.
 
 ## 2. Onboarding Quick Sign
 
 - [ ] Buka **Tilaka E-Signature → Quick Sign User** (`01.23.04`).
+- [ ] Hanya dokter dengan `IsUsingESignature = 1` yang tampil di daftar.
 - [ ] Filter “Belum terdaftar”; tombol **Daftarkan Quick Sign** muncul untuk dokter bersertifikat aktif.
 - [ ] Klik tombol → `addquicksignusers` dipanggil; status berubah menjadi “Terdaftar” dan tanggal terisi.
 - [ ] Bila email sudah terdaftar, aplikasi tetap menandai terdaftar (idempoten).
@@ -34,7 +36,8 @@ langkah di bawah belum bisa dijalankan.
 ## 4. Process Signature
 
 - [ ] Buka **File Casemix** (`01.23.02`); kolom RegistrationNo, ParamedicID, FileName, FilePath tampil.
-- [ ] Tombol **Process Signature** muncul hanya untuk file tanpa request atau request terakhir `Failed`.
+- [ ] Tombol **Process Signature** aktif hanya untuk file tanpa request atau request terakhir `Failed`, dan hanya bila dokter `IsUsingESignature = 1`.
+- [ ] Untuk dokter dengan `IsUsingESignature = 0`, file tetap tampil tetapi tombol disabled dan request langsung ditolak bila dipaksa.
 - [ ] Klik tombol untuk file uji.
 - [ ] Request dibuat dengan `request_id`, satu signer (DPJP), posisi 1/1/1/1/1.
 - [ ] Halaman status menampilkan status per signer dan tautan **Buka Auth** bila `UNAUTHORIZED`.

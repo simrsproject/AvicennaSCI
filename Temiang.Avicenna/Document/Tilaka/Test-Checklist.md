@@ -41,6 +41,8 @@ langkah dijalankan oleh operator di server uji.
       Tilaka agar API mereka menerima request kita. Autentikasi masuk tetap memakai HMAC
       `x-validation-token` + channel secret. Tidak ada key `TilakaCallbackAllowedIps` di aplikasi.
 - [ ] `TilakaWebviewRedirectUrl` menunjuk ke host uji (bukan `domain-rs.example`), memakai HTTPS.
+- [ ] Minimal satu dokter uji memiliki `Paramedic.IsUsingESignature = 1`; dokter tanpa flag ini
+      tidak muncul di daftar registrasi (kecuali sudah punya riwayat registrasi) dan tidak bisa didaftarkan.
 
 ### 0.2 Folder server dan ACL
 

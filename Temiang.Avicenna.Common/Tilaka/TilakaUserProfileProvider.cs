@@ -7,6 +7,7 @@ namespace Temiang.Avicenna.Common.Tilaka
     {
         string GetEmail(string paramedicID);
         string GetSignatureImageBase64(string paramedicID);
+        bool IsUsingESignature(string paramedicID);
     }
 
     public class TilakaUserProfileProvider : ITilakaUserProfileProvider
@@ -16,6 +17,13 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (string.IsNullOrWhiteSpace(paramedicID)) return null;
             var paramedic = new Paramedic();
             return paramedic.LoadByPrimaryKey(paramedicID) ? paramedic.Email : null;
+        }
+
+        public bool IsUsingESignature(string paramedicID)
+        {
+            if (string.IsNullOrWhiteSpace(paramedicID)) return false;
+            var paramedic = new Paramedic();
+            return paramedic.LoadByPrimaryKey(paramedicID) && paramedic.IsUsingESignature == true;
         }
 
         public string GetSignatureImageBase64(string paramedicID)

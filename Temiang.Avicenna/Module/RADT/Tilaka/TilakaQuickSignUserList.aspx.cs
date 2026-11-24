@@ -47,6 +47,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 return;
             }
 
+            if (paramedic.IsUsingESignature != true)
+            {
+                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
+                return;
+            }
+
             try
             {
                 var service = TilakaQuickSignServiceFactory.Create(config);
@@ -113,6 +119,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 reg.QuickSignLastErrorMessage);
 
             par.Where(par.IsActive == true);
+            par.Where(par.IsUsingESignature == true);
             if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
                 par.Where(par.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
 

@@ -72,6 +72,9 @@ namespace Temiang.Avicenna.Common.Tilaka
                 if (string.IsNullOrWhiteSpace(input.ParamedicID))
                     input.ParamedicID = casemix.ParamedicID;
 
+                if (!_profileProvider.IsUsingESignature(input.ParamedicID))
+                    return Fail("Dokter " + input.ParamedicID + " tidak menggunakan tanda tangan elektronik.");
+
                 var registration = _registrationRepository.FindLatest(
                     TilakaConstant.RelatedType.Paramedic, input.ParamedicID);
                 if (registration == null)
