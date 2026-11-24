@@ -140,7 +140,7 @@
     <tr><td>Docker</td><td>Docker Engine/Desktop + Compose untuk menjalankan <code>tilaka-lite</code>, MinIO, MariaDB.</td></tr>
     <tr><td>Jaringan</td><td>Server Avicenna ↔ <code>tilaka-lite</code> pada port yang disepakati; server Avicenna harus dapat diakses internet untuk callback Sign Plus.</td></tr>
     <tr><td>Waktu</td><td>NTP aktif di server Avicenna dan <code>tilaka-lite</code>; HMAC callback memakai timestamp.</td></tr>
-    <tr><td>Penyimpanan</td><td><code>C:\Tilaka\</code> (TnC read-only), <code>C:\Tilaka\KTP</code> (write), <code>C:\Tilaka\TemplateSign</code> (write), <code>C:\Tilaka\Signed</code> (write), dan lokasi file Casemix yang sudah ada (dibaca saja). Semuanya masuk kebijakan backup.</td></tr>
+    <tr><td>Penyimpanan</td><td><code>C:\Tilaka\</code> (TnC read-only; dapat diganti URL HTTP(S)), <code>C:\Tilaka\KTP</code> (write), <code>C:\Tilaka\TemplateSign</code> (write), <code>C:\Tilaka\Signed</code> (write), dan lokasi file Casemix yang sudah ada (dibaca saja). Semuanya masuk kebijakan backup.</td></tr>
   </table>
 
   <h3>2.2 Kredensial dan pendaftaran ke Tilaka</h3>
@@ -152,7 +152,7 @@
     <li><strong>Callback signing</strong>: <code>https://&lt;host&gt;/TilakaCallback/Signing</code> — berasal dari
         <code>tilaka-lite</code> di jaringan RS, tidak memerlukan akses publik.</li>
     <li><strong>URL redirect</strong> webview: <code>https://&lt;host&gt;/TilakaWebview/Return</code>.</li>
-    <li><strong>Teks dan versi TnC</strong> final dari legal RS; disimpan di <code>C:\Tilaka\TilakaConsent.txt</code> dan <code>TilakaConsentVersion</code>.</li>
+    <li><strong>Teks dan versi TnC</strong> final dari legal RS; disimpan di <code>TilakaConsentTextFile</code> (path lokal, UNC, <code>~/</code>, atau URL HTTP(S)) dan <code>TilakaConsentVersion</code>.</li>
   </ul>
 
   <h4>Konfigurasi Quick Sign (<code>Web.config</code>)</h4>

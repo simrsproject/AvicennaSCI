@@ -119,7 +119,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var consentText = config.ReadConsentText();
             if (string.IsNullOrWhiteSpace(consentText))
             {
-                lblMessage.Text = "File TnC Tilaka tidak ditemukan atau kosong: " + config.ConsentTextFile;
+                lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
                 if (btnDaftar.Visible)
                 {
                     chkConsent.Enabled = false;
@@ -187,7 +187,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var config = new TilakaConfig();
             if (string.IsNullOrWhiteSpace(config.ReadConsentText()))
             {
-                lblMessage.Text = "File TnC Tilaka tidak ditemukan atau kosong: " + config.ConsentTextFile;
+                lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
                 return;
             }
 
@@ -312,7 +312,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var consentText = config.ReadConsentText();
             if (string.IsNullOrWhiteSpace(consentText))
             {
-                lblMessage.Text = "File TnC Tilaka tidak ditemukan atau kosong: " + config.ConsentTextFile;
+                lblMessage.Text = "File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile;
                 return;
             }
 

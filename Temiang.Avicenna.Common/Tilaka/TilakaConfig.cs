@@ -1,6 +1,7 @@
 using System;
 using System.Configuration;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Web.Hosting;
 
@@ -78,9 +79,14 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         public string ReadConsentText()
         {
+            if (string.IsNullOrWhiteSpace(ConsentTextFile)) return null;
+
+            if (IsHttpUrl(ConsentTextFile))
+                return TrimConsentText(ReadConsentTextFromUrl(ConsentTextFile));
+
             var path = ResolveFilePath(ConsentTextFile, HostingEnvironment.MapPath);
             if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return null;
-            return File.ReadAllText(path, Encoding.UTF8).TrimEnd('\r', '\n');
+            return TrimConsentText(File.ReadAllText(path, Encoding.UTF8));
         }
 
         public static string ResolveFilePath(string configured, Func<string, string> mapPath)
@@ -88,7 +94,63 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (string.IsNullOrWhiteSpace(configured)) return null;
             if (configured.StartsWith("~/", StringComparison.Ordinal))
                 return mapPath == null ? null : mapPath(configured);
+
+            Uri uri;
+            if (Uri.TryCreate(configured, UriKind.Absolute, out uri) && !uri.IsFile)
+                return null;
+
             return Path.IsPathRooted(configured) ? configured : Path.GetFullPath(configured);
+        }
+
+        private static bool IsHttpUrl(string value)
+        {
+            Uri uri;
+            return Uri.TryCreate(value, UriKind.Absolute, out uri)
+                   && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+        }
+
+        private static string ReadConsentTextFromUrl(string url)
+        {
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.Method = "GET";
+                request.Timeout = 10000;
+                request.ReadWriteTimeout = 10000;
+
+                using (var response = (HttpWebResponse)request.GetResponse())
+                using (var stream = response.GetResponseStream())
+                {
+                    var encoding = Encoding.UTF8;
+                    if (!string.IsNullOrWhiteSpace(response.CharacterSet))
+                    {
+                        try
+                        {
+                            encoding = Encoding.GetEncoding(response.CharacterSet);
+                        }
+                        catch (ArgumentException)
+                        {
+                            // Gunakan UTF-8 bila charset dari server tidak dikenal.
+                        }
+                        catch (NotSupportedException)
+                        {
+                            // Gunakan UTF-8 bila charset dari server tidak didukung.
+                        }
+                    }
+
+                    using (var reader = new StreamReader(stream, encoding, true))
+                        return reader.ReadToEnd();
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static string TrimConsentText(string value)
+        {
+            return value == null ? null : value.TrimEnd('\r', '\n');
         }
 
         private static string GetString(string key, string fallback)

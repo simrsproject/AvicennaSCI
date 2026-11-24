@@ -28,7 +28,7 @@ langkah dijalankan oleh operator di server uji.
 | `TilakaIsLogEnabled` | `true` | Logging ke `WebServiceAPILog`. |
 | `TilakaCallbackToleranceMinutes` | `5` | Toleransi `x-request-timestamp`; jam server harus sinkron (NTP). |
 | `TilakaRegistrationExpireDays` | `7` | Nilai > 7 otomatis dibatasi 7. |
-| `TilakaConsentTextFile` | `C:\Tilaka\TilakaConsent.txt` | File teks TnC, UTF-8. |
+| `TilakaConsentTextFile` | `C:\Tilaka\TilakaConsent.txt` | Teks TnC UTF-8; boleh path lokal, UNC, `~/`, atau URL HTTP(S). |
 | `TilakaConsentVersion` | `TNT-v.1.0.1` | Harus sama dengan versi TnC yang disepakati; ikut di-hash saat registrasi. |
 | `TilakaUploadKTPImage` | `C:\Tilaka\KTP` | Root penyimpanan foto KTP. |
 | `TilakaMaxKtpSizeKb` | `1024` | Batas ukuran **setelah kompresi** (1 MB). Kontrol upload sendiri menerima ≤ 2 MB (`MaxFileSize=2097152`). |
