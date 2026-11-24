@@ -241,6 +241,9 @@ namespace Temiang.Avicenna.Common.BPJS.VClaim.v11.RujukanSatuSehat
 
         [JsonProperty("distance")]
         public decimal? Distance { get; set; }
+
+        [JsonProperty("jadwal")]
+        public string Jadwal { get; set; }
     }
 
     #endregion
