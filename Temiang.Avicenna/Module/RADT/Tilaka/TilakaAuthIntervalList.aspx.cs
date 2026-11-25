@@ -56,7 +56,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var config = new TilakaConfig();
             if (!config.IsQuickSignConfigured)
             {
-                lblMessage.Text = "Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).";
+                lblMessage.Text = TilakaAlertHtml.Error("Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).");
                 return;
             }
 
@@ -69,7 +69,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 string message;
                 if (!service.IsOk(response, out message))
                 {
-                    lblMessage.Text = message;
+                    lblMessage.Text = TilakaAlertHtml.Error(message);
                     return;
                 }
 
@@ -80,11 +80,13 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
                 lblMessage.Text = table.Rows.Count == 0
                     ? string.Empty
-                    : "Total: " + (response.Pagination == null ? table.Rows.Count : response.Pagination.TotalElements);
+                    : TilakaAlertHtml.Info("Total: " + (response.Pagination == null
+                        ? table.Rows.Count
+                        : response.Pagination.TotalElements));
             }
             catch (Exception ex)
             {
-                lblMessage.Text = ex.Message;
+                lblMessage.Text = TilakaAlertHtml.Error(ex.Message);
             }
         }
 

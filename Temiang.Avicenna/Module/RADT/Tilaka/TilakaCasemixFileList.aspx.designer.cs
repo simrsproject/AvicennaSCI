@@ -10,6 +10,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::Telerik.Web.UI.RadTextBox txtParamedicID;
         protected global::System.Web.UI.WebControls.ImageButton btnFilterParamedic;
         protected global::Telerik.Web.UI.RadGrid grdList;
-        protected global::System.Web.UI.WebControls.Label lblMessage;
+        protected global::System.Web.UI.WebControls.Literal lblMessage;
     }
 }

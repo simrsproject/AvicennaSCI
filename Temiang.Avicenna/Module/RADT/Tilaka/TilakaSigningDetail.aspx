@@ -45,5 +45,5 @@
 
     <br />
     <asp:Button ID="btnCheck" runat="server" Text="Cek Status" OnClick="btnCheck_OnClick" />
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>

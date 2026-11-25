@@ -85,7 +85,7 @@
             <td style="padding: 4px 0 6px 0;">
                 <asp:Button ID="btnReconcile" runat="server" Text="Cek Status Massal"
                     OnClick="btnReconcile_OnClick" />
-                <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+                <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
             </td>
         </tr>
     </table>

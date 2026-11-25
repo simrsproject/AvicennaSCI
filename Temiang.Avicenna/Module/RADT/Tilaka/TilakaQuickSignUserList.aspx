@@ -20,6 +20,7 @@
             <telerik:AjaxSetting AjaxControlID="grdList">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                    <telerik:AjaxUpdatedControl ControlID="lblMessage" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
         </AjaxSettings>
@@ -92,5 +93,5 @@
         </MasterTableView>
     </telerik:RadGrid>
 
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>

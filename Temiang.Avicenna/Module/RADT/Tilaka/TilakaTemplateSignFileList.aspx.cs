@@ -88,7 +88,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var config = new TilakaConfig();
             if (!config.IsQuickSignConfigured)
             {
-                lblMessage.Text = "Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).";
+                lblMessage.Text = TilakaAlertHtml.Error("Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).");
                 return;
             }
 
@@ -97,7 +97,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (registration == null || registration.CertificateStatus != TilakaConstant.CertificateStatus.Active
                 || !registration.IsQuickSignUser || string.IsNullOrWhiteSpace(registration.TilakaName))
             {
-                lblMessage.Text = "Dokter harus memiliki sertifikat aktif dan terdaftar sebagai Quick Sign user.";
+                lblMessage.Text = TilakaAlertHtml.Error("Dokter harus memiliki sertifikat aktif dan terdaftar sebagai Quick Sign user.");
                 return;
             }
 
@@ -107,7 +107,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 var content = store.Load(record.FilePath);
                 if (content == null)
                 {
-                    lblMessage.Text = "File template tidak ditemukan.";
+                    lblMessage.Text = TilakaAlertHtml.Error("File template tidak ditemukan.");
                     return;
                 }
 
@@ -117,7 +117,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
                 if (paramedic.IsUsingESignature != true)
                 {
-                    lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
+                    lblMessage.Text = TilakaAlertHtml.Error("Dokter ini tidak menggunakan tanda tangan elektronik.");
                     return;
                 }
 
@@ -162,12 +162,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 repository.Save(record);
 
                 lblMessage.Text = success
-                    ? "Template berhasil didaftarkan ke Tilaka."
-                    : error;
+                    ? TilakaAlertHtml.Success("Template berhasil didaftarkan ke Tilaka.")
+                    : TilakaAlertHtml.Error(error);
             }
             catch (Exception ex)
             {
-                lblMessage.Text = ex.Message;
+                lblMessage.Text = TilakaAlertHtml.Error(ex.Message);
             }
         }
 

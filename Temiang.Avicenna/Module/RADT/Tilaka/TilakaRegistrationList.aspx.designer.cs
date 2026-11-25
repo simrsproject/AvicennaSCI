@@ -60,6 +60,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         /// <summary>
         /// lblMessage control.
         /// </summary>
-        protected global::System.Web.UI.WebControls.Label lblMessage;
+        protected global::System.Web.UI.WebControls.Literal lblMessage;
     }
 }

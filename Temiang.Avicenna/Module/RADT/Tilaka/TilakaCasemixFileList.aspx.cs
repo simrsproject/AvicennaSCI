@@ -65,15 +65,13 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             if (result.IsSuccess)
             {
-                lblMessage.ForeColor = System.Drawing.Color.Green;
-                lblMessage.Text = "Request signature berhasil dibuat.";
+                lblMessage.Text = TilakaAlertHtml.Success("Request signature berhasil dibuat.");
             }
             else
             {
-                lblMessage.ForeColor = System.Drawing.Color.Red;
-                lblMessage.Text = string.IsNullOrWhiteSpace(result.Message)
+                lblMessage.Text = TilakaAlertHtml.Error(string.IsNullOrWhiteSpace(result.Message)
                     ? "Gagal memproses tanda tangan."
-                    : result.Message;
+                    : result.Message);
             }
 
             Session.Remove(SessionNameForList);

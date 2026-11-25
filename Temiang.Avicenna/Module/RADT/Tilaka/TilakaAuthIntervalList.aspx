@@ -88,5 +88,5 @@
         </MasterTableView>
     </telerik:RadGrid>
 
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>

@@ -132,7 +132,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 }
             }
 
-            lblMessage.Text = string.Format("{0} diperiksa (maksimal 5 per klik), {1} gagal. Grid sudah diperbarui.", checkedCount, failed);
+            var summary = string.Format(
+                "{0} diperiksa (maksimal 5 per klik), {1} gagal. Grid sudah diperbarui.",
+                checkedCount, failed);
+            lblMessage.Text = failed > 0
+                ? TilakaAlertHtml.Warning(summary)
+                : TilakaAlertHtml.Info(summary);
             Session.Remove(SessionNameForList);
             grdList.Rebind();
         }

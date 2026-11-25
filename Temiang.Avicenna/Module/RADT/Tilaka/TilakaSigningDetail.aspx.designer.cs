@@ -14,6 +14,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.HyperLink lnkSignedFile;
         protected global::Telerik.Web.UI.RadGrid grdSigner;
         protected global::System.Web.UI.WebControls.Button btnCheck;
-        protected global::System.Web.UI.WebControls.Label lblMessage;
+        protected global::System.Web.UI.WebControls.Literal lblMessage;
     }
 }

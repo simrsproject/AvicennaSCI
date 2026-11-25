@@ -49,7 +49,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var record = new TilakaQuickSignRepository().FindByRequestId(RequestID);
             if (record == null)
             {
-                lblMessage.Text = "Data request tidak ditemukan.";
+                lblMessage.Text = TilakaAlertHtml.Error("Data request tidak ditemukan.");
                 return;
             }
 
@@ -85,7 +85,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var config = new TilakaConfig();
             if (!config.IsQuickSignConfigured)
             {
-                lblMessage.Text = "Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).";
+                lblMessage.Text = TilakaAlertHtml.Error("Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).");
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             string message;
             if (!service.IsOk(status, out message))
             {
-                lblMessage.Text = message;
+                lblMessage.Text = TilakaAlertHtml.Error(message);
                 return;
             }
 
@@ -130,7 +130,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             record.LastUpdateByUserID = AppSession.UserLogin.UserID;
             repository.Save(record, signers);
 
-            lblMessage.Text = "Status diperbarui: " + record.Status;
+            lblMessage.Text = TilakaAlertHtml.Success("Status diperbarui: " + record.Status);
             LoadData();
         }
 

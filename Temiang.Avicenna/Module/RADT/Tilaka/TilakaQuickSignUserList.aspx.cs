@@ -54,20 +54,20 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var config = new TilakaConfig();
             if (!config.IsQuickSignConfigured)
             {
-                lblMessage.Text = "Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).";
+                lblMessage.Text = TilakaAlertHtml.Error("Quick Sign belum dikonfigurasi (TilakaLiteBaseUrl kosong).");
                 return;
             }
 
             var paramedic = new Paramedic();
             if (!paramedic.LoadByPrimaryKey(paramedicID) || string.IsNullOrWhiteSpace(paramedic.Email))
             {
-                lblMessage.Text = "Email dokter belum diisi.";
+                lblMessage.Text = TilakaAlertHtml.Error("Email dokter belum diisi.");
                 return;
             }
 
             if (paramedic.IsUsingESignature != true)
             {
-                lblMessage.Text = "Dokter ini tidak menggunakan tanda tangan elektronik.";
+                lblMessage.Text = TilakaAlertHtml.Error("Dokter ini tidak menggunakan tanda tangan elektronik.");
                 return;
             }
 
@@ -102,12 +102,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     success ? null : error, AppSession.UserLogin.UserID);
 
                 lblMessage.Text = success
-                    ? "Dokter berhasil didaftarkan sebagai Quick Sign user."
-                    : error;
+                    ? TilakaAlertHtml.Success("Dokter berhasil didaftarkan sebagai Quick Sign user.")
+                    : TilakaAlertHtml.Error(error);
             }
             catch (Exception ex)
             {
-                lblMessage.Text = ex.Message;
+                lblMessage.Text = TilakaAlertHtml.Error(ex.Message);
             }
 
             Session.Remove(SessionNameForList);

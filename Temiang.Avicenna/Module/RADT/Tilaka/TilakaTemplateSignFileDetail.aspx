@@ -60,5 +60,5 @@
     </table>
 
     <br />
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" ForeColor="Red" />
+    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>

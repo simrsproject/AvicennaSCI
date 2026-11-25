@@ -44,7 +44,7 @@
         </table>
     </cc:CollapsePanel>
 
-    <asp:Label ID="lblMessage" runat="server" EnableViewState="false" />
+    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 
     <telerik:RadGrid ID="grdList" runat="server" AllowPaging="True" PageSize="20"
         OnNeedDataSource="grdList_NeedDataSource" OnItemCommand="grdList_ItemCommand">

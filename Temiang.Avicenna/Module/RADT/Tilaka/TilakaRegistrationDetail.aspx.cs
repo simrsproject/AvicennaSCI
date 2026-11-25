@@ -152,7 +152,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         private void ShowSuccess(string message)
         {
             HideInformationHeader();
-            lblMessage.Text = message;
+            lblMessage.Text = TilakaAlertHtml.Success(message);
         }
 
         private void ClearMessages()
