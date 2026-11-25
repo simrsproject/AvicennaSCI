@@ -33,7 +33,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
-            Session.Remove(SessionNameForList);
             grdList.Rebind();
         }
 
@@ -138,7 +137,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             lblMessage.Text = failed > 0
                 ? TilakaAlertHtml.Warning(summary)
                 : TilakaAlertHtml.Info(summary);
-            Session.Remove(SessionNameForList);
             grdList.Rebind();
         }
 
@@ -159,9 +157,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         private DataTable GetList()
         {
-            object cached = Session[SessionNameForList];
-            if (cached != null) return (DataTable)cached;
-
             var query = new ParamedicQuery("a");
             var tilaka = new TilakaRegistrationQuery("b");
 
@@ -197,6 +192,10 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     query.ParamedicName.Like(keyword)));
             }
 
+            query.OrderBy(
+                query.ParamedicName.Ascending,
+                query.ParamedicID.Ascending);
+
             var table = query.LoadDataTable();
             table.Columns.Add("StatusText", typeof(string));
             foreach (DataRow row in table.Rows)
@@ -216,7 +215,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 table = filtered;
             }
 
-            Session[SessionNameForList] = table;
             return table;
         }
     }

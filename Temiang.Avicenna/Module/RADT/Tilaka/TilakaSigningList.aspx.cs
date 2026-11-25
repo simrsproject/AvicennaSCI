@@ -28,7 +28,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
-            Session.Remove(SessionNameForList);
             grdList.Rebind();
         }
 
@@ -59,9 +58,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         private DataTable GetList()
         {
-            object cached = Session[SessionNameForList];
-            if (cached != null) return (DataTable)cached;
-
             var query = new TilakaQuickSignRequestQuery();
             if (!string.IsNullOrWhiteSpace(txtRequestID.Text))
                 query.Where(query.RequestID.Like("%" + txtRequestID.Text.Trim() + "%"));
@@ -72,7 +68,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             query.OrderBy(query.QuickSignRequestID.Descending);
 
             var table = query.LoadDataTable();
-            Session[SessionNameForList] = table;
             return table;
         }
     }

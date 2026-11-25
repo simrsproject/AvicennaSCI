@@ -29,7 +29,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         protected void btnFilter_Click(object sender, System.Web.UI.ImageClickEventArgs e)
         {
-            Session.Remove(SessionNameForList);
             grdList.Rebind();
         }
 
@@ -74,7 +73,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     : result.Message);
             }
 
-            Session.Remove(SessionNameForList);
             grdList.Rebind();
         }
 
@@ -112,9 +110,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         private DataTable GetList()
         {
-            object cached = Session[SessionNameForList];
-            if (cached != null) return (DataTable)cached;
-
             var query = new TilakaCasemixFileQuery("a");
             var paramedic = new ParamedicQuery("b");
             query.LeftJoin(paramedic).On(query.ParamedicID == paramedic.ParamedicID);
@@ -170,7 +165,6 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 }
             }
 
-            Session[SessionNameForList] = table;
             return table;
         }
     }
