@@ -76,7 +76,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 var response = service.AddQuickSignUsers(new[] { paramedic.Email });
 
                 var success = false;
-                var error = response.Message;
+                var error = response.TechnicalError;
+
+                if (string.IsNullOrWhiteSpace(error))
+                    error = response.Message;
+
                 if (response.Data != null)
                 {
                     foreach (var item in response.Data)
@@ -93,6 +97,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                         }
                     }
                 }
+
+                if (string.IsNullOrWhiteSpace(error))
+                    error = "Gagal mendaftarkan Quick Sign user.";
 
                 var registrationRepository = new TilakaRegistrationRepository();
                 registrationRepository.UpdateQuickSignUser(
