@@ -184,99 +184,121 @@ GROUP BY c.BpjsClassID, sr.RoomID, sr.RoomName
             var par = new esParameters();
 
             var commandText = @"SELECT
-                                a.*,
-                                ISNULL(b.Available, 0) AS Available
-                            FROM
-                            (
-                                SELECT
-                                    CASE
-                                        WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
-                                        WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
-                                        WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'  
-                                        WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
-			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
-                                        ELSE c.BpjsClassID
-                                    END AS BpjsClassID,
-                                    sr.RoomID,
-                                    sr.RoomName AS ServiceUnitName,
-                                    COUNT(b.BedID) AS Capacity
-                                FROM ServiceUnit AS su
-                                INNER JOIN ServiceRoom AS sr
-                                    ON sr.ServiceUnitID = su.ServiceUnitID
-                                    AND sr.IsActive = 1
-                                INNER JOIN Bed AS b
-                                    ON b.RoomID = sr.RoomID
-                                    AND b.IsVisibleTo3rdParty = 1
-                                    AND b.IsActive = 1
-                                    AND b.SRBedStatus <> 'BedStatus-07'
-                                    AND ISNULL(b.IsTemporary, 0) = 0
-                                INNER JOIN Class AS c
-                                    ON c.ClassID = b.ClassID
-                                    AND c.IsActive = 1
-                                WHERE su.SRRegistrationType = 'IPR'
-                                GROUP BY
-                                    CASE
-                                        WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
-                                        WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
-                                        WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
-			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
-                                        ELSE c.BpjsClassID
-                                    END,
-                                    sr.RoomID,
-                                    sr.RoomName
-                            ) a
-                            LEFT JOIN
-                            (
-                                SELECT
-                                    CASE
-                                        WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
-                                        WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
-                                        WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
-			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
-                                        ELSE c.BpjsClassID
-                                    END AS BpjsClassID,
-                                    sr.RoomID,
-                                    sr.RoomName AS ServiceUnitName,
-                                    COUNT(b.BedID) AS Available
-                                FROM ServiceUnit AS su
-                                INNER JOIN ServiceRoom AS sr
-                                    ON sr.ServiceUnitID = su.ServiceUnitID
-                                    AND sr.IsActive = 1
-                                INNER JOIN Bed AS b
-                                    ON b.RoomID = sr.RoomID
-                                    AND ISNULL(b.RegistrationNo, '') = ''
-                                    AND b.IsVisibleTo3rdParty = 1
-                                    AND b.IsActive = 1
-                                    AND b.SRBedStatus = 'BedStatus-01'
-                                    AND ISNULL(b.IsTemporary, 0) = 0
-                                INNER JOIN Class AS c
-                                    ON c.ClassID = b.ClassID
-                                    AND c.IsActive = 1
-                                WHERE su.SRRegistrationType = 'IPR'
-                                GROUP BY
-                                    CASE
-                                        WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
-                                        WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
-                                        WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
-                                        WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
-			                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
-                                        ELSE c.BpjsClassID
-                                    END,
-                                    sr.RoomID,
-                                    sr.RoomName
-                            ) b
-                                ON b.BpjsClassID = a.BpjsClassID
-                                AND b.RoomID = a.RoomID
-                                AND b.ServiceUnitName = a.ServiceUnitName
-                            ORDER BY
-                                a.BpjsClassID,
-                                a.RoomID;";
+                                    a.*,
+                                    ISNULL(b.Available, 0) AS Available
+                                FROM
+                                (
+                                    SELECT
+                                        CASE
+                                            WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
+                                            WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
+                                            WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
+                                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
+                                            ELSE c.BpjsClassID
+                                        END AS BpjsClassID,
+                                        sr.RoomID,
+                                        sr.RoomName AS ServiceUnitName,
+                                        COUNT(b.BedID) AS Capacity
+                                    FROM ServiceUnit AS su
+                                    INNER JOIN ServiceRoom AS sr
+                                        ON sr.ServiceUnitID = su.ServiceUnitID
+                                        AND sr.IsActive = 1
+                                    INNER JOIN Bed AS b
+                                        ON b.RoomID = sr.RoomID
+                                        AND b.IsVisibleTo3rdParty = 1
+                                        AND b.IsActive = 1
+                                        AND b.SRBedStatus <> 'BedStatus-07'
+                                        AND ISNULL(b.IsTemporary, 0) = 0
+                                    INNER JOIN Class AS c
+                                        ON c.ClassID = b.ClassID
+                                        AND c.IsActive = 1
+                                    WHERE su.SRRegistrationType = 'IPR'
+                                    GROUP BY
+                                        CASE
+                                            WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
+                                            WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
+                                            WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
+                                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
+                                            ELSE c.BpjsClassID
+                                        END,
+                                        sr.RoomID,
+                                        sr.RoomName
+                                ) a
+                                LEFT JOIN
+                                (
+                                    SELECT
+                                        CASE
+                                            WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
+                                            WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
+                                            WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
+                                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
+                                            ELSE c.BpjsClassID
+                                        END AS BpjsClassID,
+                                        sr.RoomID,
+                                        sr.RoomName AS ServiceUnitName,
+                                        SUM(
+                                            CASE
+                                                WHEN ISNULL(LatestReservation.SRReservationStatus, '') <> '01'
+                                                THEN 1
+                                                ELSE 0
+                                            END
+                                        ) AS Available
+                                    FROM ServiceUnit AS su
+                                    INNER JOIN ServiceRoom AS sr
+                                        ON sr.ServiceUnitID = su.ServiceUnitID
+                                        AND sr.IsActive = 1
+                                    INNER JOIN Bed AS b
+                                        ON b.RoomID = sr.RoomID
+                                        AND ISNULL(b.RegistrationNo, '') = ''
+                                        AND b.IsVisibleTo3rdParty = 1
+                                        AND b.IsActive = 1
+                                        AND b.SRBedStatus = 'BedStatus-01'
+                                        AND ISNULL(b.IsTemporary, 0) = 0
+
+                                    OUTER APPLY (
+                                        SELECT TOP 1
+                                            r.ReservationNo,
+                                            r.SRReservationStatus
+                                        FROM Reservation AS r
+                                        WHERE r.RoomID = b.RoomID
+                                          AND r.BedID = b.BedID
+                                          AND r.ReservationDate >= GETDATE()
+                                        ORDER BY
+                                            r.ReservationDate ASC,
+                                            r.ReservationNo DESC
+                                    ) AS LatestReservation
+
+                                    INNER JOIN Class AS c
+                                        ON c.ClassID = b.ClassID
+                                        AND c.IsActive = 1
+
+                                    WHERE su.SRRegistrationType = 'IPR'
+
+                                    GROUP BY
+                                        CASE
+                                            WHEN sr.RoomID LIKE 'NICU%' THEN 'NIC'
+                                            WHEN sr.RoomID LIKE 'PICU%' THEN 'PIC'
+                                            WHEN sr.RoomID LIKE 'HCU%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'IMC%'  THEN 'HCU'
+                                            WHEN sr.RoomID LIKE 'ICU%'  THEN 'ICU'
+                                            WHEN su.ServiceUnitName LIKE '%ISOLASI%' THEN 'ISO'
+                                            ELSE c.BpjsClassID
+                                        END,
+                                        sr.RoomID,
+                                        sr.RoomName
+                                ) b
+                                    ON b.BpjsClassID = a.BpjsClassID
+                                    AND b.RoomID = a.RoomID
+                                    AND b.ServiceUnitName = a.ServiceUnitName
+                                ORDER BY
+                                    a.BpjsClassID,
+	                                a.RoomID";
 
             return FillDataTable(esQueryType.Text, commandText, par);
         }

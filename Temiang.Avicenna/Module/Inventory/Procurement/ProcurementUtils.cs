@@ -105,7 +105,7 @@ namespace Temiang.Avicenna.Module.Inventory
                 itemTransactionItem.Balance = ib.Balance;
                 itemTransactionItem.BalanceSG = 0;
                 itemTransactionItem.Minimum = ib.Minimum;
-                itemTransactionItem.Maximum = ib.Minimum;
+                itemTransactionItem.Maximum = ib.Maximum;
                 itemTransactionItem.BalanceTotal = BalanceTotal(ib.ItemID);
             }
             else

@@ -36,6 +36,7 @@
 /Temiang.Avicenna.Tests/obj/Debug/Temiang.Avicenna.Tests.csproj.AssemblyReference.cache
 
 # User-specific files
+.vs/
 *.suo
 *.user
 *.userosscache
