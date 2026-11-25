@@ -2222,10 +2222,13 @@ namespace Temiang.Avicenna.BusinessObject
             }
 
             // =========================================
-            // ORDER + TOP
+            // ORDER DATA ANTREAN
+            // =========================================
             // =========================================
             query.OrderBy(query.QueueSequence.Ascending);
-            query.es.Top = 50;
+
+            // Tidak menggunakan TOP 50 agar seluruh status
+            // WAITING, FINISHED, dan status lainnya ikut diambil.
 
             collection.Load(query);
 
