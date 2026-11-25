@@ -299,7 +299,7 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.ParamedicFeePaymentV3
                 out dtfee, out dtdeduc, txtPaymentDateFrom.SelectedDate, txtPaymentDateTo.SelectedDate, cboParamedicID.SelectedValue,
                 txtDischargeDateFrom.SelectedDate, txtDischargeDateTo.SelectedDate, txtPlanningPaymentDate.SelectedDate,
                 txtRegistrationNo.Text, txtMedicalNo.Text, txtPatientName.Text, cboGuarantorID.SelectedValue, cboGuarantorType.SelectedValue,
-                txtPaymentGroupNo.Text, txtVerificationNo.Text);
+                txtPaymentGroupNo.Text, txtVerificationNo.Text, txtServiceUnitName.Text);
         }
 
         private DataTable OutstandingPaymentGroupByParamedic() {
@@ -307,7 +307,7 @@ namespace Temiang.Avicenna.Module.Finance.ParamedicFee.ParamedicFeePaymentV3
 
                 txtPaymentDateFrom.SelectedDate, txtPaymentDateTo.SelectedDate, cboParamedicID.SelectedValue, 
                 txtDischargeDateFrom.SelectedDate, txtDischargeDateTo.SelectedDate, 
-                txtRegistrationNo.Text, txtMedicalNo.Text, txtPatientName.Text);
+                txtRegistrationNo.Text, txtMedicalNo.Text, txtPatientName.Text, txtServiceUnitName.Text);
         }
 
         protected void grdListVGN_NeedDataSource(object source, GridNeedDataSourceEventArgs e)

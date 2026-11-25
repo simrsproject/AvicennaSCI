@@ -206,6 +206,11 @@ namespace Temiang.Avicenna.Common
         {
             return string.Empty;
         }
+        public virtual string OnGetScriptToolBarSaveAndEditClicking()
+        {
+            return string.Empty;
+        }
+
         public virtual string OnGetScriptToolBarSaveClicking()
         {
             return string.Empty;

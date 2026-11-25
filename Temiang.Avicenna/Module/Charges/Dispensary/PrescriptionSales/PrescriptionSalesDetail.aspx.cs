@@ -164,6 +164,7 @@ namespace Temiang.Avicenna.Module.Charges
                 hdnPageId.Value = PageID;
                 TransPrescriptionItems = null;
 
+                //apol
                 if (Helper.IsApotekOnlineIntegration)
                 {
                     pnlApol.Visible = true;
@@ -771,8 +772,11 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 //pasien pribadi tentunya gk pake BPJS
                 //modified by wiliam 2026-05-15
 
+                cboGuarantorID.SelectedValue = registration.GuarantorID;
+                txtGuarantorCardNo.Text = patient.GuarantorCardNo;
+                txtBpjsSepNo.Text = registration.BpjsSepNo;
 
-                if(!string.IsNullOrEmpty(txtBpjsSepNo.Text))
+                if (!string.IsNullOrEmpty(txtBpjsSepNo.Text))
                 {
                     var sepapol = new BpjsSEP();
                     if (sepapol.LoadByPrimaryKey(txtBpjsSepNo.Text))
@@ -796,14 +800,17 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     if (apol.Query.Load())
                     {
                         txtRefAsalSJP.Text = apol.REFASALSJP;
-                        cboPoliApol.SelectedValue = apol.POLIRSP;
+                        //cboPoliApol.SelectedValue = apol.POLIRSP;
                         cboJnsRsp.SelectedValue = apol.KDJNSOBAT.ToString();
                         txtNoResep.Text = apol.NORESEP;
-                        cboDokterApol.SelectedValue = apol.KDDOKTER;
+                        //cboDokterApol.SelectedValue = apol.KDDOKTER;
                         cboIterasi.SelectedValue = apol.ITERASI.ToString();
                         txtTglSjp.SelectedDate = apol.TGLSJP;
                         txtTglPlynRsp.SelectedDate = apol.TGLPELRSP;
                         txtTglRsp.SelectedDate = apol.TGLRSP;
+
+                        PopulatePoliApol(apol.POLIRSP);
+                        PopulateDokterApol(apol.KDDOKTER);
 
                         // kalau ada tgl-nya, isi juga
                         //if (apol.TGLSJP != null)
@@ -2269,7 +2276,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             }
                             if (ToInt(tpi.TakenQty) <= 0) continue; // skip qty 0
 
-                            // cek sudah sukses sebelumnya
+                            // cek udah ada
                             var detChk = new BpjsApolDetail();
                             detChk.Query.Where(detChk.Query.PrescriptionNo == hdr.PrescriptionNo, detChk.Query.SequenceNo == tpi.SequenceNo);
                             if (detChk.Query.Load() && (detChk.METADATACODE ?? "") == "200") continue;
@@ -2298,13 +2305,13 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                 d0.LastUpdateByUserID = AppSession.UserLogin.UserID;
                                 d0.Save();
 
-                                // catet ke alert juga
+                                // alert
                                 apolErrors.Add($"Seq {tpi.SequenceNo}: mapping belum ada");
                                 continue;
                             }
 
                             // consume (opsional)
-                            int signa2 = 0;
+                            decimal signa2 = 0;
                             var cm = new ConsumeMethod();
                             cm.Query.Where(cm.Query.SRConsumeMethod == tpi.SRConsumeMethod);
                             if (cm.Query.Load()) signa2 = cm.IterationQty ?? 0;
@@ -2317,22 +2324,21 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             {
                                 var seq = Convert.ToString(tpi.SequenceNo) ?? "";
                                 var lastDigit = seq.Reverse().FirstOrDefault(char.IsDigit);
-                                jnsrobt = (lastDigit != default(char)) ? ("R.0" + lastDigit) : "R.01"; // fallback aman
+                                jnsrobt = (lastDigit != default(char)) ? ("R.0" + lastDigit) : "R.01"; // fallback
                             }
                             else
                             {
                                 jnsrobt = "N";
                             }
 
-                            // siapkan field
+                            // field
                             var kdobt = map.BridgingID; var nmobat = map.BridgingName;
                             var signa1 = ToInt(tpi.ConsumeQty);
-                            var permintaan = ToInt(tpi.PrescriptionQty); // racikan
-                            var jmlobt = ToInt(tpi.TakenQty);
+                            decimal permintaan = Convert.ToDecimal(tpi.PrescriptionQty); // racikan
+                            var jmlobt = Convert.ToDecimal(tpi.TakenQty);
                             decimal jho = Convert.ToDecimal(tpi.DaysOfUsage ?? 0);
                             var catatan = Convert.ToString(tpi.Notes);
 
-                            //pakai bila field ini udah di save di detail apol
                             var bpjsApolDet = new BpjsApolDetail();
                             bpjsApolDet.Query.Where(bpjsApolDet.Query.PrescriptionNo == hdr.PrescriptionNo,
                             bpjsApolDet.Query.SequenceNo == tpi.SequenceNo);
@@ -2340,9 +2346,9 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             {
                                 kdobt = Convert.ToString(bpjsApolDet.KDOBT);
                                 signa1 = ToInt(bpjsApolDet.SIGNA1OBT);
-                                signa2 = ToInt(bpjsApolDet.SIGNA2OBT);
-                                permintaan = ToInt(bpjsApolDet.PERMINTAAN);
-                                jmlobt = ToInt(bpjsApolDet.JMLOBT);
+                                signa2 = Convert.ToDecimal(bpjsApolDet.SIGNA2OBT);
+                                permintaan = Convert.ToDecimal(bpjsApolDet.PERMINTAAN);
+                                jmlobt = Convert.ToDecimal(bpjsApolDet.JMLOBT);
                                 jho = bpjsApolDet.JHO ?? 0;
                                 catatan = Convert.ToString(bpjsApolDet.CATKHSOBT);
                             }
@@ -2444,10 +2450,8 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             det.LastUpdateByUserID = AppSession.UserLogin.UserID;
                             det.Save();
 
-                            // kalau gagal / bukan 200, simpan untuk di-alert
                             if (!string.Equals(metaCode, "200", StringComparison.OrdinalIgnoreCase))
                             {
-                                // biar singkat: Seq xx - KdObat - Pesan
                                 var shortMsg = string.IsNullOrWhiteSpace(metaMsg) ? "Tidak diketahui" : metaMsg;
                                 apolErrors.Add($"Seq {tpi.SequenceNo} ({kdobt}): {shortMsg}");
                             }
@@ -2458,10 +2462,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         this.LogError(ex);
                         ShowInformationHeader($"APOL: {ex.Message}");
                     }
-
                 END_APOL:;
-
-                    // --- tampilkan alert kalo ada yang gagal ---
                     if (apolErrors.Count > 0)
                     {
                         var toShow = string.Join("\\n", apolErrors.Take(6));
@@ -3030,7 +3031,6 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                         int ToInt(object o) { int v; return int.TryParse(Convert.ToString(o), out v) ? v : 0; }
                                         if ((d.IsVoid ?? false) || ToInt(d.TakenQty) == 0) continue;
 
-                                        // coba pakai detail lama (untuk copy KDOBT/NMOBAT/JNSR), fallback ke mapping
                                         string kdobt = null, nmobat = null, jnsrobt = null;
                                         decimal signa1 = 0, signa2 = 0, permintaan = 0, jmlobt = 0, jho = 0;
                                         string catatan = Convert.ToString(d.Notes);
@@ -3040,7 +3040,6 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                         var hasOldDet = oldDet.Query.Load();
                                         if (hasOldDet)
                                         {
-                                            // 🔥 DELETE DULU JIKA PERNAH 200
                                             if (string.Equals(oldDet.METADATACODE, "200", StringComparison.OrdinalIgnoreCase)
                                                 && !string.IsNullOrWhiteSpace(nosjp)
                                                 && !string.IsNullOrWhiteSpace(noresep)
@@ -3109,12 +3108,11 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                         nd.KDOBT = kdobt;
                                         nd.NMOBAT = nmobat;
                                         nd.SIGNA1OBT = (int?)signa1;
-                                        nd.SIGNA2OBT = (int?)signa2;
-                                        nd.JMLOBT = (int?)jmlobt;
+                                        nd.SIGNA2OBT = (decimal?)signa2;
+                                        nd.JMLOBT = (decimal?)jmlobt;
                                         nd.JHO = jho;
                                         nd.CATKHSOBT = catatan;
 
-                                        // 🔥 BUKAN PENDING LAGI
                                         nd.METADATACODE = "ORDER";
                                         nd.METADATAMESSAGE = "Reseed after Unapprove (siap kirim ulang)";
                                         nd.LastUpdateDateTime = DateTime.Now;
@@ -4027,11 +4025,12 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     AddReduceMedicationQty(entity.PrescriptionNo, reg.RegistrationNo, reg.SRRegistrationType, !isVoid);
 
 
+
                 if (Helper.IsApotekOnlineIntegration)
                 {
                     try
                     {
-                        // cari header dulu
+                        // cari header
                         var apol = new BpjsApol();
                         apol.Query.Where(
                             apol.Query.PrescriptionNo == txtPrescriptionNo.Text,
@@ -4117,7 +4116,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         var code = (result?.Metadata.Code ?? "").Trim();
                         var msg = result?.Metadata.Message ?? "";
 
-                        // simpan jejak ke header (kalau kolomnya ada)
+                        // save header
                         apol.METADATACODE = string.IsNullOrEmpty(code) ? "HDR-DEL-UNKNOWN" : $"HDR-DEL-{code}";
                         apol.METADATAMESSAGE = string.IsNullOrWhiteSpace(msg) ? "HapusResep executed" : msg;
                         apol.LastUpdateDateTime = DateTime.Now;
@@ -5171,8 +5170,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 return;
             }
 
-
-            // --- APOL delete kalau item ini sudah pernah dikirim (code == 200) ---
+            //Apol
             if (Helper.IsApotekOnlineIntegration)
             {
                 try
@@ -5243,7 +5241,6 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
 
                                         if (!string.Equals(code, "200", StringComparison.OrdinalIgnoreCase))
                                         {
-                                            //Alert Kalo Udah Verif
                                             det.METADATACODE = $"DEL-{code}";
                                             det.METADATAMESSAGE = string.IsNullOrWhiteSpace(msg) ? "Gagal hapus di APOL." : msg;
                                             det.LastUpdateDateTime = DateTime.Now;
@@ -5259,7 +5256,6 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                             return;
                                         }
 
-                                        // sukses hapus di APOL → save log di db
                                         det.METADATACODE = "DEL-200";
                                         det.METADATAMESSAGE = string.IsNullOrWhiteSpace(msg) ? "Deleted" : msg;
                                         det.LastUpdateDateTime = DateTime.Now;
@@ -5307,6 +5303,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             }
                             else
                             {
+                                // BUKAN 200
                                 det.METADATACODE = "DEL-LOCAL";
                                 det.METADATAMESSAGE = "Dihapus lokal (belum pernah terkirim ke APOL).";
                                 det.LastUpdateDateTime = DateTime.Now;
@@ -5455,6 +5452,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     entity.IsCasemixApproved = true;
 
 
+                //Apol
                 if (Helper.IsApotekOnlineIntegration)
                 {
                     string nosjp = null, noresep = null;
@@ -5502,7 +5500,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     }
 
                     decimal signa1 = ToDecimal(userControl.QtyOfDosage);
-                    decimal signa2Dec = signa2;
+                    decimal signa2Dec = ToDecimal(signa2);
                     decimal jmlobt = ToDecimal(userControl.TakenQty);
                     decimal daysOfUsage = ToDecimal(userControl.DaysOfUsage);
 
@@ -5545,12 +5543,128 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     det.KDOBT = kdobt;
                     det.NMOBAT = nmobat;
                     det.SIGNA1OBT = signa2;
-                    det.SIGNA2OBT = ToInt(userControl.QtyOfDosage);
+                    det.SIGNA2OBT = ToDecimal(userControl.QtyOfDosage);
                     if (userControl.IsCompound == true)
                     {
-                        det.PERMINTAAN = ToInt(userControl.PrescriptionQty); // penting utk racikan
+                        string itemIdApol = string.IsNullOrWhiteSpace(userControl.ItemInterventionID)
+                            ? userControl.ItemID
+                            : userControl.ItemInterventionID;
+
+                        var itemApol = new ItemProductMedic();
+
+                        if (!itemApol.LoadByPrimaryKey(itemIdApol))
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(), "apolItemInvalid",
+                                "alert('Data obat untuk perhitungan APOL tidak ditemukan.');",
+                                true);
+                            return;
+                        }
+
+                        // Baca angka biasa maupun pecahan:
+                        // 3/4, 1/2, 7.5/30, 87.5/200, 10, dst.
+                        string dosageText = Convert.ToString(userControl.NumberOfDosage).Trim();
+                        string[] dosageParts = dosageText.Split('/');
+
+                        decimal pembilang = 0m;
+                        decimal penyebut = 1m;
+
+                        var numberStyle =
+                            System.Globalization.NumberStyles.AllowDecimalPoint |
+                            System.Globalization.NumberStyles.AllowLeadingSign;
+
+                        var culture = System.Globalization.CultureInfo.InvariantCulture;
+
+                        // Titik/koma dianggap pemisah desimal, tanpa pemisah ribuan.
+                        bool validDosage =
+                            dosageParts.Length <= 2 &&
+                            decimal.TryParse(
+                                dosageParts[0].Trim().Replace(',', '.'),
+                                numberStyle,
+                                culture,
+                                out pembilang);
+
+                        if (dosageParts.Length == 2)
+                        {
+                            validDosage = validDosage &&
+                                decimal.TryParse(
+                                    dosageParts[1].Trim().Replace(',', '.'),
+                                    numberStyle,
+                                    culture,
+                                    out penyebut);
+                        }
+
+                        if (!validDosage || pembilang <= 0m || penyebut <= 0m)
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(), "apolDosageInvalid",
+                                "alert('Dosis racikan tidak valid. Gunakan angka atau pecahan, contoh 3/4.');",
+                                true);
+                            return;
+                        }
+
+                        decimal dosing = pembilang / penyebut;
+                        decimal sediaanApol = itemApol.Dosage ?? 0m;
+
+                        string unitDosis = Convert.ToString(userControl.SRDosageUnit).Trim();
+                        string unitItem = Convert.ToString(itemApol.SRItemUnit).Trim();
+                        string unitKandungan = Convert.ToString(itemApol.SRDosageUnit).Trim();
+
+                        if (sediaanApol <= 0m ||
+                            string.IsNullOrWhiteSpace(unitDosis) ||
+                            string.IsNullOrWhiteSpace(unitItem) ||
+                            string.IsNullOrWhiteSpace(unitKandungan))
+                        {
+                            ScriptManager.RegisterStartupScript(
+                                this, GetType(), "apolUnitInvalid",
+                                "alert('Sediaan atau satuan obat belum lengkap untuk perhitungan APOL.');",
+                                true);
+                            return;
+                        }
+
+                        decimal permintaanApol;
+
+                        if (unitDosis == unitItem)
+                        {
+                            // Contoh: 3/4 TAB × 200 MG/TAB = 150 MG.
+                            permintaanApol = dosing * sediaanApol;
+                        }
+                        else if (unitDosis == unitKandungan)
+                        {
+                            // Contoh: input 150 MG, kandungan juga MG.
+                            permintaanApol = dosing;
+                        }
+                        else
+                        {
+                            // Ikuti konversi satuan alternatif pada fungsi resep.
+                            var dosageDetails = new ItemProductDosageDetailCollection();
+                            dosageDetails.Query.Where(
+                                dosageDetails.Query.ItemID == itemApol.ItemID);
+                            dosageDetails.LoadAll();
+
+                            var dosageDetail = dosageDetails.SingleOrDefault(
+                                d => d.SRDosageUnit == unitDosis);
+
+                            decimal dosageKonversi = dosageDetail == null
+                                ? 0m
+                                : Convert.ToDecimal(dosageDetail.Dosage);
+
+                            if (dosageKonversi <= 0m)
+                            {
+                                ScriptManager.RegisterStartupScript(
+                                    this, GetType(), "apolConversionInvalid",
+                                    "alert('Konversi satuan dosis obat untuk APOL belum tersedia atau tidak valid.');",
+                                    true);
+                                return;
+                            }
+
+                            // Dosis alternatif -> jumlah unit obat -> satuan kandungan.
+                            permintaanApol = (dosing / dosageKonversi) * sediaanApol;
+                        }
+
+                        det.PERMINTAAN = Math.Round(permintaanApol, 4, MidpointRounding.AwayFromZero);
                     }
-                    det.JMLOBT = ToInt(userControl.TakenQty);
+                    det.JMLOBT = jmlobt;
                     det.JHO = apolJho;
                     det.CATKHSOBT = Convert.ToString(userControl.Notes);
 
@@ -5625,6 +5739,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             if (!string.IsNullOrEmpty(Request.QueryString["type"]) && Request.QueryString["type"] == "realization")
                 cboParamedicID.Enabled = false;
 
+            //Apol
             if (Helper.IsApotekOnlineIntegration)
             {
                 btnCariPasienSep.Enabled = true;
@@ -6791,10 +6906,10 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             }
         }
 
-        //protected void btnSearchSepByNoKa_Click(object sender, EventArgs e)
-        //{
-        //    // Search logic
-        //}
+        protected void btnSearchSepByNoKa_Click(object sender, EventArgs e)
+        {
+            // Search logic
+        }
 
         protected void cboDokterApol_SelectedIndexChanged(object sender, RadComboBoxSelectedIndexChangedEventArgs e)
         {
@@ -7087,12 +7202,6 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                     return;
                 }
 
-                // case 3: header ADA tapi statusnya BUKAN ORDER (misal sudah 200) → jangan kirim ulang
-                //lblCreateApolResult.Text = $"[Code: {bpjsapol.MetadataCode}] {bpjsapol.MetadataMessage}";
-                //lblCreateApolResult.ForeColor = System.Drawing.Color.Orange;
-                ////btnCreateAPOL.Enabled = false;
-                ///
-
                 var msg = $"[Code: {bpjsapol.METADATACODE}] {bpjsapol.METADATAMESSAGE}";
                 var encodedMsg = HttpUtility.JavaScriptStringEncode(msg);
 
@@ -7147,10 +7256,109 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
             Response.Write(errorMessage);
         }
 
+        private void SetSelectedApolCombo(RadComboBox combo, string value, string text)
+        {
+            combo.Items.Clear();
+            combo.ClearSelection();
+
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            var item = new RadComboBoxItem
+            {
+                Value = value.Trim(),
+                Text = string.IsNullOrWhiteSpace(text)
+                    ? value.Trim()
+                    : text
+            };
+
+            combo.Items.Add(item);
+            item.Selected = true;
+            combo.Text = item.Text;
+        }
+
+        private void PopulatePoliApol(string kodePoli)
+        {
+            if (string.IsNullOrWhiteSpace(kodePoli))
+                return;
+
+            string namaPoli = kodePoli;
+
+            try
+            {
+                var service = new Common.BPJS.VClaim.v11.Service();
+                var result = service.GetPoli(kodePoli);
+
+                if (result != null &&
+                    result.Response != null &&
+                    result.Response.Poli != null)
+                {
+                    var poli = result.Response.Poli
+                        .FirstOrDefault(x => x.Kode == kodePoli);
+
+                    if (poli != null)
+                        namaPoli = poli.Nama;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Tambahkan logging sesuai mekanisme project
+            }
+
+            SetSelectedApolCombo(
+                cboPoliApol,
+                kodePoli,
+                namaPoli);
+        }
+
+        private void PopulateDokterApol(string kodeDokter)
+        {
+            if (string.IsNullOrWhiteSpace(kodeDokter))
+                return;
+
+            string namaDokter = kodeDokter;
+
+            try
+            {
+                var bridging = new ParamedicBridging();
+                bridging.Query.Where(
+                    bridging.Query.SRBridgingType ==
+                        AppEnum.BridgingType.BPJS.ToString(),
+                    bridging.Query.BridgingID == kodeDokter
+                );
+
+                if (bridging.Query.Load())
+                {
+                    if (!string.IsNullOrWhiteSpace(bridging.BridgingName))
+                    {
+                        namaDokter = bridging.BridgingName;
+                    }
+                    else
+                    {
+                        var dokter = new Paramedic();
+
+                        if (dokter.LoadByPrimaryKey(bridging.ParamedicID))
+                        {
+                            namaDokter = dokter.ParamedicName;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Tambahkan logging sesuai mekanisme project
+            }
+
+            SetSelectedApolCombo(
+                cboDokterApol,
+                kodeDokter,
+                kodeDokter + " - " + namaDokter);
+        }
+
         private string GetNextApolResepNo()
         {
             var coll = new BpjsApolCollection();
-            coll.LoadAll();   // load semua dulu
+            coll.LoadAll();
 
             string lastNo = null;
 
@@ -7183,7 +7391,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                 else
                 {
                     if (prefix == 'Z')
-                        throw new Exception("Sudah mencapai Z9999.");
+                        throw new Exception("Maxed Z9999.");
 
                     char nextPrefix = (char)(prefix + 1);
                     return nextPrefix + "0001";

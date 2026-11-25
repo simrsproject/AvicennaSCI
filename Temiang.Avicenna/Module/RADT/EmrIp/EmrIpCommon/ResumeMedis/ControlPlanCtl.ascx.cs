@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using Newtonsoft.Json;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.BusinessObject.JsonField;
+using Temiang.Avicenna.Common;
 using Telerik.Web.UI;
 namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
 {
@@ -17,17 +18,137 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
 
         }
 
+        public bool ValidateForDischarge(DateTime dischargeDate, out string message)
+        {
+            for (var i = 1; i <= 5; i++)
+            {
+                var suffix = i.ToString("00");
+                var date = (RadDateTimePicker)FindControl("txtControlPlanDateTime" + suffix);
+                var unit = (RadComboBox)FindControl("cboServiceUnitID" + suffix);
+                var physician = (RadComboBox)FindControl("cboParamedicName" + suffix);
+                if (date.IsEmpty && string.IsNullOrWhiteSpace(unit.SelectedValue)
+                    && string.IsNullOrWhiteSpace(physician.SelectedValue)) continue;
+
+                if (date.IsEmpty || string.IsNullOrWhiteSpace(unit.SelectedValue)
+                    || string.IsNullOrWhiteSpace(physician.SelectedValue))
+                {
+                    message = string.Format("Rencana kontrol baris {0}: tanggal, poli, dan dokter harus diisi.", i);
+                    return false;
+                }
+                if (date.SelectedDate.Value.Date <= dischargeDate.Date || date.SelectedDate.Value.Date <= DateTime.Today)
+                {
+                    message = string.Format("Rencana kontrol baris {0}: tanggal harus setelah tanggal pulang dan hari ini.", i);
+                    return false;
+                }
+            }
+            message = string.Empty;
+            return true;
+        }
+
+        public string GetEmptyOutpatientControlPlanConfirmationScript()
+        {
+            var dateClientIds = new List<string>();
+            for (var i = 1; i <= 5; i++)
+            {
+                var date = (RadDateTimePicker)FindControl("txtControlPlanDateTime" + i.ToString("00"));
+                dateClientIds.Add(string.Format("'{0}'", date.ClientID));
+            }
+
+            var message = HttpUtility.JavaScriptStringEncode(
+                AppMessage.GetMessageText(AppMessage.MessageIdEnum.OutpatientControlPlanReturnConfirmation));
+
+            return string.Format(@"
+                var controlPlanDateIds = [{0}];
+                var hasOutpatientControlPlanDate = false;
+                for (var controlPlanDateIndex = 0; controlPlanDateIndex < controlPlanDateIds.length; controlPlanDateIndex++) {{
+                    var controlPlanDatePicker = $find(controlPlanDateIds[controlPlanDateIndex]);
+                    if (controlPlanDatePicker && controlPlanDatePicker.get_selectedDate()) {{
+                        hasOutpatientControlPlanDate = true;
+                        break;
+                    }}
+                }}
+                if (!hasOutpatientControlPlanDate && !window.controlPlanSaveConfirmed) {{
+                    args.set_cancel(true);
+                    var controlPlanSaveButton = args.get_item();
+                    fw_lastTbiDisabled.enable();
+                    fw_lastTbiDisabled = null;
+                    var controlPlanDialog = radconfirm('{1}', function (willReturn) {{
+                        if (willReturn === false) {{
+                            window.controlPlanSaveConfirmed = true;
+                            try {{ controlPlanSaveButton.click(); }}
+                            finally {{ window.controlPlanSaveConfirmed = false; }}
+                        }} else {{
+                            ContinueAutoSave();
+                            if (willReturn === true) {{
+                                var firstControlPlanDate = $find(controlPlanDateIds[0]);
+                                if (firstControlPlanDate) firstControlPlanDate.get_dateInput().focus();
+                            }}
+                        }}
+                    }}, 520, 190, null, 'Rencana Kontrol Rawat Jalan');
+                    var controlPlanDialogElement = controlPlanDialog.get_popupElement();
+                    var controlPlanWindowIcon = controlPlanDialogElement.querySelector('.rwIcon');
+                    if (controlPlanWindowIcon) controlPlanWindowIcon.style.display = 'none';
+                    var controlPlanContent = controlPlanDialog.get_contentElement();
+                    controlPlanContent.style.position = 'relative';
+                    controlPlanContent.style.height = '100%';
+                    var controlPlanFooter = document.createElement('div');
+                    controlPlanFooter.style.cssText = 'position:absolute;right:20px;bottom:32px;display:flex;justify-content:flex-end;align-items:center;gap:8px;';
+                    var controlPlanButtons = controlPlanDialogElement.querySelectorAll('input[type=button], button, .rwPopupButton, .rwOkBtn, .rwCancelBtn');
+                    for (var buttonIndex = 0; buttonIndex < controlPlanButtons.length; buttonIndex++) {{
+                        var dialogButton = controlPlanButtons[buttonIndex];
+                        var buttonText = (dialogButton.value || dialogButton.textContent || '').replace(/^\s+|\s+$/g, '').toLowerCase();
+                        var buttonLabel = buttonText === 'ok' ? 'Ya, akan kontrol' :
+                            buttonText === 'cancel' ? 'Tidak, lanjut simpan' : null;
+                        if (buttonLabel) {{
+                            if (dialogButton.tagName.toLowerCase() === 'input') dialogButton.value = buttonLabel;
+                            else {{
+                                var labelElement = dialogButton.querySelector('.rwInnerSpan') || dialogButton;
+                                labelElement.textContent = buttonLabel;
+                            }}
+                            var themedButton = document.createElement('input');
+                            themedButton.type = 'button';
+                            themedButton.value = buttonLabel;
+                            themedButton.onclick = (function (originalButton) {{
+                                return function () {{ originalButton.click(); }};
+                            }})(dialogButton);
+                            dialogButton.style.display = 'none';
+                            controlPlanFooter.appendChild(themedButton);
+                        }}
+                    }}
+                    controlPlanContent.appendChild(controlPlanFooter);
+                    var pageComponents = Sys.Application.getComponents();
+                    for (var componentIndex = 0; componentIndex < pageComponents.length; componentIndex++) {{
+                        if (Telerik.Web.UI.RadFormDecorator.isInstanceOfType(pageComponents[componentIndex])) {{
+                            pageComponents[componentIndex].decorate(controlPlanFooter);
+                            break;
+                        }}
+                    }}
+                    return;
+                }}", string.Join(",", dateClientIds), message);
+        }
+
+        public string GetEmptyOutpatientControlPlanConfirmationScript(Registration registration)
+        {
+            if (registration == null || AppSession.Parameter.HealthcareInitial != "RSI" ||
+                registration.SRRegistrationType != AppConstant.RegistrationType.OutPatient ||
+                !AppSession.Parameter.GuarantorAskesID.Contains(registration.GuarantorID) ||
+                string.IsNullOrWhiteSpace(registration.BpjsSepNo))
+                return string.Empty;
+
+            return GetEmptyOutpatientControlPlanConfirmationScript();
+        }
+
         private void AddControlPlanItem(List<ControlPlanItem> itemPlans, RadDateTimePicker txtControlPlanDateTime, RadComboBox cboServiceUnitID
-            , RadComboBox cboParamedicName, RadTextBox txtSpecialtyName, RadTextBox txtNotes, RadTextBox txtAppointmentNo, RadTextBox txtAppointmentQue, RadTextBox txtAppointmentTime)
+            , RadComboBox cboParamedicName, RadTextBox txtSpecialtyName, RadTextBox txtNotes, RadTextBox txtAppointmentNo, RadTextBox txtAppointmentQue, RadTextBox txtAppointmentTime, bool includeUndatedPlans = false)
         {
 
-            if (!txtControlPlanDateTime.IsEmpty && !string.IsNullOrWhiteSpace(cboServiceUnitID.SelectedValue) && !string.IsNullOrWhiteSpace(cboParamedicName.SelectedValue))
+            if ((!txtControlPlanDateTime.IsEmpty || includeUndatedPlans) && !string.IsNullOrWhiteSpace(cboServiceUnitID.SelectedValue) && !string.IsNullOrWhiteSpace(cboParamedicName.SelectedValue))
             {
                 // Check double 
                 var isExist = false;
                 foreach (var item in itemPlans)
                 {
-                    if (item.ControlPlanDateTime.Equals(txtControlPlanDateTime.SelectedDate.Value)
+                    if (item.ControlPlanDateTime.Equals(txtControlPlanDateTime.SelectedDate.GetValueOrDefault())
                         && item.ServiceUnitID.Equals(cboServiceUnitID.SelectedValue)
                         && item.ParamedicID.Equals(cboParamedicName.SelectedValue))
                     {
@@ -40,7 +161,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                 {
                     itemPlans.Add(new ControlPlanItem
                     {
-                        ControlPlanDateTime = txtControlPlanDateTime.SelectedDate.Value,
+                        ControlPlanDateTime = txtControlPlanDateTime.SelectedDate.GetValueOrDefault(),
                         ServiceUnitID = cboServiceUnitID.SelectedValue,
                         ParamedicID = cboParamedicName.SelectedValue,
                         ParamedicName = cboParamedicName.Text,
@@ -54,6 +175,20 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             }
         }
         public ControlPlan GetControlPlan()
+        {
+            return GetControlPlan(false);
+        }
+
+        public ControlPlan GetOutpatientControlPlan(Registration registration)
+        {
+            var keepUndated = registration != null && AppSession.Parameter.HealthcareInitial == "RSI"
+                && registration.SRRegistrationType == AppConstant.RegistrationType.OutPatient
+                && AppSession.Parameter.GuarantorAskesID.Contains(registration.GuarantorID)
+                && !string.IsNullOrWhiteSpace(registration.BpjsSepNo);
+            return GetControlPlan(keepUndated);
+        }
+
+        public ControlPlan GetControlPlan(bool includeUndatedPlans)
         {
             var itemPlans = new List<ControlPlanItem>();
 
@@ -122,15 +257,17 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             //        AppointmentTime = txtAppointmentTime05.Text
             //    });
 
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtNotes01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtNotes02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtNotes03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtNotes04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04);
-            AddControlPlanItem(itemPlans, txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime01, cboServiceUnitID01, cboParamedicName01, txtSpecialtyName01, txtNotes01, txtAppointmentNo01, txtAppointmentQue01, txtAppointmentTime01, includeUndatedPlans);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime02, cboServiceUnitID02, cboParamedicName02, txtSpecialtyName02, txtNotes02, txtAppointmentNo02, txtAppointmentQue02, txtAppointmentTime02, includeUndatedPlans);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime03, cboServiceUnitID03, cboParamedicName03, txtSpecialtyName03, txtNotes03, txtAppointmentNo03, txtAppointmentQue03, txtAppointmentTime03, includeUndatedPlans);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime04, cboServiceUnitID04, cboParamedicName04, txtSpecialtyName04, txtNotes04, txtAppointmentNo04, txtAppointmentQue04, txtAppointmentTime04, includeUndatedPlans);
+            AddControlPlanItem(itemPlans, txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05, includeUndatedPlans);
 
 
             var controlPlan = new ControlPlan();
-            controlPlan.Items = itemPlans;
+            controlPlan.Items = itemPlans.Where(item => item.ControlPlanDateTime != DateTime.MinValue).ToList();
+            var undated = itemPlans.Where(item => item.ControlPlanDateTime == DateTime.MinValue).ToList();
+            if (undated.Count > 0) controlPlan.UndatedItems = undated;
             return controlPlan;
         }
 
@@ -147,6 +284,9 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
             {
                 var planCount = 0;
                 var oplan = JsonConvert.DeserializeObject<ControlPlan>(controlPlan);
+                if (oplan == null) return;
+                oplan.Items = (oplan.Items ?? new List<ControlPlanItem>())
+                    .Concat(oplan.UndatedItems ?? new List<ControlPlanItem>()).ToList();
                 if (oplan != null && oplan.Items != null)
                     planCount = oplan.Items.Count;
 
@@ -221,7 +361,7 @@ namespace Temiang.Avicenna.Module.RADT.EmrIp.EmrIpCommon.ResumeMedis
                     //txtAppointmentNo05.Text = cpi.AppointmentNo;
                     //txtAppointmentQue05.Text = cpi.AppointmentQue.ToString();
                     //txtAppointmentTime05.Text = cpi.AppointmentTime;
-                    PopulatePlanItem(oplan.Items[2], txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
+                    PopulatePlanItem(oplan.Items[4], txtControlPlanDateTime05, cboServiceUnitID05, cboParamedicName05, txtSpecialtyName05, txtNotes05, txtAppointmentNo05, txtAppointmentQue05, txtAppointmentTime05);
                 }
             }
         }

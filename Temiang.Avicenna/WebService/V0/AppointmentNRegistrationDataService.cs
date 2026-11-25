@@ -772,6 +772,8 @@ namespace Temiang.Avicenna.WebService.V0
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
         public void PatientGetOneByMedicalNo(string AccessKey, string MedicalNo)
         {
+            Context.Response.ContentType = "text/json";
+
             var log = LogAdd();
             try
             {

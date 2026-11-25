@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Temiang.Avicenna.BusinessObject.JsonField
 {
     public class ControlPlan : BaseJsonField
     {
         public List<ControlPlanItem> Items { get; set; }
+
+        // Keep incomplete plans outside Items: existing reports/integrations expect dated items there.
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public List<ControlPlanItem> UndatedItems { get; set; }
     }
     public class ControlPlanItem
     {
