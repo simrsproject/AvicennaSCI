@@ -4283,7 +4283,7 @@ namespace Temiang.Avicenna.Bridging.SatuSehat
                 
                 if (IsUsingUniqueAcsnNumber)
                 {
-                    accessionValue = $"{orderno}{sequenceNo}"; //untuk unik acsn perlu ditambahkan sequenceno agar unique
+                    accessionValue = $"{orderNoComplete}{sequenceNo}"; //untuk unik acsn perlu ditambahkan sequenceno agar unique
                 }
                 else
                 {
