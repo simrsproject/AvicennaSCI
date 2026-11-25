@@ -7,7 +7,9 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (next < TilakaConstant.CertificateStatus.None || next > TilakaConstant.CertificateStatus.Rejected) return false;
             if (!current.HasValue || current.Value <= TilakaConstant.CertificateStatus.None) return true;
             if (current.Value == TilakaConstant.CertificateStatus.Active
-                || current.Value == TilakaConstant.CertificateStatus.Rejected) return false;
+                || current.Value == TilakaConstant.CertificateStatus.Rejected)
+                return next == current.Value;
+
             return next >= current.Value;
         }
     }

@@ -47,9 +47,9 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
-        public void ActiveCurrent_IsTerminal()
+        public void ActiveCurrent_AllowsSameOnly()
         {
-            Assert.IsFalse(TilakaCertificateStatusRules.CanApply(
+            Assert.IsTrue(TilakaCertificateStatusRules.CanApply(
                 TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.Active));
             Assert.IsFalse(TilakaCertificateStatusRules.CanApply(
                 TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.Registered));
@@ -58,9 +58,9 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
-        public void RejectedCurrent_IsTerminal()
+        public void RejectedCurrent_AllowsSameOnly()
         {
-            Assert.IsFalse(TilakaCertificateStatusRules.CanApply(
+            Assert.IsTrue(TilakaCertificateStatusRules.CanApply(
                 TilakaConstant.CertificateStatus.Rejected, TilakaConstant.CertificateStatus.Rejected));
             Assert.IsFalse(TilakaCertificateStatusRules.CanApply(
                 TilakaConstant.CertificateStatus.Rejected, TilakaConstant.CertificateStatus.Active));

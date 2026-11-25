@@ -118,7 +118,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
 
             Assert.AreEqual(3, repo.Record.CertificateStatus);
             Assert.IsFalse(second.Applied);
-            Assert.AreEqual("status-regression", second.Reason);
+            Assert.AreEqual("already-applied", second.Reason);
         }
 
         [TestMethod]

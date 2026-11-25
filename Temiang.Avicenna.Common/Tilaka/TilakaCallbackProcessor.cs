@@ -62,6 +62,9 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             if (payload.Status < 0 || payload.Status > 4) return NotApplied("status-invalid");
 
+            if (record.CertificateStatus == payload.Status)
+                return NotApplied("already-applied");
+
             if (!TilakaCertificateStatusRules.CanApply(record.CertificateStatus, payload.Status))
                 return NotApplied("status-regression");
 

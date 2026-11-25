@@ -436,6 +436,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var service = new Service();
             string message;
             var certificateRejected = false;
+            var statusUnchanged = false;
 
             if (!string.IsNullOrWhiteSpace(record.RegistrationRequestID))
             {
@@ -458,6 +459,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     return;
                 }
 
+                statusUnchanged = record.CertificateStatus == certificate.Status;
                 if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
                 {
                     record.CertificateStatus = certificate.Status;
@@ -484,7 +486,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             var state = record.RegistrationState;
             LoadData();
-            if (certificateRejected)
+
+            if (statusUnchanged)
+                ShowSuccess("Status sudah " + state +
+                            ". Tidak ada perubahan status sertifikat.");
+            else if (certificateRejected)
                 ShowWarning("Status diperbarui: " + state +
                             ". Status sertifikat dari Tilaka diabaikan karena tidak lebih maju.");
             else
