@@ -13,6 +13,9 @@
             }
 
             function openConsent() {
+                var panel = document.getElementById('<%= pnlConsent.ClientID %>');
+                if (panel) panel.style.display = 'block';
+
                 var oWnd = $find("<%= winConsent.ClientID %>");
                 if (oWnd) oWnd.show();
                 return false;
@@ -64,8 +67,10 @@
         <tr>
             <td class="label">Persetujuan TnC</td>
             <td class="entry">
-                <asp:CheckBox ID="chkConsent" runat="server"
-                    Text="Dokter telah membaca dan menyetujui TnC Tilaka." />
+                <asp:Panel ID="pnlConsent" runat="server" Style="display: none;">
+                    <asp:CheckBox ID="chkConsent" runat="server"
+                        Text="Dokter telah membaca dan menyetujui TnC Tilaka." />
+                </asp:Panel>
                 &nbsp;
                 <asp:LinkButton ID="btnReadConsent" runat="server" Text="Baca Persetujuan"
                     OnClientClick="return openConsent();" CausesValidation="false"

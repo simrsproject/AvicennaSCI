@@ -97,8 +97,10 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 imgKtp.Visible = false;
             }
 
-            chkConsent.Visible = isUsingESignature && CanStartRegistration(state);
-            btnDaftar.Visible = isUsingESignature && CanStartRegistration(state);
+            var canStartRegistration = isUsingESignature && CanStartRegistration(state);
+            pnlConsent.Visible = canStartRegistration;
+            chkConsent.Visible = canStartRegistration;
+            btnDaftar.Visible = canStartRegistration;
             btnKirimData.Visible = isUsingESignature && state == TilakaRegistrationState.UuidTerbit;
             btnWebview.Visible = isUsingESignature
                                  && !string.IsNullOrWhiteSpace(webviewUrl)
@@ -135,6 +137,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (string.IsNullOrWhiteSpace(consentText))
             {
                 ShowWarning("File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile);
+                pnlConsent.Visible = false;
                 if (btnDaftar.Visible)
                 {
                     chkConsent.Enabled = false;
@@ -163,6 +166,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         private void HideActions()
         {
+            pnlConsent.Visible = false;
             chkConsent.Visible = false;
             btnReadConsent.Visible = false;
             uplKtp.Visible = false;

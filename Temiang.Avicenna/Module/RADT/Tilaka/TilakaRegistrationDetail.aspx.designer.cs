@@ -78,6 +78,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.Image imgKtp;
 
         /// <summary>
+        /// pnlConsent control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Panel pnlConsent;
+
+        /// <summary>
         /// chkConsent control.
         /// </summary>
         protected global::System.Web.UI.WebControls.CheckBox chkConsent;
