@@ -12,8 +12,16 @@ namespace Temiang.Avicenna.Controllers
         [HttpGet]
         public ActionResult Return()
         {
+            var requestId = Request.QueryString["request_id"];
+
+            if (string.IsNullOrWhiteSpace(requestId))
+                requestId = Request.QueryString["request-id"];
+
+            if (string.IsNullOrWhiteSpace(requestId))
+                requestId = Request.QueryString["register_id"];
+
             var handler = new TilakaWebviewReturnHandler(new TilakaRegistrationRepository(), new Service());
-            return View(handler.Process(Request.QueryString["request-id"]));
+            return View(handler.Process(requestId));
         }
     }
 }
