@@ -27,7 +27,9 @@ namespace Temiang.Avicenna.Common.Tilaka
         private static string Build(string background, string border, string color, string message)
         {
             return string.Concat(
-                "<div style=\"border:1px solid ", border,
+                "<div style=\"display:inline-block;max-width:100%;box-sizing:border-box;",
+                "vertical-align:top;overflow-wrap:break-word;",
+                "border:1px solid ", border,
                 ";background:", background,
                 ";color:", color,
                 ";padding:8px;margin-bottom:8px;\">",

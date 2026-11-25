@@ -27,6 +27,15 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
+        public void Build_UsesCompactWidth()
+        {
+            var html = TilakaAlertHtml.Success("Berhasil");
+
+            StringAssert.Contains(html, "display:inline-block");
+            StringAssert.Contains(html, "max-width:100%");
+        }
+
+        [TestMethod]
         public void Build_EncodesMessage()
         {
             var html = TilakaAlertHtml.Error("<script>alert(1)</script>");
