@@ -1033,8 +1033,27 @@ namespace Temiang.Avicenna.Module.Charges
                         {
                             case "complete":
                                 {
-                                    pres.CompleteDateTime = (new DateTime()).NowAtSqlServer();
-                                    pres.Save();
+                                    using (var transaction = new Temiang.Dal.Interfaces.esTransactionScope())
+                                    {
+                                        pres.CompleteDateTime = (new DateTime()).NowAtSqlServer();
+                                        pres.Save();
+
+                                        if (Helper.IsBpjsAntrolIntegration
+                                            && global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
+                                        {
+                                            var registration = new Registration();
+                                            if (registration.LoadByPrimaryKey(pres.RegistrationNo)
+                                                && !string.IsNullOrWhiteSpace(registration.AppointmentNo)
+                                                && registration.SRRegistrationType != AppConstant.RegistrationType.InPatient)
+                                            {
+                                                global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueuePharmacy(
+                                                    registration.AppointmentNo, 7,
+                                                    new DateTimeOffset(pres.CompleteDateTime.Value).ToUnixTimeMilliseconds());
+                                            }
+                                        }
+
+                                        transaction.Complete();
+                                    }
                                     grdPrescription.Rebind();
                                     break;
                                 }

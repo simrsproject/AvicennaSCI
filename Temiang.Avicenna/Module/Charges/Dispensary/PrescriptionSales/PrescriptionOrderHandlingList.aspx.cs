@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
 using System.Data;
@@ -496,48 +496,61 @@ namespace Temiang.Avicenna.Module.Charges
                 {
                     case "complete":
                         {
-                            PrescriptionSalesDetail.UpdatePrescriptionStatus(prescriptionNo, prescStat);
-                            //pres.CompleteDateTime = DateTime.Now;
-                            //pres.Save();
-
-                            if (Helper.IsBpjsAntrolIntegration)
+                            using (var transaction = new Temiang.Dal.Interfaces.esTransactionScope())
                             {
-                                try
+                                PrescriptionSalesDetail.UpdatePrescriptionStatus(prescriptionNo, prescStat);
+                                //pres.CompleteDateTime = DateTime.Now;
+                                //pres.Save();
+
+                                if (Helper.IsBpjsAntrolIntegration)
                                 {
-                                    var reg = new Registration();
-                                    reg.LoadByPrimaryKey(regNo);
-
-                                    if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
+                                    try
                                     {
-                                        var log = new WebServiceAPILog();
-                                        log.DateRequest = DateTime.Now;
-                                        log.IPAddress = string.Empty;
-                                        log.UrlAddress = "PrescriptionOrderHandlingList";
-                                        log.Params = JsonConvert.SerializeObject(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
-                                        {
-                                            Kodebooking = reg.AppointmentNo,
-                                            Taskid = 7,
-                                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                        });
+                                        var reg = new Registration();
+                                        reg.LoadByPrimaryKey(regNo);
 
-                                        var svc = new Common.BPJS.Antrian.Service();
-                                        var response = svc.UpdateWaktuAntrian(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                                         {
-                                            Kodebooking = reg.AppointmentNo,
-                                            Taskid = 7,
-                                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                        });
+                                            if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
+                                            {
+                                                global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueuePharmacy(
+                                                    reg.AppointmentNo, 7, DateTimeOffset.Now.ToUnixTimeMilliseconds());
+                                            }
+                                            else
+                                            {
+    var log = new WebServiceAPILog();
+                                            log.DateRequest = DateTime.Now;
+                                            log.IPAddress = string.Empty;
+                                            log.UrlAddress = "PrescriptionOrderHandlingList";
+                                            log.Params = JsonConvert.SerializeObject(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                            {
+                                                Kodebooking = reg.AppointmentNo,
+                                                Taskid = 7,
+                                                Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                                            });
 
-                                        log.Response = JsonConvert.SerializeObject(response);
-                                        log.Save();
+                                            var svc = new Common.BPJS.Antrian.Service();
+                                            var response = svc.UpdateWaktuAntrian(new Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                            {
+                                                Kodebooking = reg.AppointmentNo,
+                                                Taskid = 7,
+                                                Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                                            });
+
+                                            log.Response = JsonConvert.SerializeObject(response);
+                                            log.Save();
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled) throw;
+
                                     }
                                 }
-                                catch (Exception ex)
-                                {
 
-                                }
+                                transaction.Complete();
                             }
-
                             grdPrescription.Rebind();
                             break;
                         }

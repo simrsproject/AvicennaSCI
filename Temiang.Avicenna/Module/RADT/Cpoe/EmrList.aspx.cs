@@ -2790,27 +2790,34 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                             {
                                 if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                                 {
-                                    var log = new WebServiceAPILog();
-                                    log.DateRequest = DateTime.Now;
-                                    log.IPAddress = string.Empty;
-                                    log.UrlAddress = "EmrList";
-                                    log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                    if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
                                     {
-                                        Kodebooking = reg.AppointmentNo,
-                                        Taskid = 4,
-                                        Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                    });
-
-                                    var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
-                                    var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 4, new DateTimeOffset(time).ToUnixTimeMilliseconds());
+                                    }
+                                    else
                                     {
-                                        Kodebooking = reg.AppointmentNo,
-                                        Taskid = 4,
-                                        Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                    });
+                                        var log = new WebServiceAPILog();
+                                        log.DateRequest = DateTime.Now;
+                                        log.IPAddress = string.Empty;
+                                        log.UrlAddress = "EmrList";
+                                        log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        {
+                                            Kodebooking = reg.AppointmentNo,
+                                            Taskid = 4,
+                                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                                        });
 
-                                    log.Response = JsonConvert.SerializeObject(response);
-                                    log.Save();
+                                        var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
+                                        var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        {
+                                            Kodebooking = reg.AppointmentNo,
+                                            Taskid = 4,
+                                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                                        });
+
+                                        log.Response = JsonConvert.SerializeObject(response);
+                                        log.Save();
+                                    }
                                 }
                             }
                             catch (Exception e)
@@ -2854,27 +2861,34 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                             {
                                 if (!string.IsNullOrWhiteSpace(reg.AppointmentNo))
                                 {
-                                    var log = new WebServiceAPILog();
-                                    log.DateRequest = DateTime.Now;
-                                    log.IPAddress = string.Empty;
-                                    log.UrlAddress = "EmrList";
-                                    log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                    if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
                                     {
-                                        Kodebooking = reg.AppointmentNo,
-                                        Taskid = 5,
-                                        Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                    });
-
-                                    var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
-                                    var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 5, new DateTimeOffset(time).ToUnixTimeMilliseconds());
+                                    }
+                                    else
                                     {
-                                        Kodebooking = reg.AppointmentNo,
-                                        Taskid = 5,
-                                        Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
-                                    });
+                                        var log = new WebServiceAPILog();
+                                        log.DateRequest = DateTime.Now;
+                                        log.IPAddress = string.Empty;
+                                        log.UrlAddress = "EmrList";
+                                        log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        {
+                                            Kodebooking = reg.AppointmentNo,
+                                            Taskid = 5,
+                                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                                        });
 
-                                    log.Response = JsonConvert.SerializeObject(response);
-                                    log.Save();
+                                        var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
+                                        var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                                        {
+                                            Kodebooking = reg.AppointmentNo,
+                                            Taskid = 5,
+                                            Waktu = Convert.ToInt64(DateTimeOffset.Now.ToUnixTimeMilliseconds())
+                                        });
+
+                                        log.Response = JsonConvert.SerializeObject(response);
+                                        log.Save();
+                                    }
                                 }
                             }
                             catch (Exception e)

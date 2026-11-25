@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using System.Web.UI;
@@ -3668,6 +3668,14 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                             }
                         }
                     }
+                    if (Helper.IsBpjsAntrolIntegration
+                        && global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled
+                        && !string.IsNullOrWhiteSpace(reg.AppointmentNo)
+                        && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
+                    {
+                        global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueuePharmacy(
+                            reg.AppointmentNo, 6, DateTimeOffset.Now.ToUnixTimeMilliseconds());
+                    }
                     /* Automatic Journal Testing End */
                     if (Helper.IsBpjsAntrolIntegration)
                     {
@@ -3675,6 +3683,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         {
                             if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                             {
+                                if (!global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
                                 {
                                     var log = new WebServiceAPILog();
                                     log.DateRequest = DateTime.Now;
@@ -3774,6 +3783,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                     log.Response = JsonConvert.SerializeObject(response);
                                     log.Save();
                                 }
+                                if (!global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
                                 {
                                     var log = new WebServiceAPILog();
                                     log.DateRequest = DateTime.Now;

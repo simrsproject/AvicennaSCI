@@ -2464,6 +2464,7 @@ WHEN NOT MATCHED THEN
         {
             if (Helper.IsBpjsAntrolIntegration)
             {
+                var assessmentSavedAt = DateTimeOffset.Now;
                 var reg = new Registration();
                 reg.LoadByPrimaryKey(registrationNo);
 
@@ -2471,27 +2472,34 @@ WHEN NOT MATCHED THEN
                 {
                     if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                     {
-                        var log = new WebServiceAPILog();
-                        log.DateRequest = DateTime.Now;
-                        log.IPAddress = string.Empty;
-                        log.UrlAddress = "AssesmentEntry";
-                        log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                        if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
                         {
-                            Kodebooking = reg.AppointmentNo,
-                            Taskid = 4,
-                            Waktu = Convert.ToInt64(ViewState["task4_emr"])
-                        });
-
-                        var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
-                        var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                            global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 4, Convert.ToInt64(ViewState["task4_emr"]));
+                        }
+                        else
                         {
-                            Kodebooking = reg.AppointmentNo,
-                            Taskid = 4,
-                            Waktu = Convert.ToInt64(ViewState["task4_emr"])
-                        });
+                            var log = new WebServiceAPILog();
+                            log.DateRequest = DateTime.Now;
+                            log.IPAddress = string.Empty;
+                            log.UrlAddress = "AssesmentEntry";
+                            log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                            {
+                                Kodebooking = reg.AppointmentNo,
+                                Taskid = 4,
+                                Waktu = Convert.ToInt64(ViewState["task4_emr"])
+                            });
 
-                        log.Response = JsonConvert.SerializeObject(response);
-                        log.Save();
+                            var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
+                            var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                            {
+                                Kodebooking = reg.AppointmentNo,
+                                Taskid = 4,
+                                Waktu = Convert.ToInt64(ViewState["task4_emr"])
+                            });
+
+                            log.Response = JsonConvert.SerializeObject(response);
+                            log.Save();
+                        }
 
                         var time = (new DateTime()).NowAtSqlServer();
                         reg.IsConfirmedAttendance = true;
@@ -2534,27 +2542,31 @@ WHEN NOT MATCHED THEN
                 {
                     if (!string.IsNullOrWhiteSpace(reg.AppointmentNo))
                     {
-                        var log = new WebServiceAPILog();
-                        log.DateRequest = DateTime.Now;
-                        log.IPAddress = string.Empty;
-                        log.UrlAddress = "AssesmentEntry";
-                        log.Params = JsonConvert.SerializeObject(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                        if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
                         {
-                            Kodebooking = reg.AppointmentNo,
-                            Taskid = 5,
-                            Waktu = Convert.ToInt64(DateTimeOffset.Now.AddMinutes(6).ToUnixTimeMilliseconds())
-                        });
-
-                        var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
-                        var response = svc.UpdateWaktuAntrian(new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root()
+                            global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 5, assessmentSavedAt.ToUnixTimeMilliseconds());
+                        }
+                        else
                         {
-                            Kodebooking = reg.AppointmentNo,
-                            Taskid = 5,
-                            Waktu = Convert.ToInt64(DateTimeOffset.Now.AddMinutes(6).ToUnixTimeMilliseconds())
-                        });
+                            var log = new WebServiceAPILog();
+                            log.DateRequest = DateTime.Now;
+                            log.IPAddress = string.Empty;
+                            log.UrlAddress = "AssesmentEntry";
+                            var isRsi = string.Equals(AppSession.Parameter.HealthcareID, "RSI", StringComparison.OrdinalIgnoreCase);
+                            var request = new Temiang.Avicenna.Common.BPJS.Antrian.Update.WaktuAntrian.Request.Root
+                            {
+                                Kodebooking = reg.AppointmentNo,
+                                Taskid = 5,
+                                Waktu = (isRsi ? assessmentSavedAt : DateTimeOffset.Now.AddMinutes(6)).ToUnixTimeMilliseconds()
+                            };
+                            log.Params = JsonConvert.SerializeObject(request);
 
-                        log.Response = JsonConvert.SerializeObject(response);
-                        log.Save();
+                            var svc = new Temiang.Avicenna.Common.BPJS.Antrian.Service();
+                            var response = svc.UpdateWaktuAntrian(request);
+
+                            log.Response = JsonConvert.SerializeObject(response);
+                            log.Save();
+                        }
 
                         var time = (new DateTime()).NowAtSqlServer();
                         reg.IsFinishedAttendance = true;

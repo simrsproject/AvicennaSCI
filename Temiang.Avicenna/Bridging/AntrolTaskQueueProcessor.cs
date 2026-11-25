@@ -8,6 +8,53 @@ namespace Temiang.Avicenna.Bridging
 {
 internal static class AntrolTaskQueueProcessor
 {
+    internal static bool EmrQueueEnabled
+    {
+        get
+        {
+            return string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolEmrQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolTaskQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(global::Temiang.Avicenna.Common.AppSession.Parameter.HealthcareID, "RSI", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    internal static bool PharmacyQueueEnabled
+    {
+        get
+        {
+            return EmrQueueEnabled
+                && string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolPharmacyQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    internal static void EnqueuePharmacy(string booking, int task, long eventMs)
+    {
+        if (string.IsNullOrWhiteSpace(booking) || (task != 6 && task != 7) || eventMs <= 0)
+            throw new ArgumentException("Invalid pharmacy task.");
+
+        var parameters = new esParameters();
+        parameters.Add("Booking", booking, esParameterDirection.Input, System.Data.DbType.String, 50);
+        parameters.Add("TaskId", task, esParameterDirection.Input, System.Data.DbType.Int32, 0);
+        parameters.Add("EventMs", eventMs, esParameterDirection.Input, System.Data.DbType.Int64, 0);
+        new Temiang.Dal.Core.esUtility().ExecuteNonQuery("dbo", "BpjsAntrolEnqueuePharmacy", parameters);
+    }
+    internal static void EnqueueAttendance(string booking, int task, long eventMs)
+    {
+        if (eventMs <= 0)
+            throw new InvalidOperationException("Waktu attendance belum tercatat.");
+
+        var info = esConfigSettings.ConnectionInfo;
+        using (var db = new SqlConnection(info.Connections[info.Default].ConnectionString))
+        using (var cmd = Command(db, @"INSERT dbo.BpjsAntrolTaskQueue(Booking,TaskId,EventMs,StartedMs)
+            SELECT @b,@t,@time,@time WHERE NOT EXISTS
+            (SELECT 1 FROM dbo.BpjsAntrolTaskQueue WITH (UPDLOCK,HOLDLOCK) WHERE Booking=@b AND TaskId=@t)", booking, task))
+        {
+            cmd.Parameters.Add("@time", System.Data.SqlDbType.BigInt).Value = eventMs;
+            db.Open();
+            cmd.ExecuteNonQuery();
+        }
+    }
+
     private static SqlCommand Command(SqlConnection db, string sql, string booking, int task)
     {
         var cmd = new SqlCommand(sql, db);
@@ -37,7 +84,7 @@ internal static class AntrolTaskQueueProcessor
             SELECT TOP(1) q.* FROM dbo.BpjsAntrolTaskQueue q
             WHERE Status='Pending' AND DueUtc<=SYSUTCDATETIME() AND (@booking IS NULL OR Booking=@booking)
             AND (TaskId=2 OR NOT EXISTS (SELECT 1 FROM dbo.BpjsAntrolTaskQueue p
-                WHERE p.Booking=q.Booking AND p.TaskId=2 AND p.Status NOT IN ('Sent','Skipped')))
+                WHERE p.Booking=q.Booking AND p.TaskId<q.TaskId AND p.Status NOT IN ('Sent','Skipped')))
             ORDER BY DueUtc, Booking, TaskId)
             UPDATE work SET Attempts=Attempts+1, DueUtc=DATEADD(minute,5,SYSUTCDATETIME())
             OUTPUT inserted.Booking,inserted.TaskId,inserted.EventMs,inserted.Attempts;", db))
@@ -73,6 +120,8 @@ internal static class AntrolTaskQueueProcessor
                 Finish(db, booking, task, "Sent", "Terkonfirmasi dari riwayat");
             else if (ids.Contains(99) || (task == 2 && ids.Contains(3)))
                 Finish(db, booking, task, "Skipped", "Booking batal atau task 3 sudah ada");
+            else if (task >= 4 && !ids.Contains(task - 1))
+                Finish(db, booking, task, attempts >= 5 ? "Review" : "Pending", "Menunggu task " + (task - 1));
             else if (task == 3 && ids.Contains(1) && !ids.Contains(2))
             {
                 using (var cmd = Command(db, @"INSERT dbo.BpjsAntrolTaskQueue(Booking,TaskId,EventMs,StartedMs)
