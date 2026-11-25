@@ -14,11 +14,11 @@
                     AllowCustomText="false" EnableLoadOnDemand="true" Filter="Contains"
                     OnItemsRequested="cboParamedicID_ItemsRequested" />
             </td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Template No</td>
             <td class="entry"><asp:Label ID="lblTemplateNo" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">File Template</td>
             <td class="entry">
@@ -28,35 +28,35 @@
                 <asp:HyperLink ID="lnkDownload" runat="server" Text="Download PDF"
                     Target="_blank" Visible="false" />
             </td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Ukuran File</td>
             <td class="entry"><asp:Label ID="lblFileSize" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Is Default</td>
             <td class="entry">
                 <asp:CheckBox ID="chkIsDefault" runat="server" />
             </td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Is Active</td>
             <td class="entry">
                 <asp:CheckBox ID="chkIsActive" runat="server" Checked="true" />
             </td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Status</td>
             <td class="entry"><asp:Label ID="lblRegistered" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Tanggal Daftar</td>
             <td class="entry"><asp:Label ID="lblRegisteredDateTime" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Error</td>
             <td class="entry"><asp:Label ID="lblError" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
     </table>
 
     <br />

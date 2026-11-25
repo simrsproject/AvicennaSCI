@@ -35,27 +35,27 @@
         <tr>
             <td class="label">Dokter</td>
             <td class="entry"><asp:Label ID="lblParamedicName" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Nama sesuai KTP</td>
             <td class="entry"><asp:Label ID="lblNamaKTP" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">NIK (SSN)</td>
             <td class="entry"><asp:Label ID="lblSsn" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Email</td>
             <td class="entry"><asp:Label ID="lblEmail" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Status</td>
             <td class="entry"><asp:Label ID="lblStatus" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Tilaka Name</td>
             <td class="entry"><asp:Label ID="lblTilakaName" runat="server" /></td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Foto KTP</td>
             <td class="entry">
@@ -63,7 +63,7 @@
                     AllowedFileExtensions=".jpg,.jpeg,.png" MaxFileSize="2097152" />
                 <asp:Image ID="imgKtp" runat="server" Width="320" Visible="false" />
             </td>
-        </tr>
+        <td width="20"></td><td></td></tr>
         <tr>
             <td class="label">Persetujuan TnC</td>
             <td class="entry">
@@ -76,7 +76,7 @@
                     OnClientClick="return openConsent();" CausesValidation="false"
                     Style="text-decoration: underline; color: #0b5cab; cursor: pointer;" />
             </td>
-        </tr>
+        <td width="20"></td><td></td></tr>
     </table>
 
     <br />

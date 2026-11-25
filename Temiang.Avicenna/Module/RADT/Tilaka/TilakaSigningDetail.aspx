@@ -7,18 +7,18 @@
     <asp:HiddenField ID="hfRequestID" runat="server" />
 
     <table class="layout">
-        <tr><td class="label">Request ID</td><td><asp:Label ID="lblRequestID" runat="server" /></td></tr>
-        <tr><td class="label">Casemix ID</td><td><asp:Label ID="lblCasemixFileID" runat="server" /></td></tr>
+        <tr><td class="label">Request ID</td><td><asp:Label ID="lblRequestID" runat="server" /></td><td width="20"></td><td></td></tr>
+        <tr><td class="label">Casemix ID</td><td><asp:Label ID="lblCasemixFileID" runat="server" /></td><td width="20"></td><td></td></tr>
         <tr><td class="label">File</td><td>
             <asp:Label ID="lblFileName" runat="server" />
             <asp:HyperLink ID="lnkCasemix" runat="server" Text="[pratinjau]" Target="_blank" />
-        </td></tr>
-        <tr><td class="label">Template</td><td><asp:Label ID="lblTemplateNo" runat="server" /></td></tr>
-        <tr><td class="label">Status</td><td><asp:Label ID="lblStatus" runat="server" /></td></tr>
-        <tr><td class="label">Error</td><td><asp:Label ID="lblError" runat="server" /></td></tr>
+        </td><td width="20"></td><td></td></tr>
+        <tr><td class="label">Template</td><td><asp:Label ID="lblTemplateNo" runat="server" /></td><td width="20"></td><td></td></tr>
+        <tr><td class="label">Status</td><td><asp:Label ID="lblStatus" runat="server" /></td><td width="20"></td><td></td></tr>
+        <tr><td class="label">Error</td><td><asp:Label ID="lblError" runat="server" /></td><td width="20"></td><td></td></tr>
         <tr><td class="label">Dokumen bertanda tangan</td><td>
             <asp:HyperLink ID="lnkSignedFile" runat="server" Text="Unduh PDF" Target="_blank" Visible="false" />
-        </td></tr>
+        </td><td width="20"></td><td></td></tr>
     </table>
 
     <telerik:RadGrid ID="grdSigner" runat="server" AllowPaging="false"
