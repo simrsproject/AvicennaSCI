@@ -133,7 +133,15 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         protected void cboParamedicID_ItemsRequested(object sender, RadComboBoxItemsRequestedEventArgs e)
         {
-            var query = new ParamedicQuery();
+            var query = new ParamedicQuery("a");
+            var reg = new TilakaRegistrationQuery("b");
+
+            query.InnerJoin(reg).On(
+                query.ParamedicID == reg.RelatedID
+                & reg.RelatedType == TilakaConstant.RelatedType.Paramedic
+                & reg.IsLatest == true
+                & reg.IsQuickSignUser == true);
+
             query.Where(query.IsActive == true, query.IsUsingESignature == true);
 
             var text = (e.Text ?? string.Empty).Trim();
@@ -172,6 +180,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     || paramedic.IsUsingESignature != true)
                 {
                     Fail(args, "Dokter harus aktif dan menggunakan tanda tangan elektronik.");
+                    return;
+                }
+
+                var registration = new TilakaRegistrationRepository().FindLatest(
+                    TilakaConstant.RelatedType.Paramedic, paramedicID);
+                if (!TilakaQuickSignUserRules.IsRegistered(registration))
+                {
+                    Fail(args, "Dokter belum terdaftar sebagai Quick Sign user.");
                     return;
                 }
 
