@@ -12,6 +12,15 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
+        public void Auth_UsesAuthBaseUrlWhenConfigured()
+        {
+            var config = Config();
+            config.AuthBaseUrl = "https://auth.example";
+
+            Assert.AreEqual("https://auth.example/auth", TilakaUrls.Auth(config));
+        }
+
+        [TestMethod]
         public void GenerateUuid_Personal_OmitsNameAndEmail()
         {
             var config = Config();

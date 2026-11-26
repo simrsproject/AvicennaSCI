@@ -123,6 +123,28 @@ namespace Temiang.Avicenna.Tests.Tilaka
             Assert.IsFalse(transport.LastJsonBody.Contains("nationality_type"));
         }
         [TestMethod]
+        public void QuickSignFactory_UsesCloudAuthAndLiteApiBase()
+        {
+            var source = new TilakaConfig
+            {
+                BaseUrl = "https://sb-api.tilaka.id",
+                AuthPath = "/auth",
+                LiteBaseUrl = "http://10.200.200.15:8088",
+                ChannelId = "chan",
+                ChannelSecret = "secret",
+                LiteTimeoutSeconds = 5
+            };
+
+            var service = TilakaQuickSignServiceFactory.Create(source);
+
+            Assert.AreEqual("http://10.200.200.15:8088", service.Config.BaseUrl);
+            Assert.AreEqual("https://sb-api.tilaka.id", service.Config.AuthBaseUrl);
+            Assert.AreEqual("/auth", service.Config.AuthPath);
+            Assert.AreEqual("http://10.200.200.15:8088/api/v1/upload",
+                TilakaQuickSignUrls.Upload(service.Config));
+        }
+
+        [TestMethod]
         public void GetAccessToken_LogsAuthSuccessWithoutSecret()
         {
             var logger = new CapturingLogger();

@@ -7,7 +7,10 @@ namespace Temiang.Avicenna.Common.Tilaka
     {
         public static string Auth(TilakaConfig config)
         {
-            return config.BaseUrl + config.AuthPath;
+            var baseUrl = string.IsNullOrWhiteSpace(config.AuthBaseUrl)
+                ? config.BaseUrl
+                : config.AuthBaseUrl;
+            return baseUrl + config.AuthPath;
         }
 
         public static string GenerateUuid(TilakaConfig config, string name, string email)

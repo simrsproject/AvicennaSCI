@@ -24,7 +24,10 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         private static string BuildTokenKey(TilakaConfig config)
         {
-            return (config.BaseUrl ?? string.Empty) + "|" + (config.ChannelId ?? string.Empty);
+            var authBaseUrl = string.IsNullOrWhiteSpace(config.AuthBaseUrl)
+                ? config.BaseUrl
+                : config.AuthBaseUrl;
+            return (authBaseUrl ?? string.Empty) + "|" + (config.ChannelId ?? string.Empty);
         }
 
         public string GetAccessToken(bool forceRefresh = false)

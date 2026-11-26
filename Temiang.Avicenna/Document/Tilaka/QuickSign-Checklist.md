@@ -7,8 +7,8 @@ langkah di bawah belum bisa dijalankan.
 ## 1. Prasyarat
 
 - [ ] `TilakaLiteBaseUrl` terisi dan dapat diakses dari server Avicenna.
-- [ ] `TilakaLiteAuthPath` sesuai (default `/auth`).
-- [ ] Channel id/secret Quick Sign valid.
+- [ ] Auth Quick Sign memakai `TilakaBaseUrl` + `TilakaAuthPath` (cloud), bukan endpoint `/auth` milik `tilaka-lite`.
+- [ ] Channel id/secret Quick Sign valid untuk auth cloud dan endpoint lite.
 - [ ] Folder `C:\Tilaka\TemplateSign` dan `C:\Tilaka\Signed` dibuat; app pool punya Modify.
 - [ ] SQL `07.CREATE_TABLE_TilakaTemplateSignFile.sql` dan `08.INSERT_INTO_AppProgram_TilakaQuickSign.sql` sudah dijalankan.
 - [ ] Kolom `TilakaQuickSignRequest.TemplateSignFileID` ada di database.

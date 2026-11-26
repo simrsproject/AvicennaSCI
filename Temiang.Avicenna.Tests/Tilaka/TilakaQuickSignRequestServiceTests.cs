@@ -167,7 +167,6 @@ namespace Temiang.Avicenna.Tests.Tilaka
             return new TilakaConfig
             {
                 LiteBaseUrl = "https://lite",
-                LiteAuthPath = "/auth",
                 ChannelId = "chan",
                 ChannelSecret = "secret",
                 LiteTimeoutSeconds = 5

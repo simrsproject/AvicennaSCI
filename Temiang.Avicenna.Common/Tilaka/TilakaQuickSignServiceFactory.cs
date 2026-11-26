@@ -15,10 +15,13 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             source = source ?? new TilakaConfig();
 
+            var liteBaseUrl = (source.LiteBaseUrl ?? string.Empty).TrimEnd('/');
             var config = new TilakaConfig
             {
-                BaseUrl = (source.LiteBaseUrl ?? string.Empty).TrimEnd('/'),
-                AuthPath = source.LiteAuthPath,
+                BaseUrl = liteBaseUrl,
+                LiteBaseUrl = liteBaseUrl,
+                AuthBaseUrl = source.BaseUrl,
+                AuthPath = source.AuthPath,
                 ChannelId = source.ChannelId,
                 ChannelSecret = source.ChannelSecret,
                 TimeoutSeconds = source.LiteTimeoutSeconds,

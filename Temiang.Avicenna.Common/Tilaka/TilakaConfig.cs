@@ -12,6 +12,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         public const string DefaultBaseUrl = "https://sb-api.tilaka.id";
 
         public string BaseUrl { get; set; }
+        public string AuthBaseUrl { get; set; }
         public string AuthPath { get; set; }
         public string ChannelId { get; set; }
         public string ChannelSecret { get; set; }
@@ -29,7 +30,6 @@ namespace Temiang.Avicenna.Common.Tilaka
         public string ClientCertificatePassword { get; set; }
 
         public string LiteBaseUrl { get; set; }
-        public string LiteAuthPath { get; set; }
         public int LiteTimeoutSeconds { get; set; }
         public bool LiteIsLogEnabled { get; set; }
         public bool QuickSignAllowUnsignedCallback { get; set; }
@@ -50,6 +50,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         public TilakaConfig()
         {
             BaseUrl = GetString("TilakaBaseUrl", DefaultBaseUrl).TrimEnd('/');
+            AuthBaseUrl = BaseUrl;
             AuthPath = GetString("TilakaAuthPath", "/auth");
             ChannelId = GetString("TilakaChannelId", string.Empty);
             ChannelSecret = GetString("TilakaChannelSecret", string.Empty);
@@ -68,7 +69,6 @@ namespace Temiang.Avicenna.Common.Tilaka
             ClientCertificatePassword = GetString("TilakaClientCertificatePassword", string.Empty);
 
             LiteBaseUrl = GetString("TilakaLiteBaseUrl", string.Empty).TrimEnd('/');
-            LiteAuthPath = GetString("TilakaLiteAuthPath", "/auth");
             LiteTimeoutSeconds = GetInt("TilakaLiteTimeoutSeconds", 120);
             LiteIsLogEnabled = GetBool("TilakaLiteIsLogEnabled", true);
             QuickSignAllowUnsignedCallback = GetBool("TilakaQuickSignAllowUnsignedCallback", false);

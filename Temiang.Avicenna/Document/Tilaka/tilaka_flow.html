@@ -159,7 +159,6 @@
   <table>
     <tr><th>Key</th><th>Nilai</th><th>Catatan</th></tr>
     <tr><td><code>TilakaLiteBaseUrl</code></td><td><code>https://&lt;host-rs&gt;:8088</code></td><td>Kosong = Quick Sign nonaktif</td></tr>
-    <tr><td><code>TilakaLiteAuthPath</code></td><td><code>/auth</code></td><td></td></tr>
     <tr><td><code>TilakaLiteTimeoutSeconds</code></td><td><code>120</code></td><td></td></tr>
     <tr><td><code>TilakaLiteIsLogEnabled</code></td><td><code>true</code></td><td>Log ke <code>WebServiceAPILog</code> dengan tag <code>TILAKA</code></td></tr>
     <tr><td><code>TilakaQuickSignAllowUnsignedCallback</code></td><td><code>false</code></td><td>Bila <code>false</code>, callback tanpa token ditolak</td></tr>
@@ -167,6 +166,11 @@
     <tr><td><code>TilakaUploadTemplateSignFilePath</code></td><td><code>C:\Tilaka\TemplateSign</code></td><td>Write untuk app pool</td></tr>
     <tr><td><code>TilakaQuickSignDefaultTemplateNo</code></td><td>_(kosong)_</td><td>Fallback bila dokter tidak punya template default</td></tr>
   </table>
+  <div class="note">
+    Auth Quick Sign tetap memakai <code>TilakaBaseUrl</code> + <code>TilakaAuthPath</code>
+    (cloud <code>/auth</code>), sedangkan endpoint Quick Sign memakai
+    <code>TilakaLiteBaseUrl</code>. <code>TilakaLiteAuthPath</code> sudah tidak digunakan.
+  </div>
 
   <h3>2.3 Pengetahuan teknis minimum tim</h3>
   <table>
