@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Temiang.Avicenna.Bridging;
+using System;
 using System.Linq;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -1039,14 +1040,14 @@ namespace Temiang.Avicenna.Module.Charges
                                         pres.Save();
 
                                         if (Helper.IsBpjsAntrolIntegration
-                                            && global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
+                                            && AntrolTaskQueueProcessor.PharmacyQueueEnabled)
                                         {
                                             var registration = new Registration();
                                             if (registration.LoadByPrimaryKey(pres.RegistrationNo)
                                                 && !string.IsNullOrWhiteSpace(registration.AppointmentNo)
                                                 && registration.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                                             {
-                                                global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueuePharmacy(
+                                                AntrolTaskQueueProcessor.EnqueuePharmacy(
                                                     registration.AppointmentNo, 7,
                                                     new DateTimeOffset(pres.CompleteDateTime.Value).ToUnixTimeMilliseconds());
                                             }

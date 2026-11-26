@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterCustom.Master" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="Temiang.Avicenna.Module.RADT.Bpjs.Antrol.Dashboard" %>
+<%@ Page Language="C#" MasterPageFile="~/MasterPage/MasterCustom.Master" AutoEventWireup="true" CodeBehind="Dashboard.aspx.cs" Inherits="Temiang.Avicenna.Module.RADT.Bpjs.Antrol.Dashboard" %>
 
 <%@ Register Assembly="Telerik.Web.UI" Namespace="Telerik.Web.UI" TagPrefix="telerik" %>
 <%@ Register TagPrefix="cc" Namespace="Temiang.Avicenna.CustomControl" Assembly="Temiang.Avicenna" %>
@@ -78,6 +78,7 @@
             <telerik:RadTab runat="server" Text="Per Bulan" PageViewID="pgRiwayat" />
             <telerik:RadTab runat="server" Text="Belum Dilayani" PageViewID="pgOustanding" />
             <telerik:RadTab runat="server" Text="Antrean Per Tanggal" PageViewID="pgAntreanPerTanggal" />
+            <telerik:RadTab runat="server" Text="Monitoring Task" PageViewID="pgTaskQueue" />
         </Tabs>
     </telerik:RadTabStrip>
     <telerik:RadMultiPage ID="MultiPage1" runat="server" BorderStyle="Solid" BorderColor="Gray">
@@ -532,6 +533,113 @@
             <telerik:RadGrid ID="grdAntreanPerTanggal" runat="server" AutoGenerateColumns="true" ShowGroupPanel="false"
                 AllowSorting="True" GridLines="None" ShowFooter="false">
             </telerik:RadGrid>
+        </telerik:RadPageView>
+        <telerik:RadPageView ID="pgTaskQueue" runat="server">
+            <cc:CollapsePanel ID="pnlTaskQueueFilter" runat="server" Title="Search Filter">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="50%" style="vertical-align: top">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td width="50%" style="vertical-align: top">
+                            <table width="100%">
+                                <tr>
+                                    <td class="label">Tanggal Pelayanan</td>
+                                    <td class="entry">
+                                        <telerik:RadDatePicker ID="txtQueueDate" runat="server" Width="100px" />
+                                    </td>
+                                    <td style="text-align: left"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Nomor Booking</td>
+                                    <td class="entry">
+                                        <telerik:RadTextBox ID="txtQueueBooking" runat="server" Width="300px" MaxLength="50" />
+                                    </td>
+                                    <td style="text-align: left"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td width="50%" style="vertical-align: top">
+                            <table width="100%">
+                                <tr>
+                                    <td class="label">Status</td>
+                                    <td class="entry">
+                                        <telerik:RadComboBox ID="cboQueueStatus" runat="server" Width="300px" AllowCustomText="true" Filter="Contains" MarkFirstMatch="true">
+                                            <Items>
+                                                <telerik:RadComboBoxItem Text="Semua" Value="" />
+                                                <telerik:RadComboBoxItem Text="Menunggu (Pending)" Value="Pending" />
+                                                <telerik:RadComboBoxItem Text="Terkirim (Sent)" Value="Sent" />
+                                                <telerik:RadComboBoxItem Text="Perlu diperiksa (Review)" Value="Review" />
+                                                <telerik:RadComboBoxItem Text="Dilewati (Skipped)" Value="Skipped" />
+                                            </Items>
+                                        </telerik:RadComboBox>
+                                    </td>
+                                    <td style="text-align: left"></td>
+                                </tr>
+                                <tr>
+                                    <td class="label" />
+                                    <td colspan="2">
+                                        <asp:Button ID="btnQueueFilter" runat="server" Text="Filter" OnClick="btnQueueFilter_Click" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <asp:Panel ID="pnlQueueSummary" runat="server" CssClass="info" role="status" aria-live="polite" Style="width: 100%; box-sizing: border-box; margin: 4px 0 0; white-space: normal;">
+                <asp:Label ID="lblQueueSummary" runat="server" Font-Bold="true" />
+            </asp:Panel>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </cc:CollapsePanel>
+
+            <telerik:RadGrid ID="grdTaskQueue" runat="server" AutoGenerateColumns="false"
+                AllowPaging="true" PageSize="25" AllowSorting="true" GridLines="None"
+                OnNeedDataSource="grdTaskQueue_NeedDataSource" OnItemCommand="grdTaskQueue_ItemCommand">
+                <MasterTableView DataKeyNames="Booking,TaskId" GroupsDefaultExpanded="false">
+                    <GroupByExpressions>
+                        <telerik:GridGroupByExpression>
+                            <SelectFields><telerik:GridGroupByField FieldName="Booking" HeaderText="Booking" /></SelectFields>
+                            <GroupByFields><telerik:GridGroupByField FieldName="Booking" /></GroupByFields>
+                        </telerik:GridGroupByExpression>
+                    </GroupByExpressions>
+                    <Columns>
+                        <telerik:GridBoundColumn DataField="Booking" HeaderText="Booking" UniqueName="Booking" />
+                        <telerik:GridBoundColumn DataField="TaskId" HeaderText="Task ID" UniqueName="TaskId" />
+                        <telerik:GridBoundColumn DataField="TaskName" HeaderText="Tahap Pelayanan" UniqueName="TaskName" />
+                        <telerik:GridBoundColumn DataField="EventTime" HeaderText="Waktu Pelayanan (WIB)" DataFormatString="{0:dd/MM/yyyy HH:mm:ss}" UniqueName="EventTime" />
+                        <telerik:GridBoundColumn DataField="Status" HeaderText="Status" UniqueName="Status" />
+                        <telerik:GridBoundColumn DataField="Attempts" HeaderText="Percobaan" UniqueName="Attempts" />
+                        <telerik:GridBoundColumn DataField="RetryTime" HeaderText="Jadwal Retry (WIB)" DataFormatString="{0:dd/MM/yyyy HH:mm:ss}" UniqueName="RetryTime" />
+                        <telerik:GridBoundColumn DataField="Detail" HeaderText="Keterangan" UniqueName="Detail" HtmlEncode="true" />
+                        <telerik:GridButtonColumn CommandName="CheckQueueHistory" Text="Cek Riwayat BPJS" UniqueName="CheckQueueHistory" />
+                    </Columns>
+                </MasterTableView>
+            </telerik:RadGrid>
+            <telerik:RadWindow ID="winQueueHistory" runat="server" Title="Riwayat Task BPJS"
+                Width="950px" Height="450px" Modal="true" VisibleOnPageLoad="false"
+                Behaviors="Close,Move,Resize" KeepInScreenBounds="true" DestroyOnClose="false">
+                <ContentTemplate>
+                    <div style="padding: 10px;">
+                        <asp:Panel ID="pnlQueueHistoryMessage" runat="server" role="status" Style="margin-bottom: 8px;">
+                            <asp:Label ID="lblQueueHistory" runat="server" />
+                        </asp:Panel>
+                        <telerik:RadGrid ID="grdQueueHistory" runat="server" AutoGenerateColumns="false"
+                            GridLines="None" ShowGroupPanel="false">
+                            <MasterTableView>
+                                <Columns>
+                                    <telerik:GridBoundColumn DataField="Taskid" HeaderText="Task ID" UniqueName="Taskid" />
+                                    <telerik:GridBoundColumn DataField="Taskname" HeaderText="Tahap Pelayanan" UniqueName="Taskname" HtmlEncode="true" />
+                                    <telerik:GridBoundColumn DataField="Wakturs" HeaderText="Waktu Pelayanan (WIB)" UniqueName="Wakturs" HtmlEncode="true" />
+                                    <telerik:GridBoundColumn DataField="Waktu" HeaderText="Diterima BPJS (WIB)" UniqueName="Waktu" HtmlEncode="true" />
+                                </Columns>
+                            </MasterTableView>
+                        </telerik:RadGrid>
+                    </div>
+                </ContentTemplate>
+            </telerik:RadWindow>
         </telerik:RadPageView>
     </telerik:RadMultiPage>
 </asp:Content>

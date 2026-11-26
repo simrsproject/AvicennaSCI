@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Temiang.Avicenna.Bridging;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using Temiang.Avicenna.BusinessObject;
@@ -2790,9 +2791,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                             {
                                 if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                                 {
-                                    if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
+                                    if (AntrolTaskQueueProcessor.EmrQueueEnabled)
                                     {
-                                        global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 4, new DateTimeOffset(time).ToUnixTimeMilliseconds());
+                                        AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 4, new DateTimeOffset(time).ToUnixTimeMilliseconds());
                                     }
                                     else
                                     {
@@ -2861,9 +2862,9 @@ namespace Temiang.Avicenna.Module.RADT.Cpoe
                             {
                                 if (!string.IsNullOrWhiteSpace(reg.AppointmentNo))
                                 {
-                                    if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
+                                    if (AntrolTaskQueueProcessor.EmrQueueEnabled)
                                     {
-                                        global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 5, new DateTimeOffset(time).ToUnixTimeMilliseconds());
+                                        AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 5, new DateTimeOffset(time).ToUnixTimeMilliseconds());
                                     }
                                     else
                                     {

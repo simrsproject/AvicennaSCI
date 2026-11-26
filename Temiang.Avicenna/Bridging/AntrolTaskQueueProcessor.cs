@@ -2,19 +2,82 @@ using System;
 using Temiang.Dal.Interfaces;
 using System.Data.SqlClient;
 using System.Linq;
-using BpjsAntrian = global::Temiang.Avicenna.Common.BPJS.Antrian;
+using Temiang.Avicenna.Common;
+using BpjsAntrian = Temiang.Avicenna.Common.BPJS.Antrian;
 
 namespace Temiang.Avicenna.Bridging
 {
 internal static class AntrolTaskQueueProcessor
 {
+    internal static bool QueueEnabled
+    {
+        get
+        {
+            return string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolTaskQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(AppSession.Parameter.HealthcareID, "RSI", StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    internal static string ScheduleManualTask(string booking, int task, long eventMs)
+    {
+        if (string.IsNullOrWhiteSpace(booking) || booking.Trim().Length > 50 || task < 2 || task > 7 || eventMs <= 0)
+            throw new ArgumentException("Data task tidak valid.");
+
+        var info = esConfigSettings.ConnectionInfo;
+        using (var db = new SqlConnection(info.Connections[info.Default].ConnectionString))
+        {
+            db.Open();
+            using (var command = Command(db, @"DECLARE @lock int;
+                EXEC @lock=sys.sp_getapplock @Resource='BpjsAntrolTaskQueue.Worker',
+                    @LockMode='Exclusive',@LockOwner='Session',@LockTimeout=0;
+                IF @lock < 0
+                    THROW 50001,'Worker sedang memproses task. Silakan coba kembali.',1;
+                SELECT Status,EventMs FROM dbo.BpjsAntrolTaskQueue WHERE Booking=@b AND TaskId=@t;", booking.Trim(), task))
+            {
+                string status = null;
+                long originalTime = 0;
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        status = reader.GetString(0);
+                        originalTime = reader.GetInt64(1);
+                    }
+                }
+
+                if (status == "Sent" || status == "Skipped")
+                    return "Task sudah " + status + ". Pengiriman ulang tidak dijadwalkan.";
+                if (status != null && originalTime != eventMs)
+                    return "Task sudah tercatat dengan waktu berbeda. Gunakan waktu pelayanan asli pada Monitoring Task.";
+                if (status == "Pending")
+                    return "Task masih Pending. Worker akan memproses sesuai jadwal retry.";
+
+                using (var save = Command(db, @"IF EXISTS
+                    (SELECT 1 FROM dbo.BpjsAntrolTaskQueue WITH (UPDLOCK,HOLDLOCK) WHERE Booking=@b AND TaskId=@t)
+                    UPDATE dbo.BpjsAntrolTaskQueue SET Status='Pending',DueUtc=SYSUTCDATETIME()
+                    WHERE Booking=@b AND TaskId=@t AND Status='Review';
+                    ELSE
+                    INSERT dbo.BpjsAntrolTaskQueue(Booking,TaskId,EventMs,StartedMs)
+                    VALUES(@b,@t,@time,@time);", booking.Trim(), task))
+                {
+                    save.Parameters.Add("@time", System.Data.SqlDbType.BigInt).Value = eventMs;
+                    using (var transaction = db.BeginTransaction(System.Data.IsolationLevel.Serializable))
+                    {
+                        save.Transaction = transaction;
+                        save.ExecuteNonQuery();
+                        transaction.Commit();
+                    }
+                }
+                return "Task dijadwalkan melalui queue. Worker akan memeriksa riwayat BPJS sebelum mengirim.";
+            }
+        }
+    }
     internal static bool EmrQueueEnabled
     {
         get
         {
             return string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolEmrQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
-                && string.Equals(System.Configuration.ConfigurationManager.AppSettings["BpjsAntrolTaskQueueEnabled"], "true", StringComparison.OrdinalIgnoreCase)
-                && string.Equals(global::Temiang.Avicenna.Common.AppSession.Parameter.HealthcareID, "RSI", StringComparison.OrdinalIgnoreCase);
+                && QueueEnabled;
         }
     }
 

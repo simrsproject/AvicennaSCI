@@ -1,3 +1,4 @@
+using Temiang.Avicenna.Bridging;
 using System;
 using Temiang.Avicenna.BusinessObject;
 using Temiang.Avicenna.Common;
@@ -511,9 +512,9 @@ namespace Temiang.Avicenna.Module.Charges
 
                                         if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                                         {
-                                            if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
+                                            if (AntrolTaskQueueProcessor.PharmacyQueueEnabled)
                                             {
-                                                global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueuePharmacy(
+                                                AntrolTaskQueueProcessor.EnqueuePharmacy(
                                                     reg.AppointmentNo, 7, DateTimeOffset.Now.ToUnixTimeMilliseconds());
                                             }
                                             else
@@ -544,7 +545,7 @@ namespace Temiang.Avicenna.Module.Charges
                                     }
                                     catch (Exception ex)
                                     {
-                                        if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled) throw;
+                                        if (AntrolTaskQueueProcessor.PharmacyQueueEnabled) throw;
 
                                     }
                                 }

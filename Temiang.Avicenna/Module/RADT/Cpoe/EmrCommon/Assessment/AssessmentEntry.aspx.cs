@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Temiang.Avicenna.Bridging;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -2472,9 +2473,9 @@ WHEN NOT MATCHED THEN
                 {
                     if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                     {
-                        if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
+                        if (AntrolTaskQueueProcessor.EmrQueueEnabled)
                         {
-                            global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 4, Convert.ToInt64(ViewState["task4_emr"]));
+                            AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 4, Convert.ToInt64(ViewState["task4_emr"]));
                         }
                         else
                         {
@@ -2542,9 +2543,9 @@ WHEN NOT MATCHED THEN
                 {
                     if (!string.IsNullOrWhiteSpace(reg.AppointmentNo))
                     {
-                        if (global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EmrQueueEnabled)
+                        if (AntrolTaskQueueProcessor.EmrQueueEnabled)
                         {
-                            global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 5, assessmentSavedAt.ToUnixTimeMilliseconds());
+                            AntrolTaskQueueProcessor.EnqueueAttendance(reg.AppointmentNo, 5, assessmentSavedAt.ToUnixTimeMilliseconds());
                         }
                         else
                         {

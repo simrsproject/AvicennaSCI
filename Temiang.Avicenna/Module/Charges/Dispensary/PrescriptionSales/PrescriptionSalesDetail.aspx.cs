@@ -1,3 +1,4 @@
+using Temiang.Avicenna.Bridging;
 using System;
 using System.Linq;
 using System.Text;
@@ -3669,11 +3670,11 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         }
                     }
                     if (Helper.IsBpjsAntrolIntegration
-                        && global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled
+                        && AntrolTaskQueueProcessor.PharmacyQueueEnabled
                         && !string.IsNullOrWhiteSpace(reg.AppointmentNo)
                         && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                     {
-                        global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.EnqueuePharmacy(
+                        AntrolTaskQueueProcessor.EnqueuePharmacy(
                             reg.AppointmentNo, 6, DateTimeOffset.Now.ToUnixTimeMilliseconds());
                     }
                     /* Automatic Journal Testing End */
@@ -3683,7 +3684,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                         {
                             if (!string.IsNullOrWhiteSpace(reg.AppointmentNo) && reg.SRRegistrationType != AppConstant.RegistrationType.InPatient)
                             {
-                                if (!global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
+                                if (!AntrolTaskQueueProcessor.PharmacyQueueEnabled)
                                 {
                                     var log = new WebServiceAPILog();
                                     log.DateRequest = DateTime.Now;
@@ -3783,7 +3784,7 @@ Sys.Application.add_load(OpenAddNewRecordGrid);
                                     log.Response = JsonConvert.SerializeObject(response);
                                     log.Save();
                                 }
-                                if (!global::Temiang.Avicenna.Bridging.AntrolTaskQueueProcessor.PharmacyQueueEnabled)
+                                if (!AntrolTaskQueueProcessor.PharmacyQueueEnabled)
                                 {
                                     var log = new WebServiceAPILog();
                                     log.DateRequest = DateTime.Now;
