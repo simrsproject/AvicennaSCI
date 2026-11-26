@@ -141,7 +141,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 par.ParamedicID,
                 par.ParamedicName,
                 par.Email,
+                reg.TilakaRegistrationID,
                 reg.TilakaName,
+                reg.RegistrationState,
+                reg.RegistrationRequestID,
+                reg.RegistrationDateTime,
+                reg.KycStatus,
+                reg.ManualRegistrationStatus,
+                reg.DateExpire,
                 reg.CertificateStatus,
                 reg.CertificateExpiryDate,
                 reg.CertificateDataStatus,
@@ -154,70 +161,82 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
                 par.Where(par.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
 
-            int certificateStatusFilter;
-            if (int.TryParse(cboCertificateStatus.SelectedValue, out certificateStatusFilter))
-            {
-                if (certificateStatusFilter == TilakaConstant.CertificateStatus.None)
-                    par.Where(par.Or(
-                        reg.CertificateStatus.IsNull(),
-                        reg.CertificateStatus == TilakaConstant.CertificateStatus.None));
-                else
-                    par.Where(reg.CertificateStatus == certificateStatusFilter);
-            }
-
-            par.es.Top = AppSession.Parameter.MaxResultRecord;
             par.OrderBy(par.ParamedicName.Ascending);
 
             var table = par.LoadDataTable();
             table.Columns.Add("CertificateStatusText", typeof(string));
+            table.Columns.Add("CertificateStatusColor", typeof(string));
+            table.Columns.Add("StatusCode", typeof(int));
+            table.Columns.Add("StatusValue", typeof(string));
             table.Columns.Add("QuickSignStatus", typeof(string));
+            table.Columns.Add("QuickSignStatusColor", typeof(string));
             table.Columns.Add("CanRegister", typeof(bool));
 
+            var now = DateTime.Now;
             foreach (DataRow row in table.Rows)
             {
                 var isRegistered = row["IsQuickSignUser"] != DBNull.Value && Convert.ToBoolean(row["IsQuickSignUser"]);
-                var certificate = row["CertificateStatus"] == DBNull.Value
-                    ? 0
-                    : Convert.ToInt32(row["CertificateStatus"]);
-                var expiryDate = row["CertificateExpiryDate"] == DBNull.Value
-                    ? (DateTime?)null
-                    : Convert.ToDateTime(row["CertificateExpiryDate"]);
-                var certificateDataStatus = Convert.ToString(row["CertificateDataStatus"]);
-                var certificateActive = certificate == TilakaConstant.CertificateStatus.Active
-                    && !string.Equals(certificateDataStatus,
-                        TilakaConstant.CertificateDataStatus.Revoke,
-                        StringComparison.OrdinalIgnoreCase)
-                    && (!expiryDate.HasValue || expiryDate.Value >= DateTime.Now);
+                var record = BuildRecord(row);
+                var state = row["TilakaRegistrationID"] == DBNull.Value
+                    ? TilakaRegistrationState.BelumTerdaftar
+                    : TilakaRegistrationState.Evaluate(record, now);
+                var status = TilakaStatusPresentation.RegistrationState(state);
 
-                row["CertificateStatusText"] = CertificateStatusText(certificate);
+                row["CertificateStatusText"] = status.Text;
+                row["CertificateStatusColor"] = status.Color;
+                row["StatusCode"] = status.Code;
+                row["StatusValue"] = state;
                 row["QuickSignStatus"] = isRegistered ? "Terdaftar" : "Belum terdaftar";
-                row["CanRegister"] = !isRegistered && certificateActive;
+                row["QuickSignStatusColor"] = TilakaStatusPresentation.QuickSignStatusColor(isRegistered);
+                row["CanRegister"] = !isRegistered && TilakaRegistrationState.IsCertificateActive(record, now);
+            }
 
-                if (!string.IsNullOrWhiteSpace(cboStatus.SelectedValue) && cboStatus.SelectedValue == "1" && !isRegistered)
-                    row.Delete();
-                else if (!string.IsNullOrWhiteSpace(cboStatus.SelectedValue) && cboStatus.SelectedValue == "0" && isRegistered)
-                    row.Delete();
+            int certificateStatusFilter;
+            var filterCertificateStatus = int.TryParse(cboCertificateStatus.SelectedValue, out certificateStatusFilter);
+            var filterQuickSign = !string.IsNullOrWhiteSpace(cboStatus.SelectedValue);
+
+            if (filterCertificateStatus || filterQuickSign)
+            {
+                foreach (DataRow row in table.Rows)
+                {
+                    var isRegistered = row["IsQuickSignUser"] != DBNull.Value
+                                       && Convert.ToBoolean(row["IsQuickSignUser"]);
+                    var remove = filterCertificateStatus
+                                 && Convert.ToInt32(row["StatusCode"]) != certificateStatusFilter;
+                    remove = remove
+                             || (filterQuickSign && cboStatus.SelectedValue == "1" && !isRegistered)
+                             || (filterQuickSign && cboStatus.SelectedValue == "0" && isRegistered);
+
+                    if (remove) row.Delete();
+                }
             }
 
             table.AcceptChanges();
             return table;
         }
 
-        private static string CertificateStatusText(int status)
+        private static TilakaRegistrationRecord BuildRecord(DataRow row)
         {
-            string name;
-
-            switch (status)
+            return new TilakaRegistrationRecord
             {
-                case TilakaConstant.CertificateStatus.None: name = "Belum ada"; break;
-                case TilakaConstant.CertificateStatus.InVerification: name = "Menunggu Verifikasi"; break;
-                case TilakaConstant.CertificateStatus.Registered: name = "Sertifikat Terbit"; break;
-                case TilakaConstant.CertificateStatus.Active: name = "Aktif"; break;
-                case TilakaConstant.CertificateStatus.Rejected: name = "Ditolak"; break;
-                default: name = "Tidak diketahui"; break;
-            }
-
-            return status + " - " + name;
+                RegistrationState = Convert.ToString(row["RegistrationState"]),
+                RegistrationRequestID = Convert.ToString(row["RegistrationRequestID"]),
+                RegistrationDateTime = row["RegistrationDateTime"] == DBNull.Value
+                    ? (DateTime?)null
+                    : Convert.ToDateTime(row["RegistrationDateTime"]),
+                KycStatus = Convert.ToString(row["KycStatus"]),
+                ManualRegistrationStatus = Convert.ToString(row["ManualRegistrationStatus"]),
+                DateExpire = row["DateExpire"] == DBNull.Value
+                    ? (DateTime?)null
+                    : Convert.ToDateTime(row["DateExpire"]),
+                CertificateStatus = row["CertificateStatus"] == DBNull.Value
+                    ? (int?)null
+                    : Convert.ToInt32(row["CertificateStatus"]),
+                CertificateExpiryDate = row["CertificateExpiryDate"] == DBNull.Value
+                    ? (DateTime?)null
+                    : Convert.ToDateTime(row["CertificateExpiryDate"]),
+                CertificateDataStatus = Convert.ToString(row["CertificateDataStatus"])
+            };
         }
     }
 }

@@ -200,12 +200,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 query.ParamedicID.Ascending);
 
             var table = query.LoadDataTable();
+            table.Columns.Add("StatusValue", typeof(string));
             table.Columns.Add("StatusText", typeof(string));
+            table.Columns.Add("StatusColor", typeof(string));
             foreach (DataRow row in table.Rows)
             {
                 if (row["TilakaRegistrationID"] == DBNull.Value)
                 {
-                    row["StatusText"] = TilakaRegistrationState.BelumTerdaftar;
+                    SetStatus(row, TilakaRegistrationState.BelumTerdaftar);
                     continue;
                 }
 
@@ -230,19 +232,27 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                         : Convert.ToDateTime(row["DateExpire"])
                 };
 
-                row["StatusText"] = TilakaRegistrationState.Evaluate(record, DateTime.Now);
+                SetStatus(row, TilakaRegistrationState.Evaluate(record, DateTime.Now));
             }
 
             if (!string.IsNullOrWhiteSpace(cboState.SelectedValue))
             {
                 var filtered = table.Clone();
                 foreach (DataRow row in table.Rows)
-                    if (Convert.ToString(row["StatusText"]) == cboState.SelectedValue)
+                    if (Convert.ToString(row["StatusValue"]) == cboState.SelectedValue)
                         filtered.ImportRow(row);
                 table = filtered;
             }
 
             return table;
+        }
+
+        private static void SetStatus(DataRow row, string state)
+        {
+            var status = TilakaStatusPresentation.RegistrationState(state);
+            row["StatusValue"] = state;
+            row["StatusText"] = status.Text;
+            row["StatusColor"] = status.Color;
         }
     }
 }

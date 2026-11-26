@@ -52,20 +52,21 @@
                 <td width="50%" style="vertical-align: top">
                     <table width="100%">
                         <tr>
-                            <td class="label">Status</td>
+                            <td class="label">Sertifikat Status</td>
                             <td class="entry">
                                 <telerik:RadComboBox ID="cboState" runat="server" Width="300px" AllowCustomText="false">
                                     <Items>
                                         <telerik:RadComboBoxItem Text="(Semua)" Value="" />
-                                        <telerik:RadComboBoxItem Text="Belum terdaftar" Value="BelumTerdaftar" />
-                                        <telerik:RadComboBoxItem Text="Menunggu KYC" Value="MenungguKyc" />
-                                        <telerik:RadComboBoxItem Text="KYC gagal" Value="KycGagal" />
-                                        <telerik:RadComboBoxItem Text="Menunggu verifikasi" Value="MenungguVerifikasi" />
-                                        <telerik:RadComboBoxItem Text="Sertifikat terbit" Value="SertifikatTerbit" />
-                                        <telerik:RadComboBoxItem Text="Aktif" Value="Aktif" />
-                                        <telerik:RadComboBoxItem Text="Ditolak" Value="Ditolak" />
-                                        <telerik:RadComboBoxItem Text="Dicabut" Value="Dicabut" />
-                                        <telerik:RadComboBoxItem Text="Kedaluwarsa" Value="Kedaluwarsa" />
+                                        <telerik:RadComboBoxItem Text="0 - Belum Terdaftar" Value="BelumTerdaftar" />
+                                        <telerik:RadComboBoxItem Text="1 - Menunggu KYC" Value="MenungguKyc" />
+                                        <telerik:RadComboBoxItem Text="2 - Menunggu Verifikasi" Value="MenungguVerifikasi" />
+                                        <telerik:RadComboBoxItem Text="3 - Sertifikat Terbit" Value="SertifikatTerbit" />
+                                        <telerik:RadComboBoxItem Text="4 - Aktif" Value="Aktif" />
+                                        <telerik:RadComboBoxItem Text="5 - KYC Gagal" Value="KycGagal" />
+                                        <telerik:RadComboBoxItem Text="6 - Ditolak" Value="Ditolak" />
+                                        <telerik:RadComboBoxItem Text="7 - Dicabut" Value="Dicabut" />
+                                        <telerik:RadComboBoxItem Text="8 - Kedaluwarsa" Value="Kedaluwarsa" />
+                                        <telerik:RadComboBoxItem Text="9 - UUID Terbit" Value="UuidTerbit" />
                                     </Items>
                                 </telerik:RadComboBox>
                             </td>
@@ -98,7 +99,11 @@
                 <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ID" UniqueName="ParamedicID" />
                 <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="NamaKTP" HeaderText="Nama KTP" UniqueName="NamaKTP" />
-                <telerik:GridBoundColumn DataField="StatusText" HeaderText="Status" UniqueName="StatusText" />
+                <telerik:GridTemplateColumn HeaderText="Sertifikat Status" UniqueName="StatusText">
+                    <ItemTemplate>
+                        <span style='<%# "color:" + Eval("StatusColor") + ";" %>'><%# Eval("StatusText") %></span>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridBoundColumn DataField="TilakaName" HeaderText="Tilaka Name" UniqueName="TilakaName" />
                 <telerik:GridBoundColumn DataField="LastCheckedDateTime" HeaderText="Cek Terakhir"
                     DataFormatString="{0:dd-MM-yyyy HH:mm}" UniqueName="LastCheckedDateTime" />

@@ -74,11 +74,16 @@
                                 <telerik:RadComboBox ID="cboCertificateStatus" runat="server" Width="300px" AllowCustomText="false">
                                     <Items>
                                         <telerik:RadComboBoxItem Text="(Semua)" Value="" />
-                                        <telerik:RadComboBoxItem Text="0 - Belum ada" Value="0" />
-                                        <telerik:RadComboBoxItem Text="1 - Menunggu Verifikasi" Value="1" />
-                                        <telerik:RadComboBoxItem Text="2 - Sertifikat Terbit" Value="2" />
-                                        <telerik:RadComboBoxItem Text="3 - Aktif" Value="3" />
-                                        <telerik:RadComboBoxItem Text="4 - Ditolak" Value="4" />
+                                        <telerik:RadComboBoxItem Text="0 - Belum Terdaftar" Value="0" />
+                                        <telerik:RadComboBoxItem Text="1 - Menunggu KYC" Value="1" />
+                                        <telerik:RadComboBoxItem Text="2 - Menunggu Verifikasi" Value="2" />
+                                        <telerik:RadComboBoxItem Text="3 - Sertifikat Terbit" Value="3" />
+                                        <telerik:RadComboBoxItem Text="4 - Aktif" Value="4" />
+                                        <telerik:RadComboBoxItem Text="5 - KYC Gagal" Value="5" />
+                                        <telerik:RadComboBoxItem Text="6 - Ditolak" Value="6" />
+                                        <telerik:RadComboBoxItem Text="7 - Dicabut" Value="7" />
+                                        <telerik:RadComboBoxItem Text="8 - Kedaluwarsa" Value="8" />
+                                        <telerik:RadComboBoxItem Text="9 - UUID Terbit" Value="9" />
                                     </Items>
                                 </telerik:RadComboBox>
                             </td>
@@ -106,8 +111,16 @@
                 <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="Email" HeaderText="Email" UniqueName="Email" />
                 <telerik:GridBoundColumn DataField="TilakaName" HeaderText="Tilaka Name" UniqueName="TilakaName" />
-                <telerik:GridBoundColumn DataField="CertificateStatusText" HeaderText="Sertifikat Status" UniqueName="CertificateStatusText" />
-                <telerik:GridBoundColumn DataField="QuickSignStatus" HeaderText="Quick Sign" UniqueName="QuickSignStatus" />
+                <telerik:GridTemplateColumn HeaderText="Sertifikat Status" UniqueName="CertificateStatusText">
+                    <ItemTemplate>
+                        <span style='<%# "color:" + Eval("CertificateStatusColor") + ";" %>'><%# Eval("CertificateStatusText") %></span>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
+                <telerik:GridTemplateColumn HeaderText="Quick Sign" UniqueName="QuickSignStatus">
+                    <ItemTemplate>
+                        <span style='<%# "color:" + Eval("QuickSignStatusColor") + ";" %>'><%# Eval("QuickSignStatus") %></span>
+                    </ItemTemplate>
+                </telerik:GridTemplateColumn>
                 <telerik:GridBoundColumn DataField="QuickSignRegisteredDateTime" HeaderText="Register Time"
                     DataFormatString="{0:dd-MM-yyyy HH:mm}" UniqueName="QuickSignRegisteredDateTime" />
                 <telerik:GridBoundColumn DataField="QuickSignLastErrorMessage" HeaderText="Error" UniqueName="QuickSignLastErrorMessage" />
