@@ -21,6 +21,7 @@ namespace Temiang.Avicenna.Common.Tilaka
                 BaseUrl = liteBaseUrl,
                 LiteBaseUrl = liteBaseUrl,
                 AuthBaseUrl = source.BaseUrl,
+                CloudBaseUrl = source.BaseUrl,
                 AuthPath = source.AuthPath,
                 ChannelId = source.ChannelId,
                 ChannelSecret = source.ChannelSecret,

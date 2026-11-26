@@ -8,6 +8,8 @@ langkah di bawah belum bisa dijalankan.
 
 - [ ] `TilakaLiteBaseUrl` terisi dan dapat diakses dari server Avicenna.
 - [ ] Auth Quick Sign memakai `TilakaBaseUrl` + `TilakaAuthPath` (cloud), bukan endpoint `/auth` milik `tilaka-lite`.
+- [ ] Endpoint admin (`addquicksignusers`, `quicksign-addtemplates`, `quicksign-authsessions`) memakai cloud `TilakaBaseUrl`.
+- [ ] Endpoint dokumen (`/api/v1/upload`, `/api/v1/requestquicksign`, `/api/v1/checksignstatus`, `/getpresignurl`) memakai `TilakaLiteBaseUrl`.
 - [ ] Channel id/secret Quick Sign valid untuk auth cloud dan endpoint lite.
 - [ ] Folder `C:\Tilaka\TemplateSign` dan `C:\Tilaka\Signed` dibuat; app pool punya Modify.
 - [ ] SQL `07.CREATE_TABLE_TilakaTemplateSignFile.sql` dan `08.INSERT_INTO_AppProgram_TilakaQuickSign.sql` sudah dijalankan.

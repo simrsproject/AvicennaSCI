@@ -13,6 +13,7 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         public string BaseUrl { get; set; }
         public string AuthBaseUrl { get; set; }
+        public string CloudBaseUrl { get; set; }
         public string AuthPath { get; set; }
         public string ChannelId { get; set; }
         public string ChannelSecret { get; set; }
@@ -51,6 +52,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             BaseUrl = GetString("TilakaBaseUrl", DefaultBaseUrl).TrimEnd('/');
             AuthBaseUrl = BaseUrl;
+            CloudBaseUrl = BaseUrl;
             AuthPath = GetString("TilakaAuthPath", "/auth");
             ChannelId = GetString("TilakaChannelId", string.Empty);
             ChannelSecret = GetString("TilakaChannelSecret", string.Empty);

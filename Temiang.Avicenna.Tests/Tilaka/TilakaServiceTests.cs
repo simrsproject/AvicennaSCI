@@ -139,9 +139,12 @@ namespace Temiang.Avicenna.Tests.Tilaka
 
             Assert.AreEqual("http://10.200.200.15:8088", service.Config.BaseUrl);
             Assert.AreEqual("https://sb-api.tilaka.id", service.Config.AuthBaseUrl);
+            Assert.AreEqual("https://sb-api.tilaka.id", service.Config.CloudBaseUrl);
             Assert.AreEqual("/auth", service.Config.AuthPath);
             Assert.AreEqual("http://10.200.200.15:8088/api/v1/upload",
                 TilakaQuickSignUrls.Upload(service.Config));
+            Assert.AreEqual("https://sb-api.tilaka.id/addquicksignusers",
+                TilakaQuickSignUrls.AddUsers(service.Config));
         }
 
         [TestMethod]

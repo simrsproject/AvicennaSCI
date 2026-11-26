@@ -12,6 +12,40 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
+        public void QuickSignAdminEndpoints_UseCloudBase()
+        {
+            var config = new TilakaConfig
+            {
+                LiteBaseUrl = "http://lite:8088",
+                CloudBaseUrl = "https://sb-api.tilaka.id"
+            };
+
+            Assert.AreEqual("https://sb-api.tilaka.id/addquicksignusers",
+                TilakaQuickSignUrls.AddUsers(config));
+            Assert.AreEqual("https://sb-api.tilaka.id/quicksign-addtemplates",
+                TilakaQuickSignUrls.AddTemplates(config));
+            StringAssert.StartsWith(TilakaQuickSignUrls.AuthSessions(config, "", "", 1, 25),
+                "https://sb-api.tilaka.id/quicksign-authsessions");
+        }
+
+        [TestMethod]
+        public void QuickSignLiteEndpoints_UseLiteBase()
+        {
+            var config = new TilakaConfig
+            {
+                LiteBaseUrl = "http://lite:8088",
+                CloudBaseUrl = "https://sb-api.tilaka.id"
+            };
+
+            Assert.AreEqual("http://lite:8088/api/v1/upload",
+                TilakaQuickSignUrls.Upload(config));
+            Assert.AreEqual("http://lite:8088/api/v1/requestquicksign",
+                TilakaQuickSignUrls.RequestSign(config));
+            Assert.AreEqual("http://lite:8088/api/v1/checksignstatus",
+                TilakaQuickSignUrls.CheckSignStatus(config));
+        }
+
+        [TestMethod]
         public void Auth_UsesAuthBaseUrlWhenConfigured()
         {
             var config = Config();

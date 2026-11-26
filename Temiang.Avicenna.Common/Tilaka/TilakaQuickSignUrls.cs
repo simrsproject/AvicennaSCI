@@ -27,18 +27,18 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         public static string AddUsers(TilakaConfig config)
         {
-            return Base(config) + "/addquicksignusers";
+            return AdminBase(config) + "/addquicksignusers";
         }
 
         public static string AddTemplates(TilakaConfig config)
         {
-            return Base(config) + "/quicksign-addtemplates";
+            return AdminBase(config) + "/quicksign-addtemplates";
         }
 
         public static string AuthSessions(TilakaConfig config, string email, string authStatus,
             int pageNumber, int limit)
         {
-            var builder = new StringBuilder(Base(config) + "/quicksign-authsessions?page_number=" +
+            var builder = new StringBuilder(AdminBase(config) + "/quicksign-authsessions?page_number=" +
                                            pageNumber.ToString(CultureInfo.InvariantCulture) +
                                            "&limit=" + limit.ToString(CultureInfo.InvariantCulture));
             if (!string.IsNullOrWhiteSpace(email))
@@ -51,6 +51,14 @@ namespace Temiang.Avicenna.Common.Tilaka
         public static string Base(TilakaConfig config)
         {
             return (config.LiteBaseUrl ?? string.Empty).TrimEnd('/');
+        }
+
+        public static string AdminBase(TilakaConfig config)
+        {
+            var baseUrl = string.IsNullOrWhiteSpace(config.CloudBaseUrl)
+                ? config.BaseUrl
+                : config.CloudBaseUrl;
+            return (baseUrl ?? string.Empty).TrimEnd('/');
         }
     }
 }

@@ -168,7 +168,11 @@
   </table>
   <div class="note">
     Auth Quick Sign tetap memakai <code>TilakaBaseUrl</code> + <code>TilakaAuthPath</code>
-    (cloud <code>/auth</code>), sedangkan endpoint Quick Sign memakai
+    (cloud <code>/auth</code>). Endpoint admin (<code>/addquicksignusers</code>,
+    <code>/quicksign-addtemplates</code>, <code>/quicksign-authsessions</code>) juga memakai
+    cloud <code>TilakaBaseUrl</code>, sedangkan endpoint dokumen
+    (<code>/api/v1/upload</code>, <code>/api/v1/requestquicksign</code>,
+    <code>/api/v1/checksignstatus</code>, <code>/getpresignurl</code>) memakai
     <code>TilakaLiteBaseUrl</code>. <code>TilakaLiteAuthPath</code> sudah tidak digunakan.
   </div>
 
