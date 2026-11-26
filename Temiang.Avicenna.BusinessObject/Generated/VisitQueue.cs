@@ -2076,6 +2076,7 @@ namespace Temiang.Avicenna.BusinessObject
             // =========================================
             // OPTIONAL FILTERS
             // =========================================
+            // Jika status kosong, tampilkan semua status
             if (!string.IsNullOrWhiteSpace(status))
             {
                 query.Where(query.Status == status);
@@ -2102,10 +2103,12 @@ namespace Temiang.Avicenna.BusinessObject
             }
 
             // =========================================
-            // ORDER + TOP
+            // ORDER
             // =========================================
             query.OrderBy(query.QueueSequence.Ascending);
-            query.es.Top = 50;
+
+            // Tidak menggunakan Top 50
+            // Semua data sesuai filter akan ditampilkan
 
             collection.Load(query);
 
@@ -2132,6 +2135,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.ServiceUnitID,
                     x.CategoryID,
                     x.RecallCount,
+                    x.QueueSequence,
 
                     ServiceUnitName =
                         serviceUnits
@@ -2142,13 +2146,12 @@ namespace Temiang.Avicenna.BusinessObject
 
                     x.ParamedicID,
 
-
                     ParamedicName =
                         paramedics
                             .FirstOrDefault(p =>
                                 p.ParamedicID == x.ParamedicID
                             )
-                            ?.ParamedicName,
+                            ?.ParamedicName
                 })
                 .ToList();
         }
