@@ -13,9 +13,14 @@ namespace Temiang.Avicenna.Tests.Tilaka
             public string LastJsonBody;
             public string LastBearer;
             public string JsonResponse = "{\"success\":true,\"message\":\"Success\",\"data\":[\"uuid-1\"]}";
+            public bool FailPostForm;
 
             public TilakaTransportResult PostForm(string url, IDictionary<string, string> form, int timeoutSeconds)
             {
+                if (FailPostForm)
+                    throw new TilakaTransportException(
+                        "The remote server returned an error: (401) Unauthorized.", 401, string.Empty);
+
                 return new TilakaTransportResult
                 {
                     StatusCode = 200,
@@ -40,6 +45,22 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 byte[] content, string contentType, string bearerToken, int timeoutSeconds)
             {
                 return new TilakaTransportResult { StatusCode = 200, Body = "{}" };
+            }
+        }
+
+        private class CapturingLogger : ITilakaLogger
+        {
+            public string Operation;
+            public string Request;
+            public string Response;
+            public long ElapsedMs;
+
+            public void Log(string operation, string requestBody, string responseBody, long elapsedMs)
+            {
+                Operation = operation;
+                Request = requestBody;
+                Response = responseBody;
+                ElapsedMs = elapsedMs;
             }
         }
 
@@ -101,6 +122,38 @@ namespace Temiang.Avicenna.Tests.Tilaka
             StringAssert.Contains(transport.LastJsonBody, "\"registration_id\":\"uuid-1\"");
             Assert.IsFalse(transport.LastJsonBody.Contains("nationality_type"));
         }
+        [TestMethod]
+        public void GetAccessToken_LogsAuthSuccessWithoutSecret()
+        {
+            var logger = new CapturingLogger();
+            var service = new Temiang.Avicenna.Common.Tilaka.Service(
+                Config(), new FakeTransport(), logger);
+
+            service.GetAccessToken();
+
+            StringAssert.StartsWith(logger.Operation, "Auth ");
+            StringAssert.Contains(logger.Operation, "/auth");
+            StringAssert.Contains(logger.Response, "[HTTP 200]");
+            Assert.IsFalse(logger.Request.Contains("client_secret=secret"));
+            StringAssert.Contains(logger.Request, "client_secret=[redacted]");
+        }
+
+        [TestMethod]
+        public void GetAccessToken_LogsAuthFailureAs401()
+        {
+            var logger = new CapturingLogger();
+            var transport = new FakeTransport { FailPostForm = true };
+            var service = new Temiang.Avicenna.Common.Tilaka.Service(
+                Config(), transport, logger);
+
+            Assert.ThrowsException<TilakaTransportException>(() => service.GetAccessToken());
+
+            StringAssert.StartsWith(logger.Operation, "Auth ");
+            StringAssert.Contains(logger.Response, "[HTTP 401]");
+            Assert.IsFalse(logger.Request.Contains("client_secret=secret"));
+            StringAssert.Contains(logger.Request, "client_secret=[redacted]");
+        }
+
         [TestMethod]
         public void IsOk_UsesCertificateMessageInfoWhenBaseMessageEmpty()
         {

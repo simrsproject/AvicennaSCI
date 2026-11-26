@@ -28,5 +28,15 @@ namespace Temiang.Avicenna.Tests.Tilaka
             var masked = WebServiceApiLogger.Mask("{\"access_token\":\"secret-token\"}");
             Assert.IsFalse(masked.Contains("secret-token"));
         }
+
+        [TestMethod]
+        public void Mask_HidesFormClientSecret()
+        {
+            var masked = WebServiceApiLogger.Mask(
+                "client_id=chan&grant_type=client_credentials&client_secret=secret-value");
+
+            Assert.IsFalse(masked.Contains("secret-value"));
+            StringAssert.Contains(masked, "[redacted]");
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 
@@ -44,7 +45,36 @@ namespace Temiang.Avicenna.Common.Tilaka
                 { "client_secret", _config.ChannelSecret }
             };
 
-            var result = _transport.PostForm(TilakaUrls.Auth(_config), form, _config.TimeoutSeconds);
+            var authUrl = TilakaUrls.Auth(_config);
+            var stopwatch = Stopwatch.StartNew();
+
+            TilakaTransportResult result;
+            try
+            {
+                result = _transport.PostForm(authUrl, form, _config.TimeoutSeconds);
+                stopwatch.Stop();
+
+                WriteLog("Auth " + authUrl, BuildSafeAuthForm(form),
+                    "[HTTP " + result.StatusCode + "] " + result.Body,
+                    stopwatch.ElapsedMilliseconds);
+            }
+            catch (TilakaTransportException ex)
+            {
+                stopwatch.Stop();
+                WriteLog("Auth " + authUrl, BuildSafeAuthForm(form),
+                    "[HTTP " + ex.StatusCode + "] " + ex.ResponseBody,
+                    stopwatch.ElapsedMilliseconds);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                WriteLog("Auth " + authUrl, BuildSafeAuthForm(form),
+                    "[ERROR] " + ex.Message,
+                    stopwatch.ElapsedMilliseconds);
+                throw;
+            }
+
             if (result.StatusCode != 200 || string.IsNullOrWhiteSpace(result.Body))
                 throw new InvalidOperationException("Gagal mendapatkan access token Tilaka. HTTP " + result.StatusCode);
 
@@ -68,6 +98,13 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
 
             return token;
+        }
+
+        private static string BuildSafeAuthForm(IDictionary<string, string> form)
+        {
+            return "client_id=" + Uri.EscapeDataString(form["client_id"] ?? string.Empty) +
+                   "&grant_type=" + Uri.EscapeDataString(form["grant_type"] ?? string.Empty) +
+                   "&client_secret=[redacted]";
         }
 
         private void InvalidateToken()

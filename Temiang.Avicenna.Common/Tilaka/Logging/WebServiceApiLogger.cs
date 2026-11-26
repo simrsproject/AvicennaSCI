@@ -22,6 +22,10 @@ namespace Temiang.Avicenna.Common.Tilaka
             "(\"(access_token|client_secret|refresh_token)\"\\s*:\\s*)\"[^\"]*\"",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
+        private static readonly Regex FormSecretPattern = new Regex(
+            "(client_secret|password)=([^&\\s]+)",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private readonly TilakaConfig _config;
 
         public WebServiceApiLogger(TilakaConfig config)
@@ -56,6 +60,7 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (string.IsNullOrEmpty(json)) return json;
 
             json = TokenPattern.Replace(json, m => m.Groups[1].Value + "\"[redacted]\"");
+            json = FormSecretPattern.Replace(json, m => m.Groups[1].Value + "=[redacted]");
             json = Base64Pattern.Replace(json, m => m.Groups[1].Value + "\"[base64]\"");
             json = NikPattern.Replace(json, m =>
             {
