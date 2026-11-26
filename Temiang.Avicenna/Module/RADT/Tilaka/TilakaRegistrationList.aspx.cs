@@ -195,6 +195,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     query.ParamedicName.Like(keyword)));
             }
 
+            var emailKeyword = txtEmail.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(emailKeyword))
+                query.Where(query.Email.Like("%" + emailKeyword + "%"));
+
+            var tilakaNameKeyword = txtTilakaName.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(tilakaNameKeyword))
+                query.Where(tilaka.TilakaName.Like("%" + tilakaNameKeyword + "%"));
+
             query.OrderBy(
                 query.ParamedicName.Ascending,
                 query.ParamedicID.Ascending);

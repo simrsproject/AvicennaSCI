@@ -12,6 +12,11 @@
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterEmail">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="btnFilterStatus">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
@@ -43,6 +48,17 @@
                             </td>
                             <td style="text-align: left">
                                 <asp:ImageButton ID="btnFilterParamedic" runat="server"
+                                    ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Email</td>
+                            <td class="entry">
+                                <telerik:RadTextBox ID="txtEmail" runat="server" Width="300px" />
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterEmail" runat="server"
                                     ImageUrl="~/Images/Toolbar/search16.png"
                                     OnClick="btnFilter_Click" ToolTip="Search" />
                             </td>

@@ -42,6 +42,15 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::Telerik.Web.UI.RadTextBox txtParamedicName;
 
         /// <summary>
+        /// txtEmail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadTextBox txtEmail;
+
+        /// <summary>
         /// btnFilterParamedic control.
         /// </summary>
         /// <remarks>
@@ -49,6 +58,15 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.ImageButton btnFilterParamedic;
+
+        /// <summary>
+        /// btnFilterEmail control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterEmail;
 
         /// <summary>
         /// cboStatus control.

@@ -161,6 +161,9 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
                 par.Where(par.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
 
+            if (!string.IsNullOrWhiteSpace(txtEmail.Text))
+                par.Where(par.Email.Like("%" + txtEmail.Text.Trim() + "%"));
+
             par.OrderBy(par.ParamedicName.Ascending);
 
             var table = par.LoadDataTable();

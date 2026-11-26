@@ -33,9 +33,19 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::Telerik.Web.UI.RadTextBox txtParamedicName;
 
         /// <summary>
+        /// txtEmail control.
+        /// </summary>
+        protected global::Telerik.Web.UI.RadTextBox txtEmail;
+
+        /// <summary>
         /// cboState control.
         /// </summary>
         protected global::Telerik.Web.UI.RadComboBox cboState;
+
+        /// <summary>
+        /// txtTilakaName control.
+        /// </summary>
+        protected global::Telerik.Web.UI.RadTextBox txtTilakaName;
 
         /// <summary>
         /// btnFilterParamedic control.
@@ -43,9 +53,19 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.ImageButton btnFilterParamedic;
 
         /// <summary>
+        /// btnFilterEmail control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterEmail;
+
+        /// <summary>
         /// btnFilterState control.
         /// </summary>
         protected global::System.Web.UI.WebControls.ImageButton btnFilterState;
+
+        /// <summary>
+        /// btnFilterTilakaName control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterTilakaName;
 
         /// <summary>
         /// grdList control.
