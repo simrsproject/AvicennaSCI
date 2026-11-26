@@ -70,6 +70,15 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 return;
             }
 
+            var registration = new TilakaRegistrationRepository().FindLatest(
+                TilakaConstant.RelatedType.Paramedic, paramedicID);
+            if (!TilakaRegistrationState.IsCertificateActive(registration, DateTime.Now))
+            {
+                lblMessage.Text = TilakaAlertHtml.Error(
+                    "Sertifikat dokter belum aktif, sudah kedaluwarsa, atau dicabut.");
+                return;
+            }
+
             try
             {
                 var service = TilakaQuickSignServiceFactory.Create(config);
@@ -134,6 +143,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 par.Email,
                 reg.TilakaName,
                 reg.CertificateStatus,
+                reg.CertificateExpiryDate,
+                reg.CertificateDataStatus,
                 reg.IsQuickSignUser,
                 reg.QuickSignRegisteredDateTime,
                 reg.QuickSignLastErrorMessage);
@@ -156,9 +167,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 var certificate = row["CertificateStatus"] == DBNull.Value
                     ? 0
                     : Convert.ToInt32(row["CertificateStatus"]);
+                var expiryDate = row["CertificateExpiryDate"] == DBNull.Value
+                    ? (DateTime?)null
+                    : Convert.ToDateTime(row["CertificateExpiryDate"]);
+                var certificateDataStatus = Convert.ToString(row["CertificateDataStatus"]);
+                var certificateActive = certificate == TilakaConstant.CertificateStatus.Active
+                    && !string.Equals(certificateDataStatus,
+                        TilakaConstant.CertificateDataStatus.Revoke,
+                        StringComparison.OrdinalIgnoreCase)
+                    && (!expiryDate.HasValue || expiryDate.Value >= DateTime.Now);
 
                 row["QuickSignStatus"] = isRegistered ? "Terdaftar" : "Belum terdaftar";
-                row["CanRegister"] = !isRegistered && certificate == TilakaConstant.CertificateStatus.Active;
+                row["CanRegister"] = !isRegistered && certificateActive;
 
                 if (!string.IsNullOrWhiteSpace(cboStatus.SelectedValue) && cboStatus.SelectedValue == "1" && !isRegistered)
                     row.Delete();

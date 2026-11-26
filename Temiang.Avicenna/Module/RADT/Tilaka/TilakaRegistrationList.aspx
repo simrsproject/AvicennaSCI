@@ -64,6 +64,7 @@
                                         <telerik:RadComboBoxItem Text="Sertifikat terbit" Value="SertifikatTerbit" />
                                         <telerik:RadComboBoxItem Text="Aktif" Value="Aktif" />
                                         <telerik:RadComboBoxItem Text="Ditolak" Value="Ditolak" />
+                                        <telerik:RadComboBoxItem Text="Dicabut" Value="Dicabut" />
                                         <telerik:RadComboBoxItem Text="Kedaluwarsa" Value="Kedaluwarsa" />
                                     </Items>
                                 </telerik:RadComboBox>

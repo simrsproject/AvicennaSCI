@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Temiang.Avicenna.Common.Tilaka
 {
@@ -26,6 +27,7 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         public int? CertificateStatus { get; set; }
         public string CertificateStatusInfo { get; set; }
+        public string CertificateDataStatus { get; set; }
         public string CertificateSerialNumber { get; set; }
         public DateTime? CertificateStartDate { get; set; }
         public DateTime? CertificateExpiryDate { get; set; }
@@ -51,6 +53,43 @@ namespace Temiang.Avicenna.Common.Tilaka
         /// <summary>
         /// Menerapkan hasil /userregstatus secara field-by-field; nilai kosong tidak menimpa data lama.
         /// </summary>
+        public void ApplyUserReEnrollStatus(TilakaUserReEnrollData data)
+        {
+            if (data == null || string.IsNullOrWhiteSpace(data.Status)) return;
+
+            // C adalah status interim; diperlakukan seperti proses KYC berjalan.
+            KycStatus = string.Equals(data.Status, "C", StringComparison.OrdinalIgnoreCase)
+                ? TilakaConstant.KycStatus.InVerification
+                : data.Status;
+
+            int reasonCode;
+            KycReasonCode = int.TryParse(data.ReasonCode, out reasonCode) ? reasonCode : (int?)null;
+
+            if (!string.IsNullOrWhiteSpace(data.LivenessFailMessage))
+                LastErrorMessage = data.LivenessFailMessage;
+        }
+
+        public void ApplyCertificateStatus(CheckCertStatusResponse certificate)
+        {
+            if (certificate == null) return;
+
+            CertificateStatus = certificate.Status;
+            CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
+
+            if (certificate.Data != null && certificate.Data.Length > 0)
+            {
+                var data = certificate.Data[0];
+                CertificateDataStatus = data.Status;
+                CertificateSerialNumber = data.SerialNumber;
+                CertificateStartDate = ParseDate(data.StartActiveDate);
+                CertificateExpiryDate = ParseDate(data.ExpiryDate);
+            }
+            else if (certificate.Status == TilakaConstant.CertificateStatus.None)
+            {
+                CertificateDataStatus = null;
+            }
+        }
+
         public void ApplyUserRegistrationStatus(TilakaKycData data)
         {
             if (data == null) return;
@@ -65,6 +104,18 @@ namespace Temiang.Avicenna.Common.Tilaka
                 int reasonCode;
                 if (int.TryParse(data.ReasonCode, out reasonCode)) KycReasonCode = reasonCode;
             }
+        }
+
+        private static DateTime? ParseDate(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value)) return null;
+
+            DateTime parsed;
+            if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out parsed))
+                return parsed;
+            if (DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.None, out parsed))
+                return parsed;
+            return null;
         }
     }
 }

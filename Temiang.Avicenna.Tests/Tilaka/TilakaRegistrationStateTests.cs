@@ -143,5 +143,51 @@ namespace Temiang.Avicenna.Tests.Tilaka
 
             Assert.AreEqual(TilakaRegistrationState.SertifikatTerbit, TilakaRegistrationState.Evaluate(record, DateTime.Now));
         }
+
+        [TestMethod]
+        public void ActiveCertificateWithExpiredDate_IsKedaluwarsa()
+        {
+            var record = Record();
+            record.CertificateStatus = TilakaConstant.CertificateStatus.Active;
+            record.CertificateExpiryDate = DateTime.Now.AddDays(-1);
+
+            Assert.AreEqual(TilakaRegistrationState.Kedaluwarsa, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+            Assert.IsFalse(TilakaRegistrationState.IsCertificateActive(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void RevokedCertificateData_IsDicabut()
+        {
+            var record = Record();
+            record.CertificateStatus = TilakaConstant.CertificateStatus.Active;
+            record.CertificateExpiryDate = DateTime.Now.AddDays(30);
+            record.CertificateDataStatus = TilakaConstant.CertificateDataStatus.Revoke;
+
+            Assert.AreEqual(TilakaRegistrationState.Dicabut, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+            Assert.IsFalse(TilakaRegistrationState.IsCertificateActive(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void ActiveCertificateWithoutExpiry_IsActive()
+        {
+            var record = Record();
+            record.CertificateStatus = TilakaConstant.CertificateStatus.Active;
+
+            Assert.AreEqual(TilakaRegistrationState.Aktif, TilakaRegistrationState.Evaluate(record, DateTime.Now));
+            Assert.IsTrue(TilakaRegistrationState.IsCertificateActive(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void ReEnrollStatus_MapsInterimAndSuccess()
+        {
+            var record = Record();
+
+            record.ApplyUserReEnrollStatus(new TilakaUserReEnrollData { Status = "C", ReasonCode = "0" });
+            Assert.AreEqual(TilakaConstant.KycStatus.InVerification, record.KycStatus);
+
+            record.ApplyUserReEnrollStatus(new TilakaUserReEnrollData { Status = "S", ReasonCode = "0" });
+            Assert.AreEqual(TilakaConstant.KycStatus.Success, record.KycStatus);
+            Assert.AreEqual(0, record.KycReasonCode);
+        }
     }
 }

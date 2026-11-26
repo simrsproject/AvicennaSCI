@@ -79,8 +79,8 @@ namespace Temiang.Avicenna.Common.Tilaka
                     TilakaConstant.RelatedType.Paramedic, input.ParamedicID);
                 if (registration == null)
                     return Fail("Dokter " + input.ParamedicID + " belum terdaftar di Tilaka.");
-                if (registration.CertificateStatus != TilakaConstant.CertificateStatus.Active)
-                    return Fail("Sertifikat dokter " + input.ParamedicID + " belum aktif.");
+                if (!TilakaRegistrationState.IsCertificateActive(registration, DateTime.Now))
+                    return Fail("Sertifikat dokter " + input.ParamedicID + " belum aktif, kedaluwarsa, atau dicabut.");
                 if (!registration.IsQuickSignUser)
                     return Fail("Dokter " + input.ParamedicID + " belum terdaftar sebagai Quick Sign user.");
                 if (string.IsNullOrWhiteSpace(registration.TilakaName))

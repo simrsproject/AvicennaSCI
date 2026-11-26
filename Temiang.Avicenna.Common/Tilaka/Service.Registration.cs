@@ -10,6 +10,19 @@ namespace Temiang.Avicenna.Common.Tilaka
             return Execute<GenerateUuidResponse>("GenerateUUID", url, "{}");
         }
 
+        public GenerateUuidResponse GenerateUuidReEnroll(string tilakaName)
+        {
+            return Execute<GenerateUuidResponse>("GenerateUUIDReEnroll",
+                TilakaUrls.GenerateUuidReEnroll(_config, tilakaName), "{}");
+        }
+
+        public UserReEnrollStatusResponse GetUserReEnrollStatus(string registrationId)
+        {
+            var body = JsonConvert.SerializeObject(new { registration_id = registrationId });
+            return Execute<UserReEnrollStatusResponse>("UserReEnrollStatus",
+                TilakaUrls.UserReEnrollStatus(_config), body);
+        }
+
         public RegisterForKycCheckResponse RegisterForKycCheck(RegisterForKycCheckRequest request)
         {
             var body = JsonConvert.SerializeObject(request, new JsonSerializerSettings

@@ -97,10 +97,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 imgKtp.Visible = false;
             }
 
-            var canStartRegistration = isUsingESignature && CanStartRegistration(state);
-            pnlConsent.Visible = canStartRegistration;
-            chkConsent.Visible = canStartRegistration;
+            var canReEnroll = isUsingESignature && CanReEnroll(state, record)
+                              && record != null
+                              && !string.IsNullOrWhiteSpace(record.TilakaName);
+            var canStartRegistration = isUsingESignature
+                                       && CanStartRegistration(state)
+                                       && !canReEnroll;
+            var showConsent = canStartRegistration || canReEnroll;
+
+            pnlConsent.Visible = showConsent;
+            chkConsent.Visible = showConsent;
             btnDaftar.Visible = canStartRegistration;
+            btnReEnroll.Visible = canReEnroll;
             btnKirimData.Visible = isUsingESignature && state == TilakaRegistrationState.UuidTerbit;
             btnWebview.Visible = isUsingESignature
                                  && !string.IsNullOrWhiteSpace(webviewUrl)
@@ -119,6 +127,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                    || state == TilakaRegistrationState.Kedaluwarsa
                    || state == TilakaRegistrationState.KycGagal
                    || state == TilakaRegistrationState.Ditolak;
+        }
+
+        private static bool CanReEnroll(string state, TilakaRegistrationRecord record)
+        {
+            if (state == TilakaRegistrationState.Kedaluwarsa
+                || state == TilakaRegistrationState.Dicabut)
+                return true;
+
+            return record != null
+                   && string.Equals(record.RequestType,
+                       TilakaConstant.RequestType.ReEnroll, StringComparison.OrdinalIgnoreCase)
+                   && state == TilakaRegistrationState.KycGagal;
         }
 
         private static bool IsWebviewState(string state)
@@ -158,6 +178,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             lblMessage.Text = TilakaAlertHtml.Success(message);
         }
 
+        private void ShowInfo(string message)
+        {
+            HideInformationHeader();
+            lblMessage.Text = TilakaAlertHtml.Info(message);
+        }
+
         private void ClearMessages()
         {
             lblMessage.Text = string.Empty;
@@ -171,6 +197,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             btnReadConsent.Visible = false;
             uplKtp.Visible = false;
             btnDaftar.Visible = false;
+            btnReEnroll.Visible = false;
             btnKirimData.Visible = false;
             btnWebview.Visible = false;
             btnCekStatus.Visible = false;
@@ -180,10 +207,121 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         {
             if (record == null || string.IsNullOrWhiteSpace(record.RegistrationRequestID)) return string.Empty;
             if (state == TilakaRegistrationState.Kedaluwarsa
+                || state == TilakaRegistrationState.Dicabut
                 || state == TilakaRegistrationState.Ditolak) return string.Empty;
+
+            var isReEnroll = string.Equals(record.RequestType,
+                TilakaConstant.RequestType.ReEnroll, StringComparison.OrdinalIgnoreCase);
+
             if (state == TilakaRegistrationState.SertifikatTerbit)
-                return TilakaUrls.ActivationWebview(config, record.RegistrationRequestID);
-            return TilakaUrls.RegistrationWebview(config, record.RegistrationRequestID);
+            {
+                return isReEnroll
+                    ? TilakaUrls.ActivationWebviewByIssueId(config, record.RegistrationRequestID)
+                    : TilakaUrls.ActivationWebview(config, record.RegistrationRequestID);
+            }
+
+            return isReEnroll
+                ? TilakaUrls.ReEnrollWebview(config, record.RegistrationRequestID)
+                : TilakaUrls.RegistrationWebview(config, record.RegistrationRequestID);
+        }
+
+        protected void btnReEnroll_OnClick(object sender, EventArgs e)
+        {
+            ClearMessages();
+            try
+            {
+                StartReEnroll();
+            }
+            catch (InvalidOperationException ex)
+            {
+                ShowWarning(ex.Message);
+            }
+            catch (Exception)
+            {
+                ShowWarning("Gagal memproses re-enroll Tilaka. Silakan coba lagi atau hubungi administrator.");
+            }
+        }
+
+        private void StartReEnroll()
+        {
+            var paramedic = new Paramedic();
+            if (!paramedic.LoadByPrimaryKey(ParamedicID))
+            {
+                ShowWarning("Dokter tidak ditemukan.");
+                return;
+            }
+
+            if (paramedic.IsUsingESignature != true)
+            {
+                ShowWarning("Dokter ini tidak menggunakan tanda tangan elektronik.");
+                return;
+            }
+
+            if (!chkConsent.Checked)
+            {
+                ShowWarning("Persetujuan TnC Tilaka belum dicentang.");
+                return;
+            }
+
+            var config = new TilakaConfig();
+            if (string.IsNullOrWhiteSpace(config.ReadConsentText()))
+            {
+                ShowWarning("File TnC Tilaka tidak ditemukan, kosong, atau tidak dapat diakses: " + config.ConsentTextFile);
+                return;
+            }
+
+            var repository = new TilakaRegistrationRepository();
+            var latest = repository.FindLatest(TilakaConstant.RelatedType.Paramedic, ParamedicID);
+            if (latest == null || string.IsNullOrWhiteSpace(latest.TilakaName))
+            {
+                ShowWarning("Tilaka Name dokter belum tersedia.");
+                return;
+            }
+
+            var state = TilakaRegistrationState.Evaluate(latest, DateTime.Now);
+            if (!CanReEnroll(state, latest))
+            {
+                ShowWarning("Re-enroll hanya tersedia untuk sertifikat kedaluwarsa atau dicabut.");
+                return;
+            }
+
+            var service = new Service();
+            var uuid = service.GenerateUuidReEnroll(latest.TilakaName);
+            string message;
+            if (!service.IsOk(uuid, out message) || uuid.Data == null || uuid.Data.Length == 0)
+            {
+                ShowWarning(string.IsNullOrWhiteSpace(message)
+                    ? "Gagal mendapatkan UUID re-enroll Tilaka."
+                    : message);
+                return;
+            }
+
+            repository.Save(new TilakaRegistrationRecord
+            {
+                RelatedType = TilakaConstant.RelatedType.Paramedic,
+                RelatedID = ParamedicID,
+                IsLatest = true,
+                RegistrationRequestID = uuid.Data[0],
+                RequestType = TilakaConstant.RequestType.ReEnroll,
+                DateExpire = DateTime.Now.AddDays(3),
+                RegistrationState = TilakaRegistrationState.UuidTerbit,
+                RegisteredName = paramedic.NamaKTP,
+                RegisteredNIK = paramedic.Ssn,
+                RegisteredEmail = paramedic.Email,
+                TilakaName = latest.TilakaName,
+                KtpFilePath = latest.KtpFilePath,
+                KtpFileName = latest.KtpFileName,
+                KtpContentType = latest.KtpContentType,
+                KtpUploadedDateTime = latest.KtpUploadedDateTime,
+                CertificateStatus = null,
+                CertificateDataStatus = null,
+                ConsentVersion = config.ConsentVersion,
+                ConsentApprovedByUserID = AppSession.UserLogin.UserID,
+                LastUpdateByUserID = AppSession.UserLogin.UserID
+            });
+
+            LoadData();
+            ShowSuccess("UUID re-enroll berhasil dibuat. Lanjutkan dengan Kirim Data KYC.");
         }
 
         protected void btnDaftar_OnClick(object sender, EventArgs e)
@@ -351,6 +489,13 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 return;
             }
 
+            if (string.Equals(record.RequestType,
+                TilakaConstant.RequestType.ReEnroll, StringComparison.OrdinalIgnoreCase))
+            {
+                SendReEnrollKyc(record, config, consentText, repository);
+                return;
+            }
+
             var store = new TilakaKtpFileStore(config.UploadKtpPath, config.MaxKtpSizeKb);
             var ktpBytes = store.Load(record.KtpFilePath);
             if (ktpBytes == null)
@@ -404,6 +549,46 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             ShowSuccess("Data KYC terkirim. Silakan buka webview registrasi.");
         }
 
+        private void SendReEnrollKyc(TilakaRegistrationRecord record, TilakaConfig config,
+            string consentText, TilakaRegistrationRepository repository)
+        {
+            var consentTimestamp = DateTime.Now;
+            var request = new RegisterForKycCheckRequest
+            {
+                RegistrationId = record.RegistrationRequestID,
+                IsApproved = true,
+                ConsentText = consentText,
+                Version = config.ConsentVersion,
+                ConsentTimestamp = consentTimestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)
+            };
+            request.HashConsent = TilakaSignature.CreateConsentHash(config.ChannelSecret, config.ChannelId,
+                request.ConsentText, request.Version, request.ConsentTimestamp);
+
+            var service = new Service();
+            var response = service.RegisterForKycCheck(request);
+            string message;
+            if (!service.IsOk(response, out message))
+            {
+                ShowWarning(string.IsNullOrWhiteSpace(message)
+                    ? "Permintaan KYC re-enroll Tilaka gagal."
+                    : message);
+                return;
+            }
+
+            record.RegistrationDateTime = DateTime.Now;
+            record.RegistrationState = TilakaRegistrationState.MenungguKyc;
+            record.KycStatus = null;
+            record.KycReasonCode = null;
+            record.ConsentVersion = config.ConsentVersion;
+            record.ConsentTimestamp = consentTimestamp;
+            record.ConsentApprovedByUserID = AppSession.UserLogin.UserID;
+            record.LastUpdateByUserID = AppSession.UserLogin.UserID;
+            repository.Save(record);
+
+            LoadData();
+            ShowSuccess("Data KYC re-enroll terkirim. Silakan buka webview re-enroll.");
+        }
+
         protected void btnCekStatus_OnClick(object sender, EventArgs e)
         {
             ClearMessages();
@@ -438,16 +623,60 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var certificateRejected = false;
             var statusUnchanged = false;
 
+            var isReEnroll = string.Equals(record.RequestType,
+                TilakaConstant.RequestType.ReEnroll, StringComparison.OrdinalIgnoreCase);
+
             if (!string.IsNullOrWhiteSpace(record.RegistrationRequestID))
             {
-                var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
-                if (!service.IsOk(registration, out message))
+                if (isReEnroll)
                 {
-                    ShowWarning(message);
-                    return;
-                }
+                    var reEnroll = service.GetUserReEnrollStatus(record.RegistrationRequestID);
+                    if (!service.IsOk(reEnroll, out message))
+                    {
+                        ShowWarning(message);
+                        return;
+                    }
 
-                record.ApplyUserRegistrationStatus(registration.Data);
+                    record.ApplyUserReEnrollStatus(reEnroll.Data);
+
+                    record.LastCheckedDateTime = DateTime.Now;
+                    record.LastCheckSource = TilakaConstant.LogSource.Manual;
+                    record.RegistrationState = TilakaRegistrationState.Evaluate(record, DateTime.Now);
+                    repository.Save(record);
+
+                    if (!string.Equals(record.KycStatus,
+                        TilakaConstant.KycStatus.Success, StringComparison.OrdinalIgnoreCase))
+                    {
+                        LoadData();
+
+                        if (string.Equals(record.KycStatus,
+                            TilakaConstant.KycStatus.Fail, StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(record.KycStatus,
+                                TilakaConstant.KycStatus.Error, StringComparison.OrdinalIgnoreCase))
+                        {
+                            ShowWarning("KYC re-enroll gagal" +
+                                        (record.KycReasonCode.HasValue
+                                            ? " (reason code " + record.KycReasonCode.Value + ")."
+                                            : "."));
+                        }
+                        else
+                        {
+                            ShowInfo("Re-enroll masih dalam proses KYC/liveness.");
+                        }
+                        return;
+                    }
+                }
+                else
+                {
+                    var registration = service.GetUserRegistrationStatus(record.RegistrationRequestID);
+                    if (!service.IsOk(registration, out message))
+                    {
+                        ShowWarning(message);
+                        return;
+                    }
+
+                    record.ApplyUserRegistrationStatus(registration.Data);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(record.TilakaName))
@@ -462,14 +691,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 statusUnchanged = record.CertificateStatus == certificate.Status;
                 if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
                 {
-                    record.CertificateStatus = certificate.Status;
-                    record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
-                    if (certificate.Data != null && certificate.Data.Length > 0)
-                    {
-                        record.CertificateSerialNumber = certificate.Data[0].SerialNumber;
-                        record.CertificateStartDate = ParseDate(certificate.Data[0].StartActiveDate);
-                        record.CertificateExpiryDate = ParseDate(certificate.Data[0].ExpiryDate);
-                    }
+                    record.ApplyCertificateStatus(certificate);
                 }
                 else
                 {

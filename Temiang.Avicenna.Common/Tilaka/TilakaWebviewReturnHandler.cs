@@ -38,8 +38,7 @@ namespace Temiang.Avicenna.Common.Tilaka
 
                 if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
                 {
-                    record.CertificateStatus = certificate.Status;
-                    record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
+                    record.ApplyCertificateStatus(certificate);
                 }
 
                 record.LastErrorMessage = null;

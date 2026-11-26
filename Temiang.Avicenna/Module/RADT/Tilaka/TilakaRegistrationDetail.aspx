@@ -82,6 +82,7 @@
     <br />
     <div style="margin-left: 10px;">
         <asp:Button ID="btnDaftar" runat="server" Text="Daftar" OnClick="btnDaftar_OnClick" />
+        <asp:Button ID="btnReEnroll" runat="server" Text="Re-enroll Sertifikat" OnClick="btnReEnroll_OnClick" />
         <asp:Button ID="btnKirimData" runat="server" Text="Kirim Data KYC" OnClick="btnKirimData_OnClick" />
         <asp:Button ID="btnWebview" runat="server" Text="Buka Webview" OnClientClick="return openWebview();" />
         <asp:Button ID="btnCekStatus" runat="server" Text="Cek Status" OnClick="btnCekStatus_OnClick" />

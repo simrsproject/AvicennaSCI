@@ -32,7 +32,11 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             var query = new TilakaRegistrationQuery();
             query.Where(query.IsLatest == true);
-            query.Where(query.CertificateStatus.IsNull() || (query.CertificateStatus < TilakaConstant.CertificateStatus.Active));
+            query.Where(query.Or(
+                query.CertificateStatus.IsNull(),
+                query.CertificateStatus < TilakaConstant.CertificateStatus.Active,
+                query.CertificateExpiryDate <= DateTime.Now.AddDays(30),
+                query.CertificateDataStatus == TilakaConstant.CertificateDataStatus.Revoke));
             query.es.Top = max;
             query.OrderBy(query.LastCheckedDateTime.Ascending, query.TilakaRegistrationID.Ascending);
 
@@ -134,6 +138,7 @@ namespace Temiang.Avicenna.Common.Tilaka
                 TilakaName = entity.TilakaName,
                 CertificateStatus = entity.CertificateStatus,
                 CertificateStatusInfo = entity.CertificateStatusInfo,
+                CertificateDataStatus = entity.CertificateDataStatus,
                 CertificateSerialNumber = entity.CertificateSerialNumber,
                 CertificateStartDate = entity.CertificateStartDate,
                 CertificateExpiryDate = entity.CertificateExpiryDate,
@@ -172,6 +177,7 @@ namespace Temiang.Avicenna.Common.Tilaka
             entity.TilakaName = record.TilakaName;
             entity.CertificateStatus = record.CertificateStatus;
             entity.CertificateStatusInfo = record.CertificateStatusInfo;
+            entity.CertificateDataStatus = record.CertificateDataStatus;
             entity.CertificateSerialNumber = record.CertificateSerialNumber;
             entity.CertificateStartDate = record.CertificateStartDate;
             entity.CertificateExpiryDate = record.CertificateExpiryDate;

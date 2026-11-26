@@ -92,7 +92,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             var registration = new TilakaRegistrationRepository().FindLatest(
                 TilakaConstant.RelatedType.Paramedic, record.ParamedicID);
-            if (registration == null || registration.CertificateStatus != TilakaConstant.CertificateStatus.Active
+            if (registration == null || !TilakaRegistrationState.IsCertificateActive(registration, DateTime.Now)
                 || !registration.IsQuickSignUser || string.IsNullOrWhiteSpace(registration.TilakaName))
             {
                 lblMessage.Text = TilakaAlertHtml.Error("Dokter harus memiliki sertifikat aktif dan terdaftar sebagai Quick Sign user.");

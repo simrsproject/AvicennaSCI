@@ -98,6 +98,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.Button btnDaftar;
 
         /// <summary>
+        /// btnReEnroll control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnReEnroll;
+
+        /// <summary>
         /// btnKirimData control.
         /// </summary>
         protected global::System.Web.UI.WebControls.Button btnKirimData;

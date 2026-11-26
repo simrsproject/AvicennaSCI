@@ -289,6 +289,7 @@
     <Compile Include="Tilaka\Response\TilakaCertMessage.cs" />
     <Compile Include="Tilaka\Response\TilakaKycData.cs" />
     <Compile Include="Tilaka\Response\UserRegStatusResponse.cs" />
+    <Compile Include="Tilaka\Response\UserReEnrollStatusResponse.cs" />
     <Compile Include="Tilaka\Parsing\FlexibleIntConverter.cs" />
     <Compile Include="Tilaka\Parsing\TilakaCertMessageConverter.cs" />
     <Compile Include="Tilaka\Parsing\TilakaResponseParser.cs" />
@@ -307,6 +308,7 @@
     <Compile Include="Tilaka\ITilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationState.cs" />
+    <Compile Include="Tilaka\TilakaReEnrollReturnHandler.cs" />
     <Compile Include="Tilaka\TilakaCertificateStatusRules.cs" />
     <Compile Include="Tilaka\TilakaRegistrationGuard.cs" />
     <Compile Include="Tilaka\ITilakaKtpFileStore.cs" />

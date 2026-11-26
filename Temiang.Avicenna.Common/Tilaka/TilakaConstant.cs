@@ -21,6 +21,13 @@ namespace Temiang.Avicenna.Common.Tilaka
             public const string Expired = "E";
         }
 
+        public static class CertificateDataStatus
+        {
+            public const string Active = "Aktif";
+            public const string Registered = "Registered";
+            public const string Revoke = "Revoke";
+        }
+
         public static class CertificateStatus
         {
             public const int None = 0;

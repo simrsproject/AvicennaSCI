@@ -50,5 +50,32 @@ namespace Temiang.Avicenna.Tests.Tilaka
             StringAssert.Contains(url, "channel_id=chan-1");
             StringAssert.Contains(url, "request_id=uuid-1");
         }
+
+        [TestMethod]
+        public void GenerateUuidReEnroll_IncludesRequestTypeAndUser()
+        {
+            var url = TilakaUrls.GenerateUuidReEnroll(Config(), "anita 001");
+
+            StringAssert.Contains(url, "request_type=re_enroll");
+            StringAssert.Contains(url, "user_identifier=anita%20001");
+        }
+
+        [TestMethod]
+        public void ReEnrollWebview_UsesIssueId()
+        {
+            var url = TilakaUrls.ReEnrollWebview(Config(), "issue-1");
+
+            StringAssert.Contains(url, "issue_id=issue-1");
+        }
+
+        [TestMethod]
+        public void ActivationWebviewByIssueId_UsesIssueId()
+        {
+            var url = TilakaUrls.ActivationWebviewByIssueId(Config(), "issue-1");
+
+            StringAssert.Contains(url, "issue_id=issue-1");
+            StringAssert.Contains(url, "setting=1");
+            StringAssert.Contains(url, "channel_id=chan-1");
+        }
     }
 }

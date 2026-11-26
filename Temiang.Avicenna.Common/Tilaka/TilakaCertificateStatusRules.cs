@@ -6,9 +6,13 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             if (next < TilakaConstant.CertificateStatus.None || next > TilakaConstant.CertificateStatus.Rejected) return false;
             if (!current.HasValue || current.Value <= TilakaConstant.CertificateStatus.None) return true;
-            if (current.Value == TilakaConstant.CertificateStatus.Active
-                || current.Value == TilakaConstant.CertificateStatus.Rejected)
-                return next == current.Value;
+            if (current.Value == TilakaConstant.CertificateStatus.Active)
+                return next == TilakaConstant.CertificateStatus.Active
+                    || next == TilakaConstant.CertificateStatus.None
+                    || next == TilakaConstant.CertificateStatus.Rejected;
+
+            if (current.Value == TilakaConstant.CertificateStatus.Rejected)
+                return next == TilakaConstant.CertificateStatus.Rejected;
 
             return next >= current.Value;
         }

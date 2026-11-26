@@ -17,11 +17,21 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             if (record == null) return BelumTerdaftar;
 
+            if (IsRevoked(record)) return Dicabut;
+
             var cert = record.CertificateStatus ?? -1;
-            if (cert == TilakaConstant.CertificateStatus.Active) return Aktif;
+            if (cert == TilakaConstant.CertificateStatus.Active)
+            {
+                if (record.CertificateExpiryDate.HasValue && record.CertificateExpiryDate.Value < now)
+                    return Kedaluwarsa;
+                return Aktif;
+            }
             if (cert == TilakaConstant.CertificateStatus.Rejected) return Ditolak;
             if (cert == TilakaConstant.CertificateStatus.Registered) return SertifikatTerbit;
             if (cert == TilakaConstant.CertificateStatus.InVerification) return MenungguVerifikasi;
+
+            if (record.CertificateExpiryDate.HasValue && record.CertificateExpiryDate.Value < now)
+                return Kedaluwarsa;
 
             if (record.ManualRegistrationStatus == TilakaConstant.ManualRegistrationStatus.InVerification)
                 return MenungguVerifikasi;
@@ -40,6 +50,29 @@ namespace Temiang.Avicenna.Common.Tilaka
             if (!record.RegistrationDateTime.HasValue) return UuidTerbit;
 
             return MenungguKyc;
+        }
+
+        public static bool IsCertificateActive(TilakaRegistrationRecord record, System.DateTime now)
+        {
+            if (record == null) return false;
+            if (record.CertificateStatus != TilakaConstant.CertificateStatus.Active) return false;
+            if (IsRevoked(record)) return false;
+            return !record.CertificateExpiryDate.HasValue || record.CertificateExpiryDate.Value >= now;
+        }
+
+        public static bool IsExpiringSoon(TilakaRegistrationRecord record, System.DateTime now, int days)
+        {
+            if (!IsCertificateActive(record, now) || !record.CertificateExpiryDate.HasValue)
+                return false;
+
+            return record.CertificateExpiryDate.Value <= now.AddDays(days);
+        }
+
+        private static bool IsRevoked(TilakaRegistrationRecord record)
+        {
+            return string.Equals(record.CertificateDataStatus,
+                TilakaConstant.CertificateDataStatus.Revoke,
+                System.StringComparison.OrdinalIgnoreCase);
         }
     }
 }

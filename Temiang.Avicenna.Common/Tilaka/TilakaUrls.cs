@@ -21,6 +21,16 @@ namespace Temiang.Avicenna.Common.Tilaka
             return url + BuildQuery(query);
         }
 
+        public static string GenerateUuidReEnroll(TilakaConfig config, string tilakaName)
+        {
+            var query = new Dictionary<string, string>
+            {
+                { "request_type", "re_enroll" },
+                { "user_identifier", tilakaName }
+            };
+            return config.BaseUrl + "/generateUUID" + BuildQuery(query);
+        }
+
         public static string RegisterForKycCheck(TilakaConfig config)
         {
             return config.BaseUrl + "/registerForKycCheck";
@@ -54,6 +64,18 @@ namespace Temiang.Avicenna.Common.Tilaka
             var query = new Dictionary<string, string>();
             query["request_id"] = requestId;
             query["setting"] = "1";
+            AddIfAny(query, "channel_id", config.ChannelId);
+            AddIfAny(query, "redirect_url", config.WebviewRedirectUrl);
+            return config.BaseUrl + "/personal-webview/link-account" + BuildQuery(query);
+        }
+
+        public static string ActivationWebviewByIssueId(TilakaConfig config, string issueId)
+        {
+            var query = new Dictionary<string, string>
+            {
+                { "issue_id", issueId },
+                { "setting", "1" }
+            };
             AddIfAny(query, "channel_id", config.ChannelId);
             AddIfAny(query, "redirect_url", config.WebviewRedirectUrl);
             return config.BaseUrl + "/personal-webview/link-account" + BuildQuery(query);

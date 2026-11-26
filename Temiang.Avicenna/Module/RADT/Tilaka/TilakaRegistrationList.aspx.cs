@@ -105,7 +105,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                         }
 
                         if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
-                            record.CertificateStatus = certificate.Status;
+                            record.ApplyCertificateStatus(certificate);
                         else
                             certificateRejected = true;
                     }
@@ -172,9 +172,12 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 tilaka.TilakaRegistrationID,
                 tilaka.RegistrationRequestID,
                 tilaka.RegistrationState,
+                tilaka.RegistrationDateTime,
                 tilaka.KycStatus,
                 tilaka.ManualRegistrationStatus,
                 tilaka.CertificateStatus,
+                tilaka.CertificateExpiryDate,
+                tilaka.CertificateDataStatus,
                 tilaka.TilakaName,
                 tilaka.DateExpire,
                 tilaka.LastCheckedDateTime);
@@ -200,10 +203,34 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             table.Columns.Add("StatusText", typeof(string));
             foreach (DataRow row in table.Rows)
             {
-                var state = Convert.ToString(row["RegistrationState"]);
-                row["StatusText"] = string.IsNullOrWhiteSpace(state)
-                    ? TilakaRegistrationState.BelumTerdaftar
-                    : state;
+                if (row["TilakaRegistrationID"] == DBNull.Value)
+                {
+                    row["StatusText"] = TilakaRegistrationState.BelumTerdaftar;
+                    continue;
+                }
+
+                var record = new TilakaRegistrationRecord
+                {
+                    RegistrationState = Convert.ToString(row["RegistrationState"]),
+                    RegistrationRequestID = Convert.ToString(row["RegistrationRequestID"]),
+                    RegistrationDateTime = row["RegistrationDateTime"] == DBNull.Value
+                        ? (DateTime?)null
+                        : Convert.ToDateTime(row["RegistrationDateTime"]),
+                    KycStatus = Convert.ToString(row["KycStatus"]),
+                    ManualRegistrationStatus = Convert.ToString(row["ManualRegistrationStatus"]),
+                    CertificateStatus = row["CertificateStatus"] == DBNull.Value
+                        ? (int?)null
+                        : Convert.ToInt32(row["CertificateStatus"]),
+                    CertificateExpiryDate = row["CertificateExpiryDate"] == DBNull.Value
+                        ? (DateTime?)null
+                        : Convert.ToDateTime(row["CertificateExpiryDate"]),
+                    CertificateDataStatus = Convert.ToString(row["CertificateDataStatus"]),
+                    DateExpire = row["DateExpire"] == DBNull.Value
+                        ? (DateTime?)null
+                        : Convert.ToDateTime(row["DateExpire"])
+                };
+
+                row["StatusText"] = TilakaRegistrationState.Evaluate(record, DateTime.Now);
             }
 
             if (!string.IsNullOrWhiteSpace(cboState.SelectedValue))

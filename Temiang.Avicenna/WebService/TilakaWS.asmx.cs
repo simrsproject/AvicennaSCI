@@ -77,10 +77,7 @@ namespace Temiang.Avicenna.WebService
                         else if (TilakaCertificateStatusRules.CanApply(record.CertificateStatus, certificate.Status))
                         {
                             if (record.CertificateStatus != certificate.Status) changed = true;
-                            record.CertificateStatus = certificate.Status;
-                            record.CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
-                            if (certificate.Data != null && certificate.Data.Length > 0)
-                                record.CertificateSerialNumber = certificate.Data[0].SerialNumber;
+                            record.ApplyCertificateStatus(certificate);
                         }
                         else
                         {

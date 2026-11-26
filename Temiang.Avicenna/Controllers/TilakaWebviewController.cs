@@ -20,7 +20,20 @@ namespace Temiang.Avicenna.Controllers
             if (string.IsNullOrWhiteSpace(requestId))
                 requestId = Request.QueryString["register_id"];
 
-            var handler = new TilakaWebviewReturnHandler(new TilakaRegistrationRepository(), new Service());
+            var service = new Service();
+            var repository = new TilakaRegistrationRepository();
+
+            if (string.IsNullOrWhiteSpace(requestId))
+            {
+                var issueId = Request.QueryString["issue_id"];
+                if (!string.IsNullOrWhiteSpace(issueId))
+                {
+                    return View(new TilakaReEnrollReturnHandler(repository, service)
+                        .Process(issueId));
+                }
+            }
+
+            var handler = new TilakaWebviewReturnHandler(repository, service);
             return View(handler.Process(requestId));
         }
     }

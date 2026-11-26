@@ -47,14 +47,16 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
-        public void ActiveCurrent_AllowsSameOnly()
+        public void ActiveCurrent_AllowsSameAndTerminalDowngrade()
         {
             Assert.IsTrue(TilakaCertificateStatusRules.CanApply(
                 TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.Active));
+            Assert.IsTrue(TilakaCertificateStatusRules.CanApply(
+                TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.None));
+            Assert.IsTrue(TilakaCertificateStatusRules.CanApply(
+                TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.Rejected));
             Assert.IsFalse(TilakaCertificateStatusRules.CanApply(
                 TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.Registered));
-            Assert.IsFalse(TilakaCertificateStatusRules.CanApply(
-                TilakaConstant.CertificateStatus.Active, TilakaConstant.CertificateStatus.Rejected));
         }
 
         [TestMethod]
