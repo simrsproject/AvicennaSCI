@@ -99,6 +99,7 @@
                 <telerik:GridBoundColumn DataField="ParamedicID" HeaderText="ID" UniqueName="ParamedicID" />
                 <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="NamaKTP" HeaderText="Nama KTP" UniqueName="NamaKTP" />
+                <telerik:GridBoundColumn DataField="Email" HeaderText="Email" UniqueName="Email" />
                 <telerik:GridTemplateColumn HeaderText="Sertifikat Status" UniqueName="StatusText">
                     <ItemTemplate>
                         <span style='<%# "color:" + Eval("StatusColor") + ";" %>'><%# Eval("StatusText") %></span>

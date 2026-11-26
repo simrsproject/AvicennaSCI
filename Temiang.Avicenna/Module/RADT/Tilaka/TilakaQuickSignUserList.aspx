@@ -116,7 +116,7 @@
                         <span style='<%# "color:" + Eval("CertificateStatusColor") + ";" %>'><%# Eval("CertificateStatusText") %></span>
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
-                <telerik:GridTemplateColumn HeaderText="Quick Sign" UniqueName="QuickSignStatus">
+                <telerik:GridTemplateColumn HeaderText="Quick Sign Status" UniqueName="QuickSignStatus">
                     <ItemTemplate>
                         <span style='<%# "color:" + Eval("QuickSignStatusColor") + ";" %>'><%# Eval("QuickSignStatus") %></span>
                     </ItemTemplate>
