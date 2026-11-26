@@ -1073,13 +1073,27 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
         private void BindFaskes(List<FaskesItem> list)
         {
-            if (list == null || list.Count == 0)
+            list = (list ?? new List<FaskesItem>())
+                .Where(x => x != null
+                    && !string.IsNullOrWhiteSpace(x.Jadwal)
+                    && !string.Equals(
+                        x.Jadwal.Trim(),
+                        "null",
+                        StringComparison.OrdinalIgnoreCase))
+                .OrderBy(x => x.Distance)
+                .ToList();
+
+            cboFaskesRujukan.Items.Clear();
+            cboFaskesRujukan.ClearSelection();
+            cboFaskesRujukan.Text = string.Empty;
+
+            Session["faskesList"] = list;
+
+            if (list.Count == 0)
             {
-                Alert("Faskes tidak ditemukan");
+                Alert("Tidak ada faskes dengan jadwal pelayanan tersedia");
                 return;
             }
-
-            list = list.OrderBy(x => x.Distance).ToList();
 
             cboFaskesRujukan.DataSource = list;
             cboFaskesRujukan.DataTextField = "Nmppk";
@@ -1088,8 +1102,6 @@ namespace Temiang.Avicenna.Module.RADT.Bpjs
 
             cboFaskesRujukan.ClearSelection();
             cboFaskesRujukan.Text = string.Empty;
-
-            Session["faskesList"] = list;
         }
 
         protected void cboFaskesRujukan_ItemDataBound(object sender, RadComboBoxItemEventArgs e)

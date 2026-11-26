@@ -388,3 +388,8 @@ Titipan Daniel
 
 ---[13-08-2026 - Wiliam]---
 1. Modifikasi file ServiceUnitTransactionDetail.aspx.cs dan ServiceUnitTransactionDetail.aspx agar saat enter barcode tidak empty.
+
+---[24-08-2026 - Danang]---
+1. Perbaikan Apol
+2. Perbaikaan Rujukan Satusehat
+	- Penambahan validasi jadwal

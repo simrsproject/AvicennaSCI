@@ -264,12 +264,16 @@ namespace Temiang.Avicenna.WebService.V1_1
                     "RSI",
                     StringComparison.OrdinalIgnoreCase))
                 {
+                    string patientID = reg["PatientID"].ToString();
+
                     visitNo =
                         VisitQueue.TakeQueueVisitPasienTitipan(
                             GuarantorID,
                             reg["ServiceUnitID"].ToString(),
                             UserID,
-                            DateTime.Today
+                            DateTime.Today,
+                            AppointmentNo,
+                            patientID
                         );
 
                     if (!string.IsNullOrWhiteSpace(visitNo))

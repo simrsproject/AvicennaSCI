@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Data;
-using Telerik.Web.UI;
+using System.Linq;
 using Telerik.Web.Data.Extensions;
+using Telerik.Web.UI;
 using Temiang.Avicenna.BusinessObject;
+using Temiang.Avicenna.BusinessObject.Generated;
 using Temiang.Avicenna.BusinessObject.Reference;
 using Temiang.Avicenna.Common;
 using Temiang.Dal.DynamicQuery;
@@ -863,31 +864,76 @@ namespace Temiang.Avicenna.Module.Charges
 
                 entity.Save();
 
+
+                // =========================================
+                // VISIT QUEUE - RSI
+                // Buat antrean baru untuk registrasi referral
+                // =========================================
                 if (string.Equals(
                     AppSession.Parameter.HealthcareID,
                     "RSI",
                     StringComparison.OrdinalIgnoreCase))
                 {
-                    var visitQueue = new VisitQueue();
-                    var query = new VisitQueueQuery();
+                    // Cari antrean terakhir dari registrasi sumber
+                    var sourceQueues = new VisitQueueCollection();
+                    var sourceQuery = new VisitQueueQuery();
 
-                    query.Where(query.RegistrationNo == txtRegistrationNo.Text);
+                    sourceQuery.es.Top = 1;
 
-                    if (visitQueue.Load(query))
+                    sourceQuery.Where(
+                        sourceQuery.RegistrationNo == txtRegistrationNo.Text
+                    );
+
+                    sourceQuery.OrderBy(
+                        sourceQuery.CreatedDate.Descending
+                    );
+
+                    sourceQueues.Load(sourceQuery);
+
+                    if (sourceQueues.Count == 0)
                     {
-                        visitQueue.ServiceUnitID = entity.ServiceUnitID;
-                        visitQueue.ParamedicID = entity.ParamedicID;
+                        throw new Exception(
+                            "Antrean sumber tidak ditemukan untuk registrasi: "
+                            + txtRegistrationNo.Text
+                        );
+                    }
 
-                        // Update QueueKey
-                        visitQueue.QueueKey = string.Format("{0}|{1}|{2}",
+                    // Ambil data antrean sumber
+                    var sourceQueue = sourceQueues[0];
+
+                    if (string.IsNullOrWhiteSpace(sourceQueue.VisitNo))
+                    {
+                        throw new Exception(
+                            "VisitNo antrean sumber kosong."
+                        );
+                    }
+
+                    if (string.IsNullOrWhiteSpace(sourceQueue.SRAutoNumber))
+                    {
+                        throw new Exception(
+                            "SRAutoNumber antrean sumber kosong."
+                        );
+                    }
+
+                    // Buat VisitQueue baru untuk registrasi referral
+                    var queueResult =
+                        VisitQueue.InsertVisitQueueStage(
+                            sourceQueue.VisitNo,
+                            sourceQueue.SRAutoNumber,
+                            AppSession.UserLogin.UserID,
+                            DateTime.Now,
                             entity.ServiceUnitID,
-                            visitQueue.StageID,
-                            entity.ParamedicID);
+                            entity.ParamedicID,
+                            entity.RegistrationNo,
+                            entity.PatientID
+                        );
 
-                        visitQueue.LastUpdated = DateTime.Now;
-                        visitQueue.UpdatedBy = AppSession.UserLogin.UserID;
-
-                        visitQueue.Save();
+                    if (queueResult == null)
+                    {
+                        throw new Exception(
+                            "Gagal membuat VisitQueue untuk registrasi referral: "
+                            + entity.RegistrationNo
+                        );
                     }
                 }
 

@@ -73,6 +73,14 @@
                 color: #666;
                 margin-top: 2px;
             }
+
+            .faskes-schedule {
+                font-size: 12px;
+                font-weight: bold;
+                color: #247a3c;
+                margin-top: 4px;
+                margin-bottom: 3px;
+            }
         </style>
 
     </telerik:RadCodeBlock>
@@ -305,6 +313,10 @@
                             <div class="faskes-title">
                                 <%# FaskesText(Eval("Nmppk")) %>
                                 <span class="faskes-code">(<%# FaskesText(Eval("Kdppk")) %>)</span>
+                            </div>
+
+                            <div class="faskes-schedule">
+                                Jadwal: <%# FaskesText(Eval("Jadwal")) %>
                             </div>
 
                             <div class="faskes-meta">

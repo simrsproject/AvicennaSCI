@@ -829,7 +829,9 @@ namespace Temiang.Avicenna.Controllers
                                 reg.GuarantorID,
                                 reg.ServiceUnitID,
                                 AppSession.UserLogin.UserID,
-                                DateTime.Now.Date
+                                DateTime.Now.Date,
+                                AppointmentNo,
+                                reg.PatientID
                             );
 
                         if (!string.IsNullOrEmpty(visitNo))

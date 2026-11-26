@@ -257,6 +257,7 @@
                                 fw_lastTbiDisabled = args.get_item();
                                 fw_lastTbiDisabled.disable();
                                 PauseAutoSave();
+                                <%=BasePageDialogEntryCurrent.OnGetScriptToolBarSaveAndEditClicking() %>
                                 document.getElementById('<%= fw_btnAutoSave.ClientID %>').click();
                                 return;
                             }

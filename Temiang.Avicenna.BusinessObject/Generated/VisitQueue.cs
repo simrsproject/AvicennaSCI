@@ -2076,6 +2076,7 @@ namespace Temiang.Avicenna.BusinessObject
             // =========================================
             // OPTIONAL FILTERS
             // =========================================
+            // Jika status kosong, tampilkan semua status
             if (!string.IsNullOrWhiteSpace(status))
             {
                 query.Where(query.Status == status);
@@ -2102,10 +2103,12 @@ namespace Temiang.Avicenna.BusinessObject
             }
 
             // =========================================
-            // ORDER + TOP
+            // ORDER
             // =========================================
             query.OrderBy(query.QueueSequence.Ascending);
-            query.es.Top = 50;
+
+            // Tidak menggunakan Top 50
+            // Semua data sesuai filter akan ditampilkan
 
             collection.Load(query);
 
@@ -2132,6 +2135,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.ServiceUnitID,
                     x.CategoryID,
                     x.RecallCount,
+                    x.QueueSequence,
 
                     ServiceUnitName =
                         serviceUnits
@@ -2142,25 +2146,24 @@ namespace Temiang.Avicenna.BusinessObject
 
                     x.ParamedicID,
 
-
                     ParamedicName =
                         paramedics
                             .FirstOrDefault(p =>
                                 p.ParamedicID == x.ParamedicID
                             )
-                            ?.ParamedicName,
+                            ?.ParamedicName
                 })
                 .ToList();
         }
 
         public static object GetQueueForAllServieUnitAdmin(
-            DateTime queueDate,
-            string status,
-            string stageID,
-            string serviceUnitID,
-            string paramedicID,
-            string categoryID
-        )
+             DateTime queueDate,
+             string status,
+             string stageID,
+             string serviceUnitID,
+             string paramedicID,
+             string categoryID
+         )
         {
             var collection = new VisitQueueCollection();
             var query = new VisitQueueQuery("v");
@@ -2222,10 +2225,13 @@ namespace Temiang.Avicenna.BusinessObject
             }
 
             // =========================================
-            // ORDER + TOP
+            // ORDER DATA ANTREAN
+            // =========================================
             // =========================================
             query.OrderBy(query.QueueSequence.Ascending);
-            query.es.Top = 50;
+
+            // Tidak menggunakan TOP 50 agar seluruh status
+            // WAITING, FINISHED, dan status lainnya ikut diambil.
 
             collection.Load(query);
 
@@ -2273,10 +2279,17 @@ namespace Temiang.Avicenna.BusinessObject
                 patients.Query.Load();
             }
 
+            // =========================================
+            // PATIENT DICTIONARY
+            // =========================================
             var patientDict =
                 patients.ToDictionary(
                     x => x.PatientID,
-                    x => x.FirstName
+                    x => new
+                    {
+                        x.FirstName,
+                        x.MedicalNo
+                    }
                 );
 
             // =========================================
@@ -2289,11 +2302,19 @@ namespace Temiang.Avicenna.BusinessObject
                     x.VisitNo,
                     x.RegistrationNo,
                     x.PatientID,
+
+                    MedicalNo =
+                        !string.IsNullOrEmpty(x.PatientID)
+                        && patientDict.ContainsKey(x.PatientID)
+                            ? patientDict[x.PatientID].MedicalNo
+                            : null,
+
                     FirstName =
                         !string.IsNullOrEmpty(x.PatientID)
                         && patientDict.ContainsKey(x.PatientID)
-                            ? patientDict[x.PatientID]
+                            ? patientDict[x.PatientID].FirstName
                             : null,
+
                     x.QueueDate,
                     x.Status,
                     x.QueueSequence,
@@ -2302,6 +2323,7 @@ namespace Temiang.Avicenna.BusinessObject
                     x.RecallCount,
 
                     x.ServiceUnitID,
+
                     ServiceUnitName =
                         !string.IsNullOrEmpty(x.ServiceUnitID)
                         && serviceUnitDict.ContainsKey(x.ServiceUnitID)
@@ -3735,13 +3757,15 @@ namespace Temiang.Avicenna.BusinessObject
             }
         }
 
-        //FOR PASIEN TITIPAN
+        // FOR PASIEN TITIPAN
         public static string TakeQueueVisitPasienTitipan
         (
             string guarantorID,
             string serviceUnitID,
             string userID,
-            DateTime transDate
+            DateTime transDate,
+            string appointmentNo,
+            string patientID
         )
         {
             esParameters prms =
@@ -3781,6 +3805,22 @@ namespace Temiang.Avicenna.BusinessObject
                 esParameterDirection.Input,
                 DbType.Date,
                 0
+            );
+
+            prms.Add(
+                "AppointmentNo",
+                appointmentNo,
+                esParameterDirection.Input,
+                DbType.String,
+                50
+            );
+
+            prms.Add(
+                "PatientID",
+                patientID,
+                esParameterDirection.Input,
+                DbType.String,
+                50
             );
 
             // =========================================

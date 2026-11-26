@@ -24,6 +24,15 @@ namespace Temiang.Avicenna.Module.Charges.Dispensary.PrescriptionSales
         protected global::System.Web.UI.WebControls.Label lblNOSJP;
 
         /// <summary>
+        /// txtNOSJP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNOSJP;
+
+        /// <summary>
         /// lblNORESEP control.
         /// </summary>
         /// <remarks>
@@ -31,6 +40,15 @@ namespace Temiang.Avicenna.Module.Charges.Dispensary.PrescriptionSales
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblNORESEP;
+
+        /// <summary>
+        /// txtNORESEP control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtNORESEP;
 
         /// <summary>
         /// grdApolDetail control.

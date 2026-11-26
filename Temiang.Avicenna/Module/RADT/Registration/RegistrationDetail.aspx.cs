@@ -10386,7 +10386,6 @@ namespace Temiang.Avicenna.Module.RADT
             EventArgs e
         )
         {
-
             if (!string.Equals(
                 AppSession.Parameter.HealthcareID,
                 "RSI",
@@ -10397,12 +10396,29 @@ namespace Temiang.Avicenna.Module.RADT
 
             txtVisitNo.Text = string.Empty;
 
+            string appointmentNo = string.Empty;
+            string patientID = txtPatientID.Text;
+
+            var registration = new Registration();
+
+            if (registration.LoadByPrimaryKey(txtRegistrationNo.Text))
+            {
+                appointmentNo = registration.AppointmentNo;
+
+                if (!string.IsNullOrWhiteSpace(registration.PatientID))
+                {
+                    patientID = registration.PatientID;
+                }
+            }
+
             txtGenerateVisitNo.Text =
                 VisitQueue.TakeQueueVisitPasienTitipan(
                     cboGuarantorID.SelectedValue,
                     cboServiceUnitID.SelectedValue,
                     AppSession.UserLogin.UserID,
-                    DateTime.Today
+                    DateTime.Today,
+                    appointmentNo,
+                    patientID
                 );
         }
 
