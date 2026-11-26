@@ -17,6 +17,11 @@
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
                 </UpdatedControls>
             </telerik:AjaxSetting>
+            <telerik:AjaxSetting AjaxControlID="btnFilterCertificateStatus">
+                <UpdatedControls>
+                    <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
+                </UpdatedControls>
+            </telerik:AjaxSetting>
             <telerik:AjaxSetting AjaxControlID="grdList">
                 <UpdatedControls>
                     <telerik:AjaxUpdatedControl ControlID="grdList" LoadingPanelID="fw_ajxLoadingPanel" />
@@ -47,7 +52,7 @@
                 <td width="50%" style="vertical-align: top">
                     <table width="100%">
                         <tr>
-                            <td class="label">Status</td>
+                            <td class="label">Quick Sign Status</td>
                             <td class="entry">
                                 <telerik:RadComboBox ID="cboStatus" runat="server" Width="300px" AllowCustomText="false">
                                     <Items>
@@ -63,11 +68,35 @@
                                     OnClick="btnFilter_Click" ToolTip="Search" />
                             </td>
                         </tr>
+                        <tr>
+                            <td class="label">Sertifikat Status</td>
+                            <td class="entry">
+                                <telerik:RadComboBox ID="cboCertificateStatus" runat="server" Width="300px" AllowCustomText="false">
+                                    <Items>
+                                        <telerik:RadComboBoxItem Text="(Semua)" Value="" />
+                                        <telerik:RadComboBoxItem Text="0 - Belum ada" Value="0" />
+                                        <telerik:RadComboBoxItem Text="1 - Menunggu Verifikasi" Value="1" />
+                                        <telerik:RadComboBoxItem Text="2 - Sertifikat Terbit" Value="2" />
+                                        <telerik:RadComboBoxItem Text="3 - Aktif" Value="3" />
+                                        <telerik:RadComboBoxItem Text="4 - Ditolak" Value="4" />
+                                    </Items>
+                                </telerik:RadComboBox>
+                            </td>
+                            <td style="text-align: left">
+                                <asp:ImageButton ID="btnFilterCertificateStatus" runat="server"
+                                    ImageUrl="~/Images/Toolbar/search16.png"
+                                    OnClick="btnFilter_Click" ToolTip="Search" />
+                            </td>
+                        </tr>
                     </table>
                 </td>
             </tr>
         </table>
     </cc:CollapsePanel>
+
+    <div style="text-align: right;">
+        <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
+    </div>
 
     <telerik:RadGrid ID="grdList" runat="server" AllowPaging="True" PageSize="20"
         OnNeedDataSource="grdList_NeedDataSource" OnItemCommand="grdList_ItemCommand">
@@ -77,7 +106,7 @@
                 <telerik:GridBoundColumn DataField="ParamedicName" HeaderText="Dokter" UniqueName="ParamedicName" />
                 <telerik:GridBoundColumn DataField="Email" HeaderText="Email" UniqueName="Email" />
                 <telerik:GridBoundColumn DataField="TilakaName" HeaderText="Tilaka Name" UniqueName="TilakaName" />
-                <telerik:GridBoundColumn DataField="CertificateStatus" HeaderText="Sertifikat Status" UniqueName="CertificateStatus" />
+                <telerik:GridBoundColumn DataField="CertificateStatusText" HeaderText="Sertifikat Status" UniqueName="CertificateStatusText" />
                 <telerik:GridBoundColumn DataField="QuickSignStatus" HeaderText="Quick Sign" UniqueName="QuickSignStatus" />
                 <telerik:GridBoundColumn DataField="QuickSignRegisteredDateTime" HeaderText="Register Time"
                     DataFormatString="{0:dd-MM-yyyy HH:mm}" UniqueName="QuickSignRegisteredDateTime" />
@@ -92,6 +121,4 @@
             </Columns>
         </MasterTableView>
     </telerik:RadGrid>
-
-    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>

@@ -69,6 +69,24 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.ImageButton btnFilterStatus;
 
         /// <summary>
+        /// cboCertificateStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Telerik.Web.UI.RadComboBox cboCertificateStatus;
+
+        /// <summary>
+        /// btnFilterCertificateStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ImageButton btnFilterCertificateStatus;
+
+        /// <summary>
         /// grdList control.
         /// </summary>
         /// <remarks>

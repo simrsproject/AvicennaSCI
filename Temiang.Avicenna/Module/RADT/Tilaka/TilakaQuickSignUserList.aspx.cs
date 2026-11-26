@@ -154,10 +154,22 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!string.IsNullOrWhiteSpace(txtParamedicName.Text))
                 par.Where(par.ParamedicName.Like("%" + txtParamedicName.Text.Trim() + "%"));
 
+            int certificateStatusFilter;
+            if (int.TryParse(cboCertificateStatus.SelectedValue, out certificateStatusFilter))
+            {
+                if (certificateStatusFilter == TilakaConstant.CertificateStatus.None)
+                    par.Where(par.Or(
+                        reg.CertificateStatus.IsNull(),
+                        reg.CertificateStatus == TilakaConstant.CertificateStatus.None));
+                else
+                    par.Where(reg.CertificateStatus == certificateStatusFilter);
+            }
+
             par.es.Top = AppSession.Parameter.MaxResultRecord;
             par.OrderBy(par.ParamedicName.Ascending);
 
             var table = par.LoadDataTable();
+            table.Columns.Add("CertificateStatusText", typeof(string));
             table.Columns.Add("QuickSignStatus", typeof(string));
             table.Columns.Add("CanRegister", typeof(bool));
 
@@ -177,6 +189,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                         StringComparison.OrdinalIgnoreCase)
                     && (!expiryDate.HasValue || expiryDate.Value >= DateTime.Now);
 
+                row["CertificateStatusText"] = CertificateStatusText(certificate);
                 row["QuickSignStatus"] = isRegistered ? "Terdaftar" : "Belum terdaftar";
                 row["CanRegister"] = !isRegistered && certificateActive;
 
@@ -188,6 +201,23 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             table.AcceptChanges();
             return table;
+        }
+
+        private static string CertificateStatusText(int status)
+        {
+            string name;
+
+            switch (status)
+            {
+                case TilakaConstant.CertificateStatus.None: name = "Belum ada"; break;
+                case TilakaConstant.CertificateStatus.InVerification: name = "Menunggu Verifikasi"; break;
+                case TilakaConstant.CertificateStatus.Registered: name = "Sertifikat Terbit"; break;
+                case TilakaConstant.CertificateStatus.Active: name = "Aktif"; break;
+                case TilakaConstant.CertificateStatus.Rejected: name = "Ditolak"; break;
+                default: name = "Tidak diketahui"; break;
+            }
+
+            return status + " - " + name;
         }
     }
 }
