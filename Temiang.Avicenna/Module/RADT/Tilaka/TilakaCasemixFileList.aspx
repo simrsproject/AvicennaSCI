@@ -94,7 +94,8 @@
                             CommandArgument='<%# Eval("CasemixFileID") %>'
                             Visible='<%# Eval("CanDelete") %>'
                             OnClientClick="return confirm('Hapus file Casemix ini?');"
-                            ToolTip="Delete" />
+                            ToolTip="Delete"
+                            Style="margin-left: 20px; vertical-align: middle;" />
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
             </Columns>

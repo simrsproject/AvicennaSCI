@@ -73,7 +73,8 @@
                             CommandArgument='<%# Eval("TemplateSignFileID") %>'
                             Visible='<%# Eval("CanDelete") %>'
                             OnClientClick="return confirm('Hapus template ini? Data yang dihapus tidak dapat dikembalikan.');"
-                            ToolTip="Delete" />
+                            ToolTip="Delete"
+                            Style="margin-left: 20px; vertical-align: middle;" />
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
             </Columns>
