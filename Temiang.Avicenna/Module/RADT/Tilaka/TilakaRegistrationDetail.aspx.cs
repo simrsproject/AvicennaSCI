@@ -115,6 +115,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                                  && IsWebviewState(state);
             btnCekStatus.Visible = record != null && state != TilakaRegistrationState.BelumTerdaftar;
 
+            var canChangeMfa = isUsingESignature
+                && TilakaRegistrationActionRules.CanChangeMfa(record, state);
+
+            btnChangeMfa.Visible = canChangeMfa;
+            hfChangeMfaUrl.Value = canChangeMfa
+                ? TilakaUrls.ChangeMfaWebview(config, record.TilakaName)
+                : string.Empty;
+
             ConfigureConsent(config);
 
             if (!isUsingESignature)
@@ -201,6 +209,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             btnKirimData.Visible = false;
             btnWebview.Visible = false;
             btnCekStatus.Visible = false;
+            btnChangeMfa.Visible = false;
+            hfChangeMfaUrl.Value = string.Empty;
         }
 
         private static string BuildWebviewUrl(TilakaConfig config, TilakaRegistrationRecord record, string state)

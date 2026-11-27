@@ -1,3 +1,4 @@
+using System;
 using System.Web.Mvc;
 using Temiang.Avicenna.Common.Tilaka;
 
@@ -12,6 +13,16 @@ namespace Temiang.Avicenna.Controllers
         [HttpGet]
         public ActionResult Return()
         {
+            var mode = Request.QueryString["mode"];
+            if (string.Equals(mode, "mfa", StringComparison.OrdinalIgnoreCase))
+            {
+                return View("Return", new TilakaWebviewReturnResult
+                {
+                    IsSuccess = true,
+                    Message = "Jika proses di Tilaka selesai, MFA sudah diperbarui."
+                });
+            }
+
             var requestId = Request.QueryString["request_id"];
 
             if (string.IsNullOrWhiteSpace(requestId))

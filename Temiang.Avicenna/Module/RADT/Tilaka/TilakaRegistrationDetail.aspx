@@ -12,6 +12,12 @@
                 return false;
             }
 
+            function openChangeMfa() {
+                var url = document.getElementById('<%= hfChangeMfaUrl.ClientID %>').value;
+                if (url) window.open(url, '_blank');
+                return false;
+            }
+
             function openConsent() {
                 var panel = document.getElementById('<%= pnlConsent.ClientID %>');
                 if (panel) panel.style.display = 'block';
@@ -30,6 +36,7 @@
 
     <asp:HiddenField ID="hfWebviewUrl" runat="server" />
     <asp:HiddenField ID="hfParamedicID" runat="server" />
+    <asp:HiddenField ID="hfChangeMfaUrl" runat="server" />
 
     <table width="100%">
         <tr>
@@ -89,6 +96,8 @@
         <asp:Button ID="btnKirimData" runat="server" Text="Kirim Data KYC" OnClick="btnKirimData_OnClick" />
         <asp:Button ID="btnWebview" runat="server" Text="Buka Webview" OnClientClick="return openWebview();" />
         <asp:Button ID="btnCekStatus" runat="server" Text="Cek Status" OnClick="btnCekStatus_OnClick" />
+        <asp:Button ID="btnChangeMfa" runat="server" Text="Ganti MFA"
+            OnClientClick="return openChangeMfa();" />
     </div>
     <br />
     <br />
