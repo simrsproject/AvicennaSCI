@@ -32,6 +32,15 @@ namespace Temiang.Avicenna.Common.Tilaka
         public DateTime? CertificateStartDate { get; set; }
         public DateTime? CertificateExpiryDate { get; set; }
 
+        public string RevokeRequestID { get; set; }
+        public string RevokeReason { get; set; }
+        public string RevokeNote { get; set; }
+        public string RevokeStatus { get; set; }
+        public string RevokeMessage { get; set; }
+        public DateTime? RevokeRequestedDateTime { get; set; }
+        public string RevokeRequestedByUserID { get; set; }
+        public DateTime? RevokeCompletedDateTime { get; set; }
+
         public string ConsentVersion { get; set; }
         public DateTime? ConsentTimestamp { get; set; }
         public string ConsentApprovedByUserID { get; set; }
@@ -75,6 +84,19 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             CertificateStatus = certificate.Status;
             CertificateStatusInfo = certificate.Message == null ? null : certificate.Message.Info;
+
+            var isRevoked = string.Equals(CertificateDataStatus,
+                                TilakaConstant.CertificateDataStatus.Revoke,
+                                StringComparison.OrdinalIgnoreCase)
+                            || string.Equals(RevokeStatus,
+                                TilakaConstant.RevokeStatus.Success,
+                                StringComparison.OrdinalIgnoreCase);
+
+            if (isRevoked)
+            {
+                CertificateDataStatus = TilakaConstant.CertificateDataStatus.Revoke;
+                return;
+            }
 
             if (certificate.Data != null && certificate.Data.Length > 0)
             {

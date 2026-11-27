@@ -2,7 +2,7 @@
 ===============================================================================
                        Persistence Layer and Business Objects
 ===============================================================================
-                    Date Generated       : 2026-11-26 10:42:09 AM
+                    Date Generated       : 2026-11-27 05:16:18 PM
 ===============================================================================
 				Author: Wiliam Decosta (wiliamdecosta@gmail.com) - YBRS
 ===============================================================================
@@ -205,6 +205,14 @@ namespace Temiang.Avicenna.BusinessObject
 						case "QuickSignRegisteredDateTime": this.str.QuickSignRegisteredDateTime = (string)value; break;
 						case "QuickSignLastErrorMessage": this.str.QuickSignLastErrorMessage = (string)value; break;
 						case "CertificateDataStatus": this.str.CertificateDataStatus = (string)value; break;
+						case "RevokeRequestID": this.str.RevokeRequestID = (string)value; break;
+						case "RevokeReason": this.str.RevokeReason = (string)value; break;
+						case "RevokeNote": this.str.RevokeNote = (string)value; break;
+						case "RevokeStatus": this.str.RevokeStatus = (string)value; break;
+						case "RevokeMessage": this.str.RevokeMessage = (string)value; break;
+						case "RevokeRequestedDateTime": this.str.RevokeRequestedDateTime = (string)value; break;
+						case "RevokeRequestedByUserID": this.str.RevokeRequestedByUserID = (string)value; break;
+						case "RevokeCompletedDateTime": this.str.RevokeCompletedDateTime = (string)value; break;
 					}
 				}
 				else
@@ -285,6 +293,16 @@ namespace Temiang.Avicenna.BusinessObject
 						
 							if (value == null || value is System.DateTime)
 								this.QuickSignRegisteredDateTime = (System.DateTime?)value;
+							break;
+						case "RevokeRequestedDateTime":
+						
+							if (value == null || value is System.DateTime)
+								this.RevokeRequestedDateTime = (System.DateTime?)value;
+							break;
+						case "RevokeCompletedDateTime":
+						
+							if (value == null || value is System.DateTime)
+								this.RevokeCompletedDateTime = (System.DateTime?)value;
 							break;
 					
 						default:
@@ -887,6 +905,126 @@ namespace Temiang.Avicenna.BusinessObject
 				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.CertificateDataStatus, value);
 			}
 		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeRequestID
+		/// </summary>
+		virtual public System.String RevokeRequestID
+		{
+			get
+			{
+				return base.GetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeRequestID);
+			}
+			
+			set
+			{
+				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeRequestID, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeReason
+		/// </summary>
+		virtual public System.String RevokeReason
+		{
+			get
+			{
+				return base.GetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeReason);
+			}
+			
+			set
+			{
+				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeReason, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeNote
+		/// </summary>
+		virtual public System.String RevokeNote
+		{
+			get
+			{
+				return base.GetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeNote);
+			}
+			
+			set
+			{
+				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeNote, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeStatus
+		/// </summary>
+		virtual public System.String RevokeStatus
+		{
+			get
+			{
+				return base.GetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeStatus);
+			}
+			
+			set
+			{
+				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeStatus, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeMessage
+		/// </summary>
+		virtual public System.String RevokeMessage
+		{
+			get
+			{
+				return base.GetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeMessage);
+			}
+			
+			set
+			{
+				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeMessage, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeRequestedDateTime
+		/// </summary>
+		virtual public System.DateTime? RevokeRequestedDateTime
+		{
+			get
+			{
+				return base.GetSystemDateTime(TilakaRegistrationMetadata.ColumnNames.RevokeRequestedDateTime);
+			}
+			
+			set
+			{
+				base.SetSystemDateTime(TilakaRegistrationMetadata.ColumnNames.RevokeRequestedDateTime, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeRequestedByUserID
+		/// </summary>
+		virtual public System.String RevokeRequestedByUserID
+		{
+			get
+			{
+				return base.GetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeRequestedByUserID);
+			}
+			
+			set
+			{
+				base.SetSystemString(TilakaRegistrationMetadata.ColumnNames.RevokeRequestedByUserID, value);
+			}
+		}
+		/// <summary>
+		/// Maps to TilakaRegistration.RevokeCompletedDateTime
+		/// </summary>
+		virtual public System.DateTime? RevokeCompletedDateTime
+		{
+			get
+			{
+				return base.GetSystemDateTime(TilakaRegistrationMetadata.ColumnNames.RevokeCompletedDateTime);
+			}
+			
+			set
+			{
+				base.SetSystemDateTime(TilakaRegistrationMetadata.ColumnNames.RevokeCompletedDateTime, value);
+			}
+		}
 		
 		
 		#endregion	
@@ -1483,6 +1621,118 @@ namespace Temiang.Avicenna.BusinessObject
 					else entity.CertificateDataStatus = Convert.ToString(value);
 				}
 			}
+			public System.String RevokeRequestID
+			{
+				get
+				{
+					System.String data = entity.RevokeRequestID;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeRequestID = null;
+					else entity.RevokeRequestID = Convert.ToString(value);
+				}
+			}
+			public System.String RevokeReason
+			{
+				get
+				{
+					System.String data = entity.RevokeReason;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeReason = null;
+					else entity.RevokeReason = Convert.ToString(value);
+				}
+			}
+			public System.String RevokeNote
+			{
+				get
+				{
+					System.String data = entity.RevokeNote;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeNote = null;
+					else entity.RevokeNote = Convert.ToString(value);
+				}
+			}
+			public System.String RevokeStatus
+			{
+				get
+				{
+					System.String data = entity.RevokeStatus;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeStatus = null;
+					else entity.RevokeStatus = Convert.ToString(value);
+				}
+			}
+			public System.String RevokeMessage
+			{
+				get
+				{
+					System.String data = entity.RevokeMessage;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeMessage = null;
+					else entity.RevokeMessage = Convert.ToString(value);
+				}
+			}
+			public System.String RevokeRequestedDateTime
+			{
+				get
+				{
+					System.DateTime? data = entity.RevokeRequestedDateTime;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeRequestedDateTime = null;
+					else entity.RevokeRequestedDateTime = Convert.ToDateTime(value);
+				}
+			}
+			public System.String RevokeRequestedByUserID
+			{
+				get
+				{
+					System.String data = entity.RevokeRequestedByUserID;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeRequestedByUserID = null;
+					else entity.RevokeRequestedByUserID = Convert.ToString(value);
+				}
+			}
+			public System.String RevokeCompletedDateTime
+			{
+				get
+				{
+					System.DateTime? data = entity.RevokeCompletedDateTime;
+					return (data == null) ? String.Empty : Convert.ToString(data);
+				}
+
+				set
+				{
+					if (value == null || value.Length == 0) entity.RevokeCompletedDateTime = null;
+					else entity.RevokeCompletedDateTime = Convert.ToDateTime(value);
+				}
+			}
 			
 			private esTilakaRegistration entity;
 		}
@@ -1801,6 +2051,62 @@ namespace Temiang.Avicenna.BusinessObject
 			get
 			{
 				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.CertificateDataStatus, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeRequestID
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeRequestID, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeReason
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeReason, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeNote
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeNote, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeStatus
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeStatus, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeMessage
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeMessage, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeRequestedDateTime
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeRequestedDateTime, esSystemType.DateTime);
+			}
+		} 
+		public esQueryItem RevokeRequestedByUserID
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeRequestedByUserID, esSystemType.String);
+			}
+		} 
+		public esQueryItem RevokeCompletedDateTime
+		{
+			get
+			{
+				return new esQueryItem(this, TilakaRegistrationMetadata.ColumnNames.RevokeCompletedDateTime, esSystemType.DateTime);
 			}
 		} 
 	} 
@@ -2411,6 +2717,52 @@ namespace Temiang.Avicenna.BusinessObject
 			c.CharacterMaxLength = 20;
 			c.IsNullable = true;
 			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeRequestID, 39, typeof(System.String), esSystemType.String);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeRequestID;
+			c.CharacterMaxLength = 50;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeReason, 40, typeof(System.String), esSystemType.String);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeReason;
+			c.CharacterMaxLength = 100;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeNote, 41, typeof(System.String), esSystemType.String);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeNote;
+			c.CharacterMaxLength = 500;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeStatus, 42, typeof(System.String), esSystemType.String);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeStatus;
+			c.CharacterMaxLength = 20;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeMessage, 43, typeof(System.String), esSystemType.String);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeMessage;
+			c.CharacterMaxLength = 1000;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeRequestedDateTime, 44, typeof(System.DateTime), esSystemType.DateTime);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeRequestedDateTime;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeRequestedByUserID, 45, typeof(System.String), esSystemType.String);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeRequestedByUserID;
+			c.CharacterMaxLength = 40;
+			c.IsNullable = true;
+			_columns.Add(c); 
+				
+			c = new esColumnMetadata(TilakaRegistrationMetadata.ColumnNames.RevokeCompletedDateTime, 46, typeof(System.DateTime), esSystemType.DateTime);
+			c.PropertyName = TilakaRegistrationMetadata.PropertyNames.RevokeCompletedDateTime;
+			c.IsNullable = true;
+			_columns.Add(c); 
 		}
 		#endregion
 	
@@ -2476,6 +2828,14 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string QuickSignRegisteredDateTime = "QuickSignRegisteredDateTime";
 			public const string QuickSignLastErrorMessage = "QuickSignLastErrorMessage";
 			public const string CertificateDataStatus = "CertificateDataStatus";
+			public const string RevokeRequestID = "RevokeRequestID";
+			public const string RevokeReason = "RevokeReason";
+			public const string RevokeNote = "RevokeNote";
+			public const string RevokeStatus = "RevokeStatus";
+			public const string RevokeMessage = "RevokeMessage";
+			public const string RevokeRequestedDateTime = "RevokeRequestedDateTime";
+			public const string RevokeRequestedByUserID = "RevokeRequestedByUserID";
+			public const string RevokeCompletedDateTime = "RevokeCompletedDateTime";
 		}
 		#endregion	
 		
@@ -2521,6 +2881,14 @@ namespace Temiang.Avicenna.BusinessObject
 			public const string QuickSignRegisteredDateTime = "QuickSignRegisteredDateTime";
 			public const string QuickSignLastErrorMessage = "QuickSignLastErrorMessage";
 			public const string CertificateDataStatus = "CertificateDataStatus";
+			public const string RevokeRequestID = "RevokeRequestID";
+			public const string RevokeReason = "RevokeReason";
+			public const string RevokeNote = "RevokeNote";
+			public const string RevokeStatus = "RevokeStatus";
+			public const string RevokeMessage = "RevokeMessage";
+			public const string RevokeRequestedDateTime = "RevokeRequestedDateTime";
+			public const string RevokeRequestedByUserID = "RevokeRequestedByUserID";
+			public const string RevokeCompletedDateTime = "RevokeCompletedDateTime";
 		}
 		#endregion	
 
@@ -2603,6 +2971,14 @@ namespace Temiang.Avicenna.BusinessObject
 				meta.AddTypeMap("QuickSignRegisteredDateTime", new esTypeMap("datetime", "System.DateTime"));
 				meta.AddTypeMap("QuickSignLastErrorMessage", new esTypeMap("nvarchar", "System.String"));
 				meta.AddTypeMap("CertificateDataStatus", new esTypeMap("varchar", "System.String"));
+				meta.AddTypeMap("RevokeRequestID", new esTypeMap("varchar", "System.String"));
+				meta.AddTypeMap("RevokeReason", new esTypeMap("nvarchar", "System.String"));
+				meta.AddTypeMap("RevokeNote", new esTypeMap("nvarchar", "System.String"));
+				meta.AddTypeMap("RevokeStatus", new esTypeMap("varchar", "System.String"));
+				meta.AddTypeMap("RevokeMessage", new esTypeMap("nvarchar", "System.String"));
+				meta.AddTypeMap("RevokeRequestedDateTime", new esTypeMap("datetime", "System.DateTime"));
+				meta.AddTypeMap("RevokeRequestedByUserID", new esTypeMap("varchar", "System.String"));
+				meta.AddTypeMap("RevokeCompletedDateTime", new esTypeMap("datetime", "System.DateTime"));
 		
 
 				meta.Source = "TilakaRegistration";

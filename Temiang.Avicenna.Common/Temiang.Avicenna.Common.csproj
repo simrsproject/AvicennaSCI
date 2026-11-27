@@ -308,6 +308,7 @@
     <Compile Include="Tilaka\ITilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationState.cs" />
+    <Compile Include="Tilaka\TilakaRegistrationActionRules.cs" />
     <Compile Include="Tilaka\TilakaStatusPresentation.cs" />
     <Compile Include="Tilaka\TilakaQuickSignUserRules.cs" />
     <Compile Include="Tilaka\TilakaCasemixFileRules.cs" />

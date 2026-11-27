@@ -109,6 +109,7 @@
     <Compile Include="Tilaka\TilakaAuthTests.cs" />
     <Compile Include="Tilaka\TilakaServiceTests.cs" />
     <Compile Include="Tilaka\TilakaRegistrationStateTests.cs" />
+    <Compile Include="Tilaka\TilakaRegistrationActionRulesTests.cs" />
     <Compile Include="Tilaka\TilakaQuickSignUserRulesTests.cs" />
     <Compile Include="Tilaka\TilakaStatusPresentationTests.cs" />
     <Compile Include="Tilaka\TilakaWebviewReturnHandlerTests.cs" />

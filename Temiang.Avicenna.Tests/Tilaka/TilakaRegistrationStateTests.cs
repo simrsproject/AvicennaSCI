@@ -189,5 +189,46 @@ namespace Temiang.Avicenna.Tests.Tilaka
             Assert.AreEqual(TilakaConstant.KycStatus.Success, record.KycStatus);
             Assert.AreEqual(0, record.KycReasonCode);
         }
+
+        [TestMethod]
+        public void RevokeStatusSuccess_IsDicabutEvenWithoutCertificateDataStatus()
+        {
+            var record = Record();
+            record.CertificateStatus = TilakaConstant.CertificateStatus.Active;
+            record.CertificateExpiryDate = DateTime.Now.AddDays(30);
+            record.RevokeStatus = TilakaConstant.RevokeStatus.Success;
+
+            Assert.AreEqual(TilakaRegistrationState.Dicabut,
+                TilakaRegistrationState.Evaluate(record, DateTime.Now));
+            Assert.IsFalse(TilakaRegistrationState.IsCertificateActive(record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void ApplyCertificateStatus_DoesNotOverwriteRevoke()
+        {
+            var record = Record();
+            record.CertificateStatus = TilakaConstant.CertificateStatus.Active;
+            record.CertificateExpiryDate = DateTime.Now.AddDays(30);
+            record.RevokeStatus = TilakaConstant.RevokeStatus.Success;
+            record.CertificateDataStatus = TilakaConstant.CertificateDataStatus.Revoke;
+
+            record.ApplyCertificateStatus(new CheckCertStatusResponse
+            {
+                Success = true,
+                Status = TilakaConstant.CertificateStatus.Active,
+                Data = new[]
+                {
+                    new TilakaCertificate
+                    {
+                        Status = TilakaConstant.CertificateDataStatus.Active,
+                        SerialNumber = "SER-STALE"
+                    }
+                }
+            });
+
+            Assert.AreEqual(TilakaConstant.CertificateDataStatus.Revoke, record.CertificateDataStatus);
+            Assert.AreEqual(TilakaRegistrationState.Dicabut,
+                TilakaRegistrationState.Evaluate(record, DateTime.Now));
+        }
     }
 }

@@ -37,11 +37,47 @@ namespace Temiang.Avicenna.Common.Tilaka
             public const int Rejected = 4;
         }
 
+        public static class RevokeStatus
+        {
+            public const string Requested = "Requested";
+            public const string Success = "Success";
+            public const string Failed = "Failed";
+        }
+
+        public static class RevokeReason
+        {
+            public const string Resign = "Resign";
+            public const string Phk = "PHK";
+            public const string HabisKontrak = "Habis Kontrak";
+            public const string Mutasi = "Mutasi";
+            public const string PemindahanDepartemen = "Pemindahan Departemen";
+            public const string PindahDivisi = "Pindah Divisi";
+            public const string InternalFraud = "Internal Fraud";
+            public const string PenutupanHakAkses = "Penutupan Hak Akses";
+            public const string PelanggaranHukumDariUser = "Pelanggaran Hukum dari User";
+            public const string PerangkatHilangAtauDicuri = "Perangkat Hilang, Perangkat Dicuri";
+
+            public static readonly string[] All =
+            {
+                Resign,
+                Phk,
+                HabisKontrak,
+                Mutasi,
+                PemindahanDepartemen,
+                PindahDivisi,
+                InternalFraud,
+                PenutupanHakAkses,
+                PelanggaranHukumDariUser,
+                PerangkatHilangAtauDicuri
+            };
+        }
+
         public static class LogSource
         {
             public const string Callback = "callback";
             public const string Manual = "manual";
             public const string Reconcile = "reconcile";
+            public const string Revoke = "revoke";
         }
 
         public static class RelatedType

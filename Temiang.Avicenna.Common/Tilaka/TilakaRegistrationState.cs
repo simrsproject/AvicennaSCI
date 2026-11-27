@@ -71,8 +71,11 @@ namespace Temiang.Avicenna.Common.Tilaka
         private static bool IsRevoked(TilakaRegistrationRecord record)
         {
             return string.Equals(record.CertificateDataStatus,
-                TilakaConstant.CertificateDataStatus.Revoke,
-                System.StringComparison.OrdinalIgnoreCase);
+                       TilakaConstant.CertificateDataStatus.Revoke,
+                       System.StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(record.RevokeStatus,
+                       TilakaConstant.RevokeStatus.Success,
+                       System.StringComparison.OrdinalIgnoreCase);
         }
     }
 }
