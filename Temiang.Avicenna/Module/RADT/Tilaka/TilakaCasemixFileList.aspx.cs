@@ -100,7 +100,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             try
             {
-                repository.Delete(id);
+                repository.SoftDelete(id, AppSession.UserLogin.UserID);
                 lblMessage.Text = TilakaAlertHtml.Success("File Casemix berhasil dihapus.");
             }
             catch (Exception ex)
@@ -158,7 +158,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             query.Select(query,
                 paramedic.ParamedicName,
                 paramedic.IsUsingESignature);
-            query.Where(query.IsVoid == false);
+            query.Where(query.IsVoid == false, query.IsDeleted == false);
 
             if (!string.IsNullOrWhiteSpace(txtRegistrationNo.Text))
                 query.Where(query.RegistrationNo.Like("%" + txtRegistrationNo.Text.Trim() + "%"));

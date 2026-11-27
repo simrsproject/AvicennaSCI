@@ -72,7 +72,7 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 DownloadPath = downloadPath;
             }
 
-            public void Delete(long casemixFileID) { }
+            public void SoftDelete(long casemixFileID, string userID) { }
         }
 
         private static FakeRepository Repository()

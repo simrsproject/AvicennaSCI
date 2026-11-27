@@ -14,6 +14,8 @@ CREATE TABLE [dbo].[TilakaCasemixFile]
     [LastProcessedDateTime]   DATETIME     NULL,
     [LastUpdateDateTime]      DATETIME     NULL,
     [LastUpdateByUserID]      VARCHAR(40)  NULL,
+    [IsDeleted]               BIT          NOT NULL
+        CONSTRAINT [DF_TilakaCasemixFile_IsDeleted] DEFAULT ((0)),
 
     CONSTRAINT [PK_TilakaCasemixFile]
         PRIMARY KEY CLUSTERED

@@ -13,6 +13,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public bool IsVoid { get; set; }
+        public bool IsDeleted { get; set; }
         public long? LastQuickSignRequestID { get; set; }
         public DateTime? LastProcessedDateTime { get; set; }
         public string DownloadPath { get; set; }
@@ -24,7 +25,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         IList<TilakaCasemixFileRecord> FindAll();
         void UpdateLink(long casemixFileID, long quickSignRequestID, DateTime processedDateTime);
         void UpdateDownloadPath(long casemixFileID, long quickSignRequestID, string downloadPath);
-        void Delete(long casemixFileID);
+        void SoftDelete(long casemixFileID, string userID);
     }
 
     public class TilakaCasemixFileRepository : ITilakaCasemixFileRepository
@@ -32,13 +33,18 @@ namespace Temiang.Avicenna.Common.Tilaka
         public TilakaCasemixFileRecord FindByID(long casemixFileID)
         {
             var entity = new TilakaCasemixFile();
-            return entity.LoadByPrimaryKey(casemixFileID) ? Map(entity) : null;
+            if (!entity.LoadByPrimaryKey(casemixFileID)) return null;
+            if (entity.IsDeleted == true) return null;
+
+            return Map(entity);
         }
 
         public IList<TilakaCasemixFileRecord> FindAll()
         {
             var collection = new TilakaCasemixFileCollection();
-            collection.Query.Where(collection.Query.IsVoid == false);
+            collection.Query.Where(
+                collection.Query.IsVoid == false,
+                collection.Query.IsDeleted == false);
             collection.Query.OrderBy(collection.Query.CasemixFileID.Descending);
             collection.Load(collection.Query);
 
@@ -51,6 +57,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         {
             var entity = new TilakaCasemixFile();
             if (!entity.LoadByPrimaryKey(casemixFileID)) return;
+            if (entity.IsDeleted == true) return;
 
             entity.LastQuickSignRequestID = quickSignRequestID;
             entity.LastProcessedDateTime = processedDateTime;
@@ -69,6 +76,7 @@ namespace Temiang.Avicenna.Common.Tilaka
 
             var entity = new TilakaCasemixFile();
             if (!entity.LoadByPrimaryKey(casemixFileID)) return;
+            if (entity.IsDeleted == true) return;
 
             // Jangan biarkan callback request lama menimpa path request terbaru.
             if (!TilakaSignedFileRules.ShouldUpdateDownloadPath(
@@ -85,12 +93,15 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
         }
 
-        public void Delete(long casemixFileID)
+        public void SoftDelete(long casemixFileID, string userID)
         {
             var entity = new TilakaCasemixFile();
             if (!entity.LoadByPrimaryKey(casemixFileID)) return;
 
-            entity.MarkAsDeleted();
+            entity.IsDeleted = true;
+            entity.LastUpdateDateTime = DateTime.Now;
+            entity.LastUpdateByUserID = userID;
+
             using (var scope = new esTransactionScope())
             {
                 entity.Save();
@@ -108,6 +119,7 @@ namespace Temiang.Avicenna.Common.Tilaka
                 FileName = entity.FileName,
                 FilePath = entity.FilePath,
                 IsVoid = entity.IsVoid ?? false,
+                IsDeleted = entity.IsDeleted ?? false,
                 LastQuickSignRequestID = entity.LastQuickSignRequestID,
                 LastProcessedDateTime = entity.LastProcessedDateTime,
                 DownloadPath = entity.DownloadPath
