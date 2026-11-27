@@ -34,6 +34,18 @@ namespace Temiang.Avicenna.Controllers
             var service = new Service();
             var repository = new TilakaRegistrationRepository();
 
+            if (string.Equals(Request.QueryString["mode"], "revoke",
+                    StringComparison.OrdinalIgnoreCase)
+                || !string.IsNullOrWhiteSpace(Request.QueryString["revoke_id"]))
+            {
+                var revokeResult = new TilakaRevokeReturnHandler(repository, service).Process(
+                    Request.QueryString["request_id"],
+                    Request.QueryString["revoke_id"],
+                    Request.QueryString["status"]);
+
+                return View("Return", revokeResult);
+            }
+
             if (string.IsNullOrWhiteSpace(requestId))
             {
                 var issueId = Request.QueryString["issue_id"];
