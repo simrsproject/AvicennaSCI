@@ -65,6 +65,13 @@
                         <asp:LinkButton ID="btnRegister" runat="server" Text="Register"
                             CommandName="register" CommandArgument='<%# Eval("TemplateSignFileID") %>'
                             Visible='<%# Eval("CanRegister") %>' />
+                        <asp:ImageButton ID="btnDelete" runat="server"
+                            ImageUrl="~/Images/Toolbar/delete16.png"
+                            CommandName="delete"
+                            CommandArgument='<%# Eval("TemplateSignFileID") %>'
+                            Visible='<%# Eval("CanDelete") %>'
+                            OnClientClick="return confirm('Hapus template ini? Data yang dihapus tidak dapat dikembalikan.');"
+                            ToolTip="Delete" />
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
             </Columns>

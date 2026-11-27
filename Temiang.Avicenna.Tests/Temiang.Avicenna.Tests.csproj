@@ -99,6 +99,7 @@
     <Compile Include="Tilaka\TilakaConfigTests.cs" />
     <Compile Include="Tilaka\TilakaSignedFileRulesTests.cs" />
     <Compile Include="Tilaka\TilakaTemplateSignFileRulesTests.cs" />
+    <Compile Include="Tilaka\TilakaTemplateSignFileStoreTests.cs" />
     <Compile Include="Tilaka\TilakaSignatureTests.cs" />
     <Compile Include="Tilaka\TilakaTransportTests.cs" />
     <Compile Include="Tilaka\TilakaUrlsTests.cs" />

@@ -32,6 +32,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         TilakaTemplateSignFileRecord FindByParamedicAndTemplateNo(string paramedicID, string templateNo);
         IList<TilakaTemplateSignFileRecord> FindByParamedic(string paramedicID);
         void Save(TilakaTemplateSignFileRecord record);
+        void Delete(long templateSignFileID);
     }
 
     public class TilakaTemplateSignFileRepository : ITilakaTemplateSignFileRepository
@@ -111,6 +112,19 @@ namespace Temiang.Avicenna.Common.Tilaka
             }
 
             record.TemplateSignFileID = entity.TemplateSignFileID ?? 0;
+        }
+
+        public void Delete(long templateSignFileID)
+        {
+            var entity = new TilakaTemplateSignFile();
+            if (!entity.LoadByPrimaryKey(templateSignFileID)) return;
+
+            entity.MarkAsDeleted();
+            using (var scope = new esTransactionScope())
+            {
+                entity.Save();
+                scope.Complete();
+            }
         }
 
         private static TilakaTemplateSignFileRecord Map(TilakaTemplateSignFile entity)

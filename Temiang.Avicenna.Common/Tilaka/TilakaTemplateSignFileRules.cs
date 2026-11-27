@@ -9,6 +9,11 @@ namespace Temiang.Avicenna.Common.Tilaka
             return isActive && !isRegistered;
         }
 
+        public static bool CanDelete(bool isRegistered)
+        {
+            return !isRegistered;
+        }
+
         public static bool ResolveIsDefault(bool isActive, bool requestedDefault)
         {
             return isActive && requestedDefault;

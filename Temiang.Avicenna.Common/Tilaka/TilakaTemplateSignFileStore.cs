@@ -51,6 +51,13 @@ namespace Temiang.Avicenna.Common.Tilaka
             return File.Exists(fullPath) ? File.ReadAllBytes(fullPath) : null;
         }
 
+        public void Delete(string relativePath)
+        {
+            if (string.IsNullOrWhiteSpace(relativePath)) return;
+            var fullPath = ResolveFullPath(relativePath);
+            if (File.Exists(fullPath)) File.Delete(fullPath);
+        }
+
         private string ResolveFullPath(string relativePath)
         {
             var fullPath = Path.GetFullPath(Path.Combine(

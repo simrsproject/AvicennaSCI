@@ -66,7 +66,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
         protected void grdList_ItemCommand(object source, GridCommandEventArgs e)
         {
-            if (e.CommandName != "register") return;
+            if (e.CommandName != "register" && e.CommandName != "delete") return;
 
             long id;
             if (!long.TryParse(Convert.ToString(e.CommandArgument), out id)) return;
@@ -75,9 +75,49 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             var record = repository.FindByID(id);
             if (record == null) return;
 
-            RegisterTemplate(record, repository);
+            if (e.CommandName == "register")
+                RegisterTemplate(record, repository);
+            else
+                DeleteTemplate(record, repository);
 
             grdList.Rebind();
+        }
+
+        private void DeleteTemplate(TilakaTemplateSignFileRecord record,
+            ITilakaTemplateSignFileRepository repository)
+        {
+            if (record.IsRegistered)
+            {
+                lblMessage.Text = TilakaAlertHtml.Error("Template yang sudah terdaftar tidak dapat dihapus.");
+                return;
+            }
+
+            try
+            {
+                repository.Delete(record.TemplateSignFileID);
+                DeleteTemplateFile(record.FilePath);
+                lblMessage.Text = TilakaAlertHtml.Success("Template berhasil dihapus.");
+            }
+            catch (Exception ex)
+            {
+                lblMessage.Text = TilakaAlertHtml.Error(ex.Message);
+            }
+        }
+
+        private static void DeleteTemplateFile(string relativePath)
+        {
+            if (string.IsNullOrWhiteSpace(relativePath)) return;
+
+            try
+            {
+                var config = new TilakaConfig();
+                if (!string.IsNullOrWhiteSpace(config.TemplateSignFolder))
+                    new TilakaTemplateSignFileStore(config.TemplateSignFolder).Delete(relativePath);
+            }
+            catch
+            {
+                // Record sudah terhapus; kegagalan membersihkan file tidak boleh membatalkan proses.
+            }
         }
 
         private void RegisterTemplate(TilakaTemplateSignFileRecord record,
@@ -190,12 +230,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
 
             var table = query.LoadDataTable();
             table.Columns.Add("CanRegister", typeof(bool));
+            table.Columns.Add("CanDelete", typeof(bool));
 
             foreach (DataRow row in table.Rows)
             {
                 var isActive = row["IsActive"] != DBNull.Value && Convert.ToBoolean(row["IsActive"]);
                 var isRegistered = row["IsRegistered"] != DBNull.Value && Convert.ToBoolean(row["IsRegistered"]);
                 row["CanRegister"] = TilakaTemplateSignFileRules.CanRegister(isActive, isRegistered);
+                row["CanDelete"] = TilakaTemplateSignFileRules.CanDelete(isRegistered);
             }
 
             return table;

@@ -125,6 +125,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
             }
 
             public void Save(TilakaTemplateSignFileRecord record) { }
+
+            public void Delete(long templateSignFileID) { }
         }
 
         private class FakeRegistrationRepository : ITilakaRegistrationRepository

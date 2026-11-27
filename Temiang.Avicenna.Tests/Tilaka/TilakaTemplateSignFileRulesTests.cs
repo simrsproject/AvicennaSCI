@@ -21,6 +21,18 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
+        public void CanDelete_NotRegistered_ReturnsTrue()
+        {
+            Assert.IsTrue(TilakaTemplateSignFileRules.CanDelete(false));
+        }
+
+        [TestMethod]
+        public void CanDelete_Registered_ReturnsFalse()
+        {
+            Assert.IsFalse(TilakaTemplateSignFileRules.CanDelete(true));
+        }
+
+        [TestMethod]
         public void ResolveIsDefault_Inactive_ForcesFalse()
         {
             Assert.IsFalse(TilakaTemplateSignFileRules.ResolveIsDefault(false, true));
