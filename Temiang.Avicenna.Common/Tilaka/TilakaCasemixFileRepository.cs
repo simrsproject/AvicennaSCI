@@ -24,6 +24,7 @@ namespace Temiang.Avicenna.Common.Tilaka
         IList<TilakaCasemixFileRecord> FindAll();
         void UpdateLink(long casemixFileID, long quickSignRequestID, DateTime processedDateTime);
         void UpdateDownloadPath(long casemixFileID, long quickSignRequestID, string downloadPath);
+        void Delete(long casemixFileID);
     }
 
     public class TilakaCasemixFileRepository : ITilakaCasemixFileRepository
@@ -77,6 +78,19 @@ namespace Temiang.Avicenna.Common.Tilaka
             entity.DownloadPath = downloadPath;
             entity.LastUpdateDateTime = DateTime.Now;
 
+            using (var scope = new esTransactionScope())
+            {
+                entity.Save();
+                scope.Complete();
+            }
+        }
+
+        public void Delete(long casemixFileID)
+        {
+            var entity = new TilakaCasemixFile();
+            if (!entity.LoadByPrimaryKey(casemixFileID)) return;
+
+            entity.MarkAsDeleted();
             using (var scope = new esTransactionScope())
             {
                 entity.Save();

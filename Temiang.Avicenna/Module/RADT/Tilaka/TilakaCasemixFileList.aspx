@@ -86,6 +86,13 @@
                         <asp:LinkButton ID="btnStatus" runat="server" Text="Status"
                             CommandName="status" CommandArgument='<%# Eval("RequestID") %>'
                             Visible='<%# !string.IsNullOrEmpty(Convert.ToString(Eval("RequestID"))) %>' />
+                        <asp:ImageButton ID="btnDelete" runat="server"
+                            ImageUrl="~/Images/Toolbar/delete16.png"
+                            CommandName="delete"
+                            CommandArgument='<%# Eval("CasemixFileID") %>'
+                            Visible='<%# Eval("CanDelete") %>'
+                            OnClientClick="return confirm('Hapus file Casemix ini?');"
+                            ToolTip="Delete" />
                     </ItemTemplate>
                 </telerik:GridTemplateColumn>
             </Columns>

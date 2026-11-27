@@ -47,6 +47,13 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 return;
             }
 
+            if (e.CommandName == "delete")
+            {
+                DeleteCasemixFile(Convert.ToString(e.CommandArgument));
+                grdList.Rebind();
+                return;
+            }
+
             if (e.CommandName != "process") return;
 
             long id;
@@ -74,6 +81,41 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             }
 
             grdList.Rebind();
+        }
+
+        private void DeleteCasemixFile(string commandArgument)
+        {
+            long id;
+            if (!long.TryParse(commandArgument, out id)) return;
+
+            var repository = new TilakaCasemixFileRepository();
+            var record = repository.FindByID(id);
+            if (record == null) return;
+
+            if (!TilakaCasemixFileRules.CanDelete(HasQuickSignRequest(id)))
+            {
+                lblMessage.Text = TilakaAlertHtml.Error("File Casemix yang sudah diproses tidak dapat dihapus.");
+                return;
+            }
+
+            try
+            {
+                repository.Delete(id);
+                lblMessage.Text = TilakaAlertHtml.Success("File Casemix berhasil dihapus.");
+            }
+            catch (Exception ex)
+            {
+                lblMessage.Text = TilakaAlertHtml.Error(ex.Message);
+            }
+        }
+
+        private static bool HasQuickSignRequest(long casemixFileId)
+        {
+            var query = new TilakaQuickSignRequestQuery();
+            query.Where(query.CasemixFileID == casemixFileId);
+            query.es.Top = 1;
+
+            return new TilakaQuickSignRequest().Load(query);
         }
 
         private TilakaQuickSignSubmitResult ProcessSignature(long casemixFileId)
@@ -137,6 +179,7 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             table.Columns.Add("RequestID", typeof(string));
             table.Columns.Add("RequestStatus", typeof(string));
             table.Columns.Add("CanProcess", typeof(bool));
+            table.Columns.Add("CanDelete", typeof(bool));
 
             foreach (DataRow row in table.Rows)
             {
@@ -156,12 +199,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                     row["RequestStatus"] = status;
                     row["CanProcess"] = isUsingESignature
                                         && status == TilakaQuickSignConstant.RequestStatus.Failed;
+                    row["CanDelete"] = TilakaCasemixFileRules.CanDelete(true);
                 }
                 else
                 {
                     row["RequestID"] = DBNull.Value;
                     row["RequestStatus"] = "Belum diproses";
                     row["CanProcess"] = isUsingESignature;
+                    row["CanDelete"] = TilakaCasemixFileRules.CanDelete(false);
                 }
             }
 

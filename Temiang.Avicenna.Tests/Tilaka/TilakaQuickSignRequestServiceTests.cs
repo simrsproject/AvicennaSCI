@@ -104,6 +104,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
             }
 
             public void UpdateDownloadPath(long casemixFileID, long quickSignRequestID, string downloadPath) { }
+
+            public void Delete(long casemixFileID) { }
         }
 
         private class FakeTemplateRepository : ITilakaTemplateSignFileRepository

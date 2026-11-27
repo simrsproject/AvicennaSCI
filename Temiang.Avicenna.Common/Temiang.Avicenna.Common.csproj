@@ -310,6 +310,7 @@
     <Compile Include="Tilaka\TilakaRegistrationState.cs" />
     <Compile Include="Tilaka\TilakaStatusPresentation.cs" />
     <Compile Include="Tilaka\TilakaQuickSignUserRules.cs" />
+    <Compile Include="Tilaka\TilakaCasemixFileRules.cs" />
     <Compile Include="Tilaka\TilakaReEnrollReturnHandler.cs" />
     <Compile Include="Tilaka\TilakaCertificateStatusRules.cs" />
     <Compile Include="Tilaka\TilakaRegistrationGuard.cs" />

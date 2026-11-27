@@ -96,6 +96,7 @@
     <Compile Include="Admedika\AdmedikaServiceTests.cs" />
     <Compile Include="Admedika\AdmedikaTokenTests.cs" />
     <Compile Include="Tilaka\TilakaAlertHtmlTests.cs" />
+    <Compile Include="Tilaka\TilakaCasemixFileRulesTests.cs" />
     <Compile Include="Tilaka\TilakaConfigTests.cs" />
     <Compile Include="Tilaka\TilakaSignedFileRulesTests.cs" />
     <Compile Include="Tilaka\TilakaTemplateSignFileRulesTests.cs" />

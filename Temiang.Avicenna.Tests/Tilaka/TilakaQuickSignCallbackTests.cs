@@ -71,6 +71,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 RequestID = quickSignRequestID;
                 DownloadPath = downloadPath;
             }
+
+            public void Delete(long casemixFileID) { }
         }
 
         private static FakeRepository Repository()
