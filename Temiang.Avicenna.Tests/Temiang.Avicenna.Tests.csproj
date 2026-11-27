@@ -112,6 +112,7 @@
     <Compile Include="Tilaka\TilakaRegistrationActionRulesTests.cs" />
     <Compile Include="Tilaka\TilakaRevokeResponseDataTests.cs" />
     <Compile Include="Tilaka\TilakaRevokeReturnHandlerTests.cs" />
+    <Compile Include="Tilaka\TilakaWebviewRequestTests.cs" />
     <Compile Include="Tilaka\TilakaQuickSignUserRulesTests.cs" />
     <Compile Include="Tilaka\TilakaStatusPresentationTests.cs" />
     <Compile Include="Tilaka\TilakaWebviewReturnHandlerTests.cs" />

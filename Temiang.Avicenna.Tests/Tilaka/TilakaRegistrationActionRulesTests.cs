@@ -51,5 +51,14 @@ namespace Temiang.Avicenna.Tests.Tilaka
             Assert.IsTrue(TilakaRegistrationActionRules.CanRevoke(
                 record, TilakaRegistrationState.Aktif));
         }
+
+        [TestMethod]
+        public void Revoke_RejectsNonESignatureDoctor()
+        {
+            Assert.IsFalse(TilakaRegistrationActionRules.CanRevoke(
+                Record(), TilakaRegistrationState.Aktif, false));
+            Assert.IsTrue(TilakaRegistrationActionRules.CanRevoke(
+                Record(), TilakaRegistrationState.Aktif, true));
+        }
     }
 }

@@ -1892,6 +1892,7 @@
     <Content Include="Document\2026\11\20\08.INSERT_INTO_AppProgram_TilakaQuickSign.sql" />
     <Content Include="Document\2026\11\24\01.ALTER_TABLE_TilakaCasemixFile.sql" />
     <Content Include="Document\2026\11\26\01.ALTER_TABLE_TilakaRegistration_CertificateDataStatus.sql" />
+    <Content Include="Document\2026\11\27\02.ALTER_TABLE_TilakaRegistration_Revoke.sql" />
     <Content Include="Document\Tilaka\tilaka_flow.html" />
     <Content Include="Document\Tilaka\QuickSign-Checklist.md" />
     <Content Include="Document\Admedika\CANCEL_OPEN_CLAIMS_TXN.pdf" />

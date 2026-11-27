@@ -29,10 +29,32 @@ namespace Temiang.Avicenna.Common.Tilaka
                 if (string.IsNullOrWhiteSpace(status))
                     return Fail("Status revoke tidak ditemukan.");
 
+                if (!string.Equals(record.RevokeStatus,
+                        TilakaConstant.RevokeStatus.Requested,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    if (string.Equals(record.RevokeStatus,
+                            TilakaConstant.RevokeStatus.Success,
+                            StringComparison.OrdinalIgnoreCase))
+                        return new TilakaWebviewReturnResult
+                        {
+                            IsSuccess = true,
+                            Message = "Revoke sertifikat sudah berhasil."
+                        };
+
+                    return Fail("Tidak ada pengajuan revoke yang sedang diproses.");
+                }
+
+                if (string.IsNullOrWhiteSpace(revokeId)
+                    || string.IsNullOrWhiteSpace(record.RevokeRequestID)
+                    || !string.Equals(revokeId, record.RevokeRequestID,
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    return Fail("ID revoke tidak cocok dengan pengajuan.");
+                }
+
                 var now = DateTime.Now;
                 record.RevokeCompletedDateTime = now;
-                if (!string.IsNullOrWhiteSpace(revokeId))
-                    record.RevokeRequestID = revokeId;
                 record.LastCheckedDateTime = now;
                 record.LastCheckSource = TilakaConstant.LogSource.Revoke;
 
@@ -82,8 +104,9 @@ namespace Temiang.Avicenna.Common.Tilaka
 
         private static bool IsSuccess(string status)
         {
-            return string.Equals(status, "Sukses", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(status, "Success", StringComparison.OrdinalIgnoreCase);
+            var normalized = (status ?? string.Empty).Trim();
+            return string.Equals(normalized, "Sukses", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(normalized, "Success", StringComparison.OrdinalIgnoreCase);
         }
 
         private static TilakaWebviewReturnResult Fail(string message)

@@ -79,7 +79,8 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 TilakaName = "anita001",
                 CertificateStatus = TilakaConstant.CertificateStatus.Active,
                 CertificateExpiryDate = DateTime.Now.AddDays(30),
-                RevokeStatus = TilakaConstant.RevokeStatus.Requested
+                RevokeStatus = TilakaConstant.RevokeStatus.Requested,
+                RevokeRequestID = "rev-1"
             };
         }
 
@@ -185,6 +186,57 @@ namespace Temiang.Avicenna.Tests.Tilaka
                 repository.Record.CertificateDataStatus);
             Assert.AreEqual(TilakaRegistrationState.Dicabut,
                 TilakaRegistrationState.Evaluate(repository.Record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void NeverRequested_DoesNotRevoke()
+        {
+            var repository = new FakeRepository { Record = Record() };
+            repository.Record.RevokeStatus = null;
+            var handler = new TilakaRevokeReturnHandler(
+                repository, CreateService(new FakeTransport()));
+
+            var result = handler.Process("uuid-1", "rev-1", "Sukses");
+
+            Assert.IsFalse(result.IsSuccess);
+            Assert.IsNull(repository.Record.CertificateDataStatus);
+            Assert.AreEqual(TilakaRegistrationState.Aktif,
+                TilakaRegistrationState.Evaluate(repository.Record, DateTime.Now));
+            Assert.AreEqual(0, repository.SaveCalls);
+        }
+
+        [TestMethod]
+        public void MismatchedRevokeId_DoesNotRevoke()
+        {
+            var repository = new FakeRepository { Record = Record() };
+            var handler = new TilakaRevokeReturnHandler(
+                repository, CreateService(new FakeTransport()));
+
+            var result = handler.Process("uuid-1", "rev-other", "Sukses");
+
+            Assert.IsFalse(result.IsSuccess);
+            Assert.IsNull(repository.Record.CertificateDataStatus);
+            Assert.AreEqual(0, repository.SaveCalls);
+        }
+
+        [TestMethod]
+        public void FailedAfterSuccess_DoesNotDowngrade()
+        {
+            var repository = new FakeRepository { Record = Record() };
+            repository.Record.RevokeStatus = TilakaConstant.RevokeStatus.Success;
+            repository.Record.CertificateDataStatus = TilakaConstant.CertificateDataStatus.Revoke;
+            repository.Record.RegistrationState = TilakaRegistrationState.Dicabut;
+            var handler = new TilakaRevokeReturnHandler(
+                repository, CreateService(new FakeTransport()));
+
+            var result = handler.Process("uuid-1", "rev-1", "Gagal");
+
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(TilakaConstant.RevokeStatus.Success,
+                repository.Record.RevokeStatus);
+            Assert.AreEqual(TilakaConstant.CertificateDataStatus.Revoke,
+                repository.Record.CertificateDataStatus);
+            Assert.AreEqual(0, repository.SaveCalls);
         }
     }
 }

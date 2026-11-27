@@ -308,6 +308,7 @@
     <Compile Include="Tilaka\Service.RevokeCertificate.cs" />
     <Compile Include="Tilaka\TilakaRevokeResponseData.cs" />
     <Compile Include="Tilaka\TilakaRevokeReturnHandler.cs" />
+    <Compile Include="Tilaka\TilakaWebviewRequest.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRecord.cs" />
     <Compile Include="Tilaka\ITilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRepository.cs" />

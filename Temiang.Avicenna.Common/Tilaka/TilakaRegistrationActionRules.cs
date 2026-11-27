@@ -18,5 +18,11 @@ namespace Temiang.Avicenna.Common.Tilaka
                        TilakaConstant.RevokeStatus.Success,
                        StringComparison.OrdinalIgnoreCase);
         }
+
+        public static bool CanRevoke(TilakaRegistrationRecord record, string state,
+            bool isUsingESignature)
+        {
+            return isUsingESignature && CanRevoke(record, state);
+        }
     }
 }

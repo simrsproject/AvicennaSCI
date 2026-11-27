@@ -41,11 +41,18 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 return;
             }
 
+            if (paramedic.IsUsingESignature != true)
+            {
+                DisableOk("Dokter ini tidak menggunakan tanda tangan elektronik.");
+                return;
+            }
+
             var repository = new TilakaRegistrationRepository();
             var record = repository.FindLatest(
                 TilakaConstant.RelatedType.Paramedic, ParamedicID);
             var state = TilakaRegistrationState.Evaluate(record, DateTime.Now);
-            if (!TilakaRegistrationActionRules.CanRevoke(record, state))
+            if (!TilakaRegistrationActionRules.CanRevoke(
+                    record, state, paramedic.IsUsingESignature == true))
             {
                 DisableOk("Sertifikat tidak dalam status Aktif.");
                 return;
@@ -89,11 +96,17 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             if (!chkConfirm.Checked)
                 return Fail("Konfirmasi revoke wajib dicentang.");
 
+            var paramedic = new Paramedic();
+            if (!paramedic.LoadByPrimaryKey(ParamedicID)
+                || paramedic.IsUsingESignature != true)
+                return Fail("Dokter ini tidak menggunakan tanda tangan elektronik.");
+
             var repository = new TilakaRegistrationRepository();
             var record = repository.FindLatest(
                 TilakaConstant.RelatedType.Paramedic, ParamedicID);
             var state = TilakaRegistrationState.Evaluate(record, DateTime.Now);
-            if (!TilakaRegistrationActionRules.CanRevoke(record, state))
+            if (!TilakaRegistrationActionRules.CanRevoke(
+                    record, state, paramedic.IsUsingESignature == true))
                 return Fail("Sertifikat tidak dalam status Aktif.");
 
             if (string.IsNullOrWhiteSpace(record.RegistrationRequestID))

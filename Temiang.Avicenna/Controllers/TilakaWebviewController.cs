@@ -23,13 +23,10 @@ namespace Temiang.Avicenna.Controllers
                 });
             }
 
-            var requestId = Request.QueryString["request_id"];
-
-            if (string.IsNullOrWhiteSpace(requestId))
-                requestId = Request.QueryString["request-id"];
-
-            if (string.IsNullOrWhiteSpace(requestId))
-                requestId = Request.QueryString["register_id"];
+            var requestId = TilakaWebviewRequest.ResolveRequestId(
+                Request.QueryString["request_id"],
+                Request.QueryString["request-id"],
+                Request.QueryString["register_id"]);
 
             var service = new Service();
             var repository = new TilakaRegistrationRepository();
@@ -39,7 +36,7 @@ namespace Temiang.Avicenna.Controllers
                 || !string.IsNullOrWhiteSpace(Request.QueryString["revoke_id"]))
             {
                 var revokeResult = new TilakaRevokeReturnHandler(repository, service).Process(
-                    Request.QueryString["request_id"],
+                    requestId,
                     Request.QueryString["revoke_id"],
                     Request.QueryString["status"]);
 

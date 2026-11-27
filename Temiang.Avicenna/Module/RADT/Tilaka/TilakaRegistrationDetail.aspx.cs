@@ -123,8 +123,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 ? TilakaUrls.ChangeMfaWebview(config, record.TilakaName)
                 : string.Empty;
 
-            var canRevoke = isUsingESignature
-                && TilakaRegistrationActionRules.CanRevoke(record, state);
+            var canRevoke = TilakaRegistrationActionRules.CanRevoke(
+                record, state, isUsingESignature);
 
             btnRevoke.Visible = canRevoke;
             hfRevokeUrl.Value = canRevoke
