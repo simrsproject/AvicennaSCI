@@ -78,5 +78,16 @@ namespace Temiang.Avicenna.Tests.Tilaka
             Assert.IsFalse(result.IsOk);
             Assert.IsFalse(string.IsNullOrEmpty(result.TechnicalError));
         }
+
+        [TestMethod]
+        public void Parse_RequestRevokeCertificate_ReadsDataArray()
+        {
+            var json = "{\"success\":true,\"message\":\"ok\",\"data\":[\"rev-1\",\"https://sb-api.tilaka.id/personal-webview/kyc/revoke?revoke_id=rev-1\"]}";
+            var result = TilakaResponseParser.Parse<RequestRevokeCertificateResponse>(json, 200);
+
+            Assert.IsTrue(result.IsOk);
+            Assert.AreEqual(2, result.Data.Length);
+            Assert.AreEqual("rev-1", result.Data[0]);
+        }
     }
 }

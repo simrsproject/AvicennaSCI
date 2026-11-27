@@ -194,5 +194,24 @@ namespace Temiang.Avicenna.Tests.Tilaka
             Assert.IsFalse(ok);
             Assert.AreEqual("Sertifikat tidak ditemukan", message);
         }
+
+        [TestMethod]
+        public void RequestRevokeCertificate_PostsUserAndReason()
+        {
+            var transport = new FakeTransport
+            {
+                JsonResponse = "{\"success\":true,\"message\":\"request revoke sertifikat berhasil\",\"data\":[\"rev-1\",\"https://sb-api.tilaka.id/personal-webview/kyc/revoke?revoke_id=rev-1\"]}"
+            };
+            var service = new Temiang.Avicenna.Common.Tilaka.Service(
+                Config(), transport, new NullTilakaLogger());
+
+            var result = service.RequestRevokeCertificate("anita001", "Resign");
+
+            Assert.IsTrue(result.IsOk);
+            StringAssert.Contains(transport.LastJsonUrl, "/requestRevokeCertificate");
+            StringAssert.Contains(transport.LastJsonBody, "\"user_identifier\":\"anita001\"");
+            StringAssert.Contains(transport.LastJsonBody, "\"reason\":\"Resign\"");
+            Assert.AreEqual("rev-1", result.Data[0]);
+        }
     }
 }

@@ -283,6 +283,7 @@
     <Compile Include="Tilaka\TilakaResponse.cs" />
     <Compile Include="Tilaka\Request\RegisterForKycCheckRequest.cs" />
     <Compile Include="Tilaka\Response\CheckCertStatusResponse.cs" />
+    <Compile Include="Tilaka\Response\RequestRevokeCertificateResponse.cs" />
     <Compile Include="Tilaka\Response\GenerateUuidResponse.cs" />
     <Compile Include="Tilaka\Response\RegisterForKycCheckResponse.cs" />
     <Compile Include="Tilaka\Response\TilakaCertificate.cs" />
@@ -304,6 +305,8 @@
     <Compile Include="Tilaka\Service.Auth.cs" />
     <Compile Include="Tilaka\Service.Registration.cs" />
     <Compile Include="Tilaka\Service.Certificate.cs" />
+    <Compile Include="Tilaka\Service.RevokeCertificate.cs" />
+    <Compile Include="Tilaka\TilakaRevokeResponseData.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRecord.cs" />
     <Compile Include="Tilaka\ITilakaRegistrationRepository.cs" />
     <Compile Include="Tilaka\TilakaRegistrationRepository.cs" />
