@@ -189,6 +189,20 @@ namespace Temiang.Avicenna.Tests.Tilaka
         }
 
         [TestMethod]
+        public void StatusWithWhitespace_IsSuccess()
+        {
+            var repository = new FakeRepository { Record = Record() };
+            var handler = new TilakaRevokeReturnHandler(
+                repository, CreateService(new FakeTransport()));
+
+            var result = handler.Process("uuid-1", "rev-1", "Sukses ");
+
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(TilakaConstant.RevokeStatus.Success,
+                repository.Record.RevokeStatus);
+        }
+
+        [TestMethod]
         public void NeverRequested_DoesNotRevoke()
         {
             var repository = new FakeRepository { Record = Record() };
