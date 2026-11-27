@@ -61,6 +61,9 @@
             <td class="entry">
                 <telerik:RadAsyncUpload ID="uplKtp" runat="server" ControlObjectsVisibility="None"
                     AllowedFileExtensions=".jpg,.jpeg,.png" MaxFileSize="2097152" />
+                <span style="margin-left: 8px; color: #666; font-size: 11px;">
+                    Maks. upload 2 MB (JPG/PNG)
+                </span>
                 <asp:Image ID="imgKtp" runat="server" Width="320" Visible="false" />
             </td>
         <td width="20"></td><td></td></tr>
