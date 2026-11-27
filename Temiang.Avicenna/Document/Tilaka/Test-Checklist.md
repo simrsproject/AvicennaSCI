@@ -7,7 +7,8 @@ langkah dijalankan oleh operator di server uji.
 - Lingkungan: sandbox Tilaka (`https://sb-api.tilaka.id`) — **jangan** memakai channel produksi.
 - Host uji: `https://<host>` (ganti dengan domain server uji yang dapat diakses internet).
 - Database uji: jalankan skrip `Temiang.Avicenna/Document/2026/11/20/01.CREATE_TABLE_TilakaRegistration.sql`,
-  `02.ALTER_TABLE_Paramedic.sql`, dan `03.INSERT_INTO_AppProgram_Tilaka.sql` secara berurutan.
+  `02.ALTER_TABLE_Paramedic.sql`, `03.INSERT_INTO_AppProgram_Tilaka.sql`, dan
+  `Temiang.Avicenna/Document/2026/11/27/02.ALTER_TABLE_TilakaRegistration_Revoke.sql` secara berurutan.
 - Entity `Temiang.Avicenna.BusinessObject/Generated/TilakaRegistration.cs` dan kolom
   `Paramedic.NamaKTP` disediakan oleh pemilik repo (tidak dibuat ulang di sini).
 
@@ -74,10 +75,11 @@ icacls "C:\Tilaka\TilakaConsent.txt" /grant "IIS APPPOOL\<AppPoolName>:(R)"
 - [ ] Callback certificate status: `https://<host>/TilakaCallback/CertificateStatus`
 - [ ] Redirect webview: `https://<host>/TilakaWebview/Return`
 
-Catatan redirect: `TilakaUrls` mengirim `redirect_url` **persis seperti nilai konfigurasi**, tanpa
-menambahkan `request-id`. Menurut PRD Tilaka §6.3, Tilaka yang menambahkan parameter `request-id`
-(dan `tilaka-name`) ke URL redirect tersebut saat webview selesai. Halaman
-`TilakaWebview/Return` mewajibkan `?request-id=`; bila parameter tidak ada, halaman menampilkan
+Catatan redirect: untuk registrasi/aktivasi, `TilakaUrls` mengirim `redirect_url` **persis seperti
+nilai konfigurasi**, tanpa menambahkan `request-id`; Tilaka yang menambahkan parameter tersebut saat
+webview selesai. Untuk **Ganti MFA**, Avicenna menambahkan `?mode=mfa`. Untuk **Revoke**, Avicenna
+menambahkan `?mode=revoke&request_id=<RegistrationRequestID>`. Halaman `TilakaWebview/Return`
+mewajibkan `request_id` untuk registrasi/revoke; bila parameter tidak ada, halaman menampilkan
 "Parameter request-id tidak ditemukan." — dalam kasus itu gunakan tombol **Cek Status** di halaman
 detail (lihat 5.1).
 
@@ -358,10 +360,34 @@ sekali lagi dengan `ConvertFrom-Json` sebelum membaca field.
 
 ---
 
+## 7. Change MFA
+
+- [ ] Buka detail dokter dengan state `Aktif` dan `TilakaName` terisi.
+- [ ] Tombol **Ganti MFA** tampil.
+- [ ] Klik tombol; tab baru membuka `/personal-webview/login?setting=2...`.
+- [ ] URL berisi `tilaka_name`, `channel_id`, dan `redirect_url` dengan `mode=mfa`.
+- [ ] Setelah webview ditutup, tidak ada perubahan pada `TilakaRegistration`.
+- [ ] Halaman return menampilkan pesan bahwa proses MFA harus diselesaikan di Tilaka.
+
+## 8. Revoke Certificate
+
+- [ ] Buka detail dokter dengan state `Aktif`.
+- [ ] Tombol **Revoke Sertifikat** tampil.
+- [ ] Dialog menampilkan dokter, Tilaka Name, nomor sertifikat, dan 10 alasan resmi.
+- [ ] Submit tanpa alasan atau tanpa centang konfirmasi ditolak.
+- [ ] Submit valid menghasilkan `RevokeStatus=Requested` dan `RevokeRequestID` terisi.
+- [ ] Webview liveness revoke terbuka di tab baru.
+- [ ] Liveness sukses menghasilkan `RevokeStatus=Success`, `CertificateDataStatus=Revoke`, `RegistrationState=Dicabut`.
+- [ ] Liveness gagal menghasilkan `RevokeStatus=Failed` dan state tetap `Aktif`.
+- [ ] Dokter yang sudah `Dicabut` tidak eligible untuk Quick Sign.
+- [ ] `checkcertstatus` yang terlambat mengembalikan `Aktif` tidak mengubah state `Dicabut`.
+
+---
+
 ## Known limitations / follow-ups
 
-- **Belum ada UI revoke/re-enroll** pada fase ini. Pencabutan sertifikat dan pendaftaran ulang harus
-  dilakukan manual di portal Tilaka; aplikasi hanya menampilkan state `Dicabut` bila datanya ada.
+- **UI revoke sudah tersedia** untuk admin/HR pada halaman detail dokter. Pendaftaran ulang tetap
+  memakai tombol **Re-enroll Sertifikat**; aplikasi tidak menghapus data historis.
 - **Quick Sign tidak termasuk** dalam fase ini (hanya registrasi & aktivasi regular).
 - **WNA belum ada di UI**: form hanya memakai data KTP WNI (`NamaKTP`, NIK, foto KTP). Alur paspor/WNA
   belum disediakan.
