@@ -92,6 +92,43 @@ namespace Temiang.Avicenna.Common.Tilaka
             return config.BaseUrl + "/personal-webview/kyc/re-enroll" + BuildQuery(query);
         }
 
+        public static string RequestRevokeCertificate(TilakaConfig config)
+        {
+            return config.BaseUrl + "/requestRevokeCertificate";
+        }
+
+        public static string ChangeMfaWebview(TilakaConfig config, string tilakaName)
+        {
+            var query = new Dictionary<string, string>();
+            query["setting"] = "2";
+            AddIfAny(query, "tilaka_name", tilakaName);
+            AddIfAny(query, "channel_id", config.ChannelId);
+            AddIfAny(query, "redirect_url", WebviewRedirect(config, "mfa", null));
+            return config.BaseUrl + "/personal-webview/login" + BuildQuery(query);
+        }
+
+        public static string WebviewRedirect(TilakaConfig config, string mode, string requestId)
+        {
+            var url = config.WebviewRedirectUrl;
+            if (string.IsNullOrWhiteSpace(url)) return string.Empty;
+
+            var query = new Dictionary<string, string>();
+            AddIfAny(query, "mode", mode);
+            AddIfAny(query, "request_id", requestId);
+            if (query.Count == 0) return url;
+
+            return url + (url.Contains("?") ? "&" : "?") + BuildQuery(query).TrimStart('?');
+        }
+
+        public static string AppendRedirectUrl(string url, string redirectUrl)
+        {
+            if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(redirectUrl))
+                return url;
+
+            return url + (url.Contains("?") ? "&" : "?")
+                + "redirect_url=" + System.Uri.EscapeDataString(redirectUrl);
+        }
+
         private static void AddIfAny(IDictionary<string, string> query, string key, string value)
         {
             if (!string.IsNullOrWhiteSpace(value)) query[key] = value;

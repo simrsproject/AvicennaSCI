@@ -120,5 +120,57 @@ namespace Temiang.Avicenna.Tests.Tilaka
             StringAssert.Contains(url, "setting=1");
             StringAssert.Contains(url, "channel_id=chan-1");
         }
+
+        [TestMethod]
+        public void ChangeMfaWebview_UsesSettingTwoAndRedirectModeMfa()
+        {
+            var config = Config();
+            config.WebviewRedirectUrl = "https://rs.example/TilakaWebview/Return";
+
+            var url = TilakaUrls.ChangeMfaWebview(config, "anita 001");
+
+            StringAssert.StartsWith(url, "https://sb-api.tilaka.id/personal-webview/login?");
+            StringAssert.Contains(url, "setting=2");
+            StringAssert.Contains(url, "tilaka_name=anita%20001");
+            StringAssert.Contains(url, "channel_id=chan-1");
+            StringAssert.Contains(
+                url,
+                "redirect_url=https%3A%2F%2Frs.example%2FTilakaWebview%2FReturn%3Fmode%3Dmfa");
+        }
+
+        [TestMethod]
+        public void WebviewRedirect_AppendsModeAndRequestIdToExistingQuery()
+        {
+            var config = Config();
+            config.WebviewRedirectUrl = "https://rs.example/TilakaWebview/Return?a=1";
+
+            var url = TilakaUrls.WebviewRedirect(config, "revoke", "uuid-1");
+
+            StringAssert.Contains(url, "a=1");
+            StringAssert.Contains(url, "mode=revoke");
+            StringAssert.Contains(url, "request_id=uuid-1");
+        }
+
+        [TestMethod]
+        public void AppendRedirectUrl_EncodesRedirectUrl()
+        {
+            var url = TilakaUrls.AppendRedirectUrl(
+                "https://sb-api.tilaka.id/personal-webview/kyc/revoke?revoke_id=rev-1",
+                "https://rs.example/TilakaWebview/Return?mode=revoke&request_id=uuid-1");
+
+            Assert.AreEqual(
+                "https://sb-api.tilaka.id/personal-webview/kyc/revoke?revoke_id=rev-1" +
+                "&redirect_url=https%3A%2F%2Frs.example%2FTilakaWebview%2FReturn" +
+                "%3Fmode%3Drevoke%26request_id%3Duuid-1",
+                url);
+        }
+
+        [TestMethod]
+        public void RequestRevokeCertificate_UsesBaseUrl()
+        {
+            Assert.AreEqual(
+                "https://sb-api.tilaka.id/requestRevokeCertificate",
+                TilakaUrls.RequestRevokeCertificate(Config()));
+        }
     }
 }
