@@ -71,6 +71,10 @@
         </table>
     </cc:CollapsePanel>
 
+    <div style="text-align: right;">
+        <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
+    </div>
+
     <telerik:RadGrid ID="grdList" runat="server" AllowPaging="False"
         OnNeedDataSource="grdList_NeedDataSource">
         <MasterTableView AutoGenerateColumns="false" DataKeyNames="Email"
@@ -87,6 +91,4 @@
             </Columns>
         </MasterTableView>
     </telerik:RadGrid>
-
-    <asp:Literal ID="lblMessage" runat="server" EnableViewState="false" />
 </asp:Content>
