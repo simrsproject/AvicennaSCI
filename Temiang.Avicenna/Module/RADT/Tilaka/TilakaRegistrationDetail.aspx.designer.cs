@@ -38,9 +38,19 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         protected global::System.Web.UI.WebControls.HiddenField hfChangeMfaUrl;
 
         /// <summary>
+        /// hfRevokeUrl control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.HiddenField hfRevokeUrl;
+
+        /// <summary>
         /// winConsent control.
         /// </summary>
         protected global::Telerik.Web.UI.RadWindow winConsent;
+
+        /// <summary>
+        /// winRevoke control.
+        /// </summary>
+        protected global::Telerik.Web.UI.RadWindow winRevoke;
 
         /// <summary>
         /// lblParamedicName control.
@@ -126,6 +136,11 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
         /// btnChangeMfa control.
         /// </summary>
         protected global::System.Web.UI.WebControls.Button btnChangeMfa;
+
+        /// <summary>
+        /// btnRevoke control.
+        /// </summary>
+        protected global::System.Web.UI.WebControls.Button btnRevoke;
 
         /// <summary>
         /// lblMessage control.

@@ -123,6 +123,14 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
                 ? TilakaUrls.ChangeMfaWebview(config, record.TilakaName)
                 : string.Empty;
 
+            var canRevoke = isUsingESignature
+                && TilakaRegistrationActionRules.CanRevoke(record, state);
+
+            btnRevoke.Visible = canRevoke;
+            hfRevokeUrl.Value = canRevoke
+                ? "TilakaRevokeDialog.aspx?paramedicId=" + Server.UrlEncode(ParamedicID)
+                : string.Empty;
+
             ConfigureConsent(config);
 
             if (!isUsingESignature)
@@ -211,6 +219,8 @@ namespace Temiang.Avicenna.Module.RADT.Tilaka
             btnCekStatus.Visible = false;
             btnChangeMfa.Visible = false;
             hfChangeMfaUrl.Value = string.Empty;
+            btnRevoke.Visible = false;
+            hfRevokeUrl.Value = string.Empty;
         }
 
         private static string BuildWebviewUrl(TilakaConfig config, TilakaRegistrationRecord record, string state)

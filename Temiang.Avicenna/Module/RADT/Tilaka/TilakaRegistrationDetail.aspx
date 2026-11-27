@@ -18,6 +18,22 @@
                 return false;
             }
 
+            function openRevoke() {
+                var url = document.getElementById('<%= hfRevokeUrl.ClientID %>').value;
+                if (url) {
+                    var oWnd = $find("<%= winRevoke.ClientID %>");
+                    if (oWnd) {
+                        oWnd.setUrl(url);
+                        oWnd.show();
+                    }
+                }
+                return false;
+            }
+
+            function onRevokeClosed(sender, args) {
+                window.location.reload();
+            }
+
             function openConsent() {
                 var panel = document.getElementById('<%= pnlConsent.ClientID %>');
                 if (panel) panel.style.display = 'block';
@@ -34,9 +50,15 @@
         Modal="true" VisibleStatusbar="False" Title="Persetujuan Tilaka"
         NavigateUrl="TilakaConsentHandler.ashx" />
 
+    <telerik:RadWindow ID="winRevoke" runat="server" Animation="None"
+        Behavior="Close,Move,Resize" Width="620px" Height="480px"
+        Modal="true" VisibleStatusbar="False" Title="Revoke Sertifikat"
+        OnClientClose="onRevokeClosed" />
+
     <asp:HiddenField ID="hfWebviewUrl" runat="server" />
     <asp:HiddenField ID="hfParamedicID" runat="server" />
     <asp:HiddenField ID="hfChangeMfaUrl" runat="server" />
+    <asp:HiddenField ID="hfRevokeUrl" runat="server" />
 
     <table width="100%">
         <tr>
@@ -98,6 +120,8 @@
         <asp:Button ID="btnCekStatus" runat="server" Text="Cek Status" OnClick="btnCekStatus_OnClick" />
         <asp:Button ID="btnChangeMfa" runat="server" Text="Ganti MFA"
             OnClientClick="return openChangeMfa();" />
+        <asp:Button ID="btnRevoke" runat="server" Text="Revoke Sertifikat"
+            OnClientClick="return openRevoke();" />
     </div>
     <br />
     <br />

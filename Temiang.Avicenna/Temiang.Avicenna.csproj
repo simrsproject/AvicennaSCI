@@ -24332,6 +24332,13 @@
     <Compile Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx.designer.cs">
       <DependentUpon>TilakaRegistrationDetail.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaRevokeDialog.aspx.cs">
+      <DependentUpon>TilakaRevokeDialog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Module\RADT\Tilaka\TilakaRevokeDialog.aspx.designer.cs">
+      <DependentUpon>TilakaRevokeDialog.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx.cs">
       <DependentUpon>TilakaKtpImageHandler.ashx</DependentUpon>
     </Compile>
@@ -25504,6 +25511,7 @@
     <Content Include="Module\RADT\Master\ImageTemplate\ImageTemplateSearch.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationList.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaRegistrationDetail.aspx" />
+    <Content Include="Module\RADT\Tilaka\TilakaRevokeDialog.aspx" />
     <Content Include="Module\RADT\Tilaka\TilakaKtpImageHandler.ashx" />
     <Content Include="Module\RADT\Tilaka\TilakaConsentHandler.ashx" />
     <Content Include="Module\RADT\Tilaka\TilakaCasemixFileList.aspx" />
