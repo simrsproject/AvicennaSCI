@@ -88,6 +88,8 @@ namespace Temiang.Avicenna.Common.Tilaka
                     }
                 }
 
+                record.CertificateStatus = TilakaConstant.CertificateStatus.None;
+                record.CertificateStatusInfo = "Belum memiliki sertifikat";
                 _repository.Save(record);
 
                 return new TilakaWebviewReturnResult

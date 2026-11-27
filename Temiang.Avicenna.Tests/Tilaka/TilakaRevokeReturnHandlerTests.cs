@@ -182,6 +182,34 @@ namespace Temiang.Avicenna.Tests.Tilaka
 
             handler.Process("uuid-1", "rev-1", "Sukses");
 
+            Assert.AreEqual(TilakaConstant.CertificateStatus.None,
+                repository.Record.CertificateStatus);
+            Assert.AreEqual("Belum memiliki sertifikat",
+                repository.Record.CertificateStatusInfo);
+            Assert.AreEqual(TilakaConstant.CertificateDataStatus.Revoke,
+                repository.Record.CertificateDataStatus);
+            Assert.AreEqual(TilakaRegistrationState.Dicabut,
+                TilakaRegistrationState.Evaluate(repository.Record, DateTime.Now));
+        }
+
+        [TestMethod]
+        public void SuccessStatus_CheckStatusFailure_StillSetsRawStatusNone()
+        {
+            var repository = new FakeRepository { Record = Record() };
+            var transport = new FakeTransport
+            {
+                CertificateJson = "{\"success\":false,\"message\":\"gagal\",\"data\":null}"
+            };
+            var handler = new TilakaRevokeReturnHandler(
+                repository, CreateService(transport));
+
+            var result = handler.Process("uuid-1", "rev-1", "Sukses");
+
+            Assert.IsTrue(result.IsSuccess);
+            Assert.AreEqual(TilakaConstant.CertificateStatus.None,
+                repository.Record.CertificateStatus);
+            Assert.AreEqual("Belum memiliki sertifikat",
+                repository.Record.CertificateStatusInfo);
             Assert.AreEqual(TilakaConstant.CertificateDataStatus.Revoke,
                 repository.Record.CertificateDataStatus);
             Assert.AreEqual(TilakaRegistrationState.Dicabut,
